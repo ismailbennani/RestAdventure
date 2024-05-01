@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Server.Authentication;
+namespace GameApi.Authentication;
 
 class AuthenticationResult
 {

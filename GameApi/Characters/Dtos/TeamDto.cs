@@ -1,4 +1,4 @@
-﻿namespace Server.Characters.Dtos;
+﻿namespace GameApi.Characters.Dtos;
 
 /// <summary>
 ///     Team of characters

@@ -1,8 +1,8 @@
 ﻿using Core.Players;
-using Server.Persistence;
+using Kernel.Persistence;
 using Xtensive.Orm;
 
-namespace Server.Authentication;
+namespace GameApi.Authentication;
 
 class PlayerAuthenticationService
 {

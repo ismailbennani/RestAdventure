@@ -1,8 +1,8 @@
 ﻿using NJsonSchema;
 
-namespace Server.OpenApi;
+namespace Kernel.OpenApi;
 
-class TypeNameWithoutDtoGenerator : ITypeNameGenerator
+public class TypeNameWithoutDtoGenerator : ITypeNameGenerator
 {
     readonly ITypeNameGenerator _generator;
 

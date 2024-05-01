@@ -4,6 +4,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{362B2200-2F45-4124-A5B8-B44257D8E074}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameApi", "GameApi\GameApi.csproj", "{44BFFE5E-C024-4C02-9FEF-6EAEB26E9280}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kernel", "Kernel\Kernel.csproj", "{9C56445C-4F3B-41B4-B0E6-740718872407}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +22,13 @@ Global
 		{362B2200-2F45-4124-A5B8-B44257D8E074}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{362B2200-2F45-4124-A5B8-B44257D8E074}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{362B2200-2F45-4124-A5B8-B44257D8E074}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44BFFE5E-C024-4C02-9FEF-6EAEB26E9280}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44BFFE5E-C024-4C02-9FEF-6EAEB26E9280}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44BFFE5E-C024-4C02-9FEF-6EAEB26E9280}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44BFFE5E-C024-4C02-9FEF-6EAEB26E9280}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C56445C-4F3B-41B4-B0E6-740718872407}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C56445C-4F3B-41B4-B0E6-740718872407}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C56445C-4F3B-41B4-B0E6-740718872407}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C56445C-4F3B-41B4-B0E6-740718872407}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

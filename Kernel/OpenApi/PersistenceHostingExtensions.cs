@@ -1,12 +1,17 @@
 ﻿using System.Reflection;
+using Kernel.Persistence;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Xtensive.Orm;
 using Xtensive.Orm.Configuration;
 
-namespace Server.Persistence;
+namespace Kernel.OpenApi;
 
-static class PersistenceHostingExtensions
+public static class PersistenceHostingExtensions
 {
-    public static async Task SetupPersistence(this WebApplicationBuilder builder, ILogger logger, params Assembly[] assembliesToLoad)
+    public static async Task SetupPersistence(this IHostApplicationBuilder builder, ILogger logger, params Assembly[] assembliesToLoad)
     {
         string connectionString = builder.Configuration.GetConnectionString("Main") ?? throw new InvalidOperationException("Missing connection string");
         DomainUpgradeMode? upgradeMode = ParseUpgradeMode(builder.Configuration["Persistence:UpgradeMode"]);

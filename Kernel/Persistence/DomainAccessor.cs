@@ -1,6 +1,6 @@
 ﻿using Xtensive.Orm;
 
-namespace Server.Persistence;
+namespace Kernel.Persistence;
 
 /// <summary>
 ///     Provide a reference to the <see cref="Domain" /> instance built at startup

@@ -1,24 +1,25 @@
 ﻿using System.Security.Claims;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 
-namespace Server.Authentication;
+namespace GameApi.Authentication;
 
-class ApiKeyAuthenticationOptions : AuthenticationSchemeOptions
+class GameApiAuthenticationOptions : AuthenticationSchemeOptions
 {
     public const string AuthenticationScheme = "ApiKey";
     public string TokenHeaderName { get; set; } = "Authorization";
 }
 
-class ApiKeyAuthenticationHandler : AuthenticationHandler<ApiKeyAuthenticationOptions>
+class GameApiAuthenticationHandler : AuthenticationHandler<GameApiAuthenticationOptions>
 {
     readonly PlayerAuthenticationService _authenticationService;
 
-    public ApiKeyAuthenticationHandler(
+    public GameApiAuthenticationHandler(
         PlayerAuthenticationService authenticationService,
-        IOptionsMonitor<ApiKeyAuthenticationOptions> options,
+        IOptionsMonitor<GameApiAuthenticationOptions> options,
         ILoggerFactory logger,
         UrlEncoder encoder
     ) : base(options, logger, encoder)

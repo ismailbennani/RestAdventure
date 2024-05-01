@@ -1,12 +1,10 @@
 using System.Reflection;
+using System.Text.RegularExpressions;
 using Core.Players;
-using NSwag;
-using NSwag.Generation.Processors.Security;
+using GameApi;
+using Kernel.OpenApi;
 using Serilog;
 using Serilog.Extensions.Logging;
-using Server.Authentication;
-using Server.OpenApi;
-using Server.Persistence;
 
 Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateBootstrapLogger();
 ILoggerFactory loggerFactory = new SerilogLoggerFactory(Log.Logger);
@@ -17,47 +15,62 @@ try
 
     WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-    await builder.SetupPersistence(loggerFactory.CreateLogger("Persistence"), typeof(PlayerDbo).Assembly);
+    await builder.SetupPersistence(loggerFactory.CreateLogger("Persistence"), typeof(GameApiHostingExtensions).Assembly, typeof(PlayerDbo).Assembly);
 
     builder.Services.AddSerilog();
-
-    builder.SetupApiKeyAuthentication();
-
     builder.Services.AddControllers();
+
+    builder.SetupGameApi();
+
     builder.Services.AddOpenApiDocument(
         settings =>
         {
-            settings.Title = "Rest Adventure - Game API";
-            settings.DocumentName = "game";
+            settings.Title = "Rest Adventure - API";
+            settings.DocumentName = "api";
             settings.Version = thisAssembly.GetName().Version!.ToString();
 
-            settings.SchemaSettings.TypeNameGenerator = new TypeNameWithoutDtoGenerator(settings.SchemaSettings.TypeNameGenerator);
-
-            settings.AddSecurity(
-                "api-key",
-                new OpenApiSecurityScheme
-                {
-                    Type = OpenApiSecuritySchemeType.ApiKey,
-                    Name = "Authorization",
-                    In = OpenApiSecurityApiKeyLocation.Header
-                }
-            );
-
-            settings.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("api-key"));
+            settings.OperationProcessors.Insert(0, new KeepOnlyControllersInAssemblyOperationProcessor(thisAssembly));
         }
     );
+
 
     WebApplication app = builder.Build();
 
     app.UseHttpsRedirection();
 
-    app.UseOpenApi();
-    app.UseSwaggerUi();
+    app.UseOpenApi(
+        settings =>
+        {
+            settings.PostProcess += (document, request) =>
+            {
+                Match match = OpenApiDocumentNameRegex().Match(request.Path);
+                if (!match.Success)
+                {
+                    return;
+                }
+
+                string documentName = match.Groups["name"].Value;
+                string? pathPrefix = documentName switch
+                {
+                    "game" => "/game",
+                    "api" => null,
+                    _ => null
+                };
+
+                document.BasePath = pathPrefix;
+            };
+        }
+    );
+    app.UseSwaggerUi(settings => { settings.TagsSorter = "alpha"; });
+
+    app.MapGameApi("/game");
+
+    app.UseRouting();
 
     app.UseAuthentication();
     app.UseAuthorization();
 
-    app.MapDefaultControllerRoute();
+    app.MapControllers();
 
     app.Run();
 }
@@ -68,4 +81,10 @@ catch (Exception ex)
 finally
 {
     Log.CloseAndFlush();
+}
+
+partial class Program
+{
+    [GeneratedRegex("swagger/(?<name>[^/]*)/swagger.json")]
+    private static partial Regex OpenApiDocumentNameRegex();
 }
