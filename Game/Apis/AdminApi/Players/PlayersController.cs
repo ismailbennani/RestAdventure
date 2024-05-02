@@ -24,7 +24,7 @@ public class PlayersController : ControllerBase
         PlayerRegistrationDto? registration = await _playerRegistrationService.RegisterPlayer(playerId);
         if (registration == null)
         {
-            return BadRequest($"Could not register player {playerId}");
+            return Problem($"Could not register player {playerId}", statusCode: StatusCodes.Status400BadRequest);
         }
 
         return registration;
@@ -39,7 +39,7 @@ public class PlayersController : ControllerBase
         PlayerRegistrationDto? registration = await _playerRegistrationService.GetRegistration(playerId);
         if (registration == null)
         {
-            return BadRequest($"Could not find registration of player {playerId}");
+            return Problem($"Could not find registration of player {playerId}", statusCode: StatusCodes.Status400BadRequest);
         }
 
         return registration;
@@ -55,7 +55,7 @@ public class PlayersController : ControllerBase
         PlayerRegistrationDto? newRegistration = await _playerRegistrationService.RefreshApiKey(playerId);
         if (newRegistration == null)
         {
-            return BadRequest($"Could not refresh registration of player {playerId}");
+            return Problem($"Could not refresh registration of player {playerId}", statusCode: StatusCodes.Status400BadRequest);
         }
 
         return newRegistration;

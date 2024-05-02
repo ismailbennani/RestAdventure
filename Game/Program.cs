@@ -5,6 +5,7 @@ using RestAdventure.Core.Players;
 using RestAdventure.Game.Apis.AdminApi;
 using RestAdventure.Game.Apis.GameApi;
 using RestAdventure.Game.Authentication;
+using RestAdventure.Game.Registration;
 using RestAdventure.Kernel.OpenApi;
 using Serilog;
 using Serilog.Extensions.Logging;
@@ -24,8 +25,9 @@ try
     builder.Services.AddControllers();
 
     SetupGameApiAuthentication(builder);
+    SetupOpenApiDocuments(builder);
 
-    SetupOpenApiDocument(builder);
+    builder.Services.AddSingleton<PlayerRegistrationService>();
 
     WebApplication app = builder.Build();
 
@@ -61,7 +63,7 @@ void SetupGameApiAuthentication(WebApplicationBuilder builder)
         .AddScheme<GameApiAuthenticationOptions, GameApiAuthenticationHandler>(GameApiAuthenticationOptions.AuthenticationScheme, options => { });
 }
 
-void SetupOpenApiDocument(WebApplicationBuilder builder)
+void SetupOpenApiDocuments(WebApplicationBuilder builder)
 {
     builder.Services.AddOpenApiDocument(
         settings =>
@@ -96,18 +98,6 @@ void SetupOpenApiDocument(WebApplicationBuilder builder)
 
             settings.OperationProcessors.Insert(0, new KeepOnlyControllersWithAttributeOperationProcessor(typeof(AdminApiAttribute)));
             settings.SchemaSettings.TypeNameGenerator = new TypeNameWithoutDtoGenerator(settings.SchemaSettings.TypeNameGenerator);
-
-            settings.AddSecurity(
-                "api-key",
-                new OpenApiSecurityScheme
-                {
-                    Type = OpenApiSecuritySchemeType.ApiKey,
-                    Name = "Authorization",
-                    In = OpenApiSecurityApiKeyLocation.Header
-                }
-            );
-
-            settings.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("api-key"));
         }
     );
 }
