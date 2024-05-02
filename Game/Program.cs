@@ -56,7 +56,6 @@ return;
 
 void SetupGameApiAuthentication(WebApplicationBuilder builder)
 {
-
     builder.Services.AddSingleton<PlayerAuthenticationService>();
     builder.Services.AddAuthentication(GameApiAuthenticationOptions.AuthenticationScheme)
         .AddScheme<GameApiAuthenticationOptions, GameApiAuthenticationHandler>(GameApiAuthenticationOptions.AuthenticationScheme, options => { });

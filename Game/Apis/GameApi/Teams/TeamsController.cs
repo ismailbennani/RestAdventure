@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RestAdventure.Game.Apis.GameApi.Teams.Dtos;
+using RestAdventure.Game.Authentication;
 
 namespace RestAdventure.Game.Apis.GameApi.Teams;
 
@@ -9,7 +10,7 @@ namespace RestAdventure.Game.Apis.GameApi.Teams;
 /// </summary>
 [Route("game/team")]
 [ApiController]
-[Authorize]
+[Authorize(AuthenticationSchemes = GameApiAuthenticationOptions.AuthenticationScheme)]
 [GameApi]
 public class TeamsController : ControllerBase
 {
