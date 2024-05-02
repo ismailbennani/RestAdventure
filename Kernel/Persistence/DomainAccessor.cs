@@ -1,6 +1,6 @@
 ﻿using Xtensive.Orm;
 
-namespace Kernel.Persistence;
+namespace RestAdventure.Kernel.Persistence;
 
 /// <summary>
 ///     Provide a reference to the <see cref="Domain" /> instance built at startup

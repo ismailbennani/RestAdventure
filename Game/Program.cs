@@ -1,9 +1,9 @@
 using System.Reflection;
-using Core.Players;
-using Game.Authentication;
-using Kernel.OpenApi;
 using NSwag;
 using NSwag.Generation.Processors.Security;
+using RestAdventure.Core.Players;
+using RestAdventure.Game.Authentication;
+using RestAdventure.Kernel.OpenApi;
 using Serilog;
 using Serilog.Extensions.Logging;
 

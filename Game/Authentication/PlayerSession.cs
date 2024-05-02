@@ -1,4 +1,4 @@
-﻿namespace Game.Authentication;
+﻿namespace RestAdventure.Game.Authentication;
 
 class PlayerSession
 {

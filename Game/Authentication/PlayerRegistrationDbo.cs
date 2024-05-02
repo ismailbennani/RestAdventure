@@ -1,7 +1,7 @@
-﻿using Core.Players;
+﻿using RestAdventure.Core.Players;
 using Xtensive.Orm;
 
-namespace Game.Authentication;
+namespace RestAdventure.Game.Authentication;
 
 [HierarchyRoot]
 class PlayerRegistrationDbo : Entity

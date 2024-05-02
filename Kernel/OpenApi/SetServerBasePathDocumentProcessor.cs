@@ -2,7 +2,7 @@
 using NSwag.Generation.Processors;
 using NSwag.Generation.Processors.Contexts;
 
-namespace Kernel.OpenApi;
+namespace RestAdventure.Kernel.OpenApi;
 
 public class SetServerBasePathDocumentProcessor : IDocumentProcessor
 {

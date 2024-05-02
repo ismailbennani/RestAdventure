@@ -1,6 +1,6 @@
 ﻿using NJsonSchema;
 
-namespace Kernel.OpenApi;
+namespace RestAdventure.Kernel.OpenApi;
 
 public class TypeNameWithoutDtoGenerator : ITypeNameGenerator
 {

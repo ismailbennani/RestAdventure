@@ -1,6 +1,6 @@
 ﻿using Xtensive.Orm;
 
-namespace Core.Players;
+namespace RestAdventure.Core.Players;
 
 [HierarchyRoot]
 public class PlayerDbo : Entity

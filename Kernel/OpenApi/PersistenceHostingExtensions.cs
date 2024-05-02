@@ -1,13 +1,13 @@
 ﻿using System.Reflection;
-using Kernel.Persistence;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using RestAdventure.Kernel.Persistence;
 using Xtensive.Orm;
 using Xtensive.Orm.Configuration;
 
-namespace Kernel.OpenApi;
+namespace RestAdventure.Kernel.OpenApi;
 
 public static class PersistenceHostingExtensions
 {

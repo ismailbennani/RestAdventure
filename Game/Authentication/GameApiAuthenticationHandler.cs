@@ -1,11 +1,10 @@
 ﻿using System.Security.Claims;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 
-namespace Game.Authentication;
+namespace RestAdventure.Game.Authentication;
 
 class GameApiAuthenticationOptions : AuthenticationSchemeOptions
 {

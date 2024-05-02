@@ -1,12 +1,10 @@
 ﻿using System.Reflection;
-using Game.Authentication;
-using Kernel.OpenApi;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
 using NSwag;
 using NSwag.Generation.Processors.Security;
+using RestAdventure.Game.Authentication;
+using RestAdventure.Kernel.OpenApi;
 
-namespace Game;
+namespace RestAdventure.Game;
 
 public static class GameApiHostingExtensions
 {

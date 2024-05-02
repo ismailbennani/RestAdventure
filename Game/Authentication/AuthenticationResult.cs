@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Game.Authentication;
+namespace RestAdventure.Game.Authentication;
 
 class AuthenticationResult
 {

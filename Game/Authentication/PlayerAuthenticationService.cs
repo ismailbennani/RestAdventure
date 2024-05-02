@@ -1,8 +1,8 @@
-﻿using Core.Players;
-using Kernel.Persistence;
+﻿using RestAdventure.Core.Players;
+using RestAdventure.Kernel.Persistence;
 using Xtensive.Orm;
 
-namespace Game.Authentication;
+namespace RestAdventure.Game.Authentication;
 
 class PlayerAuthenticationService
 {

@@ -1,16 +1,15 @@
-﻿using Game.Authentication;
-using Game.Characters.Dtos;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RestAdventure.Game.Characters.Dtos;
 
-namespace Game.Characters;
+namespace RestAdventure.Game.Characters;
 
 /// <summary>
 ///     Team
 /// </summary>
 [Route("team")]
 [ApiController]
-[Authorize(AuthenticationSchemes = GameApiAuthenticationOptions.AuthenticationScheme)]
+[Authorize]
 public class TeamsController : ControllerBase
 {
     /// <summary>
