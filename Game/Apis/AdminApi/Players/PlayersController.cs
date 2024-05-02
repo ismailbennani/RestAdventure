@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RestAdventure.Game.Registration;
 
-namespace RestAdventure.Game.Apis.AdminApi;
+namespace RestAdventure.Game.Apis.AdminApi.Players;
 
 [Route("admin/players")]
 [ApiController]
