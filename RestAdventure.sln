@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{362B2200-2F45-4124-A5B8-B44257D8E074}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameApi", "GameApi\GameApi.csproj", "{44BFFE5E-C024-4C02-9FEF-6EAEB26E9280}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Game", "Game\Game.csproj", "{44BFFE5E-C024-4C02-9FEF-6EAEB26E9280}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kernel", "Kernel\Kernel.csproj", "{9C56445C-4F3B-41B4-B0E6-740718872407}"
 EndProject

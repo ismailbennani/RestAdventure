@@ -1,12 +1,12 @@
 ﻿using System.Reflection;
-using GameApi.Authentication;
+using Game.Authentication;
 using Kernel.OpenApi;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using NSwag;
 using NSwag.Generation.Processors.Security;
 
-namespace GameApi;
+namespace Game;
 
 public static class GameApiHostingExtensions
 {

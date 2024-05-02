@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace GameApi.Diagnostics;
+namespace Game.Diagnostics;
 
 /// <summary>
 ///     Status

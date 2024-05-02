@@ -1,6 +1,6 @@
 using System.Reflection;
 using Core.Players;
-using GameApi.Authentication;
+using Game.Authentication;
 using Kernel.OpenApi;
 using NSwag;
 using NSwag.Generation.Processors.Security;

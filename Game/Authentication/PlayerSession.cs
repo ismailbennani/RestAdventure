@@ -1,4 +1,4 @@
-﻿namespace GameApi.Authentication;
+﻿namespace Game.Authentication;
 
 class PlayerSession
 {

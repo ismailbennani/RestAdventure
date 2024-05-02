@@ -1,9 +1,9 @@
-﻿using GameApi.Authentication;
-using GameApi.Characters.Dtos;
+﻿using Game.Authentication;
+using Game.Characters.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GameApi.Characters;
+namespace Game.Characters;
 
 /// <summary>
 ///     Team

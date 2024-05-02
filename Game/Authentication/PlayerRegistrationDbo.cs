@@ -1,7 +1,7 @@
 ﻿using Core.Players;
 using Xtensive.Orm;
 
-namespace GameApi.Authentication;
+namespace Game.Authentication;
 
 [HierarchyRoot]
 class PlayerRegistrationDbo : Entity

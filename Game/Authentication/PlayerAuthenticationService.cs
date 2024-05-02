@@ -2,7 +2,7 @@
 using Kernel.Persistence;
 using Xtensive.Orm;
 
-namespace GameApi.Authentication;
+namespace Game.Authentication;
 
 class PlayerAuthenticationService
 {
