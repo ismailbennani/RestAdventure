@@ -37,6 +37,36 @@ public class PlayerRegistrationService
         return registration.ToDto();
     }
 
+    public async Task<PlayerRegistrationDto?> GetRegistration(Guid playerId)
+    {
+        await using Session session = await _domainAccessor.Domain.OpenSessionAsync();
+        await using TransactionScope transaction = await session.OpenTransactionAsync();
+
+        PlayerRegistrationDbo? existingRegistration = await GetExistingPlayerRegistration(session, playerId);
+
+        return existingRegistration?.ToDto();
+    }
+
+    public async Task<PlayerRegistrationDto?> RefreshApiKey(Guid apiKey)
+    {
+        await using Session session = await _domainAccessor.Domain.OpenSessionAsync();
+        await using TransactionScope transaction = await session.OpenTransactionAsync();
+
+        PlayerRegistrationDbo? existingRegistration = await GetExistingPlayerRegistration(session, apiKey);
+        if (existingRegistration == null)
+        {
+            return null;
+        }
+
+        PlayerDbo player = existingRegistration.Player;
+        PlayerRegistrationDbo newRegistration = new(player);
+        existingRegistration.Remove();
+
+        transaction.Complete();
+
+        return newRegistration.ToDto();
+    }
+
     static async Task<PlayerRegistrationDbo?> GetExistingPlayerRegistration(Session session, Guid playerId) =>
         await session.Query.All<PlayerRegistrationDbo>().FirstOrDefaultAsync(r => r.Player.Id == playerId);
 

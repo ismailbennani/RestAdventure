@@ -17,6 +17,7 @@ class PlayerRegistrationDbo : Entity
     public Guid ApiKey { get; private set; }
 
     [Field]
+    [Association(OnTargetRemove = OnRemoveAction.Cascade)]
     public PlayerDbo Player { get; private set; }
 
     [Field]
