@@ -1,4 +1,4 @@
-﻿namespace RestAdventure.Game.Characters.Dtos;
+﻿namespace RestAdventure.Game.GameApi.Teams.Dtos;
 
 /// <summary>
 ///     Character

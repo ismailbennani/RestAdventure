@@ -1,13 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using RestAdventure.Game.Characters.Dtos;
+using RestAdventure.Game.GameApi.Teams.Dtos;
 
-namespace RestAdventure.Game.Characters;
+namespace RestAdventure.Game.GameApi.Teams;
 
 /// <summary>
 ///     Team
 /// </summary>
-[Route("team")]
+[Route("game/team")]
 [ApiController]
 [Authorize]
 public class TeamsController : ControllerBase
