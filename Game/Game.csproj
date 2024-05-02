@@ -23,7 +23,7 @@
     </ItemGroup>
 
     <PropertyGroup>
-        <MinVerTagPrefix>api-v</MinVerTagPrefix>
+        <MinVerTagPrefix>v</MinVerTagPrefix>
     </PropertyGroup>
 
 </Project>

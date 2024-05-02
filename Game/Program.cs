@@ -52,17 +52,17 @@ finally
 
 return;
 
-void SetupGameApiAuthentication(WebApplicationBuilder webApplicationBuilder)
+void SetupGameApiAuthentication(WebApplicationBuilder builder)
 {
 
-    webApplicationBuilder.Services.AddSingleton<PlayerAuthenticationService>();
-    webApplicationBuilder.Services.AddAuthentication(GameApiAuthenticationOptions.AuthenticationScheme)
+    builder.Services.AddSingleton<PlayerAuthenticationService>();
+    builder.Services.AddAuthentication(GameApiAuthenticationOptions.AuthenticationScheme)
         .AddScheme<GameApiAuthenticationOptions, GameApiAuthenticationHandler>(GameApiAuthenticationOptions.AuthenticationScheme, options => { });
 }
 
-void SetupOpenApiDocument(WebApplicationBuilder builder1)
+void SetupOpenApiDocument(WebApplicationBuilder builder)
 {
-    builder1.Services.AddOpenApiDocument(
+    builder.Services.AddOpenApiDocument(
         settings =>
         {
             settings.Title = "Rest Adventure - Game API";
