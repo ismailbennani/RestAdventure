@@ -1,12 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csproj", "{4C11F19A-1333-4C30-A231-F0D8CDBB3D38}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{362B2200-2F45-4124-A5B8-B44257D8E074}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameApi", "GameApi\GameApi.csproj", "{44BFFE5E-C024-4C02-9FEF-6EAEB26E9280}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kernel", "Kernel\Kernel.csproj", "{9C56445C-4F3B-41B4-B0E6-740718872407}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Apps", "Apps", "{97A732DC-539D-4E1F-841F-94054AD7EBED}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -14,10 +14,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{4C11F19A-1333-4C30-A231-F0D8CDBB3D38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4C11F19A-1333-4C30-A231-F0D8CDBB3D38}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4C11F19A-1333-4C30-A231-F0D8CDBB3D38}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4C11F19A-1333-4C30-A231-F0D8CDBB3D38}.Release|Any CPU.Build.0 = Release|Any CPU
 		{362B2200-2F45-4124-A5B8-B44257D8E074}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{362B2200-2F45-4124-A5B8-B44257D8E074}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{362B2200-2F45-4124-A5B8-B44257D8E074}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -30,5 +26,8 @@ Global
 		{9C56445C-4F3B-41B4-B0E6-740718872407}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9C56445C-4F3B-41B4-B0E6-740718872407}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9C56445C-4F3B-41B4-B0E6-740718872407}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{44BFFE5E-C024-4C02-9FEF-6EAEB26E9280} = {97A732DC-539D-4E1F-841F-94054AD7EBED}
 	EndGlobalSection
 EndGlobal
