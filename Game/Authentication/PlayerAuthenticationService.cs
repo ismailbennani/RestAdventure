@@ -1,4 +1,5 @@
 ﻿using RestAdventure.Core.Players;
+using RestAdventure.Game.Registration;
 using RestAdventure.Kernel.Persistence;
 using Xtensive.Orm;
 

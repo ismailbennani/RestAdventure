@@ -23,10 +23,6 @@
       <ProjectReference Include="..\Kernel\Kernel.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="GameApi\" />
-    </ItemGroup>
-
     <PropertyGroup>
         <MinVerTagPrefix>v</MinVerTagPrefix>
     </PropertyGroup>

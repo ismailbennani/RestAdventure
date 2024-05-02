@@ -2,6 +2,8 @@ using System.Reflection;
 using NSwag;
 using NSwag.Generation.Processors.Security;
 using RestAdventure.Core.Players;
+using RestAdventure.Game.Apis.AdminApi;
+using RestAdventure.Game.Apis.GameApi;
 using RestAdventure.Game.Authentication;
 using RestAdventure.Kernel.OpenApi;
 using Serilog;
@@ -69,6 +71,31 @@ void SetupOpenApiDocument(WebApplicationBuilder builder)
             settings.DocumentName = "game";
             settings.Version = thisAssembly.GetName().Version!.ToString();
 
+            settings.OperationProcessors.Insert(0, new KeepOnlyControllersWithAttributeOperationProcessor(typeof(GameApiAttribute)));
+            settings.SchemaSettings.TypeNameGenerator = new TypeNameWithoutDtoGenerator(settings.SchemaSettings.TypeNameGenerator);
+
+            settings.AddSecurity(
+                "api-key",
+                new OpenApiSecurityScheme
+                {
+                    Type = OpenApiSecuritySchemeType.ApiKey,
+                    Name = "Authorization",
+                    In = OpenApiSecurityApiKeyLocation.Header
+                }
+            );
+
+            settings.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("api-key"));
+        }
+    );
+
+    builder.Services.AddOpenApiDocument(
+        settings =>
+        {
+            settings.Title = "Rest Adventure - Admin API";
+            settings.DocumentName = "admin";
+            settings.Version = thisAssembly.GetName().Version!.ToString();
+
+            settings.OperationProcessors.Insert(0, new KeepOnlyControllersWithAttributeOperationProcessor(typeof(AdminApiAttribute)));
             settings.SchemaSettings.TypeNameGenerator = new TypeNameWithoutDtoGenerator(settings.SchemaSettings.TypeNameGenerator);
 
             settings.AddSecurity(
