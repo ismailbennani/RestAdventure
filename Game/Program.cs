@@ -9,6 +9,7 @@ using RestAdventure.Core.Maps;
 using RestAdventure.Game.Apis.AdminApi;
 using RestAdventure.Game.Apis.GameApi;
 using RestAdventure.Game.Apis.GameApi.Services.Characters;
+using RestAdventure.Game.Apis.GameApi.Services.Game;
 using RestAdventure.Game.Authentication;
 using RestAdventure.Game.Settings;
 using RestAdventure.Kernel.OpenApi;
@@ -46,7 +47,9 @@ try
     SetupOpenApiDocuments(builder);
 
     builder.Services.AddOptions<GameSettings>();
+    builder.Services.AddOptions<ServerSettings>();
     builder.Services.AddSingleton<TeamService>();
+    builder.Services.AddSingleton<GameScheduler>();
 
     builder.Services.ConfigureCoreServices();
 
@@ -63,6 +66,8 @@ try
     app.UseAuthorization();
 
     app.MapControllers();
+
+    StartScheduler(app);
 
     app.Run();
 }
@@ -121,4 +126,10 @@ void SetupOpenApiDocuments(WebApplicationBuilder builder)
             settings.SchemaSettings.TypeNameGenerator = new TypeNameWithoutDtoGenerator(settings.SchemaSettings.TypeNameGenerator);
         }
     );
+}
+
+void StartScheduler(WebApplication app)
+{
+    GameScheduler scheduler = app.Services.GetRequiredService<GameScheduler>();
+    scheduler.Start();
 }
