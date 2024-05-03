@@ -17,19 +17,20 @@ public class TeamService
 
     public async Task<TeamDbo> GetTeamAsync(Guid playerId) => await GetOrCreateTeamAsync(playerId);
 
-    public async Task<CharacterDbo?> CreateCharacterAsync(Guid playerId, CreateCharacterRequestDto request)
+    public async Task<CharacterCreationResult> CreateCharacterAsync(Guid playerId, CreateCharacterRequestDto request)
     {
         TeamDbo team = await GetOrCreateTeamAsync(playerId);
 
         long nCharacters = await team.Characters.CountAsync();
-        if (nCharacters >= _gameSettings.Value.MaxTeamSize)
+        int maxTeamSize = _gameSettings.Value.MaxTeamSize;
+        if (nCharacters >= maxTeamSize)
         {
-            return null;
+            return new CharacterCreationResult { IsSuccess = false, ErrorMessage = $"reached max team size ({maxTeamSize})" };
         }
 
         CharacterDbo character = new(team, request.Name, request.Class);
 
-        return character;
+        return new CharacterCreationResult { IsSuccess = true, Character = character };
     }
 
     public async Task<bool> DeleteCharacterServiceAsync(Guid playerId, Guid characterId)

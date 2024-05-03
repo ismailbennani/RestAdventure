@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using NSwag;
 using NSwag.Generation.Processors.Security;
+using RestAdventure.Core.Characters;
 using RestAdventure.Game.Apis.AdminApi;
 using RestAdventure.Game.Apis.GameApi;
 using RestAdventure.Game.Apis.GameApi.Characters.Services;
@@ -21,7 +22,7 @@ try
 {
     WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-    await builder.SetupPersistence(loggerFactory.CreateLogger("Persistence"), thisAssembly, typeof(GameSettings).Assembly);
+    await builder.SetupPersistence(loggerFactory.CreateLogger("Persistence"), thisAssembly, typeof(TeamDbo).Assembly);
 
     builder.Services.AddSerilog();
     builder.Services.AddControllers().AddJsonOptions(settings => settings.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)));

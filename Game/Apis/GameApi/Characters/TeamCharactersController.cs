@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
-using RestAdventure.Core.Characters;
 using RestAdventure.Game.Apis.GameApi.Characters.Dtos;
 using RestAdventure.Game.Apis.GameApi.Characters.Requests;
 using RestAdventure.Game.Apis.GameApi.Characters.Services;
@@ -38,20 +37,20 @@ public class TeamCharactersController : ControllerBase
 
         Guid playerId = ControllerContext.RequirePlayerId();
 
-        CharacterDbo? character;
+        CharacterCreationResult result;
         using (session.Activate())
         {
-            character = await _teamService.CreateCharacterAsync(playerId, request);
+            result = await _teamService.CreateCharacterAsync(playerId, request);
         }
 
-        if (character == null)
+        if (!result.IsSuccess)
         {
-            return Problem("Could not create character", statusCode: StatusCodes.Status400BadRequest);
+            return Problem($"Could not create character: {result.ErrorMessage}", statusCode: StatusCodes.Status400BadRequest);
         }
 
         transaction.Complete();
 
-        return character.ToDto();
+        return result.Character.ToDto();
     }
 
     /// <summary>
