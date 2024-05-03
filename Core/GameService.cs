@@ -18,10 +18,10 @@ public class GameService
         return state;
     }
 
-    public async Task TickAsync()
+    public async Task<long> TickAsync()
     {
         GameStateDbo state = await GetOrCreateStateAsync();
-        state.Tick++;
+        return ++state.Tick;
     }
 
     async Task<GameStateDbo> GetOrCreateStateAsync()
@@ -30,7 +30,7 @@ public class GameService
         if (state == null)
         {
             state = new GameStateDbo();
-            _logger.LogInformation("The game state has been initialized.");
+            _logger.LogInformation("Game state has been initialized.");
         }
 
         return state;

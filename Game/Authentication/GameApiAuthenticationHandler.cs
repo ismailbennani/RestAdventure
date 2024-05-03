@@ -30,19 +30,19 @@ class GameApiAuthenticationHandler : AuthenticationHandler<GameApiAuthentication
     {
         if (!Request.Headers.TryGetValue(Options.TokenHeaderName, out StringValues authTokens))
         {
-            return Failure();
+            return AuthenticateResult.NoResult();
         }
 
         string? authToken = authTokens.FirstOrDefault();
         if (authToken == null || !Guid.TryParse(authToken, out Guid authTokenGuid))
         {
-            return Failure();
+            return AuthenticateResult.Fail("Bad auth token");
         }
 
         AuthenticationResult authenticationResult = await _authenticationService.AuthenticateAsync(authTokenGuid);
         if (!authenticationResult.IsSuccess)
         {
-            return Failure();
+            return AuthenticateResult.Fail("Authentication failed");
         }
 
         return Success(authenticationResult.Session);
@@ -61,6 +61,4 @@ class GameApiAuthenticationHandler : AuthenticationHandler<GameApiAuthentication
 
         return AuthenticateResult.Success(new AuthenticationTicket(claimsPrincipal, Scheme.Name));
     }
-
-    static AuthenticateResult Failure() => AuthenticateResult.Fail("Authentication failed");
 }

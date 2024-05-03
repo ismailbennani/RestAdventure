@@ -14,6 +14,7 @@ public class GameScheduler : IDisposable
     readonly ILogger<GameScheduler> _logger;
 
     CancellationTokenSource? _mainLoopCancellationSource;
+    readonly object _tickLock = new();
 
     public GameScheduler(DomainAccessor domainAccessor, GameService gameService, IOptions<ServerSettings> serverSettings, ILogger<GameScheduler> logger)
     {
@@ -41,7 +42,7 @@ public class GameScheduler : IDisposable
     /// <summary>
     ///     Start the simulation
     /// </summary>
-    public void Start()
+    public void Start(TimeSpan? firstTickDelay = null)
     {
         if (_mainLoopCancellationSource != null)
         {
@@ -54,10 +55,17 @@ public class GameScheduler : IDisposable
         _mainLoopCancellationSource = new CancellationTokenSource();
         CancellationToken token = _mainLoopCancellationSource.Token;
 
-        // start main loop and forget about it
-        Task _ = MainLoopAsync(token);
+        if (firstTickDelay.HasValue)
+        {
+            _logger.LogInformation("Game simulation is starting (delay: {seconds}s).", firstTickDelay.Value.TotalSeconds);
+        }
+        else
+        {
+            _logger.LogInformation("Game simulation is starting.");
+        }
 
-        _logger.LogInformation("The game simulation has started.");
+        // start main loop and forget about it
+        Task _ = MainLoopAsync(firstTickDelay, token);
     }
 
     /// <summary>
@@ -73,43 +81,63 @@ public class GameScheduler : IDisposable
         Paused = true;
         NextStepDate = null;
 
+        _logger.LogInformation("Game simulation is stopping.");
+
         _mainLoopCancellationSource.Cancel();
         _mainLoopCancellationSource.Dispose();
         _mainLoopCancellationSource = null;
-
-        _logger.LogInformation("The game simulation has stopped.");
     }
 
-    async Task MainLoopAsync(CancellationToken cancellationToken = default)
+    /// <summary>
+    ///     Tick the simulation now
+    /// </summary>
+    public async Task TickNowAsync()
     {
+        try
+        {
+            await using Session session = await _domainAccessor.Domain.OpenSessionAsync();
+            await using TransactionScope transaction = await session.OpenTransactionAsync();
+            using SessionScope _ = session.Activate();
+
+            long tick = await _gameService.TickAsync();
+
+            _logger.LogInformation("Game simulation has ticked ({tick}).", tick);
+
+            transaction.Complete();
+        }
+        catch (Exception exn)
+        {
+            _logger.LogError(exn, "An error occured in {method}.", nameof(_gameService.TickAsync));
+        }
+
+        TimeSpan tickDuration = _serverSettings.Value.TickDuration;
+
+        LastStepDate = DateTime.Now;
+        NextStepDate = LastStepDate + tickDuration;
+    }
+
+    async Task MainLoopAsync(TimeSpan? firstTickDelay, CancellationToken cancellationToken = default)
+    {
+        if (firstTickDelay.HasValue)
+        {
+            await Task.Delay(firstTickDelay.Value, cancellationToken);
+        }
+
         while (true)
         {
-            if (cancellationToken.IsCancellationRequested)
+            if (cancellationToken.IsCancellationRequested || !NextStepDate.HasValue)
             {
                 break;
             }
 
-            try
+            DateTime now = DateTime.Now;
+            if (now >= NextStepDate)
             {
-                await using Session session = await _domainAccessor.Domain.OpenSessionAsync(cancellationToken);
-                await using TransactionScope transaction = await session.OpenTransactionAsync(cancellationToken);
-                using SessionScope _ = session.Activate();
-
-                await _gameService.TickAsync();
-
-                transaction.Complete();
-            }
-            catch (Exception exn)
-            {
-                _logger.LogError(exn, "An error occured in {method}.", nameof(_gameService.TickAsync));
+                await TickNowAsync();
             }
 
-            TimeSpan tickDuration = _serverSettings.Value.TickDuration;
-
-            LastStepDate = DateTime.Now;
-            NextStepDate = LastStepDate + tickDuration;
-
-            await Task.Delay(tickDuration, cancellationToken);
+            TimeSpan toWait = NextStepDate.Value - now;
+            await Task.Delay(toWait, cancellationToken);
         }
     }
 

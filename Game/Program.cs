@@ -14,6 +14,7 @@ using RestAdventure.Game.Authentication;
 using RestAdventure.Game.Settings;
 using RestAdventure.Kernel.OpenApi;
 using Serilog;
+using Serilog.Events;
 using Serilog.Extensions.Logging;
 using Xtensive.Orm;
 
@@ -40,7 +41,12 @@ try
         transaction.Complete();
     }
 
-    builder.Services.AddSerilog();
+    builder.Services.AddSerilog(
+        (services, settings) => settings.WriteTo.Console(LogEventLevel.Verbose, "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} ({SourceContext}){NewLine}{Exception}")
+            .ReadFrom.Configuration(builder.Configuration)
+            .ReadFrom.Services(services)
+            .Enrich.FromLogContext()
+    );
     builder.Services.AddControllers().AddJsonOptions(settings => settings.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)));
 
     SetupGameApiAuthentication(builder);
