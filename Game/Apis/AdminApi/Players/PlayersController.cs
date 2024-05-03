@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using RestAdventure.Game.Apis.AdminApi.Players.Requests;
 using RestAdventure.Game.Registration;
 
 namespace RestAdventure.Game.Apis.AdminApi.Players;
@@ -19,12 +20,12 @@ public class PlayersController : ControllerBase
     ///     Register player
     /// </summary>
     [HttpPost]
-    public async Task<ActionResult<PlayerRegistrationDto>> RegisterPlayer(Guid playerId)
+    public async Task<ActionResult<PlayerRegistrationDto>> RegisterPlayer(RegisterPlayerRequestDto request)
     {
-        PlayerRegistrationDto? registration = await _playerRegistrationService.RegisterPlayer(playerId);
+        PlayerRegistrationDto? registration = await _playerRegistrationService.RegisterPlayer(request.PlayerId, request.PlayerName);
         if (registration == null)
         {
-            return Problem($"Could not register player {playerId}", statusCode: StatusCodes.Status400BadRequest);
+            return Problem($"Could not register player {request.PlayerId}", statusCode: StatusCodes.Status400BadRequest);
         }
 
         return registration;

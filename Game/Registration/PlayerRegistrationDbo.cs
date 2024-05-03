@@ -1,14 +1,13 @@
-﻿using RestAdventure.Core.Players;
-using Xtensive.Orm;
+﻿using Xtensive.Orm;
 
 namespace RestAdventure.Game.Registration;
 
 [HierarchyRoot]
 class PlayerRegistrationDbo : Entity
 {
-    public PlayerRegistrationDbo(PlayerDbo player)
+    public PlayerRegistrationDbo(Guid playerId, string playerName)
     {
-        Player = player;
+        Player = new PlayerIdentityDbo(playerId, playerName);
         CreationDate = DateTime.Now;
     }
 
@@ -17,8 +16,7 @@ class PlayerRegistrationDbo : Entity
     public Guid ApiKey { get; private set; }
 
     [Field]
-    [Association(OnTargetRemove = OnRemoveAction.Cascade)]
-    public PlayerDbo Player { get; private set; }
+    public PlayerIdentityDbo Player { get; private set; }
 
     [Field]
     public DateTime CreationDate { get; private set; }

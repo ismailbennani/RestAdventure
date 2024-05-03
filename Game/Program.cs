@@ -1,7 +1,6 @@
 using System.Reflection;
 using NSwag;
 using NSwag.Generation.Processors.Security;
-using RestAdventure.Core.Players;
 using RestAdventure.Game.Apis.AdminApi;
 using RestAdventure.Game.Apis.GameApi;
 using RestAdventure.Game.Authentication;
@@ -19,7 +18,7 @@ try
 {
     WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-    await builder.SetupPersistence(loggerFactory.CreateLogger("Persistence"), thisAssembly, typeof(PlayerDbo).Assembly);
+    await builder.SetupPersistence(loggerFactory.CreateLogger("Persistence"), thisAssembly);
 
     builder.Services.AddSerilog();
     builder.Services.AddControllers();

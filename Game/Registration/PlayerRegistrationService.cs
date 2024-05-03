@@ -1,5 +1,4 @@
-﻿using RestAdventure.Core.Players;
-using RestAdventure.Kernel.Persistence;
+﻿using RestAdventure.Kernel.Persistence;
 using Xtensive.Orm;
 
 namespace RestAdventure.Game.Registration;
@@ -13,7 +12,7 @@ public class PlayerRegistrationService
         _domainAccessor = domainAccessor;
     }
 
-    public async Task<PlayerRegistrationDto?> RegisterPlayer(Guid playerId)
+    public async Task<PlayerRegistrationDto?> RegisterPlayer(Guid playerId, string playerName)
     {
         await using Session session = await _domainAccessor.Domain.OpenSessionAsync();
         await using TransactionScope transaction = await session.OpenTransactionAsync();
@@ -21,16 +20,15 @@ public class PlayerRegistrationService
         PlayerRegistrationDbo? existingRegistration = await GetExistingPlayerRegistration(session, playerId);
         if (existingRegistration != null)
         {
+            existingRegistration.Player.Name = playerName;
             return existingRegistration.ToDto();
         }
 
-        PlayerDbo? player = await GetPlayer(session, playerId);
-        if (player == null)
+        PlayerRegistrationDbo registration;
+        using (session.Activate())
         {
-            return null;
+            registration = new PlayerRegistrationDbo(playerId, playerName);
         }
-
-        PlayerRegistrationDbo registration = new(player);
 
         transaction.Complete();
 
@@ -58,9 +56,15 @@ public class PlayerRegistrationService
             return null;
         }
 
-        PlayerDbo player = existingRegistration.Player;
-        PlayerRegistrationDbo newRegistration = new(player);
-        existingRegistration.Remove();
+        Guid playerId = existingRegistration.Player.Id;
+        string playerName = existingRegistration.Player.Name;
+
+        PlayerRegistrationDbo newRegistration;
+        using (session.Activate())
+        {
+            newRegistration = new PlayerRegistrationDbo(playerId, playerName);
+            existingRegistration.Remove();
+        }
 
         transaction.Complete();
 
@@ -69,6 +73,4 @@ public class PlayerRegistrationService
 
     static async Task<PlayerRegistrationDbo?> GetExistingPlayerRegistration(Session session, Guid playerId) =>
         await session.Query.All<PlayerRegistrationDbo>().FirstOrDefaultAsync(r => r.Player.Id == playerId);
-
-    static async Task<PlayerDbo?> GetPlayer(Session session, Guid playerId) => await session.Query.All<PlayerDbo>().SingleOrDefaultAsync(p => p.Id == playerId);
 }

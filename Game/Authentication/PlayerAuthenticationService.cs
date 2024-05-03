@@ -1,5 +1,4 @@
-﻿using RestAdventure.Core.Players;
-using RestAdventure.Game.Registration;
+﻿using RestAdventure.Game.Registration;
 using RestAdventure.Kernel.Persistence;
 using Xtensive.Orm;
 
@@ -39,7 +38,7 @@ class PlayerAuthenticationService
         await using Session? session = await _domainAccessor.Domain.OpenSessionAsync();
         await using TransactionScope? transaction = await session.OpenTransactionAsync();
 
-        PlayerDbo? player = await session.Query.All<PlayerRegistrationDbo>().Where(r => r.ApiKey == apiKey).Select(r => r.Player).SingleOrDefaultAsync();
+        PlayerIdentityDbo? player = await session.Query.All<PlayerRegistrationDbo>().Where(r => r.ApiKey == apiKey).Select(r => r.Player).SingleOrDefaultAsync();
         if (player == null)
         {
             return null;

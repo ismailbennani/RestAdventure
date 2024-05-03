@@ -34,7 +34,7 @@ class GameApiAuthenticationHandler : AuthenticationHandler<GameApiAuthentication
         }
 
         string? authToken = authTokens.FirstOrDefault();
-        if (authToken == null || Guid.TryParse(authToken, out Guid authTokenGuid))
+        if (authToken == null || !Guid.TryParse(authToken, out Guid authTokenGuid))
         {
             return Failure();
         }
