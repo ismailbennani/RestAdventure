@@ -30,7 +30,7 @@ public class TeamCharactersController : ControllerBase
     ///     Create character
     /// </summary>
     [HttpPost]
-    public async Task<ActionResult<CharacterDto>> CreateCharacterAsync(CreateCharacterRequestDto request)
+    public async Task<ActionResult<TeamCharacterDto>> CreateCharacterAsync(CreateCharacterRequestDto request)
     {
         await using Session session = await _domainAccessor.Domain.OpenSessionAsync();
         await using TransactionScope transaction = await session.OpenTransactionAsync();

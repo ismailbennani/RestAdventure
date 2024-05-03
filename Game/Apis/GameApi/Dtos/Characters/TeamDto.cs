@@ -10,7 +10,7 @@ public class TeamDto
     /// <summary>
     ///     The characters in the team
     /// </summary>
-    public required IReadOnlyCollection<CharacterDto> Characters { get; init; }
+    public required IReadOnlyCollection<TeamCharacterDto> Characters { get; init; }
 }
 
 static class TeamMappingExtensions

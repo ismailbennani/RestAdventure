@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using NSwag;
 using NSwag.Generation.Processors.Security;
+using RestAdventure.Core;
 using RestAdventure.Core.Characters;
 using RestAdventure.Core.Maps;
 using RestAdventure.Game.Apis.AdminApi;
@@ -45,8 +46,9 @@ try
     SetupOpenApiDocuments(builder);
 
     builder.Services.AddOptions<GameSettings>();
-
     builder.Services.AddSingleton<TeamService>();
+
+    builder.Services.ConfigureCoreServices();
 
     WebApplication app = builder.Build();
 
