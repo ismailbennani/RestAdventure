@@ -48,7 +48,6 @@ public class PlayersController : ControllerBase
     /// <summary>
     ///     Refresh registration
     /// </summary>
-    /// <returns></returns>
     [HttpPost("refresh")]
     public async Task<ActionResult<PlayerRegistrationDto>> RefreshApiKey(Guid playerId)
     {
