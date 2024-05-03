@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using RestAdventure.Core.Characters;
 
-namespace RestAdventure.Game.Apis.GameApi.Characters.Services;
+namespace RestAdventure.Game.Apis.GameApi.Services.Characters;
 
 public class CharacterCreationResult
 {

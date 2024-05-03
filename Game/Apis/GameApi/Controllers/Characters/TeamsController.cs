@@ -2,13 +2,13 @@
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using RestAdventure.Core.Characters;
-using RestAdventure.Game.Apis.GameApi.Characters.Dtos;
-using RestAdventure.Game.Apis.GameApi.Characters.Services;
+using RestAdventure.Game.Apis.GameApi.Dtos.Characters;
+using RestAdventure.Game.Apis.GameApi.Services.Characters;
 using RestAdventure.Game.Authentication;
 using RestAdventure.Kernel.Persistence;
 using Xtensive.Orm;
 
-namespace RestAdventure.Game.Apis.GameApi.Characters;
+namespace RestAdventure.Game.Apis.GameApi.Controllers.Characters;
 
 [Route("game/team")]
 [ApiController]

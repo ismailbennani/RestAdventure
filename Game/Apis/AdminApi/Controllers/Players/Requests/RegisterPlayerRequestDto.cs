@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace RestAdventure.Game.Apis.AdminApi.Players.Requests;
+namespace RestAdventure.Game.Apis.AdminApi.Controllers.Players.Requests;
 
 public class RegisterPlayerRequestDto
 {

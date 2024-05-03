@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using RestAdventure.Game.Registration;
 
-namespace RestAdventure.Game.Apis.AdminApi.Players.Dtos;
+namespace RestAdventure.Game.Apis.AdminApi.Dtos.Players;
 
 public class PlayerRegistrationDto
 {

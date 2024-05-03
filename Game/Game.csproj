@@ -28,6 +28,10 @@
       <ProjectReference Include="..\Kernel\Kernel.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Apis\AdminApi\Controllers\" />
+    </ItemGroup>
+
     <PropertyGroup>
         <MinVerTagPrefix>v</MinVerTagPrefix>
     </PropertyGroup>

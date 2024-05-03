@@ -4,14 +4,16 @@ using System.Text.Json.Serialization;
 using NSwag;
 using NSwag.Generation.Processors.Security;
 using RestAdventure.Core.Characters;
+using RestAdventure.Core.Maps;
 using RestAdventure.Game.Apis.AdminApi;
 using RestAdventure.Game.Apis.GameApi;
-using RestAdventure.Game.Apis.GameApi.Characters.Services;
+using RestAdventure.Game.Apis.GameApi.Services.Characters;
 using RestAdventure.Game.Authentication;
 using RestAdventure.Game.Settings;
 using RestAdventure.Kernel.OpenApi;
 using Serilog;
 using Serilog.Extensions.Logging;
+using Xtensive.Orm;
 
 Assembly thisAssembly = typeof(Program).Assembly;
 
@@ -22,7 +24,19 @@ try
 {
     WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-    await builder.SetupPersistence(loggerFactory.CreateLogger("Persistence"), thisAssembly, typeof(TeamDbo).Assembly);
+    Domain domain = await builder.SetupPersistence(loggerFactory.CreateLogger("Persistence"), thisAssembly, typeof(TeamDbo).Assembly);
+
+    {
+        // TODO: remove this
+        await using Session? session = await domain.OpenSessionAsync();
+        await using TransactionScope? transaction = await session.OpenTransactionAsync();
+        using SessionScope? _ = session.Activate();
+
+        MapAreaDbo startingArea = new("Start");
+        MapLocationDbo map = new(startingArea, 0, 0);
+
+        transaction.Complete();
+    }
 
     builder.Services.AddSerilog();
     builder.Services.AddControllers().AddJsonOptions(settings => settings.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)));

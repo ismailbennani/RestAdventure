@@ -5,7 +5,7 @@ using NSwag.Annotations;
 using RestAdventure.Game.Authentication;
 using RestAdventure.Game.Settings;
 
-namespace RestAdventure.Game.Apis.GameApi;
+namespace RestAdventure.Game.Apis.GameApi.Controllers;
 
 [Route("game")]
 [ApiController]

@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
-using RestAdventure.Game.Apis.AdminApi.Players.Dtos;
-using RestAdventure.Game.Apis.AdminApi.Players.Requests;
+using RestAdventure.Game.Apis.AdminApi.Controllers.Players.Requests;
+using RestAdventure.Game.Apis.AdminApi.Dtos.Players;
 using RestAdventure.Game.Registration;
 using RestAdventure.Kernel.Persistence;
 using Xtensive.Orm;
 
-namespace RestAdventure.Game.Apis.AdminApi.Players;
+namespace RestAdventure.Game.Apis.AdminApi.Controllers.Players;
 
 [Route("admin/players")]
 [ApiController]

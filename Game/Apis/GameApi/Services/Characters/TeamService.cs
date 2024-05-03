@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.Options;
 using RestAdventure.Core.Characters;
-using RestAdventure.Game.Apis.GameApi.Characters.Requests;
+using RestAdventure.Game.Apis.GameApi.Controllers.Characters.Requests;
 using RestAdventure.Game.Settings;
 using Xtensive.Orm;
 
-namespace RestAdventure.Game.Apis.GameApi.Characters.Services;
+namespace RestAdventure.Game.Apis.GameApi.Services.Characters;
 
 public class TeamService
 {
@@ -51,6 +51,8 @@ public class TeamService
         return true;
     }
 
-    static async Task<TeamDbo?> GetTeamInternalAsync(Guid playerId) => await Query.All<TeamDbo>().SingleOrDefaultAsync(t => t.PlayerId == playerId);
+    static async Task<TeamDbo?> GetTeamInternalAsync(Guid playerId) =>
+        (await Query.All<TeamDbo>().Where(t => t.PlayerId == playerId).Prefetch(t => t.Characters).ExecuteAsync()).SingleOrDefault();
+
     static async Task<TeamDbo> GetOrCreateTeamAsync(Guid playerId) => await GetTeamInternalAsync(playerId) ?? new TeamDbo(playerId);
 }

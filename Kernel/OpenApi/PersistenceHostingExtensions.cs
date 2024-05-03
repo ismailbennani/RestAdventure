@@ -11,7 +11,7 @@ namespace RestAdventure.Kernel.OpenApi;
 
 public static class PersistenceHostingExtensions
 {
-    public static async Task SetupPersistence(this IHostApplicationBuilder builder, ILogger logger, params Assembly[] assembliesToLoad)
+    public static async Task<Domain> SetupPersistence(this IHostApplicationBuilder builder, ILogger logger, params Assembly[] assembliesToLoad)
     {
         string connectionString = builder.Configuration.GetConnectionString("Main") ?? throw new InvalidOperationException("Missing connection string");
         DomainUpgradeMode? upgradeMode = ParseUpgradeMode(builder.Configuration["Persistence:UpgradeMode"]);
@@ -40,6 +40,8 @@ public static class PersistenceHostingExtensions
         logger.LogInformation("Domain built successfully.");
 
         builder.Services.AddSingleton(new DomainAccessor(domain));
+
+        return domain;
     }
 
     static DomainUpgradeMode? ParseUpgradeMode(string? str)

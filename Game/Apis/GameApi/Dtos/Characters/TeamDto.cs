@@ -1,6 +1,6 @@
 ﻿using RestAdventure.Core.Characters;
 
-namespace RestAdventure.Game.Apis.GameApi.Characters.Dtos;
+namespace RestAdventure.Game.Apis.GameApi.Dtos.Characters;
 
 /// <summary>
 ///     Team of characters
