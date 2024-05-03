@@ -1,19 +1,24 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using NSwag.Annotations;
+using RestAdventure.Game.Apis.AdminApi.Players.Dtos;
 using RestAdventure.Game.Apis.AdminApi.Players.Requests;
 using RestAdventure.Game.Registration;
+using RestAdventure.Kernel.Persistence;
+using Xtensive.Orm;
 
 namespace RestAdventure.Game.Apis.AdminApi.Players;
 
 [Route("admin/players")]
 [ApiController]
 [AdminApi]
+[OpenApiTag("Players")]
 public class PlayersController : ControllerBase
 {
-    readonly PlayerRegistrationService _playerRegistrationService;
+    readonly DomainAccessor _domainAccessor;
 
-    public PlayersController(PlayerRegistrationService playerRegistrationService)
+    public PlayersController(DomainAccessor domainAccessor)
     {
-        _playerRegistrationService = playerRegistrationService;
+        _domainAccessor = domainAccessor;
     }
 
     /// <summary>
@@ -22,13 +27,25 @@ public class PlayersController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<PlayerRegistrationDto>> RegisterPlayer(RegisterPlayerRequestDto request)
     {
-        PlayerRegistrationDto? registration = await _playerRegistrationService.RegisterPlayer(request.PlayerId, request.PlayerName);
-        if (registration == null)
+        await using Session session = await _domainAccessor.Domain.OpenSessionAsync();
+        await using TransactionScope transaction = await session.OpenTransactionAsync();
+
+        PlayerRegistrationDbo? existingRegistration = await GetExistingPlayerRegistration(session, request.PlayerId);
+        if (existingRegistration != null)
         {
-            return Problem($"Could not register player {request.PlayerId}", statusCode: StatusCodes.Status400BadRequest);
+            existingRegistration.Player.Name = request.PlayerName;
+            return existingRegistration.ToDto();
         }
 
-        return registration;
+        PlayerRegistrationDbo registration;
+        using (session.Activate())
+        {
+            registration = new PlayerRegistrationDbo(request.PlayerId, request.PlayerName);
+        }
+
+        transaction.Complete();
+
+        return registration.ToDto();
     }
 
     /// <summary>
@@ -37,13 +54,16 @@ public class PlayersController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<PlayerRegistrationDto>> GetApiKey(Guid playerId)
     {
-        PlayerRegistrationDto? registration = await _playerRegistrationService.GetRegistration(playerId);
-        if (registration == null)
+        await using Session session = await _domainAccessor.Domain.OpenSessionAsync();
+        await using TransactionScope transaction = await session.OpenTransactionAsync();
+
+        PlayerRegistrationDbo? existingRegistration = await GetExistingPlayerRegistration(session, playerId);
+        if (existingRegistration == null)
         {
             return Problem($"Could not find registration of player {playerId}", statusCode: StatusCodes.Status400BadRequest);
         }
 
-        return registration;
+        return existingRegistration.ToDto();
     }
 
     /// <summary>
@@ -52,12 +72,27 @@ public class PlayersController : ControllerBase
     [HttpPost("refresh")]
     public async Task<ActionResult<PlayerRegistrationDto>> RefreshApiKey(Guid playerId)
     {
-        PlayerRegistrationDto? newRegistration = await _playerRegistrationService.RefreshApiKey(playerId);
-        if (newRegistration == null)
+        await using Session session = await _domainAccessor.Domain.OpenSessionAsync();
+        await using TransactionScope transaction = await session.OpenTransactionAsync();
+
+        PlayerRegistrationDbo? existingRegistration = await GetExistingPlayerRegistration(session, playerId);
+        if (existingRegistration == null)
         {
             return Problem($"Could not refresh registration of player {playerId}", statusCode: StatusCodes.Status400BadRequest);
         }
 
-        return newRegistration;
+        PlayerRegistrationDbo newRegistration;
+        using (session.Activate())
+        {
+            newRegistration = new PlayerRegistrationDbo(existingRegistration.Player.Id, existingRegistration.Player.Name);
+            existingRegistration.Remove();
+        }
+
+        transaction.Complete();
+
+        return newRegistration.ToDto();
     }
+
+    static async Task<PlayerRegistrationDbo?> GetExistingPlayerRegistration(Session session, Guid playerId) =>
+        await session.Query.All<PlayerRegistrationDbo>().FirstOrDefaultAsync(r => r.Player.Id == playerId);
 }

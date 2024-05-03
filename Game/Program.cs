@@ -1,10 +1,13 @@
 using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using NSwag;
 using NSwag.Generation.Processors.Security;
 using RestAdventure.Game.Apis.AdminApi;
 using RestAdventure.Game.Apis.GameApi;
+using RestAdventure.Game.Apis.GameApi.Characters.Services;
 using RestAdventure.Game.Authentication;
-using RestAdventure.Game.Registration;
+using RestAdventure.Game.Settings;
 using RestAdventure.Kernel.OpenApi;
 using Serilog;
 using Serilog.Extensions.Logging;
@@ -18,15 +21,17 @@ try
 {
     WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-    await builder.SetupPersistence(loggerFactory.CreateLogger("Persistence"), thisAssembly);
+    await builder.SetupPersistence(loggerFactory.CreateLogger("Persistence"), thisAssembly, typeof(GameSettings).Assembly);
 
     builder.Services.AddSerilog();
-    builder.Services.AddControllers();
+    builder.Services.AddControllers().AddJsonOptions(settings => settings.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)));
 
     SetupGameApiAuthentication(builder);
     SetupOpenApiDocuments(builder);
 
-    builder.Services.AddSingleton<PlayerRegistrationService>();
+    builder.Services.AddOptions<GameSettings>();
+
+    builder.Services.AddSingleton<TeamService>();
 
     WebApplication app = builder.Build();
 

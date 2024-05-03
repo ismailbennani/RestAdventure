@@ -1,12 +1,19 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using RestAdventure.Game.Registration;
 
-namespace RestAdventure.Game.Registration;
+namespace RestAdventure.Game.Apis.AdminApi.Players.Dtos;
 
 public class PlayerIdentityDto
 {
+    /// <summary>
+    ///     The unique ID of the player
+    /// </summary>
     [Required]
     public required Guid Id { get; init; }
 
+    /// <summary>
+    ///     The name of the player
+    /// </summary>
     [Required]
     public required string Name { get; init; }
 }
