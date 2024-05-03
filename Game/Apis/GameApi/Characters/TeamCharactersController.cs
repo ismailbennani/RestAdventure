@@ -27,7 +27,7 @@ public class TeamCharactersController : ControllerBase
     }
 
     /// <summary>
-    ///     Delete character
+    ///     Create character
     /// </summary>
     [HttpPost]
     public async Task<ActionResult<CharacterDto>> CreateCharacterAsync(CreateCharacterRequestDto request)
