@@ -1,3 +1,5 @@
-﻿namespace RestAdventure.Core.Characters;
+﻿using RestAdventure.Kernel;
 
-public record CharacterId(Guid Guid);
+namespace RestAdventure.Core.Characters;
+
+public record CharacterId(Guid Guid) : Id(Guid);

@@ -15,4 +15,8 @@
       </PackageReference>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Kernel\Kernel.csproj" />
+    </ItemGroup>
+
 </Project>

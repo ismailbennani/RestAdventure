@@ -1,3 +1,5 @@
-﻿namespace RestAdventure.Core.Maps;
+﻿using RestAdventure.Kernel;
 
-public record MapAreaId(Guid Guid);
+namespace RestAdventure.Core.Maps;
+
+public record MapAreaId(Guid Guid) : Id(Guid);
