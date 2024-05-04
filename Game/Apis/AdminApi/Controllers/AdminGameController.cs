@@ -8,10 +8,8 @@ namespace RestAdventure.Game.Apis.AdminApi.Controllers;
 ///     Game admin operations
 /// </summary>
 [Route("admin/game")]
-[ApiController]
-[AdminApi]
 [OpenApiTag("Game")]
-public class AdminGameController : ControllerBase
+public class AdminGameController : AdminApiController
 {
     readonly GameScheduler _gameScheduler;
 

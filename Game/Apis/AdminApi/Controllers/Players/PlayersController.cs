@@ -10,10 +10,8 @@ namespace RestAdventure.Game.Apis.AdminApi.Controllers.Players;
 ///     Players operations
 /// </summary>
 [Route("admin/players/{playerGuid:guid}")]
-[ApiController]
-[AdminApi]
 [OpenApiTag("Players")]
-public class PlayersController : ControllerBase
+public class PlayersController : AdminApiController
 {
     readonly GameService _gameService;
 
