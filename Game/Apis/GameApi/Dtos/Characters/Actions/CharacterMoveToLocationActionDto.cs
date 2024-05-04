@@ -14,5 +14,5 @@ public class CharacterMoveToLocationActionDto : CharacterActionDto
 
 static class CharacterMoveToLocationActionMappingExtensions
 {
-    public static CharacterMoveToLocationActionDto ToDto(this CharacterMoveToLocationAction action) => new() { LocationId = action.LocationId };
+    public static CharacterMoveToLocationActionDto ToDto(this CharacterMoveToLocationAction action) => new() { LocationId = action.LocationId.Guid };
 }

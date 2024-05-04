@@ -15,7 +15,7 @@ public class Character : IEquatable<Character>
     /// <summary>
     ///     The unique ID of the character
     /// </summary>
-    public Guid Id { get; } = Guid.NewGuid();
+    public CharacterId Id { get; } = new(Guid.NewGuid());
 
     /// <summary>
     ///     The team of the character

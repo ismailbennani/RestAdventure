@@ -10,7 +10,7 @@ public class MapArea : IEquatable<MapArea>
 
     internal GameMapState GameMapState { get; }
 
-    public Guid Id { get; } = Guid.NewGuid();
+    public MapAreaId Id { get; } = new(Guid.NewGuid());
     public string Name { get; set; }
     public IEnumerable<MapLocation> Locations => GameMapState.GetAreaLocations(this);
 

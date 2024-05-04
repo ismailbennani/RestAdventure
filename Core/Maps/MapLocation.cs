@@ -11,7 +11,7 @@ public class MapLocation : IEquatable<MapLocation>
         PositionY = y;
     }
 
-    public Guid Id { get; } = Guid.NewGuid();
+    public MapLocationId Id { get; } = new(Guid.NewGuid());
     public MapArea Area { get; }
     public int PositionX { get; }
     public int PositionY { get; }

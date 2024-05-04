@@ -3,6 +3,7 @@ using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
+using RestAdventure.Core.Players;
 
 namespace RestAdventure.Game.Authentication;
 
@@ -26,33 +27,34 @@ class GameApiAuthenticationHandler : AuthenticationHandler<GameApiAuthentication
         _authenticationService = authenticationService;
     }
 
-    protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
+    protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         if (!Request.Headers.TryGetValue(Options.TokenHeaderName, out StringValues authTokens))
         {
-            return AuthenticateResult.NoResult();
+            return Task.FromResult(AuthenticateResult.NoResult());
         }
 
         string? authToken = authTokens.FirstOrDefault();
         if (authToken == null || !Guid.TryParse(authToken, out Guid authTokenGuid))
         {
-            return AuthenticateResult.Fail("Bad auth token");
+            return Task.FromResult(AuthenticateResult.Fail("Bad auth token"));
         }
 
-        AuthenticationResult authenticationResult = _authenticationService.Authenticate(authTokenGuid);
+        ApiKey apiKey = new(authTokenGuid);
+        AuthenticationResult authenticationResult = _authenticationService.Authenticate(apiKey);
         if (!authenticationResult.IsSuccess)
         {
-            return AuthenticateResult.Fail("Authentication failed");
+            return Task.FromResult(AuthenticateResult.Fail("Authentication failed"));
         }
 
-        return Success(authenticationResult.Session);
+        return Task.FromResult(Success(authenticationResult.Session));
     }
 
     AuthenticateResult Success(PlayerSession session)
     {
         List<Claim> claims =
         [
-            new Claim(ClaimTypes.NameIdentifier, session.PlayerId.ToString("D")),
+            new Claim(ClaimTypes.NameIdentifier, session.PlayerId.Guid.ToString("D")),
             new Claim(ClaimTypes.Name, session.PlayerName)
         ];
 

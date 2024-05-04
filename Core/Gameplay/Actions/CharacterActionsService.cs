@@ -8,8 +8,8 @@ namespace RestAdventure.Core.Gameplay.Actions;
 /// </summary>
 public class CharacterActionsService
 {
-    readonly Dictionary<Guid, CharacterAction> _actions = new();
-    readonly Dictionary<Guid, CharacterActionResult> _results = new();
+    readonly Dictionary<CharacterId, CharacterAction> _actions = new();
+    readonly Dictionary<CharacterId, CharacterActionResult> _results = new();
 
     /// <summary>
     ///     Make the character move to the given location on next tick.
@@ -24,7 +24,7 @@ public class CharacterActionsService
     {
         _results.Clear();
 
-        foreach ((Guid characterId, CharacterAction action) in _actions)
+        foreach ((CharacterId characterId, CharacterAction action) in _actions)
         {
             CharacterActionResolution resolution = action.Perform(state);
             _results[characterId] = new CharacterActionResult
@@ -39,13 +39,4 @@ public class CharacterActionsService
 
         _actions.Clear();
     }
-}
-
-public class CharacterActionResult
-{
-    public required long Tick { get; init; }
-    public required Guid CharacterId { get; init; }
-    public required CharacterAction Action { get; init; }
-    public required bool Success { get; init; }
-    public string? FailureReason { get; init; }
 }

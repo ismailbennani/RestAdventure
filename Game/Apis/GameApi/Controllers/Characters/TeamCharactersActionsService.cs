@@ -4,11 +4,12 @@ using RestAdventure.Core;
 using RestAdventure.Core.Characters;
 using RestAdventure.Core.Gameplay.Actions;
 using RestAdventure.Core.Maps;
+using RestAdventure.Core.Players;
 using RestAdventure.Game.Authentication;
 
 namespace RestAdventure.Game.Apis.GameApi.Controllers.Characters;
 
-[Route("game/team/characters/{characterId:guid}")]
+[Route("game/team/characters/{characterGuid:guid}")]
 [OpenApiTag("Team")]
 public class TeamCharactersActionsService : GameApiController
 {
@@ -24,15 +25,17 @@ public class TeamCharactersActionsService : GameApiController
     /// <summary>
     ///     Move to location
     /// </summary>
-    [HttpPost("move/{locationId:guid}")]
+    [HttpPost("move/{locationGuid:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public ActionResult MoveToLocation(Guid characterId, Guid locationId)
+    public ActionResult MoveToLocation(Guid characterGuid, Guid locationGuid)
     {
-        Guid playerId = ControllerContext.RequirePlayerId();
+        PlayerId playerId = ControllerContext.RequirePlayerId();
         GameState state = _gameService.RequireGameState();
+        CharacterId characterId = new(characterGuid);
+        MapLocationId locationId = new(locationGuid);
 
-        Team? team = state.Characters.GetTeamsOfPlayer(playerId).FirstOrDefault();
+        Team? team = state.Characters.GetTeams(playerId).FirstOrDefault();
         if (team == null)
         {
             return NotFound();

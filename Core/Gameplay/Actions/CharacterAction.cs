@@ -10,8 +10,8 @@ public abstract class CharacterAction
         CharacterId = character.Id;
     }
 
-    protected Guid TeamId { get; }
-    protected Guid CharacterId { get; }
+    protected TeamId TeamId { get; }
+    protected CharacterId CharacterId { get; }
 
     public abstract CharacterActionResolution Perform(GameState state);
 }

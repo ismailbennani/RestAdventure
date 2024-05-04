@@ -16,7 +16,7 @@ public class GameState
     }
 
 
-    public Guid Id { get; private set; }
+    public GameId Id { get; } = new(Guid.NewGuid());
     public long Tick { get; set; }
 
     public GameSettings Settings { get; }

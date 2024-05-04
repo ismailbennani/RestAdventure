@@ -51,7 +51,7 @@ static class TeamCharacterMappingExtensions
     public static TeamCharacterDto ToDto(this Character character, CharacterMappingOptions? options = null) =>
         new()
         {
-            Id = character.Id, Name = character.Name, Class = character.Class, Location = character.Location.ToDto(), LastActionResult = options?.LastActionResult?.ToDto(),
+            Id = character.Id.Guid, Name = character.Name, Class = character.Class, Location = character.Location.ToDto(), LastActionResult = options?.LastActionResult?.ToDto(),
             NextAction = options?.NextAction?.ToDto()
         };
 }

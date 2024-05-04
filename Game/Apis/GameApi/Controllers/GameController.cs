@@ -40,7 +40,7 @@ public class GameController : ControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpGet("state")]
-    public async Task<GameStateDto> GetGameStateAsync()
+    public GameStateDto GetGameState()
     {
         GameState state = _gameService.RequireGameState();
 

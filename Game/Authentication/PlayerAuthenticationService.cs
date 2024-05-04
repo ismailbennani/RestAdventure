@@ -6,14 +6,14 @@ namespace RestAdventure.Game.Authentication;
 class PlayerAuthenticationService
 {
     readonly GameService _gameService;
-    readonly Dictionary<Guid, PlayerSession> _sessions = new();
+    readonly Dictionary<ApiKey, PlayerSession> _sessions = new();
 
     public PlayerAuthenticationService(GameService gameService)
     {
         _gameService = gameService;
     }
 
-    public AuthenticationResult Authenticate(Guid apiKey)
+    public AuthenticationResult Authenticate(ApiKey apiKey)
     {
         if (!_sessions.TryGetValue(apiKey, out PlayerSession? session))
         {

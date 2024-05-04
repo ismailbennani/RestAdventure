@@ -2,6 +2,7 @@
 using NSwag.Annotations;
 using RestAdventure.Core;
 using RestAdventure.Core.Characters;
+using RestAdventure.Core.Players;
 using RestAdventure.Game.Apis.GameApi.Controllers.Characters.Requests;
 using RestAdventure.Game.Apis.GameApi.Dtos.Characters;
 using RestAdventure.Game.Authentication;
@@ -27,7 +28,7 @@ public class TeamCharactersController : GameApiController
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public ActionResult<TeamCharacterDto> CreateCharacter(CreateCharacterRequestDto request)
     {
-        Guid playerId = ControllerContext.RequirePlayerId();
+        PlayerId playerId = ControllerContext.RequirePlayerId();
         GameState state = _gameService.RequireGameState();
 
         Team team = GetOrCreateTeam(state, playerId);
@@ -44,21 +45,22 @@ public class TeamCharactersController : GameApiController
     /// <summary>
     ///     Delete character
     /// </summary>
-    [HttpDelete("{characterId:guid}")]
+    [HttpDelete("{characterGuid:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public ActionResult DeleteCharacter(Guid characterId)
+    public ActionResult DeleteCharacter(Guid characterGuid)
     {
-        Guid playerId = ControllerContext.RequirePlayerId();
+        PlayerId playerId = ControllerContext.RequirePlayerId();
         GameState state = _gameService.RequireGameState();
+        CharacterId characterId = new(characterGuid);
 
-        Team? team = state.Characters.GetTeam(playerId);
+        Team? team = state.Characters.GetTeams(playerId).FirstOrDefault();
         if (team == null)
         {
             return NotFound();
         }
 
-        Character? character = state.Characters.GetCharacter(team, playerId);
+        Character? character = state.Characters.GetCharacter(team, characterId);
         if (character == null)
         {
             return NotFound();
@@ -69,5 +71,5 @@ public class TeamCharactersController : GameApiController
         return NoContent();
     }
 
-    static Team GetOrCreateTeam(GameState state, Guid playerId) => state.Characters.GetTeamsOfPlayer(playerId).FirstOrDefault() ?? state.Characters.CreateTeam(playerId);
+    static Team GetOrCreateTeam(GameState state, PlayerId playerId) => state.Characters.GetTeams(playerId).FirstOrDefault() ?? state.Characters.CreateTeam(playerId);
 }

@@ -1,8 +1,10 @@
-﻿namespace RestAdventure.Core.Characters;
+﻿using RestAdventure.Core.Players;
+
+namespace RestAdventure.Core.Characters;
 
 public class Team : IEquatable<Team>
 {
-    internal Team(GameCharactersState gameCharactersState, Guid playerId)
+    internal Team(GameCharactersState gameCharactersState, PlayerId playerId)
     {
         GameCharactersState = gameCharactersState;
         PlayerId = playerId;
@@ -10,8 +12,8 @@ public class Team : IEquatable<Team>
 
     internal GameCharactersState GameCharactersState { get; }
 
-    public Guid Id { get; } = Guid.NewGuid();
-    public Guid PlayerId { get; private set; }
+    public TeamId Id { get; } = new(Guid.NewGuid());
+    public PlayerId PlayerId { get; private set; }
     public IEnumerable<Character> Characters => GameCharactersState.GetCharactersInTeam(this);
 
     public bool Equals(Team? other)

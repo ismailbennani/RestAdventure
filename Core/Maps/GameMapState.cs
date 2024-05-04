@@ -2,9 +2,9 @@
 
 public class GameMapState
 {
-    readonly Dictionary<Guid, MapArea> _areas = new();
-    readonly Dictionary<Guid, MapLocation> _locations = new();
-    readonly List<(Guid, Guid)> _connections = [];
+    readonly Dictionary<MapAreaId, MapArea> _areas = new();
+    readonly Dictionary<MapLocationId, MapLocation> _locations = new();
+    readonly List<(MapLocationId, MapLocationId)> _connections = [];
 
     public GameMapState(GameState gameState)
     {
@@ -32,8 +32,8 @@ public class GameMapState
         return location;
     }
 
-    public MapArea? GetArea(Guid areaId) => _areas.GetValueOrDefault(areaId);
-    public MapLocation? GetLocation(Guid locationId) => _locations.GetValueOrDefault(locationId);
+    public MapArea? GetArea(MapAreaId areaId) => _areas.GetValueOrDefault(areaId);
+    public MapLocation? GetLocation(MapLocationId locationId) => _locations.GetValueOrDefault(locationId);
 
     public void ConnectLocations(MapLocation location1, MapLocation location2)
     {
@@ -59,8 +59,8 @@ public class GameMapState
 
 public static class GameMapStateExtensions
 {
-    public static MapArea RequireArea(this GameMapState state, Guid areaId) => state.GetArea(areaId) ?? throw new InvalidOperationException($"Could not find area {areaId}");
+    public static MapArea RequireArea(this GameMapState state, MapAreaId areaId) => state.GetArea(areaId) ?? throw new InvalidOperationException($"Could not find area {areaId}");
 
-    public static MapLocation RequireLocation(this GameMapState state, Guid locationId) =>
+    public static MapLocation RequireLocation(this GameMapState state, MapLocationId locationId) =>
         state.GetLocation(locationId) ?? throw new InvalidOperationException($"Could not find location {locationId}");
 }

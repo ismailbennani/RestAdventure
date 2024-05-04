@@ -10,7 +10,7 @@ public class CharacterMoveToLocationAction : CharacterAction
         LocationId = location.Id;
     }
 
-    public Guid LocationId { get; }
+    public MapLocationId LocationId { get; }
 
     public override CharacterActionResolution Perform(GameState state)
     {

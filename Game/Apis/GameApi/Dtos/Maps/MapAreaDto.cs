@@ -20,5 +20,5 @@ public class MapAreaDto
 
 static class MapAreaMappingExtensions
 {
-    public static MapAreaDto ToDto(this MapArea area) => new() { Id = area.Id, Name = area.Name };
+    public static MapAreaDto ToDto(this MapArea area) => new() { Id = area.Id.Guid, Name = area.Name };
 }

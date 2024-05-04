@@ -27,7 +27,7 @@ public class AdminGameController : ControllerBase
     ///     Tick now
     /// </summary>
     [HttpPost("tick")]
-    public async Task TickNowAsync()
+    public void TickNow()
     {
         bool paused = _gameScheduler.Paused;
 
@@ -36,7 +36,7 @@ public class AdminGameController : ControllerBase
             _gameScheduler.Stop();
         }
 
-        await _gameScheduler.TickNowAsync();
+        _gameScheduler.TickNow();
 
         if (!paused)
         {

@@ -29,8 +29,8 @@ static class PlayerRegistrationMappingExtensions
     public static PlayerDto ToDto(this Player player) =>
         new()
         {
-            Id = player.Id,
+            Id = player.Id.Guid,
             Name = player.Name,
-            ApiKey = player.ApiKey
+            ApiKey = player.ApiKey.Guid
         };
 }

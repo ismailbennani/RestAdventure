@@ -86,7 +86,7 @@ public class GameScheduler : IDisposable
     /// <summary>
     ///     Tick the simulation now
     /// </summary>
-    public async Task TickNowAsync()
+    public void TickNow()
     {
         try
         {
@@ -122,7 +122,7 @@ public class GameScheduler : IDisposable
             DateTime now = DateTime.Now;
             if (now >= NextStepDate)
             {
-                await TickNowAsync();
+                TickNow();
             }
 
             TimeSpan toWait = NextStepDate.Value - now;

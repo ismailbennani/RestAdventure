@@ -1,11 +1,12 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
+using RestAdventure.Core.Players;
 
 namespace RestAdventure.Game.Authentication;
 
 static class AuthenticationExtensions
 {
-    public static Guid? GetPlayerId(this ControllerContext context)
+    public static PlayerId? GetPlayerId(this ControllerContext context)
     {
         string? guidStr = context.HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
         if (guidStr == null)
@@ -13,8 +14,8 @@ static class AuthenticationExtensions
             return null;
         }
 
-        return Guid.TryParse(guidStr, out Guid playerId) ? playerId : null;
+        return Guid.TryParse(guidStr, out Guid playerGuid) ? new PlayerId(playerGuid) : null;
     }
 
-    public static Guid RequirePlayerId(this ControllerContext context) => GetPlayerId(context) ?? throw new InvalidOperationException("Could not determine current player");
+    public static PlayerId RequirePlayerId(this ControllerContext context) => GetPlayerId(context) ?? throw new InvalidOperationException("Could not determine current player");
 }

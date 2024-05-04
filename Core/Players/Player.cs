@@ -2,18 +2,18 @@
 
 public class Player : IEquatable<Player>
 {
-    public Player(Guid id, string name)
+    public Player(PlayerId id, string name)
     {
         Id = id;
         Name = name;
-        ApiKey = Guid.NewGuid();
+        ApiKey = new ApiKey(Guid.NewGuid());
     }
 
-    public Guid Id { get; }
+    public PlayerId Id { get; }
     public string Name { get; set; }
-    public Guid ApiKey { get; private set; }
+    public ApiKey ApiKey { get; private set; }
 
-    public Guid RefreshApiKey() => ApiKey = Guid.NewGuid();
+    public ApiKey RefreshApiKey() => ApiKey = new ApiKey(Guid.NewGuid());
 
     public bool Equals(Player? other)
     {

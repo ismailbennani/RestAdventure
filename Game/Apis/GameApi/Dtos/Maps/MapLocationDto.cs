@@ -42,12 +42,12 @@ public class MapLocationMinimalDto
 static class MapLocationMappingExtensions
 {
     public static MapLocationMinimalDto ToMinimalDto(this MapLocation location) =>
-        new() { Id = location.Id, Area = location.Area.ToDto(), PositionX = location.PositionX, PositionY = location.PositionY };
+        new() { Id = location.Id.Guid, Area = location.Area.ToDto(), PositionX = location.PositionX, PositionY = location.PositionY };
 
     public static MapLocationDto ToDto(this MapLocation location) =>
         new()
         {
-            Id = location.Id, Area = location.Area.ToDto(), PositionX = location.PositionX, PositionY = location.PositionY,
+            Id = location.Id.Guid, Area = location.Area.ToDto(), PositionX = location.PositionX, PositionY = location.PositionY,
             ConnectedLocations = location.ConnectedLocations.Select(l => l.ToMinimalDto()).ToArray()
         };
 }

@@ -3,6 +3,7 @@ using NSwag.Annotations;
 using RestAdventure.Core;
 using RestAdventure.Core.Characters;
 using RestAdventure.Core.Gameplay.Actions;
+using RestAdventure.Core.Players;
 using RestAdventure.Game.Apis.GameApi.Dtos.Characters;
 using RestAdventure.Game.Authentication;
 
@@ -27,10 +28,10 @@ public class TeamsController : GameApiController
     [HttpGet]
     public ActionResult<TeamDto> GetTeam()
     {
-        Guid playerId = ControllerContext.RequirePlayerId();
+        PlayerId playerId = ControllerContext.RequirePlayerId();
         GameState state = _gameService.RequireGameState();
 
-        Team team = state.Characters.GetTeamsOfPlayer(playerId).FirstOrDefault() ?? state.Characters.CreateTeam(playerId);
+        Team team = state.Characters.GetTeams(playerId).FirstOrDefault() ?? state.Characters.CreateTeam(playerId);
 
         return new TeamDto
         {
