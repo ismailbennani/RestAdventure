@@ -35,12 +35,22 @@ try
     SetupGameApiAuthentication(builder);
     SetupOpenApiDocuments(builder);
 
+    if (builder.Environment.IsDevelopment())
+    {
+        builder.Services.AddCors(o => o.AddDefaultPolicy(p => p.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin().DisallowCredentials()));
+    }
+
     builder.Services.AddOptions<ServerSettings>();
     builder.Services.AddSingleton<GameScheduler>();
 
     builder.Services.ConfigureCoreServices();
 
     WebApplication app = builder.Build();
+
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseCors();
+    }
 
     app.UseHttpsRedirection();
 

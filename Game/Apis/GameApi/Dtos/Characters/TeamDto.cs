@@ -1,4 +1,6 @@
-﻿namespace RestAdventure.Game.Apis.GameApi.Dtos.Characters;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace RestAdventure.Game.Apis.GameApi.Dtos.Characters;
 
 /// <summary>
 ///     Team of characters
@@ -8,5 +10,6 @@ public class TeamDto
     /// <summary>
     ///     The characters in the team
     /// </summary>
+    [Required]
     public required IReadOnlyCollection<TeamCharacterDto> Characters { get; init; }
 }

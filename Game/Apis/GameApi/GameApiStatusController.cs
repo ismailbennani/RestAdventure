@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace RestAdventure.Game.Apis;
+namespace RestAdventure.Game.Apis.GameApi;
 
 /// <summary>
 ///     Status
 /// </summary>
-[Route("status")]
-[ApiController]
-public class StatusController : ControllerBase
+[Route("game/status")]
+public class GameApiStatusController : GameApiController
 {
     /// <summary>
     ///     Ping

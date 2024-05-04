@@ -1,0 +1,55 @@
+<div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center">
+  @if (loading || creating) {
+    <app-spinner></app-spinner>
+  } @else {
+    @if (players.length > 0) {
+      <h1>Select player</h1>
+      <ul
+        class="list-group list-group-flush border border-1"
+        style="max-width: 50%; max-height: 50%"
+      >
+        @for (player of players; track player.id) {
+          <a
+            class="list-group-item list-group-item-action d-flex justify-content-between"
+            (click)="selectPlayer(player)"
+          >
+            <div class="d-flex flex-column">
+              {{ player.name }}
+              <span class="text-muted small text-ellipsis">({{ player.id }})</span>
+            </div>
+            <i class="bi bi-chevron-right"></i>
+          </a>
+        }
+      </ul>
+      <h4 class="py-4">OR</h4>
+    }
+
+    <button class="btn btn-outline-primary" (click)="ngbModal.open(createPlayerModal)">
+      Create player
+    </button>
+  }
+</div>
+
+<ng-template #createPlayerModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Create player</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <form>
+      <div class="mb-3">
+        <label for="name">Name</label>
+        <input #name id="name" class="form-control" />
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button
+      type="button"
+      class="btn btn-outline-dark"
+      (click)="createPlayer(name.value); modal.close()"
+    >
+      Create
+    </button>
+  </div>
+</ng-template>
