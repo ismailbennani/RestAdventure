@@ -34,7 +34,7 @@ public class TeamCharacterDto
     public required MapLocationDto Location { get; init; }
 }
 
-static class CharacterMappingExtensions
+static class TeamCharacterMappingExtensions
 {
     public static TeamCharacterDto ToDto(this CharacterDbo character) =>
         new() { Id = character.Id, Name = character.Name, Class = character.Class, Location = character.Location.ToDto() };

@@ -30,9 +30,9 @@ public class CharactersController : GameApiController
     /// </summary>
     /// <returns></returns>
     [HttpGet]
-    [ProducesResponseType(typeof(IReadOnlyCollection<CharacterDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IReadOnlyCollection<CharacterMinimalDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<IReadOnlyCollection<CharacterDto>>> GetCharactersInRangeAsync()
+    public async Task<ActionResult<IReadOnlyCollection<CharacterMinimalDto>>> GetCharactersInRangeAsync()
     {
         await using Session session = await _domainAccessor.Domain.OpenSessionAsync();
         await using TransactionScope transaction = await session.OpenTransactionAsync();
@@ -52,6 +52,6 @@ public class CharactersController : GameApiController
 
         List<CharacterDbo> result = await _characterInteractionsService.GetCharactersInRange(team.Result).ToListAsync();
 
-        return result.Select(c => c.ToOtherCharacterDto()).ToArray();
+        return result.Select(c => c.ToMinimalCharacterDto()).ToArray();
     }
 }

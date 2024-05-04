@@ -3,7 +3,7 @@ using RestAdventure.Core.Characters;
 
 namespace RestAdventure.Game.Apis.GameApi.Dtos.Characters;
 
-public class CharacterDto
+public class CharacterMinimalDto
 {
     /// <summary>
     ///     The unique ID of the character
@@ -24,7 +24,7 @@ public class CharacterDto
     public required CharacterClass Class { get; init; }
 }
 
-static class OtherCharacterMappingExtensions
+static class CharacterMappingExtensions
 {
-    public static CharacterDto ToOtherCharacterDto(this CharacterDbo character) => new() { Id = character.Id, Name = character.Name, Class = character.Class };
+    public static CharacterMinimalDto ToMinimalCharacterDto(this CharacterDbo character) => new() { Id = character.Id, Name = character.Name, Class = character.Class };
 }
