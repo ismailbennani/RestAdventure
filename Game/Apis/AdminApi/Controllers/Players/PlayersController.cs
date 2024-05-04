@@ -9,7 +9,7 @@ namespace RestAdventure.Game.Apis.AdminApi.Controllers.Players;
 /// <summary>
 ///     Players operations
 /// </summary>
-[Route("admin/players/{playerGuid:guid}")]
+[Route("admin/players")]
 [OpenApiTag("Players")]
 public class PlayersController : AdminApiController
 {
@@ -23,9 +23,19 @@ public class PlayersController : AdminApiController
     }
 
     /// <summary>
+    ///     Get players
+    /// </summary>
+    [HttpGet]
+    public ActionResult<IReadOnlyCollection<PlayerDto>> GetPlayers()
+    {
+        GameState state = _gameService.RequireGameState();
+        return state.Players.All.Select(p => p.ToDto()).ToArray();
+    }
+
+    /// <summary>
     ///     Register player
     /// </summary>
-    [HttpPost]
+    [HttpPost("{playerGuid:guid}")]
     public ActionResult<PlayerDto> RegisterPlayer(Guid playerGuid, string playerName)
     {
         PlayerId playerId = new(playerGuid);
@@ -38,7 +48,7 @@ public class PlayersController : AdminApiController
     /// <summary>
     ///     Get player
     /// </summary>
-    [HttpGet]
+    [HttpGet("{playerGuid:guid}")]
     public ActionResult<PlayerDto> GetPlayer(Guid playerGuid)
     {
         PlayerId playerId = new(playerGuid);
@@ -56,7 +66,7 @@ public class PlayersController : AdminApiController
     /// <summary>
     ///     Refresh player key
     /// </summary>
-    [HttpPost("refresh")]
+    [HttpPost("{playerGuid:guid}/refresh")]
     public ActionResult<PlayerDto> RefreshPlayerKey(Guid playerGuid)
     {
         PlayerId playerId = new(playerGuid);

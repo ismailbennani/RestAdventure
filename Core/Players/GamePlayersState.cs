@@ -11,6 +11,8 @@ public class GamePlayersState
 
     internal GameState GameState { get; }
 
+    public IEnumerable<Player> All => _players.Values;
+
     public Player RegisterPlayer(PlayerId playerId, string playerName)
     {
         if (!_players.TryGetValue(playerId, out Player? player))
