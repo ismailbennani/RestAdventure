@@ -36,7 +36,10 @@ try
         using SessionScope? _ = session.Activate();
 
         MapAreaDbo startingArea = new("Start");
-        MapLocationDbo map = new(startingArea, 0, 0);
+        MapLocationDbo __ = new(startingArea, 0, 0);
+        MapLocationDbo ___ = new(startingArea, 0, 1);
+
+        __.ConnectedLocations.Add(___);
 
         transaction.Complete();
     }

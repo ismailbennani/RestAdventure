@@ -45,5 +45,5 @@ public class CharacterDbo : Entity
     ///     The location of the character
     /// </summary>
     [Field]
-    public MapLocationDbo Location { get; private set; }
+    public MapLocationDbo Location { get; set; }
 }

@@ -1,6 +1,6 @@
 ﻿namespace RestAdventure.Core.Characters;
 
-public class CharactersInteractionService
+public class CharacterInteractionsService
 {
     public IQueryable<CharacterDbo> GetCharactersInRange(CharacterDbo character) => character.Location.Characters;
     public IQueryable<CharacterDbo> GetCharactersInRange(IQueryable<CharacterDbo> characters) => characters.SelectMany(c => c.Location.Characters).Distinct();
@@ -8,5 +8,5 @@ public class CharactersInteractionService
 
 public static class CharactersInteractionServiceExtensions
 {
-    public static IQueryable<CharacterDbo> GetCharactersInRange(this CharactersInteractionService service, TeamDbo team) => service.GetCharactersInRange(team.Characters);
+    public static IQueryable<CharacterDbo> GetCharactersInRange(this CharacterInteractionsService service, TeamDbo team) => service.GetCharactersInRange(team.Characters);
 }

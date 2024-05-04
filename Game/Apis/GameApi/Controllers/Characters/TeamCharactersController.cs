@@ -1,21 +1,19 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
+using RestAdventure.Core.Characters;
 using RestAdventure.Game.Apis.GameApi.Controllers.Characters.Requests;
 using RestAdventure.Game.Apis.GameApi.Dtos.Characters;
 using RestAdventure.Game.Apis.GameApi.Services.Characters;
 using RestAdventure.Game.Authentication;
+using RestAdventure.Game.Controllers;
 using RestAdventure.Kernel.Persistence;
 using Xtensive.Orm;
 
 namespace RestAdventure.Game.Apis.GameApi.Controllers.Characters;
 
 [Route("game/team/characters")]
-[ApiController]
-[Authorize(AuthenticationSchemes = GameApiAuthenticationOptions.AuthenticationScheme)]
-[GameApi]
 [OpenApiTag("Team")]
-public class TeamCharactersController : ControllerBase
+public class TeamCharactersController : GameApiController
 {
     readonly DomainAccessor _domainAccessor;
     readonly TeamService _teamService;
@@ -30,6 +28,8 @@ public class TeamCharactersController : ControllerBase
     ///     Create character
     /// </summary>
     [HttpPost]
+    [ProducesResponseType(typeof(TeamCharacterDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<TeamCharacterDto>> CreateCharacterAsync(CreateCharacterRequestDto request)
     {
         await using Session session = await _domainAccessor.Domain.OpenSessionAsync();
@@ -37,7 +37,7 @@ public class TeamCharactersController : ControllerBase
 
         Guid playerId = ControllerContext.RequirePlayerId();
 
-        CharacterCreationResult result;
+        OperationResult<CharacterDbo> result;
         using (session.Activate())
         {
             result = await _teamService.CreateCharacterAsync(playerId, request);
@@ -50,33 +50,30 @@ public class TeamCharactersController : ControllerBase
 
         transaction.Complete();
 
-        return result.Character.ToDto();
+        return ToActionResult(result, t => t.ToDto());
     }
 
     /// <summary>
     ///     Delete character
     /// </summary>
     [HttpDelete("{characterId:guid}")]
-    public async Task<IActionResult> DeleteCharacterAsync(Guid characterId)
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> DeleteCharacterAsync(Guid characterId)
     {
         await using Session session = await _domainAccessor.Domain.OpenSessionAsync();
         await using TransactionScope transaction = await session.OpenTransactionAsync();
 
         Guid playerId = ControllerContext.RequirePlayerId();
 
-        bool success;
+        OperationResult result;
         using (session.Activate())
         {
-            success = await _teamService.DeleteCharacterServiceAsync(playerId, characterId);
-        }
-
-        if (!success)
-        {
-            return Problem($"Could not delete character {characterId}", statusCode: StatusCodes.Status404NotFound);
+            result = await _teamService.DeleteCharacterServiceAsync(playerId, characterId);
         }
 
         transaction.Complete();
 
-        return NoContent();
+        return ToActionResult(result);
     }
 }

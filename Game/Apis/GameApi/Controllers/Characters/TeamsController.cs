@@ -1,21 +1,18 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using RestAdventure.Core.Characters;
 using RestAdventure.Game.Apis.GameApi.Dtos.Characters;
 using RestAdventure.Game.Apis.GameApi.Services.Characters;
 using RestAdventure.Game.Authentication;
+using RestAdventure.Game.Controllers;
 using RestAdventure.Kernel.Persistence;
 using Xtensive.Orm;
 
 namespace RestAdventure.Game.Apis.GameApi.Controllers.Characters;
 
 [Route("game/team")]
-[ApiController]
-[Authorize(AuthenticationSchemes = GameApiAuthenticationOptions.AuthenticationScheme)]
-[GameApi]
 [OpenApiTag("Team")]
-public class TeamsController : ControllerBase
+public class TeamsController : GameApiController
 {
     readonly DomainAccessor _domainAccessor;
     readonly TeamService _teamService;
@@ -30,22 +27,22 @@ public class TeamsController : ControllerBase
     ///     Get team
     /// </summary>
     [HttpGet]
-    public async Task<TeamDto> GetTeamAsync()
+    public async Task<ActionResult<TeamDto>> GetTeamAsync()
     {
         await using Session session = await _domainAccessor.Domain.OpenSessionAsync();
         await using TransactionScope transaction = await session.OpenTransactionAsync();
 
         Guid playerId = ControllerContext.RequirePlayerId();
 
-        TeamDbo team;
+        OperationResult<TeamDbo> result;
         using (session.Activate())
         {
-            team = await _teamService.GetTeamAsync(playerId);
+            result = await _teamService.GetTeamAsync(playerId);
         }
 
         transaction.Complete();
 
-        return team.ToDto();
+        return ToActionResult(result, t => t.ToDto());
     }
 
     static async Task<TeamDbo> GetOrCreateTeamAsync(Session session, Guid playerId)

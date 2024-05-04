@@ -3,7 +3,16 @@ using RestAdventure.Core.Maps;
 
 namespace RestAdventure.Game.Apis.GameApi.Dtos.Maps;
 
-public class MapLocationDto
+public class MapLocationDto : MapLocationMinimalDto
+{
+    /// <summary>
+    ///     The locations connected to this one
+    /// </summary>
+    [Required]
+    public required IReadOnlyCollection<MapLocationMinimalDto> ConnectedLocations { get; init; }
+}
+
+public class MapLocationMinimalDto
 {
     /// <summary>
     ///     The unique ID of the location
@@ -32,6 +41,13 @@ public class MapLocationDto
 
 static class MapLocationMappingExtensions
 {
-    public static MapLocationDto ToDto(this MapLocationDbo location) =>
+    public static MapLocationMinimalDto ToMinimalDto(this MapLocationDbo location) =>
         new() { Id = location.Id, Area = location.Area.ToDto(), PositionX = location.PositionX, PositionY = location.PositionY };
+
+    public static MapLocationDto ToDto(this MapLocationDbo location) =>
+        new()
+        {
+            Id = location.Id, Area = location.Area.ToDto(), PositionX = location.PositionX, PositionY = location.PositionY,
+            ConnectedLocations = location.ConnectedLocations.Select(l => l.ToMinimalDto()).ToArray()
+        };
 }

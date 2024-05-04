@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using RestAdventure.Core.Characters;
 using RestAdventure.Game.Apis.GameApi.Controllers.Characters.Requests;
+using RestAdventure.Game.Controllers;
 using RestAdventure.Game.Settings;
 using Xtensive.Orm;
 
@@ -15,9 +16,9 @@ public class TeamService
         _gameSettings = gameSettings;
     }
 
-    public async Task<TeamDbo> GetTeamAsync(Guid playerId) => await GetOrCreateTeamAsync(playerId);
+    public async Task<OperationResult<TeamDbo>> GetTeamAsync(Guid playerId) => OperationResult.Ok(await GetOrCreateTeamAsync(playerId));
 
-    public async Task<CharacterCreationResult> CreateCharacterAsync(Guid playerId, CreateCharacterRequestDto request)
+    public async Task<OperationResult<CharacterDbo>> CreateCharacterAsync(Guid playerId, CreateCharacterRequestDto request)
     {
         TeamDbo team = await GetOrCreateTeamAsync(playerId);
 
@@ -25,30 +26,47 @@ public class TeamService
         int maxTeamSize = _gameSettings.Value.MaxTeamSize;
         if (nCharacters >= maxTeamSize)
         {
-            return new CharacterCreationResult { IsSuccess = false, ErrorMessage = $"reached max team size ({maxTeamSize})" };
+            return OperationResult.BadRequest<CharacterDbo>($"reached max team size ({maxTeamSize})");
         }
 
         CharacterDbo character = new(team, request.Name, request.Class);
 
-        return new CharacterCreationResult { IsSuccess = true, Character = character };
+        return OperationResult.Ok(character);
     }
 
-    public async Task<bool> DeleteCharacterServiceAsync(Guid playerId, Guid characterId)
+    public async Task<OperationResult<CharacterDbo>> GetCharacterAsync(Guid playerId, Guid characterId)
     {
         TeamDbo? team = await GetTeamInternalAsync(playerId);
         if (team == null)
         {
-            return false;
+            return OperationResult.NotFound<CharacterDbo>();
         }
 
         CharacterDbo? character = await team.Characters.SingleOrDefaultAsync(c => c.Id == characterId);
         if (character == null)
         {
-            return false;
+            return OperationResult.NotFound<CharacterDbo>();
+        }
+
+        return OperationResult.Ok(character);
+    }
+
+    public async Task<OperationResult> DeleteCharacterServiceAsync(Guid playerId, Guid characterId)
+    {
+        TeamDbo? team = await GetTeamInternalAsync(playerId);
+        if (team == null)
+        {
+            return OperationResult.NotFound();
+        }
+
+        CharacterDbo? character = await team.Characters.SingleOrDefaultAsync(c => c.Id == characterId);
+        if (character == null)
+        {
+            return OperationResult.NotFound();
         }
 
         character.Remove();
-        return true;
+        return OperationResult.NoContent();
     }
 
     static async Task<TeamDbo?> GetTeamInternalAsync(Guid playerId) =>
