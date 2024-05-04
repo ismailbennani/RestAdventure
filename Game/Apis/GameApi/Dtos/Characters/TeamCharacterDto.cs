@@ -36,6 +36,11 @@ public class TeamCharacterDto
     public required MapLocationDto Location { get; init; }
 
     /// <summary>
+    ///     The result of the action that has been performed on last tick
+    /// </summary>
+    public CharacterActionResultDto? LastActionResult { get; init; }
+
+    /// <summary>
     ///     The action that the character has planned for the next tick
     /// </summary>
     public CharacterActionDto? NextAction { get; init; }
@@ -44,7 +49,11 @@ public class TeamCharacterDto
 static class TeamCharacterMappingExtensions
 {
     public static TeamCharacterDto ToDto(this CharacterDbo character, CharacterMappingOptions? options = null) =>
-        new() { Id = character.Id, Name = character.Name, Class = character.Class, Location = character.Location.ToDto(), NextAction = options?.NextAction?.ToDto() };
+        new()
+        {
+            Id = character.Id, Name = character.Name, Class = character.Class, Location = character.Location.ToDto(), LastActionResult = options?.LastActionResult?.ToDto(),
+            NextAction = options?.NextAction?.ToDto()
+        };
 }
 
 class CharacterMappingOptions

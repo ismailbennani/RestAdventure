@@ -33,7 +33,7 @@ public class CharacterActionsService
                 CharacterId = characterId,
                 Action = action,
                 Success = resolution.Success,
-                ErrorMessage = resolution.ErrorMessage
+                FailureReason = resolution.ErrorMessage
             };
         }
 
@@ -47,5 +47,5 @@ public class CharacterActionResult
     public required Guid CharacterId { get; init; }
     public required CharacterAction Action { get; init; }
     public required bool Success { get; init; }
-    public string? ErrorMessage { get; init; }
+    public string? FailureReason { get; init; }
 }
