@@ -8,6 +8,9 @@ using RestAdventure.Game.Authentication;
 
 namespace RestAdventure.Game.Apis.GameApi.Controllers.Characters;
 
+/// <summary>
+///     Characters operations
+/// </summary>
 [Route("game/characters")]
 [OpenApiTag("Characters")]
 public class CharactersController : GameApiController
@@ -15,6 +18,8 @@ public class CharactersController : GameApiController
     readonly GameService _gameService;
     readonly CharacterInteractionsService _characterInteractionsService;
 
+    /// <summary>
+    /// </summary>
     public CharactersController(GameService gameService, CharacterInteractionsService characterInteractionsService)
     {
         _gameService = gameService;

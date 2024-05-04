@@ -3,6 +3,9 @@ using RestAdventure.Core.Gameplay.Actions;
 
 namespace RestAdventure.Game.Apis.GameApi.Dtos.Characters.Actions;
 
+/// <summary>
+///     An action performed by a character
+/// </summary>
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "$type", IgnoreUnrecognizedTypeDiscriminators = true)]
 [JsonDerivedType(typeof(CharacterMoveToLocationActionDto), "move-to-location")]
 public class CharacterActionDto

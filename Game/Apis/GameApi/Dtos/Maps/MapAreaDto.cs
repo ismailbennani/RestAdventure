@@ -3,6 +3,9 @@ using RestAdventure.Core.Maps;
 
 namespace RestAdventure.Game.Apis.GameApi.Dtos.Maps;
 
+/// <summary>
+///     Map area
+/// </summary>
 public class MapAreaDto
 {
     /// <summary>

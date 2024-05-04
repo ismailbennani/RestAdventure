@@ -9,14 +9,19 @@ using RestAdventure.Game.Authentication;
 
 namespace RestAdventure.Game.Apis.GameApi.Controllers.Characters;
 
+/// <summary>
+///     Characters actions operations
+/// </summary>
 [Route("game/team/characters/{characterGuid:guid}")]
 [OpenApiTag("Team")]
-public class TeamCharactersActionsService : GameApiController
+public class TeamCharactersActionsController : GameApiController
 {
     readonly GameService _gameService;
     readonly CharacterActionsService _characterActionsService;
 
-    public TeamCharactersActionsService(GameService gameService, CharacterActionsService characterActionsService)
+    /// <summary>
+    /// </summary>
+    public TeamCharactersActionsController(GameService gameService, CharacterActionsService characterActionsService)
     {
         _gameService = gameService;
         _characterActionsService = characterActionsService;

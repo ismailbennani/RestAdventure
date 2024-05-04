@@ -9,12 +9,17 @@ using RestAdventure.Game.Authentication;
 
 namespace RestAdventure.Game.Apis.GameApi.Controllers.Characters;
 
+/// <summary>
+///     Team characters operations
+/// </summary>
 [Route("game/team/characters")]
 [OpenApiTag("Team")]
 public class TeamCharactersController : GameApiController
 {
     readonly GameService _gameService;
 
+    /// <summary>
+    /// </summary>
     public TeamCharactersController(GameService gameService)
     {
         _gameService = gameService;

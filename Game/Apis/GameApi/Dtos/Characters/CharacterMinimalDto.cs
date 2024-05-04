@@ -3,6 +3,9 @@ using RestAdventure.Core.Characters;
 
 namespace RestAdventure.Game.Apis.GameApi.Dtos.Characters;
 
+/// <summary>
+///     Minimal character information
+/// </summary>
 public class CharacterMinimalDto
 {
     /// <summary>

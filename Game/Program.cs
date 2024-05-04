@@ -54,7 +54,7 @@ try
 
     app.MapControllers();
 
-    await LoadGameAsync(app);
+    LoadGame(app);
     StartScheduler(app);
 
     app.Run();
@@ -116,10 +116,10 @@ void SetupOpenApiDocuments(WebApplicationBuilder builder)
     );
 }
 
-async Task<GameState> LoadGameAsync(WebApplication app)
+GameState LoadGame(WebApplication app)
 {
     GameService gameService = app.Services.GetRequiredService<GameService>();
-    GameState gameState = await gameService.NewGameAsync(new GameSettings());
+    GameState gameState = gameService.NewGame(new GameSettings());
 
     MapArea startingArea = gameState.Map.CreateArea("Start");
     MapLocation map1 = gameState.Map.CreateLocation(startingArea, 0, 0);

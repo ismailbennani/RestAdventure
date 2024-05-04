@@ -6,6 +6,9 @@ using RestAdventure.Game.Apis.AdminApi.Dtos.Players;
 
 namespace RestAdventure.Game.Apis.AdminApi.Controllers.Players;
 
+/// <summary>
+///     Players operations
+/// </summary>
 [Route("admin/players/{playerGuid:guid}")]
 [ApiController]
 [AdminApi]
@@ -14,6 +17,8 @@ public class PlayersController : ControllerBase
 {
     readonly GameService _gameService;
 
+    /// <summary>
+    /// </summary>
     public PlayersController(GameService gameService)
     {
         _gameService = gameService;

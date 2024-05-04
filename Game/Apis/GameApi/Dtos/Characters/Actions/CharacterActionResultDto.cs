@@ -3,6 +3,9 @@ using RestAdventure.Core.Gameplay.Actions;
 
 namespace RestAdventure.Game.Apis.GameApi.Dtos.Characters.Actions;
 
+/// <summary>
+///     The result of an action performed by a character
+/// </summary>
 public class CharacterActionResultDto
 {
     /// <summary>

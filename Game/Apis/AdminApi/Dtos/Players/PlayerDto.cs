@@ -3,6 +3,9 @@ using RestAdventure.Core.Players;
 
 namespace RestAdventure.Game.Apis.AdminApi.Dtos.Players;
 
+/// <summary>
+///     A player
+/// </summary>
 public class PlayerDto
 {
     /// <summary>

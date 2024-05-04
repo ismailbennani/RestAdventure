@@ -4,6 +4,9 @@ using RestAdventure.Game.Settings;
 
 namespace RestAdventure.Game.Apis.GameApi.Services.Game;
 
+/// <summary>
+///     Game scheduler
+/// </summary>
 public class GameScheduler : IDisposable
 {
     readonly GameService _gameService;
@@ -12,6 +15,8 @@ public class GameScheduler : IDisposable
 
     CancellationTokenSource? _mainLoopCancellationSource;
 
+    /// <summary>
+    /// </summary>
     public GameScheduler(GameService gameService, IOptions<ServerSettings> serverSettings, ILogger<GameScheduler> logger)
     {
         _gameService = gameService;

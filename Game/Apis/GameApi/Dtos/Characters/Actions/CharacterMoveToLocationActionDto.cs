@@ -3,6 +3,9 @@ using RestAdventure.Core.Gameplay.Actions;
 
 namespace RestAdventure.Game.Apis.GameApi.Dtos.Characters.Actions;
 
+/// <summary>
+///     Character moves to location
+/// </summary>
 public class CharacterMoveToLocationActionDto : CharacterActionDto
 {
     /// <summary>

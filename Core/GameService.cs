@@ -18,7 +18,7 @@ public class GameService
         _logger = logger;
     }
 
-    public async Task<GameState> NewGameAsync(GameSettings settings)
+    public GameState NewGame(GameSettings settings)
     {
         _gameState = new GameState(settings);
 
@@ -27,13 +27,13 @@ public class GameService
         return _gameState;
     }
 
-    public async Task<GameState> LoadGameAsync() => throw new NotImplementedException();
+    public GameState LoadGame() => throw new NotImplementedException();
 
     public GameState RequireGameState()
     {
         if (_gameState == null)
         {
-            throw new InvalidOperationException($"No game has been loaded. Please call {nameof(NewGameAsync)} or {nameof(LoadGameAsync)}.");
+            throw new InvalidOperationException($"No game has been loaded. Please call {nameof(NewGame)} or {nameof(LoadGame)}.");
         }
 
         return _gameState;

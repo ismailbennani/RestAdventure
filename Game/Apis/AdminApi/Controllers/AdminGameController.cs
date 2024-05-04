@@ -4,6 +4,9 @@ using RestAdventure.Game.Apis.GameApi.Services.Game;
 
 namespace RestAdventure.Game.Apis.AdminApi.Controllers;
 
+/// <summary>
+///     Game admin operations
+/// </summary>
 [Route("admin/game")]
 [ApiController]
 [AdminApi]
@@ -12,6 +15,8 @@ public class AdminGameController : ControllerBase
 {
     readonly GameScheduler _gameScheduler;
 
+    /// <summary>
+    /// </summary>
     public AdminGameController(GameScheduler gameScheduler)
     {
         _gameScheduler = gameScheduler;

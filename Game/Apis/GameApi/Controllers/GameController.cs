@@ -10,6 +10,9 @@ using RestAdventure.Game.Settings;
 
 namespace RestAdventure.Game.Apis.GameApi.Controllers;
 
+/// <summary>
+///     Game operations
+/// </summary>
 [Route("game")]
 [ApiController]
 [Authorize(AuthenticationSchemes = GameApiAuthenticationOptions.AuthenticationScheme)]
@@ -21,6 +24,8 @@ public class GameController : ControllerBase
     readonly GameScheduler _gameScheduler;
     readonly IOptions<GameSettings> _gameSettings;
 
+    /// <summary>
+    /// </summary>
     public GameController(GameService gameService, GameScheduler gameScheduler, IOptions<GameSettings> gameSettings)
     {
         _gameSettings = gameSettings;

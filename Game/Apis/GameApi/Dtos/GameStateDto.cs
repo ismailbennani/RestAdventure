@@ -2,6 +2,9 @@
 
 namespace RestAdventure.Game.Apis.GameApi.Dtos;
 
+/// <summary>
+///     Game state
+/// </summary>
 public class GameStateDto
 {
     /// <summary>

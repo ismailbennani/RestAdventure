@@ -1,5 +1,8 @@
 ﻿namespace RestAdventure.Game.Settings;
 
+/// <summary>
+///     Server settings
+/// </summary>
 public class ServerSettings
 {
     /// <summary>
