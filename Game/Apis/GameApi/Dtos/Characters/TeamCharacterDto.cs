@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using RestAdventure.Core.Characters;
+using RestAdventure.Core.Gameplay.Actions;
+using RestAdventure.Game.Apis.GameApi.Dtos.Characters.Actions;
 using RestAdventure.Game.Apis.GameApi.Dtos.Maps;
 
 namespace RestAdventure.Game.Apis.GameApi.Dtos.Characters;
@@ -32,10 +34,21 @@ public class TeamCharacterDto
     /// </summary>
     [Required]
     public required MapLocationDto Location { get; init; }
+
+    /// <summary>
+    ///     The action that the character has planned for the next tick
+    /// </summary>
+    public CharacterActionDto? NextAction { get; init; }
 }
 
 static class TeamCharacterMappingExtensions
 {
-    public static TeamCharacterDto ToDto(this CharacterDbo character) =>
-        new() { Id = character.Id, Name = character.Name, Class = character.Class, Location = character.Location.ToDto() };
+    public static TeamCharacterDto ToDto(this CharacterDbo character, CharacterMappingOptions? options = null) =>
+        new() { Id = character.Id, Name = character.Name, Class = character.Class, Location = character.Location.ToDto(), NextAction = options?.NextAction?.ToDto() };
+}
+
+class CharacterMappingOptions
+{
+    public CharacterActionResult? LastActionResult { get; init; }
+    public CharacterAction? NextAction { get; init; }
 }

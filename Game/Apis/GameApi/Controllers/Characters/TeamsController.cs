@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using RestAdventure.Core.Characters;
+using RestAdventure.Core.Gameplay.Actions;
 using RestAdventure.Game.Apis.GameApi.Dtos.Characters;
 using RestAdventure.Game.Apis.GameApi.Services.Characters;
 using RestAdventure.Game.Authentication;
@@ -16,11 +17,13 @@ public class TeamsController : GameApiController
 {
     readonly DomainAccessor _domainAccessor;
     readonly TeamService _teamService;
+    readonly CharacterActionsService _characterActionsService;
 
-    public TeamsController(DomainAccessor domainAccessor, TeamService teamService)
+    public TeamsController(DomainAccessor domainAccessor, TeamService teamService, CharacterActionsService characterActionsService)
     {
         _domainAccessor = domainAccessor;
         _teamService = teamService;
+        _characterActionsService = characterActionsService;
     }
 
     /// <summary>
@@ -34,15 +37,35 @@ public class TeamsController : GameApiController
 
         Guid playerId = ControllerContext.RequirePlayerId();
 
-        OperationResult<TeamDbo> result;
+        OperationResult<TeamDbo> team;
         using (session.Activate())
         {
-            result = await _teamService.GetTeamAsync(playerId);
+            team = await _teamService.GetTeamAsync(playerId);
+        }
+
+        if (!team.IsSuccess)
+        {
+            return ToFailedActionResult(team);
         }
 
         transaction.Complete();
 
-        return ToActionResult(result, t => t.ToDto());
+        IEnumerable<TeamCharacterDto> characterDtos;
+        using (session.Activate())
+        {
+            characterDtos = team.Result.Characters.ToList()
+                .Select(
+                    c => c.ToDto(
+                        new CharacterMappingOptions
+                        {
+                            LastActionResult = _characterActionsService.GetLastActionResult(c),
+                            NextAction = _characterActionsService.GetNextAction(c)
+                        }
+                    )
+                );
+        }
+
+        return ToActionResult(team, t => new TeamDto { Characters = characterDtos.ToArray() });
     }
 
     static async Task<TeamDbo> GetOrCreateTeamAsync(Session session, Guid playerId)

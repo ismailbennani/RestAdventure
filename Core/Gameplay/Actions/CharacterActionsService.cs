@@ -18,6 +18,8 @@ public class CharacterActionsService
 
     public CharacterActionResult? GetLastActionResult(CharacterDbo character) => _results.GetValueOrDefault(character.Id);
 
+    public CharacterAction? GetNextAction(CharacterDbo character) => _actions.GetValueOrDefault(character.Id);
+
     public async Task ResolveActionsAsync(GameStateDbo state)
     {
         _results.Clear();
