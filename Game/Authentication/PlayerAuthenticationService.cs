@@ -1,49 +1,34 @@
-﻿using RestAdventure.Game.Registration;
-using RestAdventure.Kernel.Persistence;
-using Xtensive.Orm;
+﻿using RestAdventure.Core;
+using RestAdventure.Core.Players;
 
 namespace RestAdventure.Game.Authentication;
 
 class PlayerAuthenticationService
 {
-    readonly DomainAccessor _domainAccessor;
+    readonly GameService _gameService;
     readonly Dictionary<Guid, PlayerSession> _sessions = new();
 
-    public PlayerAuthenticationService(DomainAccessor domainAccessor)
+    public PlayerAuthenticationService(GameService gameService)
     {
-        _domainAccessor = domainAccessor;
+        _gameService = gameService;
     }
 
-    public async Task<AuthenticationResult> AuthenticateAsync(Guid apiKey)
+    public AuthenticationResult Authenticate(Guid apiKey)
     {
         if (!_sessions.TryGetValue(apiKey, out PlayerSession? session))
         {
-            session = await LoadSessionFromPersistence(apiKey);
-
-            if (session == null)
+            Player? player = _gameService.RequireGameState().Players.GetPlayerByApiKey(apiKey);
+            if (player == null)
             {
                 return AuthenticationResult.Failure();
             }
 
+            session = new PlayerSession(player.Id, player.Name);
             _sessions[apiKey] = session;
         }
 
         session.LastActivityDate = DateTime.Now;
 
         return AuthenticationResult.Success(session);
-    }
-
-    async Task<PlayerSession?> LoadSessionFromPersistence(Guid apiKey)
-    {
-        await using Session? session = await _domainAccessor.Domain.OpenSessionAsync();
-        await using TransactionScope? transaction = await session.OpenTransactionAsync();
-
-        PlayerIdentityDbo? player = await session.Query.All<PlayerRegistrationDbo>().Where(r => r.ApiKey == apiKey).Select(r => r.Player).SingleOrDefaultAsync();
-        if (player == null)
-        {
-            return null;
-        }
-
-        return new PlayerSession(player.Id, player.Name);
     }
 }

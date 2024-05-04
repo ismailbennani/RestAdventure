@@ -48,7 +48,7 @@ public class TeamCharacterDto
 
 static class TeamCharacterMappingExtensions
 {
-    public static TeamCharacterDto ToDto(this CharacterDbo character, CharacterMappingOptions? options = null) =>
+    public static TeamCharacterDto ToDto(this Character character, CharacterMappingOptions? options = null) =>
         new()
         {
             Id = character.Id, Name = character.Name, Class = character.Class, Location = character.Location.ToDto(), LastActionResult = options?.LastActionResult?.ToDto(),

@@ -1,6 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using RestAdventure.Core.Gameplay.Actions;
-using Xtensive.Orm;
+using RestAdventure.Game.Settings;
 
 namespace RestAdventure.Core;
 
@@ -9,35 +10,43 @@ public class GameService
     readonly CharacterActionsService _characterActionsService;
     readonly ILogger<GameService> _logger;
 
+    GameState? _gameState;
+
     public GameService(CharacterActionsService characterActionsService, ILogger<GameService> logger)
     {
         _characterActionsService = characterActionsService;
         _logger = logger;
     }
 
-    public async Task<GameStateDbo> GetStateAsync()
+    public async Task<GameState> NewGameAsync(GameSettings settings)
     {
-        GameStateDbo state = await GetOrCreateStateAsync();
-        return state;
+        _gameState = new GameState(settings);
+
+        _logger.LogInformation("Game state has been initialized with settings: {settingsJson}.", JsonSerializer.Serialize(settings));
+
+        return _gameState;
     }
 
-    public async Task<long> TickAsync()
-    {
-        GameStateDbo state = await GetOrCreateStateAsync();
-        return ++state.Tick;
-    }
+    public async Task<GameState> LoadGameAsync() => throw new NotImplementedException();
 
-    async Task<GameStateDbo> GetOrCreateStateAsync()
+    public GameState RequireGameState()
     {
-        GameStateDbo? state = await Query.All<GameStateDbo>().SingleOrDefaultAsync();
-        if (state == null)
+        if (_gameState == null)
         {
-            state = new GameStateDbo();
-            _logger.LogInformation("Game state has been initialized.");
+            throw new InvalidOperationException($"No game has been loaded. Please call {nameof(NewGameAsync)} or {nameof(LoadGameAsync)}.");
         }
 
-        await _characterActionsService.ResolveActionsAsync(state);
+        return _gameState;
+    }
 
-        return state;
+    public long Tick()
+    {
+        GameState state = RequireGameState();
+
+        state.Tick++;
+
+        _characterActionsService.ResolveActions(state);
+
+        return state.Tick;
     }
 }

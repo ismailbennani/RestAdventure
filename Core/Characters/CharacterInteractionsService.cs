@@ -2,11 +2,11 @@
 
 public class CharacterInteractionsService
 {
-    public IQueryable<CharacterDbo> GetCharactersInRange(CharacterDbo character) => character.Location.Characters;
-    public IQueryable<CharacterDbo> GetCharactersInRange(IQueryable<CharacterDbo> characters) => characters.SelectMany(c => c.Location.Characters).Distinct();
+    public IEnumerable<Character> GetCharactersInRange(Character character) => character.Location.Characters;
+    public IEnumerable<Character> GetCharactersInRange(IEnumerable<Character> characters) => characters.SelectMany(c => c.Location.Characters).Distinct();
 }
 
 public static class CharactersInteractionServiceExtensions
 {
-    public static IQueryable<CharacterDbo> GetCharactersInRange(this CharacterInteractionsService service, TeamDbo team) => service.GetCharactersInRange(team.Characters);
+    public static IEnumerable<Character> GetCharactersInRange(this CharacterInteractionsService service, Team team) => service.GetCharactersInRange(team.Characters);
 }

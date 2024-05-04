@@ -1,13 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
+using RestAdventure.Core;
 using RestAdventure.Core.Characters;
 using RestAdventure.Game.Apis.GameApi.Controllers.Characters.Requests;
 using RestAdventure.Game.Apis.GameApi.Dtos.Characters;
-using RestAdventure.Game.Apis.GameApi.Services.Characters;
 using RestAdventure.Game.Authentication;
-using RestAdventure.Game.Controllers;
-using RestAdventure.Kernel.Persistence;
-using Xtensive.Orm;
 
 namespace RestAdventure.Game.Apis.GameApi.Controllers.Characters;
 
@@ -15,13 +12,11 @@ namespace RestAdventure.Game.Apis.GameApi.Controllers.Characters;
 [OpenApiTag("Team")]
 public class TeamCharactersController : GameApiController
 {
-    readonly DomainAccessor _domainAccessor;
-    readonly TeamService _teamService;
+    readonly GameService _gameService;
 
-    public TeamCharactersController(DomainAccessor domainAccessor, TeamService teamService)
+    public TeamCharactersController(GameService gameService)
     {
-        _domainAccessor = domainAccessor;
-        _teamService = teamService;
+        _gameService = gameService;
     }
 
     /// <summary>
@@ -30,27 +25,20 @@ public class TeamCharactersController : GameApiController
     [HttpPost]
     [ProducesResponseType(typeof(TeamCharacterDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<TeamCharacterDto>> CreateCharacterAsync(CreateCharacterRequestDto request)
+    public ActionResult<TeamCharacterDto> CreateCharacter(CreateCharacterRequestDto request)
     {
-        await using Session session = await _domainAccessor.Domain.OpenSessionAsync();
-        await using TransactionScope transaction = await session.OpenTransactionAsync();
-
         Guid playerId = ControllerContext.RequirePlayerId();
+        GameState state = _gameService.RequireGameState();
 
-        OperationResult<CharacterDbo> result;
-        using (session.Activate())
-        {
-            result = await _teamService.CreateCharacterAsync(playerId, request);
-        }
+        Team team = GetOrCreateTeam(state, playerId);
+        CharacterCreationResult result = state.Characters.CreateCharacter(team, request.Name, request.Class);
 
         if (!result.IsSuccess)
         {
             return Problem($"Could not create character: {result.ErrorMessage}", statusCode: StatusCodes.Status400BadRequest);
         }
 
-        transaction.Complete();
-
-        return ToActionResult(result, t => t.ToDto());
+        return result.Character.ToDto();
     }
 
     /// <summary>
@@ -59,21 +47,27 @@ public class TeamCharactersController : GameApiController
     [HttpDelete("{characterId:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult> DeleteCharacterAsync(Guid characterId)
+    public ActionResult DeleteCharacter(Guid characterId)
     {
-        await using Session session = await _domainAccessor.Domain.OpenSessionAsync();
-        await using TransactionScope transaction = await session.OpenTransactionAsync();
-
         Guid playerId = ControllerContext.RequirePlayerId();
+        GameState state = _gameService.RequireGameState();
 
-        OperationResult result;
-        using (session.Activate())
+        Team? team = state.Characters.GetTeam(playerId);
+        if (team == null)
         {
-            result = await _teamService.DeleteCharacterServiceAsync(playerId, characterId);
+            return NotFound();
         }
 
-        transaction.Complete();
+        Character? character = state.Characters.GetCharacter(team, playerId);
+        if (character == null)
+        {
+            return NotFound();
+        }
 
-        return ToActionResult(result);
+        state.Characters.DeleteCharacter(team, characterId);
+
+        return NoContent();
     }
+
+    static Team GetOrCreateTeam(GameState state, Guid playerId) => state.Characters.GetTeamsOfPlayer(playerId).FirstOrDefault() ?? state.Characters.CreateTeam(playerId);
 }

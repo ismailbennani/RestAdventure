@@ -41,10 +41,10 @@ public class MapLocationMinimalDto
 
 static class MapLocationMappingExtensions
 {
-    public static MapLocationMinimalDto ToMinimalDto(this MapLocationDbo location) =>
+    public static MapLocationMinimalDto ToMinimalDto(this MapLocation location) =>
         new() { Id = location.Id, Area = location.Area.ToDto(), PositionX = location.PositionX, PositionY = location.PositionY };
 
-    public static MapLocationDto ToDto(this MapLocationDbo location) =>
+    public static MapLocationDto ToDto(this MapLocation location) =>
         new()
         {
             Id = location.Id, Area = location.Area.ToDto(), PositionX = location.PositionX, PositionY = location.PositionY,

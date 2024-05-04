@@ -1,13 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
+using RestAdventure.Core;
 using RestAdventure.Core.Characters;
 using RestAdventure.Core.Gameplay.Actions;
 using RestAdventure.Core.Maps;
-using RestAdventure.Game.Apis.GameApi.Services.Characters;
 using RestAdventure.Game.Authentication;
-using RestAdventure.Game.Controllers;
-using RestAdventure.Kernel.Persistence;
-using Xtensive.Orm;
 
 namespace RestAdventure.Game.Apis.GameApi.Controllers.Characters;
 
@@ -15,14 +12,12 @@ namespace RestAdventure.Game.Apis.GameApi.Controllers.Characters;
 [OpenApiTag("Team")]
 public class TeamCharactersActionsService : GameApiController
 {
-    readonly DomainAccessor _domainAccessor;
-    readonly TeamService _teamService;
+    readonly GameService _gameService;
     readonly CharacterActionsService _characterActionsService;
 
-    public TeamCharactersActionsService(DomainAccessor domainAccessor, TeamService teamService, CharacterActionsService characterActionsService)
+    public TeamCharactersActionsService(GameService gameService, CharacterActionsService characterActionsService)
     {
-        _domainAccessor = domainAccessor;
-        _teamService = teamService;
+        _gameService = gameService;
         _characterActionsService = characterActionsService;
     }
 
@@ -32,30 +27,30 @@ public class TeamCharactersActionsService : GameApiController
     [HttpPost("move/{locationId:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult> MoveToLocationAsync(Guid characterId, Guid locationId)
+    public ActionResult MoveToLocation(Guid characterId, Guid locationId)
     {
-        await using Session session = await _domainAccessor.Domain.OpenSessionAsync();
-        await using TransactionScope transaction = await session.OpenTransactionAsync();
-
         Guid playerId = ControllerContext.RequirePlayerId();
+        GameState state = _gameService.RequireGameState();
 
-        OperationResult<CharacterDbo> character;
-        using (session.Activate())
+        Team? team = state.Characters.GetTeamsOfPlayer(playerId).FirstOrDefault();
+        if (team == null)
         {
-            character = await _teamService.GetCharacterAsync(playerId, characterId);
+            return NotFound();
         }
 
-        if (!character.IsSuccess)
+        Character? character = state.Characters.GetCharacter(team, characterId);
+        if (character == null)
         {
-            return ToFailedActionResult(character);
+            return NotFound();
         }
 
-        MapLocationDbo? location = await session.Query.All<MapLocationDbo>().SingleOrDefaultAsync(l => l.Id == locationId);
-
-        using (session.Activate())
+        MapLocation? location = state.Map.GetLocation(locationId);
+        if (location == null)
         {
-            _characterActionsService.MoveToLocation(character.Result, location);
+            return NotFound();
         }
+
+        _characterActionsService.MoveToLocation(character, location);
 
         return NoContent();
     }

@@ -14,19 +14,19 @@ public class CharacterActionsService
     /// <summary>
     ///     Make the character move to the given location on next tick.
     /// </summary>
-    public void MoveToLocation(CharacterDbo character, MapLocationDbo location) => _actions[character.Id] = new CharacterMoveToLocationAction(character, location);
+    public void MoveToLocation(Character character, MapLocation location) => _actions[character.Id] = new CharacterMoveToLocationAction(character, location);
 
-    public CharacterActionResult? GetLastActionResult(CharacterDbo character) => _results.GetValueOrDefault(character.Id);
+    public CharacterActionResult? GetLastActionResult(Character character) => _results.GetValueOrDefault(character.Id);
 
-    public CharacterAction? GetNextAction(CharacterDbo character) => _actions.GetValueOrDefault(character.Id);
+    public CharacterAction? GetNextAction(Character character) => _actions.GetValueOrDefault(character.Id);
 
-    public async Task ResolveActionsAsync(GameStateDbo state)
+    public void ResolveActions(GameState state)
     {
         _results.Clear();
 
         foreach ((Guid characterId, CharacterAction action) in _actions)
         {
-            CharacterActionResolution resolution = await action.PerformAsync();
+            CharacterActionResolution resolution = action.Perform(state);
             _results[characterId] = new CharacterActionResult
             {
                 Tick = state.Tick,

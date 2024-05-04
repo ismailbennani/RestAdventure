@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using RestAdventure.Core.Characters;
 
-namespace RestAdventure.Game.Apis.GameApi.Services.Characters;
+namespace RestAdventure.Core.Characters;
 
 public class CharacterCreationResult
 {
@@ -15,7 +14,7 @@ public class CharacterCreationResult
     /// <summary>
     ///     If the creation succeeded, the character that was created
     /// </summary>
-    public CharacterDbo? Character { get; init; }
+    public Character? Character { get; init; }
 
     /// <summary>
     ///     If the creation failed, the reason why

@@ -39,7 +39,7 @@ class GameApiAuthenticationHandler : AuthenticationHandler<GameApiAuthentication
             return AuthenticateResult.Fail("Bad auth token");
         }
 
-        AuthenticationResult authenticationResult = await _authenticationService.AuthenticateAsync(authTokenGuid);
+        AuthenticationResult authenticationResult = _authenticationService.Authenticate(authTokenGuid);
         if (!authenticationResult.IsSuccess)
         {
             return AuthenticateResult.Fail("Authentication failed");

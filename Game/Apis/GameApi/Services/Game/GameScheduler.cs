@@ -1,24 +1,19 @@
 ﻿using Microsoft.Extensions.Options;
 using RestAdventure.Core;
 using RestAdventure.Game.Settings;
-using RestAdventure.Kernel.Persistence;
-using Xtensive.Orm;
 
 namespace RestAdventure.Game.Apis.GameApi.Services.Game;
 
 public class GameScheduler : IDisposable
 {
-    readonly DomainAccessor _domainAccessor;
     readonly GameService _gameService;
     readonly IOptions<ServerSettings> _serverSettings;
     readonly ILogger<GameScheduler> _logger;
 
     CancellationTokenSource? _mainLoopCancellationSource;
-    readonly object _tickLock = new();
 
-    public GameScheduler(DomainAccessor domainAccessor, GameService gameService, IOptions<ServerSettings> serverSettings, ILogger<GameScheduler> logger)
+    public GameScheduler(GameService gameService, IOptions<ServerSettings> serverSettings, ILogger<GameScheduler> logger)
     {
-        _domainAccessor = domainAccessor;
         _gameService = gameService;
         _serverSettings = serverSettings;
         _logger = logger;
@@ -95,19 +90,13 @@ public class GameScheduler : IDisposable
     {
         try
         {
-            await using Session session = await _domainAccessor.Domain.OpenSessionAsync();
-            await using TransactionScope transaction = await session.OpenTransactionAsync();
-            using SessionScope _ = session.Activate();
-
-            long tick = await _gameService.TickAsync();
+            long tick = _gameService.Tick();
 
             _logger.LogInformation("Game simulation has ticked ({tick}).", tick);
-
-            transaction.Complete();
         }
         catch (Exception exn)
         {
-            _logger.LogError(exn, "An error occured in {method}.", nameof(_gameService.TickAsync));
+            _logger.LogError(exn, "An error occured in {method}.", nameof(_gameService.Tick));
         }
 
         TimeSpan tickDuration = _serverSettings.Value.TickDuration;

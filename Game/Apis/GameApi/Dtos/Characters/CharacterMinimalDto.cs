@@ -26,5 +26,5 @@ public class CharacterMinimalDto
 
 static class CharacterMappingExtensions
 {
-    public static CharacterMinimalDto ToMinimalCharacterDto(this CharacterDbo character) => new() { Id = character.Id, Name = character.Name, Class = character.Class };
+    public static CharacterMinimalDto ToMinimalCharacterDto(this Character character) => new() { Id = character.Id, Name = character.Name, Class = character.Class };
 }

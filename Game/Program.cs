@@ -4,11 +4,9 @@ using System.Text.Json.Serialization;
 using NSwag;
 using NSwag.Generation.Processors.Security;
 using RestAdventure.Core;
-using RestAdventure.Core.Characters;
 using RestAdventure.Core.Maps;
 using RestAdventure.Game.Apis.AdminApi;
 using RestAdventure.Game.Apis.GameApi;
-using RestAdventure.Game.Apis.GameApi.Services.Characters;
 using RestAdventure.Game.Apis.GameApi.Services.Game;
 using RestAdventure.Game.Authentication;
 using RestAdventure.Game.Settings;
@@ -16,7 +14,6 @@ using RestAdventure.Kernel.OpenApi;
 using Serilog;
 using Serilog.Events;
 using Serilog.Extensions.Logging;
-using Xtensive.Orm;
 
 Assembly thisAssembly = typeof(Program).Assembly;
 
@@ -26,23 +23,6 @@ ILoggerFactory loggerFactory = new SerilogLoggerFactory(Log.Logger);
 try
 {
     WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
-
-    Domain domain = await builder.SetupPersistence(loggerFactory.CreateLogger("Persistence"), thisAssembly, typeof(TeamDbo).Assembly);
-
-    {
-        // TODO: remove this
-        await using Session? session = await domain.OpenSessionAsync();
-        await using TransactionScope? transaction = await session.OpenTransactionAsync();
-        using SessionScope? _ = session.Activate();
-
-        MapAreaDbo startingArea = new("Start");
-        MapLocationDbo __ = new(startingArea, 0, 0);
-        MapLocationDbo ___ = new(startingArea, 0, 1);
-
-        __.ConnectedLocations.Add(___);
-
-        transaction.Complete();
-    }
 
     builder.Services.AddSerilog(
         (services, settings) => settings.WriteTo.Console(LogEventLevel.Verbose, "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} ({SourceContext}){NewLine}{Exception}")
@@ -55,9 +35,7 @@ try
     SetupGameApiAuthentication(builder);
     SetupOpenApiDocuments(builder);
 
-    builder.Services.AddOptions<GameSettings>();
     builder.Services.AddOptions<ServerSettings>();
-    builder.Services.AddSingleton<TeamService>();
     builder.Services.AddSingleton<GameScheduler>();
 
     builder.Services.ConfigureCoreServices();
@@ -76,6 +54,7 @@ try
 
     app.MapControllers();
 
+    await LoadGameAsync(app);
     StartScheduler(app);
 
     app.Run();
@@ -135,6 +114,20 @@ void SetupOpenApiDocuments(WebApplicationBuilder builder)
             settings.SchemaSettings.TypeNameGenerator = new TypeNameWithoutDtoGenerator(settings.SchemaSettings.TypeNameGenerator);
         }
     );
+}
+
+async Task<GameState> LoadGameAsync(WebApplication app)
+{
+    GameService gameService = app.Services.GetRequiredService<GameService>();
+    GameState gameState = await gameService.NewGameAsync(new GameSettings());
+
+    MapArea startingArea = gameState.Map.CreateArea("Start");
+    MapLocation map1 = gameState.Map.CreateLocation(startingArea, 0, 0);
+    MapLocation map2 = gameState.Map.CreateLocation(startingArea, 0, 1);
+
+    gameState.Map.ConnectLocations(map1, map2);
+
+    return gameState;
 }
 
 void StartScheduler(WebApplication app)

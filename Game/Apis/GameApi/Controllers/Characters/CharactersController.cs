@@ -1,12 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
+using RestAdventure.Core;
 using RestAdventure.Core.Characters;
 using RestAdventure.Game.Apis.GameApi.Dtos.Characters;
-using RestAdventure.Game.Apis.GameApi.Services.Characters;
 using RestAdventure.Game.Authentication;
-using RestAdventure.Game.Controllers;
-using RestAdventure.Kernel.Persistence;
-using Xtensive.Orm;
 
 namespace RestAdventure.Game.Apis.GameApi.Controllers.Characters;
 
@@ -14,14 +11,12 @@ namespace RestAdventure.Game.Apis.GameApi.Controllers.Characters;
 [OpenApiTag("Characters")]
 public class CharactersController : GameApiController
 {
-    readonly DomainAccessor _domainAccessor;
-    readonly TeamService _teamService;
+    readonly GameService _gameService;
     readonly CharacterInteractionsService _characterInteractionsService;
 
-    public CharactersController(DomainAccessor domainAccessor, TeamService teamService, CharacterInteractionsService characterInteractionsService)
+    public CharactersController(GameService gameService, CharacterInteractionsService characterInteractionsService)
     {
-        _domainAccessor = domainAccessor;
-        _teamService = teamService;
+        _gameService = gameService;
         _characterInteractionsService = characterInteractionsService;
     }
 
@@ -32,26 +27,17 @@ public class CharactersController : GameApiController
     [HttpGet]
     [ProducesResponseType(typeof(IReadOnlyCollection<CharacterMinimalDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<IReadOnlyCollection<CharacterMinimalDto>>> GetCharactersInRangeAsync()
+    public ActionResult<IReadOnlyCollection<CharacterMinimalDto>> GetCharactersInRange()
     {
-        await using Session session = await _domainAccessor.Domain.OpenSessionAsync();
-        await using TransactionScope transaction = await session.OpenTransactionAsync();
-
         Guid playerId = ControllerContext.RequirePlayerId();
+        GameState state = _gameService.RequireGameState();
 
-        OperationResult<TeamDbo> team;
-        using (session.Activate())
+        Team? team = state.Characters.GetTeamsOfPlayer(playerId).FirstOrDefault();
+        if (team == null)
         {
-            team = await _teamService.GetTeamAsync(playerId);
+            return NotFound();
         }
 
-        if (!team.IsSuccess)
-        {
-            return ToFailedActionResult(team);
-        }
-
-        List<CharacterDbo> result = await _characterInteractionsService.GetCharactersInRange(team.Result).ToListAsync();
-
-        return result.Select(c => c.ToMinimalCharacterDto()).ToArray();
+        return _characterInteractionsService.GetCharactersInRange(team).Select(c => c.ToMinimalCharacterDto()).ToArray();
     }
 }
