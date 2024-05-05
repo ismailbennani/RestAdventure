@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -109,7 +110,9 @@ void SetupOpenApiDocuments(WebApplicationBuilder builder)
         {
             settings.Title = "Rest Adventure - Game API";
             settings.DocumentName = "game";
-            settings.Version = thisAssembly.GetName().Version!.ToString();
+
+            FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(thisAssembly.Location);
+            settings.Version = fileVersionInfo.ProductVersion;
 
             settings.OperationProcessors.Insert(0, new KeepOnlyControllersWithAttributeOperationProcessor(typeof(GameApiAttribute)));
             settings.SchemaSettings.TypeNameGenerator = new TypeNameWithoutDtoGenerator(settings.SchemaSettings.TypeNameGenerator);
@@ -133,7 +136,9 @@ void SetupOpenApiDocuments(WebApplicationBuilder builder)
         {
             settings.Title = "Rest Adventure - Admin API";
             settings.DocumentName = "admin";
-            settings.Version = thisAssembly.GetName().Version!.ToString();
+
+            FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(thisAssembly.Location);
+            settings.Version = fileVersionInfo.ProductVersion;
 
             settings.OperationProcessors.Insert(0, new KeepOnlyControllersWithAttributeOperationProcessor(typeof(AdminApiAttribute)));
             settings.SchemaSettings.TypeNameGenerator = new TypeNameWithoutDtoGenerator(settings.SchemaSettings.TypeNameGenerator);
