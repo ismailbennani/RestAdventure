@@ -36,5 +36,5 @@ public class Job
     ///         <item>Level 4 is the max level</item>
     ///     </list>
     /// </example>
-    public required IReadOnlyList<int> LevelsExperience { get; init; }
+    public IReadOnlyList<int> LevelsExperience { get; init; } = Array.Empty<int>();
 }

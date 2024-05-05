@@ -1,4 +1,5 @@
-﻿using RestAdventure.Kernel;
+﻿using RestAdventure.Core.Conditions.Characters;
+using RestAdventure.Kernel;
 
 namespace RestAdventure.Core.Maps.Harvestables;
 
@@ -25,4 +26,9 @@ public class MapHarvestable
     ///     The description of the harvestable entity
     /// </summary>
     public string? Description { get; init; }
+
+    /// <summary>
+    ///     The condition that a character should fulfill to harvest this entity
+    /// </summary>
+    public ICharacterCondition? HarvestCondition { get; init; }
 }

@@ -2,7 +2,6 @@
 using NSwag.Annotations;
 using RestAdventure.Core;
 using RestAdventure.Core.Items;
-using RestAdventure.Core.Maps;
 using RestAdventure.Core.Maps.Locations;
 using RestAdventure.Core.Players;
 using RestAdventure.Game.Apis.GameApi.Dtos.Items;
@@ -46,7 +45,7 @@ public class GameContentController : GameApiController
             return BadRequest();
         }
 
-        Item? item = content.Items.GetItem(new ItemId(itemId));
+        Item? item = content.Items.Get(new ItemId(itemId));
         if (item == null)
         {
             return NotFound();

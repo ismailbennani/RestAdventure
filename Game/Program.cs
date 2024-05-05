@@ -4,9 +4,11 @@ using System.Text.Json.Serialization;
 using NSwag;
 using NSwag.Generation.Processors.Security;
 using RestAdventure.Core;
+using RestAdventure.Core.Conditions.Characters;
 using RestAdventure.Core.Items;
-using RestAdventure.Core.Maps;
+using RestAdventure.Core.Jobs;
 using RestAdventure.Core.Maps.Areas;
+using RestAdventure.Core.Maps.Harvestables;
 using RestAdventure.Core.Maps.Locations;
 using RestAdventure.Core.Settings;
 using RestAdventure.Game.Apis.AdminApi;
@@ -153,7 +155,16 @@ GameState LoadGame(WebApplication app)
     content.Maps.Locations.Connect(location1, location2);
 
     Item item = new() { Name = "Apple", Description = "A delicious apple.", Weight = 1 };
-    content.Items.RegisterItem(item);
+    content.Items.Register(item);
+
+    Job gatherer = new() { Name = "Gatherer", Description = "Gather stuff" };
+    content.Jobs.Register(gatherer);
+
+    MapHarvestable harvestable = new() { Name = "Apple Tree", Description = "A tree that has apples.", HarvestCondition = new CharacterJobCondition(gatherer) };
+    content.Harvestables.Register(harvestable);
+
+    MapHarvestableInstance harvestableInstance = new() { Harvestable = harvestable, Location = location1 };
+    content.Maps.Harvestables.Register(harvestableInstance);
 
     GameService gameService = app.Services.GetRequiredService<GameService>();
     GameState gameState = gameService.NewGame(content, new GameSettings());

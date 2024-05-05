@@ -6,11 +6,11 @@ public class GameItems
 
     public IEnumerable<Item> All => _items.Values;
 
-    public void RegisterItem(Item item) => _items[item.Id] = item;
-    public Item? GetItem(ItemId itemId) => _items.GetValueOrDefault(itemId);
+    public void Register(Item item) => _items[item.Id] = item;
+    public Item? Get(ItemId itemId) => _items.GetValueOrDefault(itemId);
 }
 
 public static class GameItemsExtensions
 {
-    public static Item RequireItem(this GameItems items, ItemId itemId) => items.GetItem(itemId) ?? throw new InvalidOperationException($"Could not find item {itemId}");
+    public static Item RequireItem(this GameItems items, ItemId itemId) => items.Get(itemId) ?? throw new InvalidOperationException($"Could not find item {itemId}");
 }
