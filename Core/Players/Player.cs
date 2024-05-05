@@ -1,4 +1,10 @@
-﻿namespace RestAdventure.Core.Players;
+﻿using RestAdventure.Kernel;
+
+namespace RestAdventure.Core.Players;
+
+public record PlayerId(Guid Guid) : Id(Guid);
+
+public record ApiKey(Guid Guid);
 
 public class Player : IEquatable<Player>
 {

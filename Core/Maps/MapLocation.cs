@@ -1,4 +1,8 @@
-﻿namespace RestAdventure.Core.Maps;
+﻿using RestAdventure.Kernel;
+
+namespace RestAdventure.Core.Maps;
+
+public record MapLocationId(Guid Guid) : Id(Guid);
 
 public class MapLocation : IEquatable<MapLocation>
 {

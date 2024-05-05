@@ -1,6 +1,9 @@
 ﻿using RestAdventure.Core.Maps;
+using RestAdventure.Kernel;
 
 namespace RestAdventure.Core.Characters;
+
+public record CharacterId(Guid Guid) : Id(Guid);
 
 public class Character : IEquatable<Character>
 {
