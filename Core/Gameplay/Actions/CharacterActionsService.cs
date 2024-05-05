@@ -20,13 +20,13 @@ public class CharacterActionsService
 
     public CharacterAction? GetNextAction(Character character) => _actions.GetValueOrDefault(character.Id);
 
-    public void ResolveActions(GameState state)
+    public void ResolveActions(GameContent content, GameState state)
     {
         _results.Clear();
 
         foreach ((CharacterId characterId, CharacterAction action) in _actions)
         {
-            CharacterActionResolution resolution = action.Perform(state);
+            CharacterActionResolution resolution = action.Perform(content, state);
             _results[characterId] = new CharacterActionResult
             {
                 Tick = state.Tick,

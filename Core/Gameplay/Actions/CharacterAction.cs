@@ -13,5 +13,5 @@ public abstract class CharacterAction
     protected TeamId TeamId { get; }
     protected CharacterId CharacterId { get; }
 
-    public abstract CharacterActionResolution Perform(GameState state);
+    public abstract CharacterActionResolution Perform(GameContent content, GameState state);
 }

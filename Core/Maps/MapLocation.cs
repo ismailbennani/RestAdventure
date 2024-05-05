@@ -1,6 +1,4 @@
-﻿using RestAdventure.Core.Characters;
-
-namespace RestAdventure.Core.Maps;
+﻿namespace RestAdventure.Core.Maps;
 
 public class MapLocation : IEquatable<MapLocation>
 {
@@ -15,9 +13,7 @@ public class MapLocation : IEquatable<MapLocation>
     public MapArea Area { get; }
     public int PositionX { get; }
     public int PositionY { get; }
-    public IEnumerable<MapLocation> ConnectedLocations => Area.GameMapState.GetConnectedLocations(this);
-    public IEnumerable<Character> Characters => Area.GameMapState.GameState.Characters.GetCharactersAtLocation(this);
-
+    public IEnumerable<MapLocation> ConnectedLocations => Area.GameMaps.GetConnectedLocations(this);
 
     public override string ToString() => $"{Area}[{PositionX}, {PositionY}] ({Id})";
 

@@ -36,6 +36,7 @@ public class TeamCharactersActionsController : GameApiController
     public ActionResult MoveToLocation(Guid characterGuid, Guid locationGuid)
     {
         PlayerId playerId = ControllerContext.RequirePlayerId();
+        GameContent content = _gameService.RequireGameContent();
         GameState state = _gameService.RequireGameState();
         CharacterId characterId = new(characterGuid);
         MapLocationId locationId = new(locationGuid);
@@ -52,7 +53,7 @@ public class TeamCharactersActionsController : GameApiController
             return NotFound();
         }
 
-        MapLocation? location = state.Map.GetLocation(locationId);
+        MapLocation? location = content.Maps.GetLocation(locationId);
         if (location == null)
         {
             return NotFound();

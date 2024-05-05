@@ -2,8 +2,24 @@
 
 public class CharacterInteractionsService
 {
-    public IEnumerable<Character> GetCharactersInRange(Character character) => character.Location.Characters;
-    public IEnumerable<Character> GetCharactersInRange(IEnumerable<Character> characters) => characters.SelectMany(c => c.Location.Characters).Distinct();
+    readonly GameService _gameService;
+
+    public CharacterInteractionsService(GameService gameService)
+    {
+        _gameService = gameService;
+    }
+
+    public IEnumerable<Character> GetCharactersInRange(Character character)
+    {
+        GameState state = _gameService.RequireGameState();
+        return state.Characters.GetCharactersAtLocation(character.Location);
+    }
+
+    public IEnumerable<Character> GetCharactersInRange(IEnumerable<Character> characters)
+    {
+        GameState state = _gameService.RequireGameState();
+        return characters.SelectMany(c => state.Characters.GetCharactersAtLocation(c.Location)).Distinct();
+    }
 }
 
 public static class CharactersInteractionServiceExtensions

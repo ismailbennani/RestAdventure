@@ -29,7 +29,7 @@ public class GameCharactersState
     public Team? GetTeam(TeamId teamId) => _teams.GetValueOrDefault(teamId);
     public IEnumerable<Team> GetTeams(PlayerId playerId) => _teams.Values.Where(t => t.PlayerId == playerId);
 
-    public CharacterCreationResult CreateCharacter(Team team, string name, CharacterClass characterClass, MapLocation? location = null)
+    public CharacterCreationResult CreateCharacter(Team team, string name, CharacterClass characterClass, MapLocation location)
     {
         int maxTeamSize = GameState.Settings.MaxTeamSize;
         IEnumerable<Character> characters = GetCharactersInTeam(team);
@@ -37,8 +37,6 @@ public class GameCharactersState
         {
             return new CharacterCreationResult { IsSuccess = false, ErrorMessage = $"reached max team size ({maxTeamSize})" };
         }
-
-        location ??= GameState.Map.Locations.First();
 
         Character character = new(team, name, characterClass, location);
 

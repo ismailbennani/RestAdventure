@@ -2,6 +2,7 @@
 using NSwag.Annotations;
 using RestAdventure.Core;
 using RestAdventure.Core.Characters;
+using RestAdventure.Core.Maps;
 using RestAdventure.Core.Players;
 using RestAdventure.Game.Apis.GameApi.Controllers.Characters.Requests;
 using RestAdventure.Game.Apis.GameApi.Dtos.Characters;
@@ -34,10 +35,13 @@ public class TeamCharactersController : GameApiController
     public ActionResult<TeamCharacterDto> CreateCharacter(CreateCharacterRequestDto request)
     {
         PlayerId playerId = ControllerContext.RequirePlayerId();
+        GameContent content = _gameService.RequireGameContent();
         GameState state = _gameService.RequireGameState();
 
+        MapLocation startingMap = content.Maps.Locations.First();
+
         Team team = GetOrCreateTeam(state, playerId);
-        CharacterCreationResult result = state.Characters.CreateCharacter(team, request.Name, request.Class);
+        CharacterCreationResult result = state.Characters.CreateCharacter(team, request.Name, request.Class, startingMap);
 
         if (!result.IsSuccess)
         {

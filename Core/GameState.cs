@@ -1,5 +1,4 @@
 ﻿using RestAdventure.Core.Characters;
-using RestAdventure.Core.Maps;
 using RestAdventure.Core.Players;
 using RestAdventure.Core.Settings;
 
@@ -11,7 +10,6 @@ public class GameState
     {
         Settings = settings;
         Players = new GamePlayersState(this);
-        Map = new GameMapState(this);
         Characters = new GameCharactersState(this);
     }
 
@@ -21,6 +19,5 @@ public class GameState
 
     public GameSettings Settings { get; }
     public GamePlayersState Players { get; }
-    public GameMapState Map { get; }
     public GameCharactersState Characters { get; }
 }

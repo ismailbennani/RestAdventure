@@ -2,17 +2,17 @@
 
 public class MapArea : IEquatable<MapArea>
 {
-    internal MapArea(GameMapState gameMapState, string name)
+    internal MapArea(GameMaps gameMaps, string name)
     {
-        GameMapState = gameMapState;
+        GameMaps = gameMaps;
         Name = name;
     }
 
-    internal GameMapState GameMapState { get; }
+    internal GameMaps GameMaps { get; }
 
     public MapAreaId Id { get; } = new(Guid.NewGuid());
     public string Name { get; set; }
-    public IEnumerable<MapLocation> Locations => GameMapState.GetAreaLocations(this);
+    public IEnumerable<MapLocation> Locations => GameMaps.GetAreaLocations(this);
 
     public override string ToString() => $"{Name} ({Id})";
 

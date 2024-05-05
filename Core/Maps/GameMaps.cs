@@ -1,17 +1,17 @@
 ﻿namespace RestAdventure.Core.Maps;
 
-public class GameMapState
+public class GameMaps
 {
     readonly Dictionary<MapAreaId, MapArea> _areas = new();
     readonly Dictionary<MapLocationId, MapLocation> _locations = new();
     readonly List<(MapLocationId, MapLocationId)> _connections = [];
 
-    public GameMapState(GameState gameState)
+    public GameMaps(GameContent gameContent)
     {
-        GameState = gameState;
+        GameContent = gameContent;
     }
 
-    internal GameState GameState { get; }
+    internal GameContent GameContent { get; }
 
     public IReadOnlyCollection<MapArea> Areas => _areas.Values;
     public IReadOnlyCollection<MapLocation> Locations => _locations.Values;
@@ -59,8 +59,8 @@ public class GameMapState
 
 public static class GameMapStateExtensions
 {
-    public static MapArea RequireArea(this GameMapState state, MapAreaId areaId) => state.GetArea(areaId) ?? throw new InvalidOperationException($"Could not find area {areaId}");
+    public static MapArea RequireArea(this GameMaps state, MapAreaId areaId) => state.GetArea(areaId) ?? throw new InvalidOperationException($"Could not find area {areaId}");
 
-    public static MapLocation RequireLocation(this GameMapState state, MapLocationId locationId) =>
+    public static MapLocation RequireLocation(this GameMaps state, MapLocationId locationId) =>
         state.GetLocation(locationId) ?? throw new InvalidOperationException($"Could not find location {locationId}");
 }

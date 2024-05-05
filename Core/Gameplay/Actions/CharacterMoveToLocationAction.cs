@@ -12,10 +12,10 @@ public class CharacterMoveToLocationAction : CharacterAction
 
     public MapLocationId LocationId { get; }
 
-    public override CharacterActionResolution Perform(GameState state)
+    public override CharacterActionResolution Perform(GameContent content, GameState state)
     {
         Character character = state.Characters.RequireCharacter(TeamId, CharacterId);
-        MapLocation location = state.Map.RequireLocation(LocationId);
+        MapLocation location = content.Maps.RequireLocation(LocationId);
 
         bool isAccessible = character.Location.ConnectedLocations.Contains(location);
         if (!isAccessible)

@@ -129,14 +129,16 @@ void SetupOpenApiDocuments(WebApplicationBuilder builder)
 
 GameState LoadGame(WebApplication app)
 {
+    GameContent content = new();
+
+    MapArea startingArea = content.Maps.CreateArea("Start");
+    MapLocation map1 = content.Maps.CreateLocation(startingArea, 0, 0);
+    MapLocation map2 = content.Maps.CreateLocation(startingArea, 0, 1);
+
+    content.Maps.ConnectLocations(map1, map2);
+
     GameService gameService = app.Services.GetRequiredService<GameService>();
-    GameState gameState = gameService.NewGame(new GameSettings());
-
-    MapArea startingArea = gameState.Map.CreateArea("Start");
-    MapLocation map1 = gameState.Map.CreateLocation(startingArea, 0, 0);
-    MapLocation map2 = gameState.Map.CreateLocation(startingArea, 0, 1);
-
-    gameState.Map.ConnectLocations(map1, map2);
+    GameState gameState = gameService.NewGame(content, new GameSettings());
 
     return gameState;
 }
