@@ -5,12 +5,15 @@ namespace RestAdventure.Core.Items;
 public record ItemId(Guid Guid) : Id(Guid);
 
 /// <summary>
-///     An item in the game.
+///     An item.
 ///     There should be only one instance of this class per item. It stores all the meta data about an item: its name, description, etc...
 ///     The materialization of an item in the game world is <see cref="ItemInstance" />.
 /// </summary>
 public class Item : IEquatable<Item>
 {
+    /// <summary>
+    ///     The unique ID of the item
+    /// </summary>
     public ItemId Id { get; } = new(Guid.NewGuid());
 
     /// <summary>

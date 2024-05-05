@@ -4,22 +4,20 @@ namespace RestAdventure.Core.Items;
 
 public record ItemInstanceId(Guid Guid) : Id(Guid);
 
+/// <summary>
+///     Instance of an <see cref="Item" />.
+/// </summary>
 public class ItemInstance : IEquatable<ItemInstance>
 {
-    public ItemInstance(Item item)
-    {
-        Item = item;
-    }
-
     /// <summary>
-    ///     The unique ID of this instance
+    ///     The unique ID of the instance
     /// </summary>
     public ItemInstanceId Id { get; } = new(Guid.NewGuid());
 
     /// <summary>
-    ///     The item represented by this instance
+    ///     The item that is instantiated
     /// </summary>
-    public Item Item { get; }
+    public required Item Item { get; init; }
 
     public override string ToString() => $"{Id} ({Item})";
 

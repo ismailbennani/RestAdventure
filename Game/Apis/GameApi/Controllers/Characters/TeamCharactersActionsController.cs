@@ -53,7 +53,7 @@ public class TeamCharactersActionsController : GameApiController
         }
 
         MapLocationId locationId = new(locationGuid);
-        MapLocation? location = content.Maps.GetLocation(locationId);
+        MapLocation? location = content.Maps.Locations.Get(locationId);
         if (location == null)
         {
             return NotFound();

@@ -14,6 +14,7 @@ public class Character : IEquatable<Character>
         Class = characterClass;
         Location = location;
         Inventory = new CharacterInventory(this);
+        Jobs = new CharacterJobs(this);
     }
 
     /// <summary>
@@ -39,12 +40,17 @@ public class Character : IEquatable<Character>
     /// <summary>
     ///     The location of the character
     /// </summary>
-    public MapLocation Location { get; set; }
+    public MapLocation Location { get; private set; }
 
     /// <summary>
     ///     The inventory of the character
     /// </summary>
     public CharacterInventory Inventory { get; private set; }
+
+    /// <summary>
+    ///     The jobs of the character
+    /// </summary>
+    public CharacterJobs Jobs { get; private set; }
 
     public void MoveTo(MapLocation location)
     {

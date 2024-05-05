@@ -77,7 +77,7 @@ public class GameContentController : GameApiController
             return BadRequest();
         }
 
-        MapLocation? location = content.Maps.GetLocation(new MapLocationId(locationId));
+        MapLocation? location = content.Maps.Locations.Get(new MapLocationId(locationId));
         if (location == null)
         {
             return NotFound();

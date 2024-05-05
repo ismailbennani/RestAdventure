@@ -33,7 +33,7 @@ static class MapLocationMappingExtensions
             PositionX = location.PositionX,
             PositionY = location.PositionY,
             Discovered = true,
-            ConnectedLocations = content.Maps.GetConnectedLocations(location).Select(l => l.ToMinimalDto()).ToArray()
+            ConnectedLocations = content.Maps.Locations.GetConnectedTo(location).Select(l => l.ToMinimalDto()).ToArray()
         };
 
     public static MapLocationDto ToUndiscoveredLocationDto(this MapLocation location) =>

@@ -142,13 +142,13 @@ GameState LoadGame(WebApplication app)
     GameContent content = new();
 
     MapArea area = new() { Name = "Start" };
-    content.Maps.RegisterArea(area);
+    content.Maps.Areas.Register(area);
 
     MapLocation location1 = new() { Area = area, PositionX = 0, PositionY = 0 };
     MapLocation location2 = new() { Area = area, PositionX = 0, PositionY = 1 };
-    content.Maps.RegisterLocation(location1);
-    content.Maps.RegisterLocation(location2);
-    content.Maps.ConnectLocations(location1, location2);
+    content.Maps.Locations.Register(location1);
+    content.Maps.Locations.Register(location2);
+    content.Maps.Locations.Connect(location1, location2);
 
     Item item = new() { Name = "Apple", Description = "A delicious apple.", Weight = 1 };
     content.Items.RegisterItem(item);

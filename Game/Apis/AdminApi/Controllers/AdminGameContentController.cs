@@ -44,7 +44,7 @@ public class AdminGameContentController : AdminApiController
     public SearchResult<MapLocationDto> SearchLocations([FromQuery] SearchRequestDto request)
     {
         GameContent content = _gameService.RequireGameContent();
-        IEnumerable<MapLocation> items = content.Maps.Locations;
-        return Search.Paginate(items, request.ToPaginationParameters()).Select(i => i.ToDiscoveredLocationDto(content));
+        IEnumerable<MapLocation> locations = content.Maps.Locations.All;
+        return Search.Paginate(locations, request.ToPaginationParameters()).Select(i => i.ToDiscoveredLocationDto(content));
     }
 }
