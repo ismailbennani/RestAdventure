@@ -36,6 +36,12 @@ public class TeamCharacterDto
     public required MapLocationDto Location { get; init; }
 
     /// <summary>
+    ///     The inventory of the character
+    /// </summary>
+    [Required]
+    public required CharacterInventoryDto Inventory { get; init; }
+
+    /// <summary>
     ///     The result of the action that has been performed on last tick
     /// </summary>
     public CharacterActionResultDto? LastActionResult { get; init; }
@@ -51,7 +57,12 @@ static class TeamCharacterMappingExtensions
     public static TeamCharacterDto ToDto(this Character character, CharacterMappingOptions? options = null) =>
         new()
         {
-            Id = character.Id.Guid, Name = character.Name, Class = character.Class, Location = character.Location.ToDto(), LastActionResult = options?.LastActionResult?.ToDto(),
+            Id = character.Id.Guid,
+            Name = character.Name,
+            Class = character.Class,
+            Location = character.Location.ToDto(),
+            Inventory = character.Inventory.ToDto(),
+            LastActionResult = options?.LastActionResult?.ToDto(),
             NextAction = options?.NextAction?.ToDto()
         };
 }

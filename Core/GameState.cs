@@ -1,7 +1,7 @@
 ﻿using RestAdventure.Core.Characters;
 using RestAdventure.Core.Maps;
 using RestAdventure.Core.Players;
-using RestAdventure.Game.Settings;
+using RestAdventure.Core.Settings;
 
 namespace RestAdventure.Core;
 

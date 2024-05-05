@@ -3,10 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using NSwag.Annotations;
 using RestAdventure.Core;
+using RestAdventure.Core.Settings;
 using RestAdventure.Game.Apis.GameApi.Dtos;
 using RestAdventure.Game.Apis.GameApi.Services.Game;
 using RestAdventure.Game.Authentication;
-using RestAdventure.Game.Settings;
 
 namespace RestAdventure.Game.Apis.GameApi.Controllers;
 

@@ -10,6 +10,7 @@ public class Character : IEquatable<Character>
         Name = name;
         Class = characterClass;
         Location = location;
+        Inventory = new CharacterInventory(this);
     }
 
     /// <summary>
@@ -36,6 +37,11 @@ public class Character : IEquatable<Character>
     ///     The location of the character
     /// </summary>
     public MapLocation Location { get; set; }
+
+    /// <summary>
+    ///     The inventory of the character
+    /// </summary>
+    public CharacterInventory Inventory { get; private set; }
 
     public bool Equals(Character? other)
     {

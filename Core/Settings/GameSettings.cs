@@ -1,4 +1,4 @@
-﻿namespace RestAdventure.Game.Settings;
+﻿namespace RestAdventure.Core.Settings;
 
 public class GameSettings
 {

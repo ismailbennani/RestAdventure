@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using RestAdventure.Core.Gameplay.Actions;
-using RestAdventure.Game.Settings;
+using RestAdventure.Core.Settings;
 
 namespace RestAdventure.Core;
 
