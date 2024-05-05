@@ -1,5 +1,4 @@
 ﻿using RestAdventure.Core.Characters.Notifications;
-using RestAdventure.Core.Maps;
 using RestAdventure.Core.Maps.Locations;
 using RestAdventure.Core.Players;
 
@@ -41,6 +40,7 @@ public class GameCharacters
         }
 
         Character character = new(team, name, characterClass, location);
+        await GameState.Publisher.Publish(new CharacterMovedToLocation { Character = character, Location = location });
 
         _characters[character.Id] = character;
 

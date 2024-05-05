@@ -3,7 +3,9 @@ using NSwag.Annotations;
 using RestAdventure.Core;
 using RestAdventure.Core.Items;
 using RestAdventure.Core.Jobs;
+using RestAdventure.Core.Maps.Harvestables;
 using RestAdventure.Core.Maps.Locations;
+using RestAdventure.Game.Apis.Common.Dtos.Harvestables;
 using RestAdventure.Game.Apis.Common.Dtos.Items;
 using RestAdventure.Game.Apis.Common.Dtos.Jobs;
 using RestAdventure.Game.Apis.Common.Dtos.Maps;
@@ -59,5 +61,16 @@ public class AdminGameContentController : AdminApiController
         GameContent content = _gameService.RequireGameContent();
         IEnumerable<Job> jobs = content.Jobs.All;
         return Search.Paginate(jobs, request.ToPaginationParameters()).Select(i => i.ToDto());
+    }
+
+    /// <summary>
+    ///     Search harvestables
+    /// </summary>
+    [HttpGet("harvestables")]
+    public SearchResult<HarvestableDto> SearchHarvestables([FromQuery] SearchRequestDto request)
+    {
+        GameContent content = _gameService.RequireGameContent();
+        IEnumerable<MapHarvestable> harvestables = content.Harvestables.All;
+        return Search.Paginate(harvestables, request.ToPaginationParameters()).Select(i => i.ToDto());
     }
 }

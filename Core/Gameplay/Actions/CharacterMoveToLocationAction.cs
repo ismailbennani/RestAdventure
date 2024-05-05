@@ -1,5 +1,4 @@
 ﻿using RestAdventure.Core.Characters;
-using RestAdventure.Core.Maps;
 using RestAdventure.Core.Maps.Locations;
 
 namespace RestAdventure.Core.Gameplay.Actions;
@@ -24,7 +23,7 @@ public class CharacterMoveToLocationAction : CharacterAction
             return new CharacterActionResolution { Success = false, ErrorMessage = $"Map {location.Id} is inaccessible" };
         }
 
-        character.MoveTo(location);
+        character.MoveToAsync(location);
 
         return new CharacterActionResolution { Success = true };
     }

@@ -1,6 +1,6 @@
 ﻿namespace RestAdventure.Kernel.Security;
 
-public record UserId(Guid Guid) : Id(Guid);
+public record UserId(Guid Guid);
 
 public record ApiKey(Guid Guid);
 

@@ -23,8 +23,7 @@ public class GamePlayers
             player = new Player(user);
             _players[user.Id] = player;
 
-            player.LocationDiscovered += (_, location) => GameState.Publisher.Publish(new PlayerDiscoveredLocation { Player = player, Location = location }).Wait();
-            player.ItemDiscovered += (_, item) => GameState.Publisher.Publish(new PlayerDiscoveredItem { Player = player, Item = item }).Wait();
+            player.Knowledge.Discovered += (_, resource) => GameState.Publisher.Publish(new PlayerDiscoveredResource { Player = player, Resource = resource }).Wait();
 
             await GameState.Publisher.Publish(new PlayerJoined { Player = player });
         }

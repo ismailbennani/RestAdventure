@@ -6,7 +6,7 @@ public class DiscoverItemsOnCharacterInventoryChanged : INotificationHandler<Cha
 {
     public Task Handle(CharacterInventoryChanged notification, CancellationToken cancellationToken)
     {
-        notification.Character.Team.Player.Discover(notification.ItemInstance.Item);
+        notification.Character.Team.Player.Knowledge.Discover(notification.ItemInstance.Item);
         return Task.CompletedTask;
     }
 }

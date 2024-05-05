@@ -1,9 +1,9 @@
 ﻿using RestAdventure.Core.Maps.Locations;
-using RestAdventure.Kernel;
+using RestAdventure.Core.Resources;
 
 namespace RestAdventure.Core.Maps.Harvestables;
 
-public record MapHarvestableInstanceId(Guid Guid) : Id(Guid);
+public record MapHarvestableInstanceId(Guid Guid) : ResourceId(Guid);
 
 /// <summary>
 ///     Instance of a <see cref="MapHarvestable" />

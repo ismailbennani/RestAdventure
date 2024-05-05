@@ -1,8 +1,8 @@
-﻿using RestAdventure.Kernel;
+﻿using RestAdventure.Core.Resources;
 
 namespace RestAdventure.Core.Maps.Areas;
 
-public record MapAreaId(Guid Guid) : Id(Guid);
+public record MapAreaId(Guid Guid) : ResourceId(Guid);
 
 public class MapArea : IEquatable<MapArea>
 {

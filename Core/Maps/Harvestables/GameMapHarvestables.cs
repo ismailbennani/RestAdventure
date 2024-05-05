@@ -10,7 +10,7 @@ public class GameMapHarvestables
 
     public void Register(MapHarvestableInstance harvestable) => _harvestables[harvestable.Id] = harvestable;
     public MapHarvestableInstance? Get(MapHarvestableInstanceId harvestableId) => _harvestables.GetValueOrDefault(harvestableId);
-    public IEnumerable<MapHarvestableInstance> GetAt(MapLocation location) => _harvestables.Values.Where(h => h.Location == location);
+    public IEnumerable<MapHarvestableInstance> AtLocation(MapLocation location) => _harvestables.Values.Where(h => h.Location == location);
 }
 
 public static class GameMapHarvestablesExtensions

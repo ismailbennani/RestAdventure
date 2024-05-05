@@ -1,21 +1,18 @@
 ﻿using RestAdventure.Core.Conditions.Characters;
-using RestAdventure.Kernel;
+using RestAdventure.Core.Resources;
 
 namespace RestAdventure.Core.Maps.Harvestables;
 
-public record MapHarvestableId(Guid Guid) : Id(Guid);
+public record MapHarvestableId(Guid Guid) : ResourceId(Guid);
 
 /// <summary>
 ///     A harvestable entity. Harvestable entities are interactible entities found in the world. They contain items that the player can harvest.
 ///     There should be only one instance of this class per harvestable entity. It stores all the meta data about the entity: its name, description, etc...
 ///     The materialization of the entity in the game world is <see cref="MapHarvestableInstance" />.
 /// </summary>
-public class MapHarvestable
+public class MapHarvestable : GameResource<MapHarvestableId>
 {
-    /// <summary>
-    ///     The unique ID of this harvestable entity
-    /// </summary>
-    public MapHarvestableId Id { get; } = new(Guid.NewGuid());
+    public MapHarvestable() : base(new MapHarvestableId(Guid.NewGuid())) { }
 
     /// <summary>
     ///     The name of the harvestable entity
@@ -31,4 +28,6 @@ public class MapHarvestable
     ///     The condition that a character should fulfill to harvest this entity
     /// </summary>
     public ICharacterCondition? HarvestCondition { get; init; }
+
+    public override string ToString() => $"Harvestable {Name} ({Id})";
 }

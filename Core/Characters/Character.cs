@@ -1,10 +1,10 @@
-﻿using RestAdventure.Core.Maps;
+﻿using RestAdventure.Core.Characters.Notifications;
 using RestAdventure.Core.Maps.Locations;
-using RestAdventure.Kernel;
+using RestAdventure.Core.Resources;
 
 namespace RestAdventure.Core.Characters;
 
-public record CharacterId(Guid Guid) : Id(Guid);
+public record CharacterId(Guid Guid) : ResourceId(Guid);
 
 public class Character : IEquatable<Character>
 {
@@ -53,10 +53,15 @@ public class Character : IEquatable<Character>
     /// </summary>
     public CharacterJobs Jobs { get; private set; }
 
-    public void MoveTo(MapLocation location)
+    public async Task MoveToAsync(MapLocation location)
     {
+        if (Location == location)
+        {
+            return;
+        }
+
         Location = location;
-        Team.Player.Discover(location);
+        await Team.GameCharacters.GameState.Publisher.Publish(new CharacterMovedToLocation { Character = this, Location = location });
     }
 
     public override string ToString() => $"{Class} {Name} ({Team})";

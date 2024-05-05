@@ -1,17 +1,17 @@
-﻿using RestAdventure.Kernel;
+﻿using RestAdventure.Core.Resources;
 
 namespace RestAdventure.Core.Jobs;
 
-public record JobId(Guid Guid) : Id(Guid);
+public record JobId(Guid Guid) : ResourceId(Guid);
 
 /// <summary>
 ///     A job.
 ///     There should be only one instance of this class per item. It stores all the meta data about an item: its name, description, etc...
 ///     The materialization of an item in the game world is <see cref="JobInstance" />.
 /// </summary>
-public class Job
+public class Job : GameResource<JobId>
 {
-    public JobId Id { get; } = new(Guid.NewGuid());
+    public Job() : base(new JobId(Guid.NewGuid())) { }
 
     /// <summary>
     ///     The name of the job
@@ -43,5 +43,5 @@ public class Job
     /// </example>
     public IReadOnlyList<int> LevelsExperience { get; init; } = Array.Empty<int>();
 
-    public override string ToString() => $"{Name} ({Id})";
+    public override string ToString() => $"Job {Name} ({Id})";
 }
