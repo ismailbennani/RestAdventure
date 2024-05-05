@@ -1,27 +1,22 @@
-﻿using RestAdventure.Core.Maps.Locations;
-using RestAdventure.Core.Resources;
+﻿using RestAdventure.Core.Entities;
+using RestAdventure.Core.Maps.Locations;
 
 namespace RestAdventure.Core.Maps.Harvestables;
 
-public record HarvestableInstanceId(Guid Guid) : ResourceId(Guid);
+public record HarvestableInstanceId(Guid Guid) : EntityId(Guid);
 
 /// <summary>
 ///     Instance of a <see cref="Harvestables.Harvestable" />
 /// </summary>
-public class HarvestableInstance
+public class HarvestableInstance : Entity<HarvestableInstanceId>
 {
-    /// <summary>
-    ///     The unique ID of the instance
-    /// </summary>
-    public HarvestableInstanceId Id { get; } = new(Guid.NewGuid());
+    public HarvestableInstance(Harvestable harvestable, Location location) : base(new HarvestableInstanceId(Guid.NewGuid()), harvestable.Name, location)
+    {
+        Harvestable = harvestable;
+    }
 
     /// <summary>
     ///     The harvestable entity that is instantiated
     /// </summary>
-    public required Harvestable Harvestable { get; init; }
-
-    /// <summary>
-    ///     The location of the harvestable instance
-    /// </summary>
-    public required Location Location { get; init; }
+    public Harvestable Harvestable { get; }
 }

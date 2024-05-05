@@ -1,9 +1,8 @@
 ﻿using RestAdventure.Core.Players;
-using RestAdventure.Core.Resources;
 
 namespace RestAdventure.Core.Characters;
 
-public record TeamId(Guid Guid) : ResourceId(Guid);
+public record TeamId(Guid Guid);
 
 public class Team : IEquatable<Team>
 {

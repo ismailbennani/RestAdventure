@@ -1,8 +1,6 @@
-﻿using RestAdventure.Core.Resources;
+﻿namespace RestAdventure.Core.Items;
 
-namespace RestAdventure.Core.Items;
-
-public record ItemInstanceId(Guid Guid) : ResourceId(Guid);
+public record ItemInstanceId(Guid Guid);
 
 /// <summary>
 ///     Instance of an <see cref="Item" />.

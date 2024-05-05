@@ -1,27 +1,20 @@
 ﻿using RestAdventure.Core.Characters.Notifications;
+using RestAdventure.Core.Entities;
 using RestAdventure.Core.Maps.Locations;
-using RestAdventure.Core.Resources;
 
 namespace RestAdventure.Core.Characters;
 
-public record CharacterId(Guid Guid) : ResourceId(Guid);
+public record CharacterId(Guid Guid) : EntityId(Guid);
 
-public class Character : IEquatable<Character>
+public class Character : Entity<CharacterId>
 {
-    internal Character(Team team, string name, CharacterClass characterClass, Location location)
+    internal Character(Team team, string name, CharacterClass characterClass, Location location) : base(new CharacterId(Guid.NewGuid()), name, location)
     {
         Team = team;
-        Name = name;
         Class = characterClass;
-        Location = location;
         Inventory = new CharacterInventory(this);
         Jobs = new CharacterJobs(this);
     }
-
-    /// <summary>
-    ///     The unique ID of the character
-    /// </summary>
-    public CharacterId Id { get; } = new(Guid.NewGuid());
 
     /// <summary>
     ///     The team of the character
@@ -29,19 +22,9 @@ public class Character : IEquatable<Character>
     public Team Team { get; private set; }
 
     /// <summary>
-    ///     The name of the character
-    /// </summary>
-    public string Name { get; private set; }
-
-    /// <summary>
     ///     The class of the character
     /// </summary>
     public CharacterClass Class { get; private set; }
-
-    /// <summary>
-    ///     The location of the character
-    /// </summary>
-    public Location Location { get; private set; }
 
     /// <summary>
     ///     The inventory of the character

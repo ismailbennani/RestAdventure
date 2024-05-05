@@ -163,7 +163,7 @@ GameState LoadGame(WebApplication app)
     Harvestable harvestable = new() { Name = "Apple Tree", Description = "A tree that has apples.", HarvestCondition = new CharacterJobCondition(gatherer) };
     content.Harvestables.Register(harvestable);
 
-    HarvestableInstance harvestableInstance = new() { Harvestable = harvestable, Location = location1 };
+    HarvestableInstance harvestableInstance = new(harvestable, location1);
     content.Maps.Harvestables.Register(harvestableInstance);
 
     GameService gameService = app.Services.GetRequiredService<GameService>();
