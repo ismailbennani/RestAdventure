@@ -1,4 +1,7 @@
-﻿namespace RestAdventure.Core.Maps;
+﻿using RestAdventure.Core.Maps.Areas;
+using RestAdventure.Core.Maps.Locations;
+
+namespace RestAdventure.Core.Maps;
 
 public class GameMaps
 {

@@ -6,6 +6,8 @@ using NSwag.Generation.Processors.Security;
 using RestAdventure.Core;
 using RestAdventure.Core.Items;
 using RestAdventure.Core.Maps;
+using RestAdventure.Core.Maps.Areas;
+using RestAdventure.Core.Maps.Locations;
 using RestAdventure.Core.Settings;
 using RestAdventure.Game.Apis.AdminApi;
 using RestAdventure.Game.Apis.GameApi;

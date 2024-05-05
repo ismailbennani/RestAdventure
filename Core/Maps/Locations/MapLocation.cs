@@ -1,6 +1,7 @@
-﻿using RestAdventure.Kernel;
+﻿using RestAdventure.Core.Maps.Areas;
+using RestAdventure.Kernel;
 
-namespace RestAdventure.Core.Maps;
+namespace RestAdventure.Core.Maps.Locations;
 
 public record MapLocationId(Guid Guid) : Id(Guid);
 

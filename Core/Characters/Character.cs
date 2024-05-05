@@ -1,4 +1,5 @@
 ﻿using RestAdventure.Core.Maps;
+using RestAdventure.Core.Maps.Locations;
 using RestAdventure.Kernel;
 
 namespace RestAdventure.Core.Characters;

@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using RestAdventure.Core.Maps;
+using RestAdventure.Core.Maps.Locations;
 
 namespace RestAdventure.Core.Players.Notifications;
 

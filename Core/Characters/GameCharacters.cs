@@ -1,5 +1,6 @@
 ﻿using RestAdventure.Core.Characters.Notifications;
 using RestAdventure.Core.Maps;
+using RestAdventure.Core.Maps.Locations;
 using RestAdventure.Core.Players;
 
 namespace RestAdventure.Core.Characters;

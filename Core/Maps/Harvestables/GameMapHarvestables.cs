@@ -1,4 +1,6 @@
-﻿namespace RestAdventure.Core.Maps;
+﻿using RestAdventure.Core.Maps.Locations;
+
+namespace RestAdventure.Core.Maps.Harvestables;
 
 public class GameMapHarvestables
 {

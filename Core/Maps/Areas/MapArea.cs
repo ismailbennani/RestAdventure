@@ -1,6 +1,6 @@
 ﻿using RestAdventure.Kernel;
 
-namespace RestAdventure.Core.Maps;
+namespace RestAdventure.Core.Maps.Areas;
 
 public record MapAreaId(Guid Guid) : Id(Guid);
 

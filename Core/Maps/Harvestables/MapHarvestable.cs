@@ -1,6 +1,6 @@
 ﻿using RestAdventure.Kernel;
 
-namespace RestAdventure.Core.Maps;
+namespace RestAdventure.Core.Maps.Harvestables;
 
 public record MapHarvestableId(Guid Guid) : Id(Guid);
 

@@ -1,5 +1,6 @@
 ﻿using RestAdventure.Core.Items;
 using RestAdventure.Core.Maps;
+using RestAdventure.Core.Maps.Locations;
 using RestAdventure.Kernel.Security;
 
 namespace RestAdventure.Core.Players;

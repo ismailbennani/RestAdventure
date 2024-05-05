@@ -1,5 +1,6 @@
 ﻿using RestAdventure.Core.Characters;
 using RestAdventure.Core.Maps;
+using RestAdventure.Core.Maps.Locations;
 
 namespace RestAdventure.Core.Gameplay.Actions;
 

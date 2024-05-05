@@ -3,6 +3,7 @@ using NSwag.Annotations;
 using RestAdventure.Core;
 using RestAdventure.Core.Items;
 using RestAdventure.Core.Maps;
+using RestAdventure.Core.Maps.Locations;
 using RestAdventure.Game.Apis.Common.Dtos.Queries;
 using RestAdventure.Game.Apis.GameApi.Dtos.Items;
 using RestAdventure.Game.Apis.GameApi.Dtos.Maps;
