@@ -20,15 +20,13 @@ public class TeamCharactersActionsController : GameApiController
 {
     readonly GameService _gameService;
     readonly CharacterActionsService _characterActionsService;
-    readonly CharacterInteractionsService _characterInteractionsService;
 
     /// <summary>
     /// </summary>
-    public TeamCharactersActionsController(GameService gameService, CharacterActionsService characterActionsService, CharacterInteractionsService characterInteractionsService)
+    public TeamCharactersActionsController(GameService gameService, CharacterActionsService characterActionsService)
     {
         _gameService = gameService;
         _characterActionsService = characterActionsService;
-        _characterInteractionsService = characterInteractionsService;
     }
 
     /// <summary>
@@ -98,7 +96,7 @@ public class TeamCharactersActionsController : GameApiController
             return NotFound();
         }
 
-        await _characterInteractionsService.StartInteractionAsync(character, interaction, entity);
+        await state.Interactions.StartInteractionAsync(character, interaction, entity);
 
         return NoContent();
     }

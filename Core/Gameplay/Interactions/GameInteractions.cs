@@ -1,19 +1,19 @@
-﻿using MediatR;
-using RestAdventure.Core.Characters;
+﻿using RestAdventure.Core.Characters;
 using RestAdventure.Core.Gameplay.Interactions.Notifications;
 
 namespace RestAdventure.Core.Gameplay.Interactions;
 
-public class CharacterInteractionsService
+public class GameInteractions
 {
-    readonly IPublisher _publisher;
     readonly List<InteractionInstance> _newInteractions = new();
     readonly Dictionary<CharacterId, InteractionInstance> _interactions = new();
 
-    public CharacterInteractionsService(IPublisher publisher)
+    public GameInteractions(GameState gameState)
     {
-        _publisher = publisher;
+        GameState = gameState;
     }
+
+    internal GameState GameState { get; }
 
     public async Task StartInteractionAsync(Character character, Interaction interaction, IGameEntityWithInteractions entity)
     {
@@ -44,7 +44,7 @@ public class CharacterInteractionsService
             await newInteraction.OnStartAsync(content, state);
             _interactions[newInteraction.Character.Id] = newInteraction;
 
-            await _publisher.Publish(new InteractionStarted { InteractionInstance = newInteraction });
+            await GameState.Publisher.Publish(new InteractionStarted { InteractionInstance = newInteraction });
         }
         _newInteractions.Clear();
 
@@ -70,7 +70,7 @@ public class CharacterInteractionsService
                 continue;
             }
 
-            await _publisher.Publish(new InteractionEnded { InteractionInstance = instance });
+            await GameState.Publisher.Publish(new InteractionEnded { InteractionInstance = instance });
         }
     }
 

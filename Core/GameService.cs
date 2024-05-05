@@ -2,7 +2,6 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
 using RestAdventure.Core.Gameplay.Actions;
-using RestAdventure.Core.Gameplay.Interactions;
 using RestAdventure.Core.Settings;
 using RestAdventure.Core.Simulation.Notifications;
 
@@ -12,22 +11,15 @@ public class GameService
 {
     readonly IPublisher _publisher;
     readonly CharacterActionsService _characterActionsService;
-    readonly CharacterInteractionsService _characterInteractionsService;
     readonly ILogger<GameService> _logger;
 
     GameContent? _gameContent;
     GameState? _gameState;
 
-    public GameService(
-        IPublisher publisher,
-        CharacterActionsService characterActionsService,
-        CharacterInteractionsService characterInteractionsService,
-        ILogger<GameService> logger
-    )
+    public GameService(IPublisher publisher, CharacterActionsService characterActionsService, ILogger<GameService> logger)
     {
         _publisher = publisher;
         _characterActionsService = characterActionsService;
-        _characterInteractionsService = characterInteractionsService;
         _logger = logger;
     }
 
@@ -71,7 +63,7 @@ public class GameService
         state.Tick++;
 
         _characterActionsService.ResolveActions(content, state);
-        await _characterInteractionsService.ResolveInteractionsAsync(content, state);
+        await state.Interactions.ResolveInteractionsAsync(content, state);
 
         await _publisher.Publish(new GameTick { GameState = state });
 
