@@ -3,9 +3,9 @@ using RestAdventure.Core.Entities.Notifications;
 
 namespace RestAdventure.Core.Characters.Notifications;
 
-public class DiscoverJobOnCharacterLearnedJob : INotificationHandler<EntityLearnedJob>
+public class DiscoverJobOnCharacterLearnedJob : INotificationHandler<GameEntityLearnedJob>
 {
-    public Task Handle(EntityLearnedJob notification, CancellationToken cancellationToken)
+    public Task Handle(GameEntityLearnedJob notification, CancellationToken cancellationToken)
     {
         if (notification.Entity is not Character character)
         {

@@ -3,7 +3,7 @@ using RestAdventure.Core.Entities.Notifications;
 
 namespace RestAdventure.Core.Jobs.Notifications;
 
-public class LearnInnateJobsOnEntityCreated : INotificationHandler<EntityCreated>
+public class LearnInnateJobsOnEntityCreated : INotificationHandler<GameEntityCreated>
 {
     readonly GameService _gameService;
 
@@ -12,7 +12,7 @@ public class LearnInnateJobsOnEntityCreated : INotificationHandler<EntityCreated
         _gameService = gameService;
     }
 
-    public Task Handle(EntityCreated notification, CancellationToken cancellationToken)
+    public Task Handle(GameEntityCreated notification, CancellationToken cancellationToken)
     {
         if (notification.Entity is not IEntityWithJobs withJobs)
         {

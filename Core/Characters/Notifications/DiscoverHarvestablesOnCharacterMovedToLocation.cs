@@ -4,7 +4,7 @@ using RestAdventure.Core.Maps.Harvestables;
 
 namespace RestAdventure.Core.Characters.Notifications;
 
-public class DiscoverHarvestablesOnCharacterMovedToLocation : INotificationHandler<EntityMovedToLocation>
+public class DiscoverHarvestablesOnCharacterMovedToLocation : INotificationHandler<GameEntityMovedToLocation>
 {
     readonly GameService _gameService;
 
@@ -13,7 +13,7 @@ public class DiscoverHarvestablesOnCharacterMovedToLocation : INotificationHandl
         _gameService = gameService;
     }
 
-    public Task Handle(EntityMovedToLocation notification, CancellationToken cancellationToken)
+    public Task Handle(GameEntityMovedToLocation notification, CancellationToken cancellationToken)
     {
         if (notification.Entity is not Character character)
         {

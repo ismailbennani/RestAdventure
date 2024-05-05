@@ -3,10 +3,10 @@ using RestAdventure.Core.Jobs;
 
 namespace RestAdventure.Core.Entities.Notifications;
 
-public class EntityLearnedJob : INotification
+public class GameEntityJobLeveledUp : INotification
 {
     public required IEntityWithJobs Entity { get; init; }
     public required Job Job { get; init; }
-
-    public override string ToString() => $"{Entity}[{Job}]";
+    public required int OldLevel { get; init; }
+    public required int NewLevel { get; init; }
 }

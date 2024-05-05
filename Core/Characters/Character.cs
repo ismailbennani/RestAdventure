@@ -6,9 +6,9 @@ using RestAdventure.Core.Players;
 
 namespace RestAdventure.Core.Characters;
 
-public record CharacterId(Guid Guid) : EntityId(Guid);
+public record CharacterId(Guid Guid) : GameEntityId(Guid);
 
-public class Character : Entity<CharacterId>, IEntityWithInventory, IEntityWithJobs
+public class Character : GameEntity<CharacterId>, IEntityWithInventory, IEntityWithJobs
 {
     public Character(Player player, string name, CharacterClass characterClass, Location location) : base(new CharacterId(Guid.NewGuid()), name, location)
     {

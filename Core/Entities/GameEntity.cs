@@ -2,15 +2,15 @@
 
 namespace RestAdventure.Core.Entities;
 
-public record EntityId(Guid Guid);
+public record GameEntityId(Guid Guid);
 
-/// <inheritdoc cref="Entity{TId}" />
+/// <inheritdoc cref="GameEntity{TId}" />
 /// <remarks>
-///     Common representation of all <see cref="Entity{TId}" /> instances
+///     Common representation of all <see cref="GameEntity{TId}" /> instances
 /// </remarks>
-public abstract class Entity : IEquatable<Entity>
+public abstract class GameEntity : IEquatable<GameEntity>
 {
-    public Entity(EntityId id, string name, Location location)
+    public GameEntity(GameEntityId id, string name, Location location)
     {
         Id = id;
         Name = name;
@@ -20,7 +20,7 @@ public abstract class Entity : IEquatable<Entity>
     /// <summary>
     ///     The unique ID of the entity
     /// </summary>
-    public EntityId Id { get; }
+    public GameEntityId Id { get; }
 
     /// <summary>
     ///     The name of the entity
@@ -47,7 +47,7 @@ public abstract class Entity : IEquatable<Entity>
         Moved?.Invoke(this, new EntityMovedEvent { OldLocation = oldLocation, NewLocation = Location });
     }
 
-    public bool Equals(Entity? other)
+    public bool Equals(GameEntity? other)
     {
         if (ReferenceEquals(null, other))
         {
@@ -74,14 +74,14 @@ public abstract class Entity : IEquatable<Entity>
         {
             return false;
         }
-        return Equals((Entity)obj);
+        return Equals((GameEntity)obj);
     }
 
     public override int GetHashCode() => Id.GetHashCode();
 
-    public static bool operator ==(Entity? left, Entity? right) => Equals(left, right);
+    public static bool operator ==(GameEntity? left, GameEntity? right) => Equals(left, right);
 
-    public static bool operator !=(Entity? left, Entity? right) => !Equals(left, right);
+    public static bool operator !=(GameEntity? left, GameEntity? right) => !Equals(left, right);
 }
 
 public class EntityMovedEvent
@@ -93,9 +93,9 @@ public class EntityMovedEvent
 /// <summary>
 ///     An entity is something that exists in the world, at a specific location.
 /// </summary>
-public abstract class Entity<TId> : Entity where TId: EntityId
+public abstract class GameEntity<TId> : GameEntity where TId: GameEntityId
 {
-    public Entity(TId id, string name, Location location) : base(id, name, location)
+    public GameEntity(TId id, string name, Location location) : base(id, name, location)
     {
         Id = id;
     }

@@ -3,7 +3,7 @@ using RestAdventure.Core.Items;
 
 namespace RestAdventure.Core.Entities.Notifications;
 
-public class EntityInventoryChanged : INotification
+public class GameEntityInventoryChanged : INotification
 {
     public required IEntityWithInventory Entity { get; init; }
     public required ItemInstance ItemInstance { get; init; }

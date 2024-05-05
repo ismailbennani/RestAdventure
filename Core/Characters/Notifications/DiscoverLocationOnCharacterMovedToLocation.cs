@@ -3,9 +3,9 @@ using RestAdventure.Core.Entities.Notifications;
 
 namespace RestAdventure.Core.Characters.Notifications;
 
-public class DiscoverLocationOnCharacterMovedToLocation : INotificationHandler<EntityMovedToLocation>
+public class DiscoverLocationOnCharacterMovedToLocation : INotificationHandler<GameEntityMovedToLocation>
 {
-    public Task Handle(EntityMovedToLocation notification, CancellationToken cancellationToken)
+    public Task Handle(GameEntityMovedToLocation notification, CancellationToken cancellationToken)
     {
         if (notification.Entity is not Character character)
         {

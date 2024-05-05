@@ -4,10 +4,10 @@ namespace RestAdventure.Core.Jobs;
 
 public class EntityJobs
 {
-    readonly Entity _entity;
+    readonly GameEntity _entity;
     readonly Dictionary<JobId, JobInstance> _jobs = new();
 
-    public EntityJobs(Entity entity)
+    public EntityJobs(GameEntity entity)
     {
         _entity = entity;
     }

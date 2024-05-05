@@ -3,12 +3,12 @@ using RestAdventure.Core.Maps.Locations;
 
 namespace RestAdventure.Core.Maps.Harvestables;
 
-public record HarvestableInstanceId(Guid Guid) : EntityId(Guid);
+public record HarvestableInstanceId(Guid Guid) : GameEntityId(Guid);
 
 /// <summary>
 ///     Instance of a <see cref="Harvestables.Harvestable" />
 /// </summary>
-public class HarvestableInstance : Entity<HarvestableInstanceId>
+public class HarvestableInstance : GameEntity<HarvestableInstanceId>
 {
     public HarvestableInstance(Harvestable harvestable, Location location) : base(new HarvestableInstanceId(Guid.NewGuid()), harvestable.Name, location)
     {

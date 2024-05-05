@@ -3,9 +3,9 @@ using RestAdventure.Core.Entities.Notifications;
 
 namespace RestAdventure.Core.Characters.Notifications;
 
-public class DiscoverItemsOnCharacterInventoryChanged : INotificationHandler<EntityInventoryChanged>
+public class DiscoverItemsOnCharacterInventoryChanged : INotificationHandler<GameEntityInventoryChanged>
 {
-    public Task Handle(EntityInventoryChanged notification, CancellationToken cancellationToken)
+    public Task Handle(GameEntityInventoryChanged notification, CancellationToken cancellationToken)
     {
         if (notification.Entity is not Character character)
         {
