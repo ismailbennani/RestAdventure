@@ -6,10 +6,10 @@ public abstract class CharacterAction
 {
     protected CharacterAction(Character character)
     {
-        CharacterId = character.Id;
+        Character = character;
     }
 
-    protected CharacterId CharacterId { get; }
+    protected Character Character { get; }
 
     public abstract CharacterActionResolution Perform(GameContent content, GameState state);
 }

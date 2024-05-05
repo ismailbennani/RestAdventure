@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using RestAdventure.Core.Gameplay.Actions;
+using RestAdventure.Game.Apis.Common.Dtos.Maps;
 
 namespace RestAdventure.Game.Apis.Common.Dtos.Characters.Actions;
 
@@ -12,10 +13,10 @@ public class CharacterMoveToLocationActionDto : CharacterActionDto
     ///     The location to which the character is moving
     /// </summary>
     [Required]
-    public required Guid LocationId { get; init; }
+    public required MapLocationMinimalDto Location { get; init; }
 }
 
 static class CharacterMoveToLocationActionMappingExtensions
 {
-    public static CharacterMoveToLocationActionDto ToDto(this CharacterMoveToLocationAction action) => new() { LocationId = action.LocationId.Guid };
+    public static CharacterMoveToLocationActionDto ToDto(this CharacterMoveToLocationAction action) => new() { Location = action.Location.ToMinimalDto() };
 }

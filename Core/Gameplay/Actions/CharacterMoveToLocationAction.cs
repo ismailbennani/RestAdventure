@@ -7,23 +7,20 @@ public class CharacterMoveToLocationAction : CharacterAction
 {
     public CharacterMoveToLocationAction(Character character, Location location) : base(character)
     {
-        LocationId = location.Id;
+        Location = location;
     }
 
-    public LocationId LocationId { get; }
+    public Location Location { get; }
 
     public override CharacterActionResolution Perform(GameContent content, GameState state)
     {
-        Character character = state.Entities.RequireCharacter(CharacterId);
-        Location location = content.Maps.Locations.Require(LocationId);
-
-        bool isAccessible = content.Maps.Locations.AreConnected(character.Location, location);
+        bool isAccessible = content.Maps.Locations.AreConnected(Character.Location, Location);
         if (!isAccessible)
         {
-            return new CharacterActionResolution { Success = false, ErrorMessage = $"Map {location.Id} is inaccessible" };
+            return new CharacterActionResolution { Success = false, ErrorMessage = $"Map {Location.Id} is inaccessible" };
         }
 
-        character.MoveTo(location);
+        Character.MoveTo(Location);
 
         return new CharacterActionResolution { Success = true };
     }

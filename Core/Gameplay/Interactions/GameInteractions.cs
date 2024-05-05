@@ -1,4 +1,5 @@
-﻿using RestAdventure.Core.Characters;
+﻿using System.Diagnostics.CodeAnalysis;
+using RestAdventure.Core.Characters;
 using RestAdventure.Core.Gameplay.Interactions.Notifications;
 
 namespace RestAdventure.Core.Gameplay.Interactions;
@@ -15,26 +16,32 @@ public class GameInteractions
 
     internal GameState GameState { get; }
 
-    public void StartInteraction(Character character, Interaction interaction, IGameEntityWithInteractions entity)
+    public bool TryStartInteraction(Character character, Interaction interaction, IGameEntityWithInteractions entity, [NotNullWhen(false)] out string? whyNot)
     {
         if (entity.Interactions.Get(interaction.Id) == null)
         {
-            throw new InvalidOperationException($"Interaction {interaction} cannot be performed on entity {entity}");
+            whyNot = $"Interaction {interaction} cannot be performed on entity {entity}";
+            return false;
         }
 
         InteractionInstance? currentInteraction = GetCharacterInteraction(character);
         if (currentInteraction != null)
         {
-            throw new InvalidOperationException($"Character {character} is already performing an interaction");
+            whyNot = $"Character {character} is already performing an interaction";
+            return false;
         }
 
         if (!interaction.CanInteract(character, entity))
         {
-            throw new InvalidOperationException($"Character {character} cannot perform interaction {interaction} on entity {entity}");
+            whyNot = $"Character {character} cannot perform interaction {interaction} on entity {entity}";
+            return false;
         }
 
         InteractionInstance instance = interaction.Instantiate(character, entity);
         _newInteractions.Add(instance);
+
+        whyNot = null;
+        return true;
     }
 
     public async Task ResolveInteractionsAsync(GameContent content, GameState state)

@@ -93,7 +93,7 @@ public class TeamCharactersActionsController : GameApiController
             return NotFound();
         }
 
-        state.Interactions.StartInteraction(character, interaction, entity);
+        state.Actions.Interact(character, interaction, entity);
 
         return NoContent();
     }

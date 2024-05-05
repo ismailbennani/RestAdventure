@@ -1,4 +1,5 @@
 ﻿using RestAdventure.Core.Characters;
+using RestAdventure.Core.Gameplay.Interactions;
 using RestAdventure.Core.Maps.Locations;
 
 namespace RestAdventure.Core.Gameplay.Actions;
@@ -19,9 +20,24 @@ public class GameActions
     internal GameState GameState { get; }
 
     /// <summary>
-    ///     Make the character move to the given location on next tick.
+    ///     Make the character move to the given location.
     /// </summary>
-    public void MoveToLocation(Character character, Location location) => _actions[character.Id] = new CharacterMoveToLocationAction(character, location);
+    public void MoveToLocation(Character character, Location location)
+    {
+        AssertCharacterCanPerformAction(character);
+        _actions[character.Id] = new CharacterMoveToLocationAction(character, location);
+    }
+
+    /// <summary>
+    ///     Perform an interaction.
+    /// </summary>
+    public void Interact(Character character, Interaction interaction, IGameEntityWithInteractions entity)
+    {
+        AssertCharacterCanPerformAction(character);
+        _actions[character.Id] = new CharacterInteractWithEntityAction(character, interaction, entity);
+    }
+
+    public void Cancel(Character character) => _actions.Remove(character.Id);
 
     public CharacterActionResult? GetLastActionResult(Character character) => _results.GetValueOrDefault(character.Id);
 
@@ -45,5 +61,13 @@ public class GameActions
         }
 
         _actions.Clear();
+    }
+
+    void AssertCharacterCanPerformAction(Character character)
+    {
+        if (GameState.Interactions.GetCharacterInteraction(character) != null)
+        {
+            throw new InvalidOperationException($"Character {character} cannot perform action because they are currently locked in an interaction.");
+        }
     }
 }

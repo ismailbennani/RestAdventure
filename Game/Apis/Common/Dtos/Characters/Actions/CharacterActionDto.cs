@@ -7,7 +7,8 @@ namespace RestAdventure.Game.Apis.Common.Dtos.Characters.Actions;
 ///     An action performed by a character
 /// </summary>
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "$type", IgnoreUnrecognizedTypeDiscriminators = true)]
-[JsonDerivedType(typeof(CharacterMoveToLocationActionDto), "move-to-location")]
+[JsonDerivedType(typeof(CharacterMoveToLocationActionDto), "move")]
+[JsonDerivedType(typeof(CharacterInteractWithEntityActionDto), "interact")]
 public class CharacterActionDto
 {
 }
@@ -18,6 +19,7 @@ static class CharacterActionMappingExtensions
         action switch
         {
             CharacterMoveToLocationAction moveToLocationAction => moveToLocationAction.ToDto(),
+            CharacterInteractWithEntityAction interactWithEntityAction => interactWithEntityAction.ToDto(),
             _ => new CharacterActionDto()
         };
 }
