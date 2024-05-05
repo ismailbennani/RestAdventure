@@ -1,12 +1,18 @@
 ﻿using MediatR;
+using RestAdventure.Core.Entities.Notifications;
 
 namespace RestAdventure.Core.Characters.Notifications;
 
-public class DiscoverLocationOnCharacterMovedToLocation : INotificationHandler<CharacterMovedToLocation>
+public class DiscoverLocationOnCharacterMovedToLocation : INotificationHandler<EntityMovedToLocation>
 {
-    public Task Handle(CharacterMovedToLocation notification, CancellationToken cancellationToken)
+    public Task Handle(EntityMovedToLocation notification, CancellationToken cancellationToken)
     {
-        notification.Character.Team.Player.Knowledge.Discover(notification.Location);
+        if (notification.Entity is not Character character)
+        {
+            return Task.CompletedTask;
+        }
+
+        character.Player.Knowledge.Discover(notification.NewLocation);
         return Task.CompletedTask;
     }
 }

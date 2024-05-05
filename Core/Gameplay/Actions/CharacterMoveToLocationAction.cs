@@ -14,7 +14,7 @@ public class CharacterMoveToLocationAction : CharacterAction
 
     public override CharacterActionResolution Perform(GameContent content, GameState state)
     {
-        Character character = state.Characters.RequireCharacter(TeamId, CharacterId);
+        Character character = state.Entities.RequireCharacter(CharacterId);
         Location location = content.Maps.Locations.Require(LocationId);
 
         bool isAccessible = content.Maps.Locations.AreConnected(character.Location, location);
@@ -23,7 +23,7 @@ public class CharacterMoveToLocationAction : CharacterAction
             return new CharacterActionResolution { Success = false, ErrorMessage = $"Map {location.Id} is inaccessible" };
         }
 
-        character.MoveToAsync(location);
+        character.MoveTo(location);
 
         return new CharacterActionResolution { Success = true };
     }

@@ -37,11 +37,11 @@ public class TeamController : GameApiController
         GameState state = _gameService.RequireGameState();
         Player player = ControllerContext.RequirePlayer(state);
 
-        Team team = state.Characters.GetTeams(player).FirstOrDefault() ?? state.Characters.CreateTeam(player);
+        IEnumerable<Character> characters = state.Entities.GetCharactersOfPlayer(player);
 
         return new TeamDto
         {
-            Characters = team.Characters.ToList()
+            Characters = characters.ToList()
                 .Select(
                     c => c.ToDto(
                         content,

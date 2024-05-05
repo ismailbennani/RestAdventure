@@ -1,11 +1,11 @@
 ﻿using MediatR;
 using RestAdventure.Core.Jobs;
 
-namespace RestAdventure.Core.Characters.Notifications;
+namespace RestAdventure.Core.Entities.Notifications;
 
-public class CharacterJobLeveledUp : INotification
+public class EntityJobLeveledUp : INotification
 {
-    public required Character Character { get; init; }
+    public required IEntityWithJobs Entity { get; init; }
     public required Job Job { get; init; }
     public required int OldLevel { get; init; }
     public required int NewLevel { get; init; }

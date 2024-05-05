@@ -2,7 +2,6 @@
 using NSwag.Annotations;
 using RestAdventure.Core;
 using RestAdventure.Core.Characters;
-using RestAdventure.Core.Maps.Locations;
 using RestAdventure.Core.Players;
 using RestAdventure.Game.Apis.Common.Dtos.Characters;
 using RestAdventure.Game.Apis.GameApi.Controllers.Characters.Requests;
@@ -18,12 +17,14 @@ namespace RestAdventure.Game.Apis.GameApi.Controllers.Characters;
 public class TeamCharactersController : GameApiController
 {
     readonly GameService _gameService;
+    readonly CharactersService _charactersService;
 
     /// <summary>
     /// </summary>
-    public TeamCharactersController(GameService gameService)
+    public TeamCharactersController(GameService gameService, CharactersService charactersService)
     {
         _gameService = gameService;
+        _charactersService = charactersService;
     }
 
     /// <summary>
@@ -34,14 +35,11 @@ public class TeamCharactersController : GameApiController
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<TeamCharacterDto>> CreateCharacterAsync(CreateCharacterRequestDto request)
     {
-        GameContent content = _gameService.RequireGameContent();
-        Location starting = content.Maps.Locations.All.First();
-
         GameState state = _gameService.RequireGameState();
-        Player player = ControllerContext.RequirePlayer(state);
+        GameContent content = _gameService.RequireGameContent();
 
-        Team team = GetOrCreateTeam(state, player);
-        CharacterCreationResult result = await state.Characters.CreateCharacterAsync(team, request.Name, request.Class, starting);
+        Player player = ControllerContext.RequirePlayer(state);
+        CharacterCreationResult result = await _charactersService.CreateCharacterAsync(player, request.Name, request.Class);
 
         if (!result.IsSuccess)
         {
@@ -62,23 +60,15 @@ public class TeamCharactersController : GameApiController
         GameState state = _gameService.RequireGameState();
         Player player = ControllerContext.RequirePlayer(state);
 
-        Team? team = state.Characters.GetTeams(player).FirstOrDefault();
-        if (team == null)
-        {
-            return NotFound();
-        }
-
         CharacterId characterId = new(characterGuid);
-        Character? character = state.Characters.GetCharacter(team, characterId);
-        if (character == null)
+        Character? character = state.Entities.Get<Character>(characterId);
+        if (character == null || character.Player != player)
         {
             return NotFound();
         }
 
-        await state.Characters.DeleteCharacterAsync(team, characterId);
+        await state.Entities.UnregisterAsync(character);
 
         return NoContent();
     }
-
-    static Team GetOrCreateTeam(GameState state, Player player) => state.Characters.GetTeams(player).FirstOrDefault() ?? state.Characters.CreateTeam(player);
 }

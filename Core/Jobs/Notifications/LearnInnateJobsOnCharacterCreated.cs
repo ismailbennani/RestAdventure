@@ -1,24 +1,31 @@
 ﻿using MediatR;
-using RestAdventure.Core.Characters.Notifications;
+using RestAdventure.Core.Entities.Notifications;
 
 namespace RestAdventure.Core.Jobs.Notifications;
 
-public class LearnInnateJobsOnCharacterCreated : INotificationHandler<CharacterCreated>
+public class LearnInnateJobsOnEntityCreated : INotificationHandler<EntityCreated>
 {
     readonly GameService _gameService;
 
-    public LearnInnateJobsOnCharacterCreated(GameService gameService)
+    public LearnInnateJobsOnEntityCreated(GameService gameService)
     {
         _gameService = gameService;
     }
 
-    public async Task Handle(CharacterCreated notification, CancellationToken cancellationToken)
+    public Task Handle(EntityCreated notification, CancellationToken cancellationToken)
     {
+        if (notification.Entity is not IEntityWithJobs withJobs)
+        {
+            return Task.CompletedTask;
+        }
+
         GameContent content = _gameService.RequireGameContent();
 
         foreach (Job job in content.Jobs.Innate)
         {
-            await notification.Character.Jobs.LearnAsync(job);
+            withJobs.Jobs.Learn(job);
         }
+
+        return Task.CompletedTask;
     }
 }

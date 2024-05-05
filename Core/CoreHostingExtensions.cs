@@ -9,7 +9,7 @@ public static class CoreHostingExtensions
     public static void ConfigureCoreServices(this IServiceCollection services)
     {
         services.AddSingleton<GameService>();
+        services.AddSingleton<CharactersService>();
         services.AddSingleton<CharacterActionsService>();
-        services.AddSingleton<CharacterInteractionsService>();
     }
 }

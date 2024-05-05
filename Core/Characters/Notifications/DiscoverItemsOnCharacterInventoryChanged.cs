@@ -1,12 +1,18 @@
 ﻿using MediatR;
+using RestAdventure.Core.Entities.Notifications;
 
 namespace RestAdventure.Core.Characters.Notifications;
 
-public class DiscoverItemsOnCharacterInventoryChanged : INotificationHandler<CharacterInventoryChanged>
+public class DiscoverItemsOnCharacterInventoryChanged : INotificationHandler<EntityInventoryChanged>
 {
-    public Task Handle(CharacterInventoryChanged notification, CancellationToken cancellationToken)
+    public Task Handle(EntityInventoryChanged notification, CancellationToken cancellationToken)
     {
-        notification.Character.Team.Player.Knowledge.Discover(notification.ItemInstance.Item);
+        if (notification.Entity is not Character character)
+        {
+            return Task.CompletedTask;
+        }
+
+        character.Player.Knowledge.Discover(notification.ItemInstance.Item);
         return Task.CompletedTask;
     }
 }

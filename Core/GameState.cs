@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using RestAdventure.Core.Characters;
+using RestAdventure.Core.Entities;
 using RestAdventure.Core.Players;
 using RestAdventure.Core.Settings;
 
@@ -12,7 +12,7 @@ public class GameState
         Publisher = publisher;
         Settings = settings;
         Players = new GamePlayers(this);
-        Characters = new GameCharacters(this);
+        Entities = new GameEntities(this);
     }
 
 
@@ -22,5 +22,5 @@ public class GameState
     public IPublisher Publisher { get; }
     public GameSettings Settings { get; }
     public GamePlayers Players { get; }
-    public GameCharacters Characters { get; }
+    public GameEntities Entities { get; }
 }

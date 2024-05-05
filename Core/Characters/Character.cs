@@ -1,25 +1,24 @@
-﻿using RestAdventure.Core.Characters.Notifications;
-using RestAdventure.Core.Entities;
+﻿using RestAdventure.Core.Entities;
+using RestAdventure.Core.Items;
+using RestAdventure.Core.Jobs;
 using RestAdventure.Core.Maps.Locations;
+using RestAdventure.Core.Players;
 
 namespace RestAdventure.Core.Characters;
 
 public record CharacterId(Guid Guid) : EntityId(Guid);
 
-public class Character : Entity<CharacterId>
+public class Character : Entity<CharacterId>, IEntityWithInventory, IEntityWithJobs
 {
-    internal Character(Team team, string name, CharacterClass characterClass, Location location) : base(new CharacterId(Guid.NewGuid()), name, location)
+    public Character(Player player, string name, CharacterClass characterClass, Location location) : base(new CharacterId(Guid.NewGuid()), name, location)
     {
-        Team = team;
+        Player = player;
         Class = characterClass;
-        Inventory = new CharacterInventory(this);
-        Jobs = new CharacterJobs(this);
+        Inventory = new Inventory();
+        Jobs = new EntityJobs(this);
     }
 
-    /// <summary>
-    ///     The team of the character
-    /// </summary>
-    public Team Team { get; private set; }
+    public Player Player { get; }
 
     /// <summary>
     ///     The class of the character
@@ -29,25 +28,14 @@ public class Character : Entity<CharacterId>
     /// <summary>
     ///     The inventory of the character
     /// </summary>
-    public CharacterInventory Inventory { get; private set; }
+    public Inventory Inventory { get; private set; }
 
     /// <summary>
     ///     The jobs of the character
     /// </summary>
-    public CharacterJobs Jobs { get; private set; }
+    public EntityJobs Jobs { get; private set; }
 
-    public async Task MoveToAsync(Location location)
-    {
-        if (Location == location)
-        {
-            return;
-        }
-
-        Location = location;
-        await Team.GameCharacters.GameState.Publisher.Publish(new CharacterMovedToLocation { Character = this, Location = location });
-    }
-
-    public override string ToString() => $"{Class} {Name} ({Team})";
+    public override string ToString() => $"{Class} {Name} ({Player})";
 
     public bool Equals(Character? other)
     {

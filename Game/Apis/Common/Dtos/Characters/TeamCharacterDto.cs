@@ -3,6 +3,7 @@ using RestAdventure.Core;
 using RestAdventure.Core.Characters;
 using RestAdventure.Core.Gameplay.Actions;
 using RestAdventure.Game.Apis.Common.Dtos.Characters.Actions;
+using RestAdventure.Game.Apis.Common.Dtos.Items;
 using RestAdventure.Game.Apis.Common.Dtos.Maps;
 
 namespace RestAdventure.Game.Apis.Common.Dtos.Characters;
@@ -40,7 +41,7 @@ public class TeamCharacterDto
     ///     The inventory of the character
     /// </summary>
     [Required]
-    public required CharacterInventoryDto Inventory { get; init; }
+    public required InventoryDto Inventory { get; init; }
 
     /// <summary>
     ///     The result of the action that has been performed on last tick

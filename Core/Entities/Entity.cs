@@ -32,6 +32,21 @@ public abstract class Entity : IEquatable<Entity>
     /// </summary>
     public Location Location { get; protected set; }
 
+    public event EventHandler<EntityMovedEvent>? Moved;
+
+    public void MoveTo(Location location)
+    {
+        if (Location == location)
+        {
+            return;
+        }
+
+        Location oldLocation = Location;
+        Location = location;
+
+        Moved?.Invoke(this, new EntityMovedEvent { OldLocation = oldLocation, NewLocation = Location });
+    }
+
     public bool Equals(Entity? other)
     {
         if (ReferenceEquals(null, other))
@@ -67,6 +82,12 @@ public abstract class Entity : IEquatable<Entity>
     public static bool operator ==(Entity? left, Entity? right) => Equals(left, right);
 
     public static bool operator !=(Entity? left, Entity? right) => !Equals(left, right);
+}
+
+public class EntityMovedEvent
+{
+    public required Location OldLocation { get; init; }
+    public required Location NewLocation { get; init; }
 }
 
 /// <summary>

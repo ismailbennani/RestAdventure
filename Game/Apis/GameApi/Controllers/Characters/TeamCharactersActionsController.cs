@@ -39,15 +39,10 @@ public class TeamCharactersActionsController : GameApiController
         GameState state = _gameService.RequireGameState();
         Player player = ControllerContext.RequirePlayer(state);
 
-        Team? team = state.Characters.GetTeams(player).FirstOrDefault();
-        if (team == null)
-        {
-            return NotFound();
-        }
-
         CharacterId characterId = new(characterGuid);
-        Character? character = state.Characters.GetCharacter(team, characterId);
-        if (character == null)
+        Character? character = state.Entities.Get<Character>(characterId);
+
+        if (character == null || character.Player != player)
         {
             return NotFound();
         }

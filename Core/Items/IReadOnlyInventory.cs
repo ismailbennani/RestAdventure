@@ -11,6 +11,11 @@ public interface IReadOnlyInventory
     IReadOnlyCollection<ItemStack> Stacks { get; }
 
     /// <summary>
+    ///     The total weight of all the items in the inventory
+    /// </summary>
+    int Weight { get; }
+
+    /// <summary>
     ///     Event fired each time a stack of the inventory changes
     /// </summary>
     event EventHandler<InventoryItemStackChangedEvent> Changed;
