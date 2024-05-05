@@ -19,6 +19,8 @@ public class Team : IEquatable<Team>
     public Player Player { get; private set; }
     public IEnumerable<Character> Characters => GameCharacters.GetCharactersInTeam(this);
 
+    public override string ToString() => $"{Id} ({Player})";
+
     public bool Equals(Team? other)
     {
         if (ReferenceEquals(null, other))

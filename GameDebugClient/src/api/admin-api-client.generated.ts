@@ -75,6 +75,140 @@ export class AdminApiStatusApiClient {
 }
 
 @Injectable()
+export class AdminGameContentApiClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "https://localhost:7056";
+    }
+
+    /**
+     * Search items
+     * @param pageNumber (optional) The page number
+     * @param pageSize (optional) The page size
+     */
+    searchItems(pageNumber?: number | undefined, pageSize?: number | undefined): Observable<SearchResultOfItem> {
+        let url_ = this.baseUrl + "/admin/game/content/items?";
+        if (pageNumber === null)
+            throw new Error("The parameter 'pageNumber' cannot be null.");
+        else if (pageNumber !== undefined)
+            url_ += "PageNumber=" + encodeURIComponent("" + pageNumber) + "&";
+        if (pageSize === null)
+            throw new Error("The parameter 'pageSize' cannot be null.");
+        else if (pageSize !== undefined)
+            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSearchItems(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSearchItems(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<SearchResultOfItem>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<SearchResultOfItem>;
+        }));
+    }
+
+    protected processSearchItems(response: HttpResponseBase): Observable<SearchResultOfItem> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = SearchResultOfItem.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * Search locations
+     * @param pageNumber (optional) The page number
+     * @param pageSize (optional) The page size
+     */
+    searchLocations(pageNumber?: number | undefined, pageSize?: number | undefined): Observable<SearchResultOfMapLocation> {
+        let url_ = this.baseUrl + "/admin/game/content/locations?";
+        if (pageNumber === null)
+            throw new Error("The parameter 'pageNumber' cannot be null.");
+        else if (pageNumber !== undefined)
+            url_ += "PageNumber=" + encodeURIComponent("" + pageNumber) + "&";
+        if (pageSize === null)
+            throw new Error("The parameter 'pageSize' cannot be null.");
+        else if (pageSize !== undefined)
+            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSearchLocations(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSearchLocations(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<SearchResultOfMapLocation>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<SearchResultOfMapLocation>;
+        }));
+    }
+
+    protected processSearchLocations(response: HttpResponseBase): Observable<SearchResultOfMapLocation> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = SearchResultOfMapLocation.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
 export class AdminGameApiClient {
     private http: HttpClient;
     private baseUrl: string;
@@ -300,11 +434,11 @@ export class PlayersApiClient {
      * Register player
      * @param playerName (optional) 
      */
-    registerPlayer(playerGuid: string, playerName?: string | undefined): Observable<Player> {
-        let url_ = this.baseUrl + "/admin/players/{playerGuid}?";
-        if (playerGuid === undefined || playerGuid === null)
-            throw new Error("The parameter 'playerGuid' must be defined.");
-        url_ = url_.replace("{playerGuid}", encodeURIComponent("" + playerGuid));
+    registerPlayer(userGuid: string, playerName?: string | undefined): Observable<Player> {
+        let url_ = this.baseUrl + "/admin/players/{userGuid}?";
+        if (userGuid === undefined || userGuid === null)
+            throw new Error("The parameter 'userGuid' must be defined.");
+        url_ = url_.replace("{userGuid}", encodeURIComponent("" + userGuid));
         if (playerName === null)
             throw new Error("The parameter 'playerName' cannot be null.");
         else if (playerName !== undefined)
@@ -358,11 +492,11 @@ export class PlayersApiClient {
     /**
      * Get player
      */
-    getPlayer(playerGuid: string): Observable<Player> {
-        let url_ = this.baseUrl + "/admin/players/{playerGuid}";
-        if (playerGuid === undefined || playerGuid === null)
-            throw new Error("The parameter 'playerGuid' must be defined.");
-        url_ = url_.replace("{playerGuid}", encodeURIComponent("" + playerGuid));
+    getPlayer(userGuid: string): Observable<Player> {
+        let url_ = this.baseUrl + "/admin/players/{userGuid}";
+        if (userGuid === undefined || userGuid === null)
+            throw new Error("The parameter 'userGuid' must be defined.");
+        url_ = url_.replace("{userGuid}", encodeURIComponent("" + userGuid));
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -412,11 +546,11 @@ export class PlayersApiClient {
     /**
      * Refresh player key
      */
-    refreshPlayerKey(playerGuid: string): Observable<Player> {
-        let url_ = this.baseUrl + "/admin/players/{playerGuid}/refresh";
-        if (playerGuid === undefined || playerGuid === null)
-            throw new Error("The parameter 'playerGuid' must be defined.");
-        url_ = url_.replace("{playerGuid}", encodeURIComponent("" + playerGuid));
+    refreshPlayerKey(userGuid: string): Observable<Player> {
+        let url_ = this.baseUrl + "/admin/players/{userGuid}/refresh";
+        if (userGuid === undefined || userGuid === null)
+            throw new Error("The parameter 'userGuid' must be defined.");
+        url_ = url_.replace("{userGuid}", encodeURIComponent("" + userGuid));
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -462,6 +596,371 @@ export class PlayersApiClient {
         }
         return _observableOf(null as any);
     }
+}
+
+export class SearchResultOfItem implements ISearchResultOfItem {
+    items?: Item[];
+    pageNumber?: number;
+    pageSize?: number;
+    totalItemsCount?: number;
+    totalPagesCount?: number;
+
+    constructor(data?: ISearchResultOfItem) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(Item.fromJS(item));
+            }
+            this.pageNumber = _data["pageNumber"];
+            this.pageSize = _data["pageSize"];
+            this.totalItemsCount = _data["totalItemsCount"];
+            this.totalPagesCount = _data["totalPagesCount"];
+        }
+    }
+
+    static fromJS(data: any): SearchResultOfItem {
+        data = typeof data === 'object' ? data : {};
+        let result = new SearchResultOfItem();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        data["pageNumber"] = this.pageNumber;
+        data["pageSize"] = this.pageSize;
+        data["totalItemsCount"] = this.totalItemsCount;
+        data["totalPagesCount"] = this.totalPagesCount;
+        return data;
+    }
+}
+
+export interface ISearchResultOfItem {
+    items?: Item[];
+    pageNumber?: number;
+    pageSize?: number;
+    totalItemsCount?: number;
+    totalPagesCount?: number;
+}
+
+/** Item */
+export class Item implements IItem {
+    /** The unique ID of the item
+             */
+    id!: string;
+    /** The name of the item
+             */
+    name!: string;
+    /** The description of the item
+             */
+    description?: string | undefined;
+    /** The weight of the item
+             */
+    weight!: number;
+
+    constructor(data?: IItem) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.description = _data["description"];
+            this.weight = _data["weight"];
+        }
+    }
+
+    static fromJS(data: any): Item {
+        data = typeof data === 'object' ? data : {};
+        let result = new Item();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["description"] = this.description;
+        data["weight"] = this.weight;
+        return data;
+    }
+}
+
+/** Item */
+export interface IItem {
+    /** The unique ID of the item
+             */
+    id: string;
+    /** The name of the item
+             */
+    name: string;
+    /** The description of the item
+             */
+    description?: string | undefined;
+    /** The weight of the item
+             */
+    weight: number;
+}
+
+export class SearchResultOfMapLocation implements ISearchResultOfMapLocation {
+    items?: MapLocation[];
+    pageNumber?: number;
+    pageSize?: number;
+    totalItemsCount?: number;
+    totalPagesCount?: number;
+
+    constructor(data?: ISearchResultOfMapLocation) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(MapLocation.fromJS(item));
+            }
+            this.pageNumber = _data["pageNumber"];
+            this.pageSize = _data["pageSize"];
+            this.totalItemsCount = _data["totalItemsCount"];
+            this.totalPagesCount = _data["totalPagesCount"];
+        }
+    }
+
+    static fromJS(data: any): SearchResultOfMapLocation {
+        data = typeof data === 'object' ? data : {};
+        let result = new SearchResultOfMapLocation();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        data["pageNumber"] = this.pageNumber;
+        data["pageSize"] = this.pageSize;
+        data["totalItemsCount"] = this.totalItemsCount;
+        data["totalPagesCount"] = this.totalPagesCount;
+        return data;
+    }
+}
+
+export interface ISearchResultOfMapLocation {
+    items?: MapLocation[];
+    pageNumber?: number;
+    pageSize?: number;
+    totalItemsCount?: number;
+    totalPagesCount?: number;
+}
+
+/** Map location minimal information */
+export class MapLocationMinimal implements IMapLocationMinimal {
+    /** The unique ID of the location
+             */
+    id!: string;
+    /** The area associated with the location
+             */
+    area!: MapArea;
+    /** The X coordinate associated with the location
+             */
+    positionX!: number;
+    /** The Y coordinate associated with the location
+             */
+    positionY!: number;
+
+    constructor(data?: IMapLocationMinimal) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.area = new MapArea();
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.area = _data["area"] ? MapArea.fromJS(_data["area"]) : new MapArea();
+            this.positionX = _data["positionX"];
+            this.positionY = _data["positionY"];
+        }
+    }
+
+    static fromJS(data: any): MapLocationMinimal {
+        data = typeof data === 'object' ? data : {};
+        let result = new MapLocationMinimal();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["area"] = this.area ? this.area.toJSON() : <any>undefined;
+        data["positionX"] = this.positionX;
+        data["positionY"] = this.positionY;
+        return data;
+    }
+}
+
+/** Map location minimal information */
+export interface IMapLocationMinimal {
+    /** The unique ID of the location
+             */
+    id: string;
+    /** The area associated with the location
+             */
+    area: MapArea;
+    /** The X coordinate associated with the location
+             */
+    positionX: number;
+    /** The Y coordinate associated with the location
+             */
+    positionY: number;
+}
+
+/** Map location */
+export class MapLocation extends MapLocationMinimal implements IMapLocation {
+    /** Has this location been discovered by the player.
+If false, the connected locations will be hidden.
+             */
+    discovered!: boolean;
+    /** The locations connected to this one
+             */
+    connectedLocations!: MapLocationMinimal[];
+
+    constructor(data?: IMapLocation) {
+        super(data);
+        if (!data) {
+            this.connectedLocations = [];
+        }
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.discovered = _data["discovered"];
+            if (Array.isArray(_data["connectedLocations"])) {
+                this.connectedLocations = [] as any;
+                for (let item of _data["connectedLocations"])
+                    this.connectedLocations!.push(MapLocationMinimal.fromJS(item));
+            }
+        }
+    }
+
+    static override fromJS(data: any): MapLocation {
+        data = typeof data === 'object' ? data : {};
+        let result = new MapLocation();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["discovered"] = this.discovered;
+        if (Array.isArray(this.connectedLocations)) {
+            data["connectedLocations"] = [];
+            for (let item of this.connectedLocations)
+                data["connectedLocations"].push(item.toJSON());
+        }
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Map location */
+export interface IMapLocation extends IMapLocationMinimal {
+    /** Has this location been discovered by the player.
+If false, the connected locations will be hidden.
+             */
+    discovered: boolean;
+    /** The locations connected to this one
+             */
+    connectedLocations: MapLocationMinimal[];
+}
+
+/** Map area */
+export class MapArea implements IMapArea {
+    /** The unique ID of the area
+             */
+    id!: string;
+    /** The name of the area
+             */
+    name!: string;
+
+    constructor(data?: IMapArea) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): MapArea {
+        data = typeof data === 'object' ? data : {};
+        let result = new MapArea();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        return data;
+    }
+}
+
+/** Map area */
+export interface IMapArea {
+    /** The unique ID of the area
+             */
+    id: string;
+    /** The name of the area
+             */
+    name: string;
 }
 
 /** A player */

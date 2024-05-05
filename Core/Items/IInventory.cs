@@ -8,7 +8,7 @@ public interface IInventory : IReadOnlyInventory
     /// <summary>
     ///     Add an item to the inventory. The item will be stacked with existing items if it is stackable.
     /// </summary>
-    ItemStack Add(ItemInstance item, int count);
+    ItemStack Add(ItemInstance itemInstance, int count);
 
     /// <summary>
     ///     Remove the given count of items if there are enough in the inventory.

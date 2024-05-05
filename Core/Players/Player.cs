@@ -19,9 +19,23 @@ public class Player
 
     public User User { get; }
 
-    public void Discover(MapLocation location) => _discoveredLocations.Add(location.Id);
-    public void Discover(Item item) => _discoveredItems.Add(item.Id);
+    public event EventHandler<MapLocation>? LocationDiscovered;
+    public event EventHandler<Item>? ItemDiscovered;
+
+    public void Discover(MapLocation location)
+    {
+        _discoveredLocations.Add(location.Id);
+        LocationDiscovered?.Invoke(this, location);
+    }
+
+    public void Discover(Item item)
+    {
+        _discoveredItems.Add(item.Id);
+        ItemDiscovered?.Invoke(this, item);
+    }
 
     public bool HasDiscovered(MapLocation location) => _discoveredLocations.Contains(location.Id);
     public bool HasDiscovered(Item item) => _discoveredItems.Contains(item.Id);
+
+    public override string ToString() => $"{User}";
 }

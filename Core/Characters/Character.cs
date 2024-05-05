@@ -52,6 +52,8 @@ public class Character : IEquatable<Character>
         Team.Player.Discover(location);
     }
 
+    public override string ToString() => $"{Class} {Name} ({Team})";
+
     public bool Equals(Character? other)
     {
         if (ReferenceEquals(null, other))

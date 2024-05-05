@@ -21,6 +21,8 @@ public class ItemInstance : IEquatable<ItemInstance>
     /// </summary>
     public Item Item { get; }
 
+    public override string ToString() => $"{Id} ({Item})";
+
     public bool Equals(ItemInstance? other)
     {
         if (ReferenceEquals(null, other))

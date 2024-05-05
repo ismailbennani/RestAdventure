@@ -37,7 +37,7 @@ public class PlayersController : AdminApiController
     ///     Register player
     /// </summary>
     [HttpPost("{userGuid:guid}")]
-    public ActionResult<PlayerDto> RegisterPlayer(Guid userGuid, string playerName)
+    public async Task<ActionResult<PlayerDto>> RegisterPlayerAsync(Guid userGuid, string playerName)
     {
         UserId userId = new(userGuid);
 
@@ -50,7 +50,7 @@ public class PlayersController : AdminApiController
         }
 
         User user = new(userId, playerName);
-        Player player = state.Players.RegisterPlayer(user);
+        Player player = await state.Players.RegisterPlayerAsync(user);
 
         return player.ToDto();
     }

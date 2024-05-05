@@ -75,6 +75,140 @@ export class GameApiStatusApiClient {
 }
 
 @Injectable()
+export class GameContentApiClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "https://localhost:7056";
+    }
+
+    /**
+     * Get item
+     */
+    getItem(itemId: string): Observable<Item> {
+        let url_ = this.baseUrl + "/game/content/items/{itemId}";
+        if (itemId === undefined || itemId === null)
+            throw new Error("The parameter 'itemId' must be defined.");
+        url_ = url_.replace("{itemId}", encodeURIComponent("" + itemId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetItem(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetItem(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<Item>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<Item>;
+        }));
+    }
+
+    protected processGetItem(response: HttpResponseBase): Observable<Item> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = Item.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 404) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ProblemDetails.fromJS(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * Get location
+     */
+    getLocation(locationId: string): Observable<Item> {
+        let url_ = this.baseUrl + "/game/content/locations/{locationId}";
+        if (locationId === undefined || locationId === null)
+            throw new Error("The parameter 'locationId' must be defined.");
+        url_ = url_.replace("{locationId}", encodeURIComponent("" + locationId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetLocation(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetLocation(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<Item>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<Item>;
+        }));
+    }
+
+    protected processGetLocation(response: HttpResponseBase): Observable<Item> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = Item.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 404) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ProblemDetails.fromJS(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
 export class GameApiClient {
     private http: HttpClient;
     private baseUrl: string;
@@ -531,6 +665,136 @@ export class TeamApiClient {
     }
 }
 
+/** Item */
+export class Item implements IItem {
+    /** The unique ID of the item
+             */
+    id!: string;
+    /** The name of the item
+             */
+    name!: string;
+    /** The description of the item
+             */
+    description?: string | undefined;
+    /** The weight of the item
+             */
+    weight!: number;
+
+    constructor(data?: IItem) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.description = _data["description"];
+            this.weight = _data["weight"];
+        }
+    }
+
+    static fromJS(data: any): Item {
+        data = typeof data === 'object' ? data : {};
+        let result = new Item();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["description"] = this.description;
+        data["weight"] = this.weight;
+        return data;
+    }
+}
+
+/** Item */
+export interface IItem {
+    /** The unique ID of the item
+             */
+    id: string;
+    /** The name of the item
+             */
+    name: string;
+    /** The description of the item
+             */
+    description?: string | undefined;
+    /** The weight of the item
+             */
+    weight: number;
+}
+
+export class ProblemDetails implements IProblemDetails {
+    type?: string | undefined;
+    title?: string | undefined;
+    status?: number | undefined;
+    detail?: string | undefined;
+    instance?: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IProblemDetails) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.type = _data["type"];
+            this.title = _data["title"];
+            this.status = _data["status"];
+            this.detail = _data["detail"];
+            this.instance = _data["instance"];
+        }
+    }
+
+    static fromJS(data: any): ProblemDetails {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProblemDetails();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["type"] = this.type;
+        data["title"] = this.title;
+        data["status"] = this.status;
+        data["detail"] = this.detail;
+        data["instance"] = this.instance;
+        return data;
+    }
+}
+
+export interface IProblemDetails {
+    type?: string | undefined;
+    title?: string | undefined;
+    status?: number | undefined;
+    detail?: string | undefined;
+    instance?: string | undefined;
+
+    [key: string]: any;
+}
+
 export class GameSettings implements IGameSettings {
     maxTeamSize?: number;
 
@@ -698,70 +962,6 @@ export enum CharacterClass {
     Dealer = "dealer",
 }
 
-export class ProblemDetails implements IProblemDetails {
-    type?: string | undefined;
-    title?: string | undefined;
-    status?: number | undefined;
-    detail?: string | undefined;
-    instance?: string | undefined;
-
-    [key: string]: any;
-
-    constructor(data?: IProblemDetails) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.type = _data["type"];
-            this.title = _data["title"];
-            this.status = _data["status"];
-            this.detail = _data["detail"];
-            this.instance = _data["instance"];
-        }
-    }
-
-    static fromJS(data: any): ProblemDetails {
-        data = typeof data === 'object' ? data : {};
-        let result = new ProblemDetails();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["type"] = this.type;
-        data["title"] = this.title;
-        data["status"] = this.status;
-        data["detail"] = this.detail;
-        data["instance"] = this.instance;
-        return data;
-    }
-}
-
-export interface IProblemDetails {
-    type?: string | undefined;
-    title?: string | undefined;
-    status?: number | undefined;
-    detail?: string | undefined;
-    instance?: string | undefined;
-
-    [key: string]: any;
-}
-
 /** Character */
 export class TeamCharacter implements ITeamCharacter {
     /** The unique ID of the character
@@ -776,6 +976,9 @@ export class TeamCharacter implements ITeamCharacter {
     /** The current location of the character
              */
     location!: MapLocation;
+    /** The inventory of the character
+             */
+    inventory!: CharacterInventory;
     /** The result of the action that has been performed on last tick
              */
     lastActionResult?: CharacterActionResult | undefined;
@@ -792,6 +995,7 @@ export class TeamCharacter implements ITeamCharacter {
         }
         if (!data) {
             this.location = new MapLocation();
+            this.inventory = new CharacterInventory();
         }
     }
 
@@ -801,6 +1005,7 @@ export class TeamCharacter implements ITeamCharacter {
             this.name = _data["name"];
             this.class = _data["class"];
             this.location = _data["location"] ? MapLocation.fromJS(_data["location"]) : new MapLocation();
+            this.inventory = _data["inventory"] ? CharacterInventory.fromJS(_data["inventory"]) : new CharacterInventory();
             this.lastActionResult = _data["lastActionResult"] ? CharacterActionResult.fromJS(_data["lastActionResult"]) : <any>undefined;
             this.nextAction = _data["nextAction"] ? CharacterAction.fromJS(_data["nextAction"]) : <any>undefined;
         }
@@ -819,6 +1024,7 @@ export class TeamCharacter implements ITeamCharacter {
         data["name"] = this.name;
         data["class"] = this.class;
         data["location"] = this.location ? this.location.toJSON() : <any>undefined;
+        data["inventory"] = this.inventory ? this.inventory.toJSON() : <any>undefined;
         data["lastActionResult"] = this.lastActionResult ? this.lastActionResult.toJSON() : <any>undefined;
         data["nextAction"] = this.nextAction ? this.nextAction.toJSON() : <any>undefined;
         return data;
@@ -839,6 +1045,9 @@ export interface ITeamCharacter {
     /** The current location of the character
              */
     location: MapLocation;
+    /** The inventory of the character
+             */
+    inventory: CharacterInventory;
     /** The result of the action that has been performed on last tick
              */
     lastActionResult?: CharacterActionResult | undefined;
@@ -918,6 +1127,10 @@ export interface IMapLocationMinimal {
 
 /** Map location */
 export class MapLocation extends MapLocationMinimal implements IMapLocation {
+    /** Has this location been discovered by the player.
+If false, the connected locations will be hidden.
+             */
+    discovered!: boolean;
     /** The locations connected to this one
              */
     connectedLocations!: MapLocationMinimal[];
@@ -932,6 +1145,7 @@ export class MapLocation extends MapLocationMinimal implements IMapLocation {
     override init(_data?: any) {
         super.init(_data);
         if (_data) {
+            this.discovered = _data["discovered"];
             if (Array.isArray(_data["connectedLocations"])) {
                 this.connectedLocations = [] as any;
                 for (let item of _data["connectedLocations"])
@@ -949,6 +1163,7 @@ export class MapLocation extends MapLocationMinimal implements IMapLocation {
 
     override toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
+        data["discovered"] = this.discovered;
         if (Array.isArray(this.connectedLocations)) {
             data["connectedLocations"] = [];
             for (let item of this.connectedLocations)
@@ -961,6 +1176,10 @@ export class MapLocation extends MapLocationMinimal implements IMapLocation {
 
 /** Map location */
 export interface IMapLocation extends IMapLocationMinimal {
+    /** Has this location been discovered by the player.
+If false, the connected locations will be hidden.
+             */
+    discovered: boolean;
     /** The locations connected to this one
              */
     connectedLocations: MapLocationMinimal[];
@@ -1014,6 +1233,201 @@ export interface IMapArea {
     /** The name of the area
              */
     name: string;
+}
+
+/** Inventory */
+export class Inventory implements IInventory {
+    /** The entries of the inventory
+             */
+    entries!: ItemStack[];
+
+    constructor(data?: IInventory) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.entries = [];
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["entries"])) {
+                this.entries = [] as any;
+                for (let item of _data["entries"])
+                    this.entries!.push(ItemStack.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): Inventory {
+        data = typeof data === 'object' ? data : {};
+        let result = new Inventory();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.entries)) {
+            data["entries"] = [];
+            for (let item of this.entries)
+                data["entries"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+/** Inventory */
+export interface IInventory {
+    /** The entries of the inventory
+             */
+    entries: ItemStack[];
+}
+
+/** Character inventory */
+export class CharacterInventory extends Inventory implements ICharacterInventory {
+    /** The total weight of the items in the inventory
+             */
+    weight!: number;
+
+    constructor(data?: ICharacterInventory) {
+        super(data);
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.weight = _data["weight"];
+        }
+    }
+
+    static override fromJS(data: any): CharacterInventory {
+        data = typeof data === 'object' ? data : {};
+        let result = new CharacterInventory();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["weight"] = this.weight;
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Character inventory */
+export interface ICharacterInventory extends IInventory {
+    /** The total weight of the items in the inventory
+             */
+    weight: number;
+}
+
+/** Item stack */
+export class ItemStack implements IItemStack {
+    /** The item instance representing this stack
+             */
+    itemInstance!: ItemInstance;
+    /** The number of instances in this stack
+             */
+    count!: number;
+
+    constructor(data?: IItemStack) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.itemInstance = new ItemInstance();
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.itemInstance = _data["itemInstance"] ? ItemInstance.fromJS(_data["itemInstance"]) : new ItemInstance();
+            this.count = _data["count"];
+        }
+    }
+
+    static fromJS(data: any): ItemStack {
+        data = typeof data === 'object' ? data : {};
+        let result = new ItemStack();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["itemInstance"] = this.itemInstance ? this.itemInstance.toJSON() : <any>undefined;
+        data["count"] = this.count;
+        return data;
+    }
+}
+
+/** Item stack */
+export interface IItemStack {
+    /** The item instance representing this stack
+             */
+    itemInstance: ItemInstance;
+    /** The number of instances in this stack
+             */
+    count: number;
+}
+
+/** Item instance */
+export class ItemInstance implements IItemInstance {
+    /** The unique ID of this instance
+             */
+    id!: string;
+    /** The unique ID of the item corresponding to this instance
+             */
+    itemId!: string;
+
+    constructor(data?: IItemInstance) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.itemId = _data["itemId"];
+        }
+    }
+
+    static fromJS(data: any): ItemInstance {
+        data = typeof data === 'object' ? data : {};
+        let result = new ItemInstance();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["itemId"] = this.itemId;
+        return data;
+    }
+}
+
+/** Item instance */
+export interface IItemInstance {
+    /** The unique ID of this instance
+             */
+    id: string;
+    /** The unique ID of the item corresponding to this instance
+             */
+    itemId: string;
 }
 
 /** The result of an action performed by a character */

@@ -11,6 +11,11 @@ public interface IReadOnlyInventory
     IReadOnlyCollection<ItemStack> Stacks { get; }
 
     /// <summary>
+    ///     Event fired each time a stack of the inventory changes
+    /// </summary>
+    event EventHandler<InventoryItemStackChangedEvent> Changed;
+
+    /// <summary>
     ///     Get the total count of the given item. If there are multiple stacks of items, this will return the sum of their sizes.
     /// </summary>
     int GetCountOf(Item item);

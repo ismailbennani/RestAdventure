@@ -32,7 +32,7 @@ public class TeamCharactersController : GameApiController
     [HttpPost]
     [ProducesResponseType(typeof(TeamCharacterDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public ActionResult<TeamCharacterDto> CreateCharacter(CreateCharacterRequestDto request)
+    public async Task<ActionResult<TeamCharacterDto>> CreateCharacterAsync(CreateCharacterRequestDto request)
     {
         GameContent content = _gameService.RequireGameContent();
         MapLocation startingMap = content.Maps.Locations.First();
@@ -41,7 +41,7 @@ public class TeamCharactersController : GameApiController
         Player player = ControllerContext.RequirePlayer(state);
 
         Team team = GetOrCreateTeam(state, player);
-        CharacterCreationResult result = state.Characters.CreateCharacter(team, request.Name, request.Class, startingMap);
+        CharacterCreationResult result = await state.Characters.CreateCharacterAsync(team, request.Name, request.Class, startingMap);
 
         if (!result.IsSuccess)
         {
@@ -57,7 +57,7 @@ public class TeamCharactersController : GameApiController
     [HttpDelete("{characterGuid:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public ActionResult DeleteCharacter(Guid characterGuid)
+    public async Task<ActionResult> DeleteCharacterAsync(Guid characterGuid)
     {
         GameState state = _gameService.RequireGameState();
         Player player = ControllerContext.RequirePlayer(state);
@@ -75,7 +75,7 @@ public class TeamCharactersController : GameApiController
             return NotFound();
         }
 
-        state.Characters.DeleteCharacter(team, characterId);
+        await state.Characters.DeleteCharacterAsync(team, characterId);
 
         return NoContent();
     }

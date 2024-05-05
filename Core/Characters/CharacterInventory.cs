@@ -13,14 +13,17 @@ public class CharacterInventory : IInventory
     }
 
     public IReadOnlyCollection<ItemStack> Stacks => _inventory.Stacks;
+    public event EventHandler<InventoryItemStackChangedEvent>? Changed {
+        add => _inventory.Changed += value;
+        remove => _inventory.Changed -= value;
+    }
+
     public int Weight { get; private set; }
 
-    public ItemStack Add(ItemInstance item, int count)
+    public ItemStack Add(ItemInstance itemInstance, int count)
     {
-        Weight += item.Item.Weight * count;
-        ItemStack result = _inventory.Add(item, count);
-
-        _character.Team.Player.Discover(item.Item);
+        Weight += itemInstance.Item.Weight * count;
+        ItemStack result = _inventory.Add(itemInstance, count);
 
         return result;
     }

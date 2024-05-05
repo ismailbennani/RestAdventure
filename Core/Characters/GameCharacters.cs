@@ -1,4 +1,5 @@
-﻿using RestAdventure.Core.Maps;
+﻿using RestAdventure.Core.Characters.Notifications;
+using RestAdventure.Core.Maps;
 using RestAdventure.Core.Players;
 
 namespace RestAdventure.Core.Characters;
@@ -29,18 +30,31 @@ public class GameCharacters
     public Team? GetTeam(TeamId teamId) => _teams.GetValueOrDefault(teamId);
     public IEnumerable<Team> GetTeams(Player player) => _teams.Values.Where(t => t.Player == player);
 
-    public CharacterCreationResult CreateCharacter(Team team, string name, CharacterClass characterClass, MapLocation location)
+    public async Task<CharacterCreationResult> CreateCharacterAsync(Team team, string name, CharacterClass characterClass, MapLocation location)
     {
         int maxTeamSize = GameState.Settings.MaxTeamSize;
         IEnumerable<Character> characters = GetCharactersInTeam(team);
         if (characters.Count() >= maxTeamSize)
         {
-            return new CharacterCreationResult { IsSuccess = false, ErrorMessage = $"reached max team size ({maxTeamSize})" };
+            return new CharacterCreationResult { IsSuccess = false, ErrorMessage = $"reached max team size (max:{maxTeamSize})" };
         }
 
         Character character = new(team, name, characterClass, location);
 
         _characters[character.Id] = character;
+
+        character.Inventory.Changed += (_, args) => GameState.Publisher.Publish(
+                new CharacterInventoryChanged
+                {
+                    Character = character,
+                    ItemInstance = args.ItemInstance,
+                    OldCount = args.OldCount,
+                    NewCount = args.NewCount
+                }
+            )
+            .Wait();
+
+        await GameState.Publisher.Publish(new CharacterCreated { Character = character });
 
         return new CharacterCreationResult { IsSuccess = true, Character = character };
     }
@@ -59,7 +73,7 @@ public class GameCharacters
     public IEnumerable<Character> GetCharactersInTeam(Team team) => _characters.Values.Where(c => c.Team == team);
     public IEnumerable<Character> GetCharactersAtLocation(MapLocation location) => _characters.Values.Where(c => c.Location == location);
 
-    public void DeleteCharacter(Team team, CharacterId characterId)
+    public async Task DeleteCharacterAsync(Team team, CharacterId characterId)
     {
         if (!_characters.TryGetValue(characterId, out Character? character) || character.Team != team)
         {
@@ -67,6 +81,8 @@ public class GameCharacters
         }
 
         _characters.Remove(characterId);
+
+        await GameState.Publisher.Publish(new CharacterDeleted { Character = character });
     }
 }
 

@@ -9,19 +9,26 @@ public class Inventory : IInventory
 
     public IReadOnlyCollection<ItemStack> Stacks => _stacks;
 
-    public ItemStack Add(ItemInstance item, int count)
-    {
-        ItemStack? stack = Find(item.Item);
+    public event EventHandler<InventoryItemStackChangedEvent>? Changed;
 
+    public ItemStack Add(ItemInstance itemInstance, int count)
+    {
+        ItemStack? stack = Find(itemInstance.Item);
+
+        int oldCount;
         if (stack == null)
         {
-            stack = new ItemStack(item, count);
+            oldCount = 0;
+            stack = new ItemStack(itemInstance, count);
             _stacks.Add(stack);
         }
         else
         {
+            oldCount = stack.Count;
             stack.Count += count;
         }
+
+        Changed?.Invoke(this, new InventoryItemStackChangedEvent { ItemInstance = itemInstance, OldCount = oldCount, NewCount = stack.Count });
 
         return stack;
     }
@@ -62,11 +69,14 @@ public class Inventory : IInventory
             return false;
         }
 
+        int oldCount = stack.Count;
         stack.Count -= count;
         if (stack.Count <= 0)
         {
             _stacks.Remove(stack);
         }
+
+        Changed?.Invoke(this, new InventoryItemStackChangedEvent { ItemInstance = itemInstance, OldCount = oldCount, NewCount = stack.Count });
 
         return true;
     }
@@ -76,4 +86,11 @@ public class Inventory : IInventory
     public ItemStack? Find(Item item) => _stacks.FirstOrDefault(e => e.ItemInstance.Item == item);
     public IEnumerable<ItemStack> FindAll(Item item) => _stacks.Where(e => e.ItemInstance.Item == item);
     public ItemStack? Find(ItemInstance itemInstance) => _stacks.FirstOrDefault(e => e.ItemInstance == itemInstance);
+}
+
+public class InventoryItemStackChangedEvent
+{
+    public required ItemInstance ItemInstance { get; init; }
+    public int OldCount { get; init; }
+    public int NewCount { get; init; }
 }

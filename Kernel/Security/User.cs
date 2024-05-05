@@ -19,6 +19,8 @@ public class User : IEquatable<User>
 
     public ApiKey RefreshApiKey() => ApiKey = new ApiKey(Guid.NewGuid());
 
+    public override string ToString() => $"{Name} ({Id})";
+
     public bool Equals(User? other)
     {
         if (ReferenceEquals(null, other))

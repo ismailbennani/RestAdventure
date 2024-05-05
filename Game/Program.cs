@@ -32,7 +32,16 @@ try
             .ReadFrom.Services(services)
             .Enrich.FromLogContext()
     );
+
     builder.Services.AddControllers().AddJsonOptions(settings => settings.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)));
+
+    builder.Services.AddMediatR(
+        cfg =>
+        {
+            cfg.RegisterServicesFromAssemblyContaining<Program>();
+            cfg.RegisterServicesFromAssemblyContaining<GameService>();
+        }
+    );
 
     SetupGameApiAuthentication(builder);
     SetupOpenApiDocuments(builder);

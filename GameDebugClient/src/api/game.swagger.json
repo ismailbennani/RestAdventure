@@ -30,6 +30,102 @@
         ]
       }
     },
+    "/game/content/items/{itemId}": {
+      "get": {
+        "tags": [
+          "Game"
+        ],
+        "summary": "Get item",
+        "operationId": "GameContent_GetItem",
+        "parameters": [
+          {
+            "name": "itemId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Item"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ]
+      }
+    },
+    "/game/content/locations/{locationId}": {
+      "get": {
+        "tags": [
+          "Game"
+        ],
+        "summary": "Get location",
+        "operationId": "GameContent_GetLocation",
+        "parameters": [
+          {
+            "name": "locationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Item"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ]
+      }
+    },
     "/game/settings": {
       "get": {
         "tags": [
@@ -290,6 +386,68 @@
   },
   "components": {
     "schemas": {
+      "Item": {
+        "type": "object",
+        "description": "Item\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "weight"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the item\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the item\n            ",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "description": "The description of the item\n            ",
+            "nullable": true
+          },
+          "weight": {
+            "type": "integer",
+            "description": "The weight of the item\n            ",
+            "format": "int32"
+          }
+        }
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "additionalProperties": {
+          "nullable": true
+        },
+        "properties": {
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
       "GameSettings": {
         "type": "object",
         "additionalProperties": false,
@@ -381,35 +539,6 @@
           "dealer"
         ]
       },
-      "ProblemDetails": {
-        "type": "object",
-        "additionalProperties": {
-          "nullable": true
-        },
-        "properties": {
-          "type": {
-            "type": "string",
-            "nullable": true
-          },
-          "title": {
-            "type": "string",
-            "nullable": true
-          },
-          "status": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "detail": {
-            "type": "string",
-            "nullable": true
-          },
-          "instance": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
       "TeamCharacter": {
         "type": "object",
         "description": "Character\n            ",
@@ -418,7 +547,8 @@
           "id",
           "name",
           "class",
-          "location"
+          "location",
+          "inventory"
         ],
         "properties": {
           "id": {
@@ -445,6 +575,14 @@
             "oneOf": [
               {
                 "$ref": "#/components/schemas/MapLocation"
+              }
+            ]
+          },
+          "inventory": {
+            "description": "The inventory of the character\n            ",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CharacterInventory"
               }
             ]
           },
@@ -478,9 +616,14 @@
             "description": "Map location\n            ",
             "additionalProperties": false,
             "required": [
+              "discovered",
               "connectedLocations"
             ],
             "properties": {
+              "discovered": {
+                "type": "boolean",
+                "description": "Has this location been discovered by the player.\nIf false, the connected locations will be hidden.\n            "
+              },
               "connectedLocations": {
                 "type": "array",
                 "description": "The locations connected to this one\n            ",
@@ -547,6 +690,92 @@
           "name": {
             "type": "string",
             "description": "The name of the area\n            ",
+            "minLength": 1
+          }
+        }
+      },
+      "CharacterInventory": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Inventory"
+          },
+          {
+            "type": "object",
+            "description": "Character inventory\n            ",
+            "additionalProperties": false,
+            "required": [
+              "weight"
+            ],
+            "properties": {
+              "weight": {
+                "type": "integer",
+                "description": "The total weight of the items in the inventory\n            ",
+                "format": "int32"
+              }
+            }
+          }
+        ]
+      },
+      "Inventory": {
+        "type": "object",
+        "description": "Inventory\n            ",
+        "additionalProperties": false,
+        "required": [
+          "entries"
+        ],
+        "properties": {
+          "entries": {
+            "type": "array",
+            "description": "The entries of the inventory\n            ",
+            "items": {
+              "$ref": "#/components/schemas/ItemStack"
+            }
+          }
+        }
+      },
+      "ItemStack": {
+        "type": "object",
+        "description": "Item stack\n            ",
+        "additionalProperties": false,
+        "required": [
+          "itemInstance",
+          "count"
+        ],
+        "properties": {
+          "itemInstance": {
+            "description": "The item instance representing this stack\n            ",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ItemInstance"
+              }
+            ]
+          },
+          "count": {
+            "type": "integer",
+            "description": "The number of instances in this stack\n            ",
+            "format": "int32"
+          }
+        }
+      },
+      "ItemInstance": {
+        "type": "object",
+        "description": "Item instance\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "itemId"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of this instance\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "itemId": {
+            "type": "string",
+            "description": "The unique ID of the item corresponding to this instance\n            ",
+            "format": "guid",
             "minLength": 1
           }
         }

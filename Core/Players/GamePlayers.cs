@@ -1,4 +1,5 @@
-﻿using RestAdventure.Kernel.Security;
+﻿using RestAdventure.Core.Players.Notifications;
+using RestAdventure.Kernel.Security;
 
 namespace RestAdventure.Core.Players;
 
@@ -15,12 +16,17 @@ public class GamePlayers
 
     public IEnumerable<Player> All => _players.Values;
 
-    public Player RegisterPlayer(User user)
+    public async Task<Player> RegisterPlayerAsync(User user)
     {
         if (!_players.TryGetValue(user.Id, out Player? player))
         {
             player = new Player(user);
             _players[user.Id] = player;
+
+            player.LocationDiscovered += (_, location) => GameState.Publisher.Publish(new PlayerDiscoveredLocation { Player = player, Location = location }).Wait();
+            player.ItemDiscovered += (_, item) => GameState.Publisher.Publish(new PlayerDiscoveredItem { Player = player, Item = item }).Wait();
+
+            await GameState.Publisher.Publish(new PlayerJoined { Player = player });
         }
 
         return player;

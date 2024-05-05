@@ -28,6 +28,8 @@ public class Item : IEquatable<Item>
     /// </summary>
     public required int Weight { get; init; }
 
+    public override string ToString() => $"{Name} ({Id})";
+
     public bool Equals(Item? other)
     {
         if (ReferenceEquals(null, other))

@@ -30,7 +30,7 @@ public class AdminGameController : AdminApiController
     ///     Tick now
     /// </summary>
     [HttpPost("tick")]
-    public void TickNow()
+    public async Task TickNowAsync()
     {
         bool paused = _gameScheduler.Paused;
 
@@ -39,7 +39,7 @@ public class AdminGameController : AdminApiController
             _gameScheduler.Stop();
         }
 
-        _gameScheduler.TickNow();
+        await _gameScheduler.TickNowAsync();
 
         if (!paused)
         {

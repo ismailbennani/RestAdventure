@@ -91,17 +91,15 @@ public class GameScheduler : IDisposable
     /// <summary>
     ///     Tick the simulation now
     /// </summary>
-    public void TickNow()
+    public async Task TickNowAsync()
     {
         try
         {
-            long tick = _gameService.Tick();
-
-            _logger.LogInformation("Game simulation has ticked ({tick}).", tick);
+            await _gameService.TickAsync();
         }
         catch (Exception exn)
         {
-            _logger.LogError(exn, "An error occured in {method}.", nameof(_gameService.Tick));
+            _logger.LogError(exn, "An error occured in {method}.", nameof(_gameService.TickAsync));
         }
 
         TimeSpan tickDuration = _serverSettings.Value.TickDuration;
@@ -127,7 +125,7 @@ public class GameScheduler : IDisposable
             DateTime now = DateTime.Now;
             if (now >= NextStepDate)
             {
-                TickNow();
+                await TickNowAsync();
             }
 
             TimeSpan toWait = NextStepDate.Value - now;
