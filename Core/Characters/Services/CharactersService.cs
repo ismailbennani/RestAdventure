@@ -1,7 +1,7 @@
 ﻿using RestAdventure.Core.Maps.Locations;
 using RestAdventure.Core.Players;
 
-namespace RestAdventure.Core.Characters;
+namespace RestAdventure.Core.Characters.Services;
 
 public class CharactersService
 {

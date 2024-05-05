@@ -2,6 +2,7 @@
 using NSwag.Annotations;
 using RestAdventure.Core;
 using RestAdventure.Core.Characters;
+using RestAdventure.Core.Characters.Services;
 using RestAdventure.Core.Players;
 using RestAdventure.Game.Apis.Common.Dtos.Characters;
 using RestAdventure.Game.Apis.GameApi.Controllers.Characters.Requests;

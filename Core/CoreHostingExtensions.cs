@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using RestAdventure.Core.Characters;
+using RestAdventure.Core.Characters.Services;
 using RestAdventure.Core.Gameplay.Actions;
 
 namespace RestAdventure.Core;
