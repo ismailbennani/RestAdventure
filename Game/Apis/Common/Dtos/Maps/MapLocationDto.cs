@@ -25,7 +25,7 @@ public class MapLocationDto : MapLocationMinimalDto
 
 static class MapLocationMappingExtensions
 {
-    public static MapLocationDto ToDiscoveredLocationDto(this MapLocation location, GameContent content) =>
+    public static MapLocationDto ToDiscoveredLocationDto(this Location location, GameContent content) =>
         new()
         {
             Id = location.Id.Guid,
@@ -36,7 +36,7 @@ static class MapLocationMappingExtensions
             ConnectedLocations = content.Maps.Locations.GetConnectedTo(location).Select(l => l.ToMinimalDto()).ToArray()
         };
 
-    public static MapLocationDto ToUndiscoveredLocationDto(this MapLocation location) =>
+    public static MapLocationDto ToUndiscoveredLocationDto(this Location location) =>
         new()
         {
             Id = location.Id.Guid,

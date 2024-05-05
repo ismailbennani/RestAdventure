@@ -16,8 +16,8 @@ public class DiscoverHarvestablesOnCharacterMovedToLocation : INotificationHandl
     {
         GameContent content = _gameService.RequireGameContent();
 
-        IEnumerable<MapHarvestableInstance> harvestables = content.Maps.Harvestables.AtLocation(notification.Location);
-        foreach (MapHarvestableInstance harvestableInstance in harvestables)
+        IEnumerable<HarvestableInstance> harvestables = content.Maps.Harvestables.AtLocation(notification.Location);
+        foreach (HarvestableInstance harvestableInstance in harvestables)
         {
             notification.Character.Team.Player.Knowledge.Discover(harvestableInstance.Harvestable);
         }

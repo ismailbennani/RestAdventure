@@ -8,7 +8,7 @@ public record CharacterId(Guid Guid) : ResourceId(Guid);
 
 public class Character : IEquatable<Character>
 {
-    internal Character(Team team, string name, CharacterClass characterClass, MapLocation location)
+    internal Character(Team team, string name, CharacterClass characterClass, Location location)
     {
         Team = team;
         Name = name;
@@ -41,7 +41,7 @@ public class Character : IEquatable<Character>
     /// <summary>
     ///     The location of the character
     /// </summary>
-    public MapLocation Location { get; private set; }
+    public Location Location { get; private set; }
 
     /// <summary>
     ///     The inventory of the character
@@ -53,7 +53,7 @@ public class Character : IEquatable<Character>
     /// </summary>
     public CharacterJobs Jobs { get; private set; }
 
-    public async Task MoveToAsync(MapLocation location)
+    public async Task MoveToAsync(Location location)
     {
         if (Location == location)
         {

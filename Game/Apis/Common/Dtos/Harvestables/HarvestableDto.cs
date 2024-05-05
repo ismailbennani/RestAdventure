@@ -28,7 +28,7 @@ public class HarvestableDto
 
 static class HarvestableMappingExtensions
 {
-    public static HarvestableDto ToDto(this MapHarvestable harvestable) =>
+    public static HarvestableDto ToDto(this Harvestable harvestable) =>
         new()
         {
             Id = harvestable.Id.Guid,

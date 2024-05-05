@@ -3,7 +3,6 @@ using NSwag.Annotations;
 using RestAdventure.Core;
 using RestAdventure.Core.Characters;
 using RestAdventure.Core.Gameplay.Actions;
-using RestAdventure.Core.Maps;
 using RestAdventure.Core.Maps.Locations;
 using RestAdventure.Core.Players;
 using RestAdventure.Game.Authentication;
@@ -53,8 +52,8 @@ public class TeamCharactersActionsController : GameApiController
             return NotFound();
         }
 
-        MapLocationId locationId = new(locationGuid);
-        MapLocation? location = content.Maps.Locations.Get(locationId);
+        LocationId locationId = new(locationGuid);
+        Location? location = content.Maps.Locations.Get(locationId);
         if (location == null)
         {
             return NotFound();

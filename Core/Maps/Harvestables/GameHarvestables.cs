@@ -2,16 +2,16 @@
 
 public class GameHarvestables
 {
-    readonly Dictionary<MapHarvestableId, MapHarvestable> _harvestables = [];
+    readonly Dictionary<HarvestableId, Harvestable> _harvestables = [];
 
-    public IEnumerable<MapHarvestable> All => _harvestables.Values;
+    public IEnumerable<Harvestable> All => _harvestables.Values;
 
-    public void Register(MapHarvestable harvestable) => _harvestables[harvestable.Id] = harvestable;
-    public MapHarvestable? Get(MapHarvestableId harvestableId) => _harvestables.GetValueOrDefault(harvestableId);
+    public void Register(Harvestable harvestable) => _harvestables[harvestable.Id] = harvestable;
+    public Harvestable? Get(HarvestableId harvestableId) => _harvestables.GetValueOrDefault(harvestableId);
 }
 
 public static class GameHarvestablesExtensions
 {
-    public static MapHarvestable Require(this GameHarvestables harvestables, MapHarvestableId harvestableId) =>
+    public static Harvestable Require(this GameHarvestables harvestables, HarvestableId harvestableId) =>
         harvestables.Get(harvestableId) ?? throw new InvalidOperationException($"Could not find harvestable {harvestableId}");
 }

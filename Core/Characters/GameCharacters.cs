@@ -30,7 +30,7 @@ public class GameCharacters
     public Team? GetTeam(TeamId teamId) => _teams.GetValueOrDefault(teamId);
     public IEnumerable<Team> GetTeams(Player player) => _teams.Values.Where(t => t.Player == player);
 
-    public async Task<CharacterCreationResult> CreateCharacterAsync(Team team, string name, CharacterClass characterClass, MapLocation location)
+    public async Task<CharacterCreationResult> CreateCharacterAsync(Team team, string name, CharacterClass characterClass, Location location)
     {
         int maxTeamSize = GameState.Settings.MaxTeamSize;
         IEnumerable<Character> characters = GetCharactersInTeam(team);
@@ -72,7 +72,7 @@ public class GameCharacters
     }
 
     public IEnumerable<Character> GetCharactersInTeam(Team team) => _characters.Values.Where(c => c.Team == team);
-    public IEnumerable<Character> GetCharactersAtLocation(MapLocation location) => _characters.Values.Where(c => c.Location == location);
+    public IEnumerable<Character> GetCharactersAtLocation(Location location) => _characters.Values.Where(c => c.Location == location);
 
     public async Task DeleteCharacterAsync(Team team, CharacterId characterId)
     {

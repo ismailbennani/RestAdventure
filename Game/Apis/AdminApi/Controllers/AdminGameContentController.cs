@@ -48,7 +48,7 @@ public class AdminGameContentController : AdminApiController
     public SearchResult<MapLocationDto> SearchLocations([FromQuery] SearchRequestDto request)
     {
         GameContent content = _gameService.RequireGameContent();
-        IEnumerable<MapLocation> locations = content.Maps.Locations.All;
+        IEnumerable<Location> locations = content.Maps.Locations.All;
         return Search.Paginate(locations, request.ToPaginationParameters()).Select(i => i.ToDiscoveredLocationDto(content));
     }
 
@@ -70,7 +70,7 @@ public class AdminGameContentController : AdminApiController
     public SearchResult<HarvestableDto> SearchHarvestables([FromQuery] SearchRequestDto request)
     {
         GameContent content = _gameService.RequireGameContent();
-        IEnumerable<MapHarvestable> harvestables = content.Harvestables.All;
+        IEnumerable<Harvestable> harvestables = content.Harvestables.All;
         return Search.Paginate(harvestables, request.ToPaginationParameters()).Select(i => i.ToDto());
     }
 }

@@ -7,6 +7,6 @@ namespace RestAdventure.Core.Maps;
 public class GameMaps
 {
     public GameMapAreas Areas { get; } = new();
-    public GameMapLocations Locations { get; } = new();
-    public GameMapHarvestables Harvestables { get; } = new();
+    public GameLocations Locations { get; } = new();
+    public GameHarvestablesState Harvestables { get; } = new();
 }

@@ -148,8 +148,8 @@ GameState LoadGame(WebApplication app)
     MapArea area = new() { Name = "Start" };
     content.Maps.Areas.Register(area);
 
-    MapLocation location1 = new() { Area = area, PositionX = 0, PositionY = 0 };
-    MapLocation location2 = new() { Area = area, PositionX = 0, PositionY = 1 };
+    Location location1 = new() { Area = area, PositionX = 0, PositionY = 0 };
+    Location location2 = new() { Area = area, PositionX = 0, PositionY = 1 };
     content.Maps.Locations.Register(location1);
     content.Maps.Locations.Register(location2);
     content.Maps.Locations.Connect(location1, location2);
@@ -160,10 +160,10 @@ GameState LoadGame(WebApplication app)
     Job gatherer = new() { Name = "Gatherer", Description = "Gather stuff", Innate = true };
     content.Jobs.Register(gatherer);
 
-    MapHarvestable harvestable = new() { Name = "Apple Tree", Description = "A tree that has apples.", HarvestCondition = new CharacterJobCondition(gatherer) };
+    Harvestable harvestable = new() { Name = "Apple Tree", Description = "A tree that has apples.", HarvestCondition = new CharacterJobCondition(gatherer) };
     content.Harvestables.Register(harvestable);
 
-    MapHarvestableInstance harvestableInstance = new() { Harvestable = harvestable, Location = location1 };
+    HarvestableInstance harvestableInstance = new() { Harvestable = harvestable, Location = location1 };
     content.Maps.Harvestables.Register(harvestableInstance);
 
     GameService gameService = app.Services.GetRequiredService<GameService>();

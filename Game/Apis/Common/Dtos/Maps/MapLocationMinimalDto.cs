@@ -35,6 +35,6 @@ public class MapLocationMinimalDto
 
 static class MapLocationMinimalMappingExtensions
 {
-    public static MapLocationMinimalDto ToMinimalDto(this MapLocation location) =>
+    public static MapLocationMinimalDto ToMinimalDto(this Location location) =>
         new() { Id = location.Id.Guid, Area = location.Area.ToDto(), PositionX = location.PositionX, PositionY = location.PositionY };
 }

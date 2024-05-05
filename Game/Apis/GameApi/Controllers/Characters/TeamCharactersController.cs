@@ -35,13 +35,13 @@ public class TeamCharactersController : GameApiController
     public async Task<ActionResult<TeamCharacterDto>> CreateCharacterAsync(CreateCharacterRequestDto request)
     {
         GameContent content = _gameService.RequireGameContent();
-        MapLocation startingMap = content.Maps.Locations.All.First();
+        Location starting = content.Maps.Locations.All.First();
 
         GameState state = _gameService.RequireGameState();
         Player player = ControllerContext.RequirePlayer(state);
 
         Team team = GetOrCreateTeam(state, player);
-        CharacterCreationResult result = await state.Characters.CreateCharacterAsync(team, request.Name, request.Class, startingMap);
+        CharacterCreationResult result = await state.Characters.CreateCharacterAsync(team, request.Name, request.Class, starting);
 
         if (!result.IsSuccess)
         {

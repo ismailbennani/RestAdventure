@@ -81,7 +81,7 @@ public class GameContentController : GameApiController
             return BadRequest();
         }
 
-        MapLocation? location = content.Maps.Locations.Get(new MapLocationId(locationId));
+        Location? location = content.Maps.Locations.Get(new LocationId(locationId));
         if (location == null)
         {
             return NotFound();
@@ -145,7 +145,7 @@ public class GameContentController : GameApiController
             return BadRequest();
         }
 
-        MapHarvestable? harvestable = content.Harvestables.Get(new MapHarvestableId(harvestableId));
+        Harvestable? harvestable = content.Harvestables.Get(new HarvestableId(harvestableId));
         if (harvestable == null)
         {
             return NotFound();

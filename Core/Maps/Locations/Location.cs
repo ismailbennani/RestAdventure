@@ -3,11 +3,11 @@ using RestAdventure.Core.Resources;
 
 namespace RestAdventure.Core.Maps.Locations;
 
-public record MapLocationId(Guid Guid) : ResourceId(Guid);
+public record LocationId(Guid Guid) : ResourceId(Guid);
 
-public class MapLocation : GameResource<MapLocationId>
+public class Location : GameResource<LocationId>
 {
-    public MapLocation() : base(new MapLocationId(Guid.NewGuid()))
+    public Location() : base(new LocationId(Guid.NewGuid()))
     {
     }
 

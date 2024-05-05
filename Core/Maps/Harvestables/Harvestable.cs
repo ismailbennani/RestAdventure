@@ -3,16 +3,16 @@ using RestAdventure.Core.Resources;
 
 namespace RestAdventure.Core.Maps.Harvestables;
 
-public record MapHarvestableId(Guid Guid) : ResourceId(Guid);
+public record HarvestableId(Guid Guid) : ResourceId(Guid);
 
 /// <summary>
 ///     A harvestable entity. Harvestable entities are interactible entities found in the world. They contain items that the player can harvest.
 ///     There should be only one instance of this class per harvestable entity. It stores all the meta data about the entity: its name, description, etc...
-///     The materialization of the entity in the game world is <see cref="MapHarvestableInstance" />.
+///     The materialization of the entity in the game world is <see cref="HarvestableInstance" />.
 /// </summary>
-public class MapHarvestable : GameResource<MapHarvestableId>
+public class Harvestable : GameResource<HarvestableId>
 {
-    public MapHarvestable() : base(new MapHarvestableId(Guid.NewGuid())) { }
+    public Harvestable() : base(new HarvestableId(Guid.NewGuid())) { }
 
     /// <summary>
     ///     The name of the harvestable entity
