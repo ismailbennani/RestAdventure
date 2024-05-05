@@ -60,10 +60,7 @@
                   <h2>{{ character.name }}</h2>
                   <ul>
                     <li>Class: {{ character.class }}</li>
-                    <li>
-                      Location: {{ character.location.positionX }},
-                      {{ character.location.positionY }} ({{ character.location.area.name }})
-                    </li>
+                    <li>Location: {{ character.location.positionX }}, {{ character.location.positionY }} ({{ character.location.area.name }})</li>
                   </ul>
                 </div>
                 <div class="vr"></div>
@@ -88,31 +85,42 @@
                 <div class="vr"></div>
                 <div class="d-flex flex-column py-2 px-4">
                   <h6>Move to</h6>
-                  @for (
-                    connectedLocation of character.location.connectedLocations;
-                    track connectedLocation.id
-                  ) {
+                  @for (accessibleLocation of accessibleLocations[character.id]; track accessibleLocation.id) {
                     <button
                       class="btn"
-                      [ngClass]="
-                        characterWillMoveToLocation(character, connectedLocation)
-                          ? 'btn-secondary'
-                          : 'btn-outline-secondary'
-                      "
-                      (click)="moveToLocation(character, connectedLocation)"
+                      [ngClass]="characterWillMoveToLocation(character, accessibleLocation) ? 'btn-secondary' : 'btn-outline-secondary'"
+                      (click)="moveToLocation(character, accessibleLocation)"
                     >
-                      {{ connectedLocation.area.name }}: {{ connectedLocation.positionX }},
-                      {{ connectedLocation.positionY }}
+                      {{ accessibleLocation.area.name }}: {{ accessibleLocation.positionX }},
+                      {{ accessibleLocation.positionY }}
                     </button>
+                  }
+                </div>
+                <div class="vr"></div>
+                <div class="d-flex flex-column py-2 px-4">
+                  <h6>Interactions</h6>
+                  @for (entity of entitiesWithInteractions[character.id]; track entity.id) {
+                    <span [class.text-underline]="characterWillInteractWith(character, entity)">
+                      {{ entity.name }}
+                    </span>
+                    <div class="d-flex flex-wrap">
+                      @for (interaction of entity.interactions; track interaction.id) {
+                        <button
+                          class="btn"
+                          [ngClass]="characterWillPerformInteraction(character, entity, interaction) ? 'btn-secondary' : 'btn-outline-secondary'"
+                          (click)="interact(character, entity, interaction)"
+                        >
+                          {{ interaction.name }}
+                        </button>
+                      }
+                    </div>
                   }
                 </div>
               </div>
             } @else if (character === 'loading') {
               <app-spinner></app-spinner>
             } @else {
-              <div
-                class="w-100 h-100 d-flex flex-column align-items-center justify-content-center p-4"
-              >
+              <div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center p-4">
                 <h2>Create character</h2>
                 <form>
                   <div class="mb-3">
@@ -128,12 +136,7 @@
                       }
                     </select>
                   </div>
-                  <button
-                    class="btn btn-outline-dark"
-                    (click)="createCharacter(name.value, class.value)"
-                  >
-                    Create
-                  </button>
+                  <button class="btn btn-outline-dark" (click)="createCharacter(name.value, class.value)">Create</button>
                 </form>
               </div>
             }

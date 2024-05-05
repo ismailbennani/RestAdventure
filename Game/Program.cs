@@ -80,7 +80,7 @@ try
 
     app.MapControllers();
 
-    LoadGame(app);
+    await LoadGameAsync(app);
     StartScheduler(app);
 
     app.Run();
@@ -146,7 +146,7 @@ void SetupOpenApiDocuments(WebApplicationBuilder builder)
     );
 }
 
-GameState LoadGame(WebApplication app)
+async Task<GameState> LoadGameAsync(WebApplication app)
 {
     GameContent content = new();
 
@@ -169,13 +169,14 @@ GameState LoadGame(WebApplication app)
         { Name = "Apple Tree", Description = "A tree that has apples.", HarvestCondition = new CharacterJobCondition(gatherer), Items = [new ItemStack(apple, 1)] };
     content.Harvestables.Register(harvestable);
 
-    HarvestableInstance harvestableInstance = new(harvestable, location1);
-    content.Maps.Harvestables.Register(harvestableInstance);
 
     GameService gameService = app.Services.GetRequiredService<GameService>();
-    GameState gameState = gameService.NewGame(content, new GameSettings());
+    GameState state = gameService.NewGame(content, new GameSettings());
 
-    return gameState;
+    HarvestableInstance harvestableInstance = new(harvestable, location1);
+    await state.Entities.RegisterAsync(harvestableInstance);
+
+    return state;
 }
 
 void StartScheduler(WebApplication app)

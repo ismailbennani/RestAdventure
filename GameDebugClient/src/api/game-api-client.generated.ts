@@ -456,10 +456,71 @@ export class TeamCharactersActionsApiClient {
     }
 
     /**
+     * Get accessible locations
+     */
+    getAccessibleLocations(characterGuid: string): Observable<LocationMinimal[]> {
+        let url_ = this.baseUrl + "/game/team/characters/{characterGuid}/locations";
+        if (characterGuid === undefined || characterGuid === null)
+            throw new Error("The parameter 'characterGuid' must be defined.");
+        url_ = url_.replace("{characterGuid}", encodeURIComponent("" + characterGuid));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAccessibleLocations(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAccessibleLocations(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<LocationMinimal[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<LocationMinimal[]>;
+        }));
+    }
+
+    protected processGetAccessibleLocations(response: HttpResponseBase): Observable<LocationMinimal[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(LocationMinimal.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * Move to location
      */
     moveToLocation(characterGuid: string, locationGuid: string): Observable<void> {
-        let url_ = this.baseUrl + "/game/team/characters/{characterGuid}/move/{locationGuid}";
+        let url_ = this.baseUrl + "/game/team/characters/{characterGuid}/locations/{locationGuid}";
         if (characterGuid === undefined || characterGuid === null)
             throw new Error("The parameter 'characterGuid' must be defined.");
         url_ = url_.replace("{characterGuid}", encodeURIComponent("" + characterGuid));
@@ -523,10 +584,71 @@ export class TeamCharactersActionsApiClient {
     }
 
     /**
+     * Get available interactions
+     */
+    getAvailableInteractions(characterGuid: string): Observable<EntityWithInteractions[]> {
+        let url_ = this.baseUrl + "/game/team/characters/{characterGuid}/interactions";
+        if (characterGuid === undefined || characterGuid === null)
+            throw new Error("The parameter 'characterGuid' must be defined.");
+        url_ = url_.replace("{characterGuid}", encodeURIComponent("" + characterGuid));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAvailableInteractions(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAvailableInteractions(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<EntityWithInteractions[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<EntityWithInteractions[]>;
+        }));
+    }
+
+    protected processGetAvailableInteractions(response: HttpResponseBase): Observable<EntityWithInteractions[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(EntityWithInteractions.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * Interact
      */
     interact(characterGuid: string, entityGuid: string, interactionGuid: string): Observable<void> {
-        let url_ = this.baseUrl + "/game/team/characters/{characterGuid}/entity/{entityGuid}/interact/{interactionGuid}";
+        let url_ = this.baseUrl + "/game/team/characters/{characterGuid}/interactions/entity/{entityGuid}/{interactionGuid}";
         if (characterGuid === undefined || characterGuid === null)
             throw new Error("The parameter 'characterGuid' must be defined.");
         url_ = url_.replace("{characterGuid}", encodeURIComponent("" + characterGuid));
@@ -1372,6 +1494,195 @@ export interface IGameState {
     nextTickDate: Date;
 }
 
+/** Entity (minimal) */
+export class EntityMinimal implements IEntityMinimal {
+    /** The unique ID of the entity
+             */
+    id!: string;
+    /** The name of the entity
+             */
+    name!: string;
+
+    constructor(data?: IEntityMinimal) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): EntityMinimal {
+        data = typeof data === 'object' ? data : {};
+        let result = new EntityMinimal();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        return data;
+    }
+}
+
+/** Entity (minimal) */
+export interface IEntityMinimal {
+    /** The unique ID of the entity
+             */
+    id: string;
+    /** The name of the entity
+             */
+    name: string;
+}
+
+/** Entity with interactions */
+export class EntityWithInteractions extends EntityMinimal implements IEntityWithInteractions {
+    /** The interactions that can be performed on the entity
+             */
+    interactions!: Interaction[];
+
+    constructor(data?: IEntityWithInteractions) {
+        super(data);
+        if (!data) {
+            this.interactions = [];
+        }
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            if (Array.isArray(_data["interactions"])) {
+                this.interactions = [] as any;
+                for (let item of _data["interactions"])
+                    this.interactions!.push(Interaction.fromJS(item));
+            }
+        }
+    }
+
+    static override fromJS(data: any): EntityWithInteractions {
+        data = typeof data === 'object' ? data : {};
+        let result = new EntityWithInteractions();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.interactions)) {
+            data["interactions"] = [];
+            for (let item of this.interactions)
+                data["interactions"].push(item.toJSON());
+        }
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Entity with interactions */
+export interface IEntityWithInteractions extends IEntityMinimal {
+    /** The interactions that can be performed on the entity
+             */
+    interactions: Interaction[];
+}
+
+/** Interaction (minimal) */
+export class InteractionMinimal implements IInteractionMinimal {
+    /** The unique ID of the interaction
+             */
+    id!: string;
+    /** The name of the interaction
+             */
+    name!: string;
+
+    constructor(data?: IInteractionMinimal) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): InteractionMinimal {
+        data = typeof data === 'object' ? data : {};
+        let result = new InteractionMinimal();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        return data;
+    }
+}
+
+/** Interaction (minimal) */
+export interface IInteractionMinimal {
+    /** The unique ID of the interaction
+             */
+    id: string;
+    /** The name of the interaction
+             */
+    name: string;
+}
+
+/** Interaction */
+export class Interaction extends InteractionMinimal implements IInteraction {
+    /** Can this interaction be performed
+             */
+    canInteract!: boolean;
+
+    constructor(data?: IInteraction) {
+        super(data);
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.canInteract = _data["canInteract"];
+        }
+    }
+
+    static override fromJS(data: any): Interaction {
+        data = typeof data === 'object' ? data : {};
+        let result = new Interaction();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["canInteract"] = this.canInteract;
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Interaction */
+export interface IInteraction extends IInteractionMinimal {
+    /** Can this interaction be performed
+             */
+    canInteract: boolean;
+}
+
 /** Character */
 export class TeamCharacter implements ITeamCharacter {
     /** The unique ID of the character
@@ -1385,7 +1696,7 @@ export class TeamCharacter implements ITeamCharacter {
     class!: CharacterClass;
     /** The current location of the character
              */
-    location!: Location;
+    location!: LocationMinimal;
     /** The inventory of the character
              */
     inventory!: Inventory;
@@ -1404,7 +1715,7 @@ export class TeamCharacter implements ITeamCharacter {
             }
         }
         if (!data) {
-            this.location = new Location();
+            this.location = new LocationMinimal();
             this.inventory = new Inventory();
         }
     }
@@ -1414,7 +1725,7 @@ export class TeamCharacter implements ITeamCharacter {
             this.id = _data["id"];
             this.name = _data["name"];
             this.class = _data["class"];
-            this.location = _data["location"] ? Location.fromJS(_data["location"]) : new Location();
+            this.location = _data["location"] ? LocationMinimal.fromJS(_data["location"]) : new LocationMinimal();
             this.inventory = _data["inventory"] ? Inventory.fromJS(_data["inventory"]) : new Inventory();
             this.lastActionResult = _data["lastActionResult"] ? CharacterActionResult.fromJS(_data["lastActionResult"]) : <any>undefined;
             this.nextAction = _data["nextAction"] ? CharacterAction.fromJS(_data["nextAction"]) : <any>undefined;
@@ -1454,7 +1765,7 @@ export interface ITeamCharacter {
     class: CharacterClass;
     /** The current location of the character
              */
-    location: Location;
+    location: LocationMinimal;
     /** The inventory of the character
              */
     inventory: Inventory;
@@ -1799,7 +2110,7 @@ export interface ICharacterMoveToLocationAction extends ICharacterAction {
 export class CharacterInteractWithEntityAction extends CharacterAction implements ICharacterInteractWithEntityAction {
     /** The interaction
              */
-    interaction!: Interaction;
+    interaction!: InteractionMinimal;
     /** The subject of the interaction
              */
     entity!: EntityMinimal;
@@ -1807,7 +2118,7 @@ export class CharacterInteractWithEntityAction extends CharacterAction implement
     constructor(data?: ICharacterInteractWithEntityAction) {
         super(data);
         if (!data) {
-            this.interaction = new Interaction();
+            this.interaction = new InteractionMinimal();
             this.entity = new EntityMinimal();
         }
         this._discriminator = "interact";
@@ -1816,7 +2127,7 @@ export class CharacterInteractWithEntityAction extends CharacterAction implement
     override init(_data?: any) {
         super.init(_data);
         if (_data) {
-            this.interaction = _data["interaction"] ? Interaction.fromJS(_data["interaction"]) : new Interaction();
+            this.interaction = _data["interaction"] ? InteractionMinimal.fromJS(_data["interaction"]) : new InteractionMinimal();
             this.entity = _data["entity"] ? EntityMinimal.fromJS(_data["entity"]) : new EntityMinimal();
         }
     }
@@ -1841,110 +2152,10 @@ export class CharacterInteractWithEntityAction extends CharacterAction implement
 export interface ICharacterInteractWithEntityAction extends ICharacterAction {
     /** The interaction
              */
-    interaction: Interaction;
+    interaction: InteractionMinimal;
     /** The subject of the interaction
              */
     entity: EntityMinimal;
-}
-
-/** Interaction */
-export class Interaction implements IInteraction {
-    /** The unique ID of the interaction
-             */
-    id!: string;
-    /** The name of the interaction
-             */
-    name!: string;
-
-    constructor(data?: IInteraction) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.name = _data["name"];
-        }
-    }
-
-    static fromJS(data: any): Interaction {
-        data = typeof data === 'object' ? data : {};
-        let result = new Interaction();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["name"] = this.name;
-        return data;
-    }
-}
-
-/** Interaction */
-export interface IInteraction {
-    /** The unique ID of the interaction
-             */
-    id: string;
-    /** The name of the interaction
-             */
-    name: string;
-}
-
-/** Entity (minimal) */
-export class EntityMinimal implements IEntityMinimal {
-    /** The unique ID of the entity
-             */
-    id!: string;
-    /** The name of the entity
-             */
-    name!: string;
-
-    constructor(data?: IEntityMinimal) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.name = _data["name"];
-        }
-    }
-
-    static fromJS(data: any): EntityMinimal {
-        data = typeof data === 'object' ? data : {};
-        let result = new EntityMinimal();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["name"] = this.name;
-        return data;
-    }
-}
-
-/** Entity (minimal) */
-export interface IEntityMinimal {
-    /** The unique ID of the entity
-             */
-    id: string;
-    /** The name of the entity
-             */
-    name: string;
 }
 
 /** Character creation options */

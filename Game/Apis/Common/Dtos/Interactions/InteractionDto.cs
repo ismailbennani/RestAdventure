@@ -6,23 +6,22 @@ namespace RestAdventure.Game.Apis.Common.Dtos.Interactions;
 /// <summary>
 ///     Interaction
 /// </summary>
-public class InteractionDto
+public class InteractionDto : InteractionMinimalDto
 {
     /// <summary>
-    ///     The unique ID of the interaction
-    /// </summary>
-    /// <returns></returns>
-    [Required]
-    public required Guid Id { get; init; }
-
-    /// <summary>
-    ///     The name of the interaction
+    ///     Can this interaction be performed
     /// </summary>
     [Required]
-    public required string Name { get; init; }
+    public required bool CanInteract { get; init; }
 }
 
 static class InteractionMappingExtensions
 {
-    public static InteractionDto ToDto(this Interaction interaction) => new() { Id = interaction.Id.Guid, Name = interaction.Name };
+    public static InteractionDto ToDto(this Interaction interaction, bool canInteract) =>
+        new()
+        {
+            Id = interaction.Id.Guid,
+            Name = interaction.Name,
+            CanInteract = canInteract
+        };
 }

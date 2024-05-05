@@ -14,7 +14,7 @@ public class CharacterInteractWithEntityActionDto : CharacterActionDto
     ///     The interaction
     /// </summary>
     [Required]
-    public required InteractionDto Interaction { get; init; }
+    public required InteractionMinimalDto Interaction { get; init; }
 
     /// <summary>
     ///     The subject of the interaction
@@ -28,7 +28,7 @@ static class CharacterInteractWithEntityActionMappingExtensions
     public static CharacterInteractWithEntityActionDto ToDto(this CharacterInteractWithEntityAction action) =>
         new()
         {
-            Interaction = action.Interaction.ToDto(),
+            Interaction = action.Interaction.ToMinimalDto(),
             Entity = action.Entity.ToMinimalDto()
         };
 }

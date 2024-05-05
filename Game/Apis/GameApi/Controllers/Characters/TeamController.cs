@@ -41,7 +41,6 @@ public class TeamController : GameApiController
             Characters = characters.ToList()
                 .Select(
                     c => c.ToDto(
-                        content,
                         new CharacterMappingOptions
                         {
                             LastActionResult = state.Actions.GetLastActionResult(c),

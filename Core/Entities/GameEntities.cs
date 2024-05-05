@@ -2,6 +2,7 @@
 using RestAdventure.Core.Entities.Notifications;
 using RestAdventure.Core.Items;
 using RestAdventure.Core.Jobs;
+using RestAdventure.Core.Maps.Locations;
 
 namespace RestAdventure.Core.Entities;
 
@@ -50,8 +51,10 @@ public class GameEntities
         await GameState.Publisher.Publish(new GameEntityDeleted { Entity = entity });
     }
 
-    public GameEntity? Get(GameEntityId id) => _entities.GetValueOrDefault(id);
+    public GameEntity? Get(GameEntityId id) => _entities.SingleOrDefault(kv => kv.Key.Guid == id.Guid).Value;
     public TEntity? Get<TEntity>(GameEntityId id) where TEntity: class, IGameEntity => Get(id) as TEntity;
+    public IEnumerable<GameEntity> AtLocation(Location location) => All.Where(e => e.Location == location);
+    public IEnumerable<TEntity> AtLocation<TEntity>(Location location) where TEntity: IGameEntity => All.OfType<TEntity>().Where(e => e.Location == location);
 
     void RegisterInventoryEvents(IGameEntityWithInventory entity) =>
         entity.Inventory.Changed += (_, args) => PublishSync(

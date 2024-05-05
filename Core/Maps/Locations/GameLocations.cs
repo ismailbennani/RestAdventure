@@ -25,7 +25,7 @@ public class GameLocations
         _connections.Add((location1.Id, location2.Id));
     }
 
-    public IEnumerable<Location> GetConnectedTo(Location location) =>
+    public IEnumerable<Location> ConnectedTo(Location location) =>
         _connections.Where(l => l.Item1 == location.Id || l.Item2 == location.Id)
             .Select(connection => connection.Item1 == location.Id ? _locations[connection.Item2] : _locations[connection.Item1]);
 

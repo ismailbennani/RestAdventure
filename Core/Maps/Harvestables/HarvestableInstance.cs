@@ -1,4 +1,5 @@
-﻿using RestAdventure.Core.Entities;
+﻿using RestAdventure.Core.Characters;
+using RestAdventure.Core.Entities;
 using RestAdventure.Core.Gameplay.Interactions;
 using RestAdventure.Core.Maps.Locations;
 
@@ -11,6 +12,8 @@ public record HarvestableInstanceId(Guid Guid) : GameEntityId(Guid);
 /// </summary>
 public class HarvestableInstance : GameEntity<HarvestableInstanceId>, IGameEntityWithInteractions
 {
+    static readonly HarvestInteraction Interaction = new();
+
     public HarvestableInstance(Harvestable harvestable, Location location) : base(new HarvestableInstanceId(Guid.NewGuid()), harvestable.Name, location)
     {
         Harvestable = harvestable;
@@ -24,5 +27,7 @@ public class HarvestableInstance : GameEntity<HarvestableInstanceId>, IGameEntit
     /// <summary>
     ///     The interactions
     /// </summary>
-    public EntityInteractions Interactions => new(new HarvestInteraction());
+    public EntityInteractions Interactions => new(Interaction);
+
+    public bool CanBeHarvestedBy(Character character) => Interaction.CanInteract(character, this);
 }

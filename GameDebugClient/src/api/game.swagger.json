@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0-alpha.0.60+304e1092a0fa46bbaf53c1fc0feb187f2ce25058"
+    "version": "0.0.0-alpha.0.61+852a3600d5c5975f01b3b0319a5cb6edb21fa00e"
   },
   "servers": [
     {
@@ -274,7 +274,48 @@
         ]
       }
     },
-    "/game/team/characters/{characterGuid}/move/{locationGuid}": {
+    "/game/team/characters/{characterGuid}/locations": {
+      "get": {
+        "tags": [
+          "Team"
+        ],
+        "summary": "Get accessible locations",
+        "operationId": "TeamCharactersActions_GetAccessibleLocations",
+        "parameters": [
+          {
+            "name": "characterGuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LocationMinimal"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ]
+      }
+    },
+    "/game/team/characters/{characterGuid}/locations/{locationGuid}": {
       "post": {
         "tags": [
           "Team"
@@ -335,7 +376,48 @@
         ]
       }
     },
-    "/game/team/characters/{characterGuid}/entity/{entityGuid}/interact/{interactionGuid}": {
+    "/game/team/characters/{characterGuid}/interactions": {
+      "get": {
+        "tags": [
+          "Team"
+        ],
+        "summary": "Get available interactions",
+        "operationId": "TeamCharactersActions_GetAvailableInteractions",
+        "parameters": [
+          {
+            "name": "characterGuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EntityWithInteractions"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ]
+      }
+    },
+    "/game/team/characters/{characterGuid}/interactions/entity/{entityGuid}/{interactionGuid}": {
       "post": {
         "tags": [
           "Team"
@@ -802,6 +884,95 @@
           }
         }
       },
+      "EntityWithInteractions": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/EntityMinimal"
+          },
+          {
+            "type": "object",
+            "description": "Entity with interactions\n            ",
+            "additionalProperties": false,
+            "required": [
+              "interactions"
+            ],
+            "properties": {
+              "interactions": {
+                "type": "array",
+                "description": "The interactions that can be performed on the entity\n            ",
+                "items": {
+                  "$ref": "#/components/schemas/Interaction"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Interaction": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/InteractionMinimal"
+          },
+          {
+            "type": "object",
+            "description": "Interaction\n            ",
+            "additionalProperties": false,
+            "required": [
+              "canInteract"
+            ],
+            "properties": {
+              "canInteract": {
+                "type": "boolean",
+                "description": "Can this interaction be performed\n            "
+              }
+            }
+          }
+        ]
+      },
+      "InteractionMinimal": {
+        "type": "object",
+        "description": "Interaction (minimal)\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the interaction\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the interaction\n            ",
+            "minLength": 1
+          }
+        }
+      },
+      "EntityMinimal": {
+        "type": "object",
+        "description": "Entity (minimal)\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the entity\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the entity\n            ",
+            "minLength": 1
+          }
+        }
+      },
       "TeamCharacter": {
         "type": "object",
         "description": "Character\n            ",
@@ -837,7 +1008,7 @@
             "description": "The current location of the character\n            ",
             "oneOf": [
               {
-                "$ref": "#/components/schemas/Location"
+                "$ref": "#/components/schemas/LocationMinimal"
               }
             ]
           },
@@ -1052,7 +1223,7 @@
                 "description": "The interaction\n            ",
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/Interaction"
+                    "$ref": "#/components/schemas/InteractionMinimal"
                   }
                 ]
               },
@@ -1067,50 +1238,6 @@
             }
           }
         ]
-      },
-      "Interaction": {
-        "type": "object",
-        "description": "Interaction\n            ",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "name"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "The unique ID of the interaction\n            ",
-            "format": "guid",
-            "minLength": 1
-          },
-          "name": {
-            "type": "string",
-            "description": "The name of the interaction\n            ",
-            "minLength": 1
-          }
-        }
-      },
-      "EntityMinimal": {
-        "type": "object",
-        "description": "Entity (minimal)\n            ",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "name"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "The unique ID of the entity\n            ",
-            "format": "guid",
-            "minLength": 1
-          },
-          "name": {
-            "type": "string",
-            "description": "The name of the entity\n            ",
-            "minLength": 1
-          }
-        }
       },
       "CreateCharacterRequest": {
         "type": "object",

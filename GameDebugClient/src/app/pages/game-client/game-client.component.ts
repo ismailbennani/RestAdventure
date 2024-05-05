@@ -2,18 +2,20 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbDropdownModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
-import { Observable, catchError, finalize, map, of, switchMap, tap } from 'rxjs';
-import { AdminGameApiClient, Player } from '../../../api/admin-api-client.generated';
+import { Observable, catchError, finalize, forkJoin, map, of, switchMap, tap } from 'rxjs';
+import { AdminGameApiClient, LocationMinimal, Player } from '../../../api/admin-api-client.generated';
 import {
   CharacterAction,
   CharacterClass,
+  CharacterInteractWithEntityAction,
   CharacterMoveToLocationAction,
   CreateCharacterRequest,
+  EntityWithInteractions,
   GameApiClient,
   GameSettings,
   GameState,
   ILocationMinimal,
-  Team,
+  InteractionMinimal,
   TeamApiClient,
   TeamCharacter,
   TeamCharactersActionsApiClient,
@@ -36,6 +38,8 @@ export class GameClientComponent implements OnInit {
   protected player: Player;
   protected gameState: GameState | undefined;
   protected characters: (TeamCharacter | 'loading' | undefined)[] = [];
+  protected accessibleLocations: { [characterId: string]: LocationMinimal[] } = {};
+  protected entitiesWithInteractions: { [characterId: string]: EntityWithInteractions[] } = {};
   protected performingAction: { [characterId: string]: boolean } = {};
 
   protected characterClasses: { value: CharacterClass; display: string }[] = [
@@ -138,6 +142,17 @@ export class GameClientComponent implements OnInit {
       .subscribe();
   }
 
+  interact(character: TeamCharacter, entity: EntityWithInteractions, interaction: InteractionMinimal) {
+    this.performingAction[character.id] = true;
+    this.teamCharactersActionsApiClient
+      .interact(character.id, entity.id, interaction.id)
+      .pipe(
+        switchMap(_ => this.refreshCharacters()),
+        finalize(() => (this.performingAction[character.id] = false)),
+      )
+      .subscribe();
+  }
+
   characterWillMoveToLocation(character: TeamCharacter, location: ILocationMinimal) {
     if (!character.nextAction) {
       return false;
@@ -150,6 +165,30 @@ export class GameClientComponent implements OnInit {
     return character.nextAction.location.id == location.id;
   }
 
+  characterWillInteractWith(character: TeamCharacter, entity: EntityWithInteractions) {
+    if (!character.nextAction) {
+      return false;
+    }
+
+    if (!(character.nextAction instanceof CharacterInteractWithEntityAction)) {
+      return false;
+    }
+
+    return character.nextAction.entity.id == entity.id;
+  }
+
+  characterWillPerformInteraction(character: TeamCharacter, entity: EntityWithInteractions, interaction: InteractionMinimal) {
+    if (!character.nextAction) {
+      return false;
+    }
+
+    if (!(character.nextAction instanceof CharacterInteractWithEntityAction)) {
+      return false;
+    }
+
+    return character.nextAction.entity.id == entity.id && character.nextAction.interaction.id == interaction.id;
+  }
+
   changePlayer() {
     this.router.navigateByUrl(SELECT_PLAYER_ROUTE);
   }
@@ -160,19 +199,6 @@ export class GameClientComponent implements OnInit {
     }
 
     return '???';
-  }
-
-  private refreshCharacters(): Observable<Team> {
-    return this.teamApiClient.getTeam().pipe(
-      map(team => {
-        this.characters = new Array(this.settings.maxTeamSize);
-        for (let i = 0; i < team.characters.length; i++) {
-          this.characters[i] = team.characters[i];
-        }
-
-        return team;
-      }),
-    );
   }
 
   private refreshGameState() {
@@ -194,5 +220,52 @@ export class GameClientComponent implements OnInit {
 
         setTimeout(() => this.refreshGameState(), toWait);
       });
+  }
+
+  private refreshCharacters(): Observable<unknown> {
+    return this.teamApiClient.getTeam().pipe(
+      map(team => {
+        this.characters = new Array(this.settings.maxTeamSize);
+        for (let i = 0; i < team.characters.length; i++) {
+          this.characters[i] = team.characters[i];
+        }
+
+        return team;
+      }),
+      switchMap(_ => this.refreshAccessibleLocations()),
+      switchMap(_ => this.refreshAvailableInteractions()),
+    );
+  }
+
+  private refreshAccessibleLocations(): Observable<unknown> {
+    const characters: TeamCharacter[] = this.characters.filter(c => Boolean(c) && c != 'loading').map(c => c as TeamCharacter);
+    if (characters.length === 0) {
+      return of(void 0);
+    }
+
+    return forkJoin(characters.map(c => this.teamCharactersActionsApiClient.getAccessibleLocations(c.id).pipe(map(locations => ({ character: c, locations }))))).pipe(
+      map(results => {
+        this.accessibleLocations = {};
+        for (var result of results) {
+          this.accessibleLocations[result.character.id] = result.locations;
+        }
+      }),
+    );
+  }
+
+  private refreshAvailableInteractions(): Observable<unknown> {
+    const characters: TeamCharacter[] = this.characters.filter(c => Boolean(c) && c != 'loading').map(c => c as TeamCharacter);
+    if (characters.length === 0) {
+      return of(void 0);
+    }
+
+    return forkJoin(characters.map(c => this.teamCharactersActionsApiClient.getAvailableInteractions(c.id).pipe(map(entity => ({ character: c, entity }))))).pipe(
+      map(results => {
+        this.entitiesWithInteractions = {};
+        for (var result of results) {
+          this.entitiesWithInteractions[result.character.id] = result.entity;
+        }
+      }),
+    );
   }
 }

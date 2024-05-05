@@ -36,8 +36,8 @@ public class TeamCharactersController : GameApiController
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<TeamCharacterDto>> CreateCharacterAsync(CreateCharacterRequestDto request)
     {
-        GameState state = _gameService.RequireGameState();
         GameContent content = _gameService.RequireGameContent();
+        GameState state = _gameService.RequireGameState();
 
         Player player = ControllerContext.RequirePlayer(state);
         CharacterCreationResult result = await _charactersService.CreateCharacterAsync(player, request.Name, request.Class);
@@ -47,7 +47,7 @@ public class TeamCharactersController : GameApiController
             return Problem($"Could not create character: {result.ErrorMessage}", statusCode: StatusCodes.Status400BadRequest);
         }
 
-        return result.Character.ToDto(content);
+        return result.Character.ToDto();
     }
 
     /// <summary>

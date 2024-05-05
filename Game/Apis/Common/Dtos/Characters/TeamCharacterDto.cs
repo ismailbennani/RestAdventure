@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using RestAdventure.Core;
 using RestAdventure.Core.Characters;
 using RestAdventure.Core.Gameplay.Actions;
 using RestAdventure.Game.Apis.Common.Dtos.Characters.Actions;
@@ -35,7 +34,7 @@ public class TeamCharacterDto
     ///     The current location of the character
     /// </summary>
     [Required]
-    public required LocationDto Location { get; init; }
+    public required LocationMinimalDto Location { get; init; }
 
     /// <summary>
     ///     The inventory of the character
@@ -56,13 +55,13 @@ public class TeamCharacterDto
 
 static class TeamCharacterMappingExtensions
 {
-    public static TeamCharacterDto ToDto(this Character character, GameContent content, CharacterMappingOptions? options = null) =>
+    public static TeamCharacterDto ToDto(this Character character, CharacterMappingOptions? options = null) =>
         new()
         {
             Id = character.Id.Guid,
             Name = character.Name,
             Class = character.Class,
-            Location = character.Location.ToDiscoveredLocationDto(content),
+            Location = character.Location.ToMinimalDto(),
             Inventory = character.Inventory.ToDto(),
             LastActionResult = options?.LastActionResult?.ToDto(),
             NextAction = options?.NextAction?.ToDto()

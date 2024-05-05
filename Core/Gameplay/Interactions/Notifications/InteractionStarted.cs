@@ -1,6 +1,8 @@
-﻿namespace RestAdventure.Core.Gameplay.Interactions.Notifications;
+﻿using MediatR;
 
-public class InteractionStarted
+namespace RestAdventure.Core.Gameplay.Interactions.Notifications;
+
+public class InteractionStarted: INotification
 {
     public required InteractionInstance InteractionInstance { get; init; }
 }

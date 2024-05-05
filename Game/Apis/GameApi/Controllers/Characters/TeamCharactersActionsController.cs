@@ -6,6 +6,8 @@ using RestAdventure.Core.Entities;
 using RestAdventure.Core.Gameplay.Interactions;
 using RestAdventure.Core.Maps.Locations;
 using RestAdventure.Core.Players;
+using RestAdventure.Game.Apis.Common.Dtos.Entities;
+using RestAdventure.Game.Apis.Common.Dtos.Maps;
 using RestAdventure.Game.Authentication;
 
 namespace RestAdventure.Game.Apis.GameApi.Controllers.Characters;
@@ -27,9 +29,31 @@ public class TeamCharactersActionsController : GameApiController
     }
 
     /// <summary>
+    ///     Get accessible locations
+    /// </summary>
+    [HttpGet("locations")]
+    public ActionResult<IReadOnlyCollection<LocationMinimalDto>> GetAccessibleLocations(Guid characterGuid)
+    {
+        GameContent content = _gameService.RequireGameContent();
+        GameState state = _gameService.RequireGameState();
+        Player player = ControllerContext.RequirePlayer(state);
+
+        CharacterId characterId = new(characterGuid);
+        Character? character = state.Entities.Get<Character>(characterId);
+
+        if (character == null || character.Player != player)
+        {
+            return BadRequest();
+        }
+
+        IEnumerable<Location> accessibleLocations = content.Maps.Locations.ConnectedTo(character.Location);
+        return accessibleLocations.Select(l => l.ToMinimalDto()).ToArray();
+    }
+
+    /// <summary>
     ///     Move to location
     /// </summary>
-    [HttpPost("move/{locationGuid:guid}")]
+    [HttpPost("locations/{locationGuid:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -60,13 +84,35 @@ public class TeamCharactersActionsController : GameApiController
     }
 
     /// <summary>
+    ///     Get available interactions
+    /// </summary>
+    [HttpGet("interactions")]
+    public ActionResult<IReadOnlyCollection<EntityWithInteractionsDto>> GetAvailableInteractions(Guid characterGuid)
+    {
+        GameState state = _gameService.RequireGameState();
+        Player player = ControllerContext.RequirePlayer(state);
+
+        CharacterId characterId = new(characterGuid);
+        Character? character = state.Entities.Get<Character>(characterId);
+
+        if (character == null || character.Player != player)
+        {
+            return BadRequest();
+        }
+
+        IEnumerable<IGameEntityWithInteractions> entities = state.Entities.AtLocation<IGameEntityWithInteractions>(character.Location);
+
+        return entities.Select(e => e.ToEntityWithInteractionsDto(character)).ToArray();
+    }
+
+    /// <summary>
     ///     Interact
     /// </summary>
-    [HttpPost("entity/{entityGuid:guid}/interact/{interactionGuid:guid}")]
+    [HttpPost("interactions/entity/{entityGuid:guid}/{interactionGuid:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult> InteractAsync(Guid characterGuid, Guid entityGuid, Guid interactionGuid)
+    public ActionResult Interact(Guid characterGuid, Guid entityGuid, Guid interactionGuid)
     {
         GameState state = _gameService.RequireGameState();
         Player player = ControllerContext.RequirePlayer(state);
