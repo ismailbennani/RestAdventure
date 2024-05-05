@@ -48,6 +48,8 @@ public class JobInstance
             }
         }
     }
+
+    public override string ToString() => $"{Job}[lv. {Level}, {Experience}xp]";
 }
 
 public class JobLeveledUpEvent

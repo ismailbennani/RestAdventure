@@ -5,6 +5,7 @@ public class GameJobs
     readonly Dictionary<JobId, Job> _jobs = [];
 
     public IEnumerable<Job> All => _jobs.Values;
+    public IEnumerable<Job> Innate => All.Where(j => j.Innate);
 
     public void Register(Job job) => _jobs[job.Id] = job;
     public Job? GetJob(JobId jobId) => _jobs.GetValueOrDefault(jobId);

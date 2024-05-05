@@ -24,6 +24,11 @@ public class Job
     public string? Description { get; init; }
 
     /// <summary>
+    ///     Is the job learned automatically by new characters
+    /// </summary>
+    public bool Innate { get; init; } = false;
+
+    /// <summary>
     ///     The experience to reach each level of the job.
     ///     This list of values is strictly ascending, the experience to reach the <c>N</c>th level of the job is stored in cell <c>N-2</c>.
     /// </summary>
@@ -37,4 +42,6 @@ public class Job
     ///     </list>
     /// </example>
     public IReadOnlyList<int> LevelsExperience { get; init; } = Array.Empty<int>();
+
+    public override string ToString() => $"{Name} ({Id})";
 }

@@ -157,7 +157,7 @@ GameState LoadGame(WebApplication app)
     Item item = new() { Name = "Apple", Description = "A delicious apple.", Weight = 1 };
     content.Items.Register(item);
 
-    Job gatherer = new() { Name = "Gatherer", Description = "Gather stuff" };
+    Job gatherer = new() { Name = "Gatherer", Description = "Gather stuff", Innate = true };
     content.Jobs.Register(gatherer);
 
     MapHarvestable harvestable = new() { Name = "Apple Tree", Description = "A tree that has apples.", HarvestCondition = new CharacterJobCondition(gatherer) };
