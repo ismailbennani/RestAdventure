@@ -15,7 +15,7 @@ public class GameInteractions
 
     internal GameState GameState { get; }
 
-    public async Task StartInteractionAsync(Character character, Interaction interaction, IGameEntityWithInteractions entity)
+    public void StartInteraction(Character character, Interaction interaction, IGameEntityWithInteractions entity)
     {
         if (entity.Interactions.Get(interaction.Id) == null)
         {
@@ -33,7 +33,7 @@ public class GameInteractions
             throw new InvalidOperationException($"Character {character} cannot perform interaction {interaction} on entity {entity}");
         }
 
-        InteractionInstance instance = await interaction.InstantiateAsync(character, entity);
+        InteractionInstance instance = interaction.Instantiate(character, entity);
         _newInteractions.Add(instance);
     }
 

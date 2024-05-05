@@ -6,10 +6,17 @@ namespace RestAdventure.Core.Gameplay.Actions;
 /// <summary>
 ///     Set the action that a character will perform on next tick.
 /// </summary>
-public class CharacterActionsService
+public class GameActions
 {
     readonly Dictionary<CharacterId, CharacterAction> _actions = new();
     readonly Dictionary<CharacterId, CharacterActionResult> _results = new();
+
+    public GameActions(GameState gameState)
+    {
+        GameState = gameState;
+    }
+
+    internal GameState GameState { get; }
 
     /// <summary>
     ///     Make the character move to the given location on next tick.

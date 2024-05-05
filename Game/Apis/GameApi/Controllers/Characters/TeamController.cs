@@ -2,7 +2,6 @@
 using NSwag.Annotations;
 using RestAdventure.Core;
 using RestAdventure.Core.Characters;
-using RestAdventure.Core.Gameplay.Actions;
 using RestAdventure.Core.Players;
 using RestAdventure.Game.Apis.Common.Dtos.Characters;
 using RestAdventure.Game.Authentication;
@@ -17,14 +16,12 @@ namespace RestAdventure.Game.Apis.GameApi.Controllers.Characters;
 public class TeamController : GameApiController
 {
     readonly GameService _gameService;
-    readonly CharacterActionsService _characterActionsService;
 
     /// <summary>
     /// </summary>
-    public TeamController(GameService gameService, CharacterActionsService characterActionsService)
+    public TeamController(GameService gameService)
     {
         _gameService = gameService;
-        _characterActionsService = characterActionsService;
     }
 
     /// <summary>
@@ -47,8 +44,8 @@ public class TeamController : GameApiController
                         content,
                         new CharacterMappingOptions
                         {
-                            LastActionResult = _characterActionsService.GetLastActionResult(c),
-                            NextAction = _characterActionsService.GetNextAction(c)
+                            LastActionResult = state.Actions.GetLastActionResult(c),
+                            NextAction = state.Actions.GetNextAction(c)
                         }
                     )
                 )

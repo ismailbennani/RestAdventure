@@ -17,21 +17,16 @@ public abstract class GameEntity : IEquatable<GameEntity>, IGameEntity
         Location = location;
     }
 
-    /// <summary>
-    ///     The unique ID of the entity
-    /// </summary>
+    /// <inheritdoc />
     public GameEntityId Id { get; }
 
-    /// <summary>
-    ///     The name of the entity
-    /// </summary>
+    /// <inheritdoc />
     public string Name { get; protected set; }
 
-    /// <summary>
-    ///     The location of the entity
-    /// </summary>
+    /// <inheritdoc />
     public Location Location { get; private set; }
 
+    /// <inheritdoc />
     public event EventHandler<EntityMovedEvent>? Moved;
 
     public void MoveTo(Location location)

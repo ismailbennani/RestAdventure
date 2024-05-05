@@ -17,5 +17,5 @@ public abstract class Interaction
     public abstract string Name { get; }
 
     public abstract bool CanInteract(Character character, IGameEntityWithInteractions entity);
-    public abstract Task<InteractionInstance> InstantiateAsync(Character character, IGameEntityWithInteractions entity);
+    public abstract InteractionInstance Instantiate(Character character, IGameEntityWithInteractions entity);
 }

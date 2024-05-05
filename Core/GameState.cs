@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using RestAdventure.Core.Entities;
+using RestAdventure.Core.Gameplay.Actions;
 using RestAdventure.Core.Gameplay.Interactions;
 using RestAdventure.Core.Players;
 using RestAdventure.Core.Settings;
@@ -14,6 +15,7 @@ public class GameState
         Settings = settings;
         Players = new GamePlayers(this);
         Entities = new GameEntities(this);
+        Actions = new GameActions(this);
         Interactions = new GameInteractions(this);
     }
 
@@ -25,5 +27,6 @@ public class GameState
     public GameSettings Settings { get; }
     public GamePlayers Players { get; }
     public GameEntities Entities { get; }
+    public GameActions Actions { get; }
     public GameInteractions Interactions { get; }
 }

@@ -3,7 +3,6 @@ using NSwag.Annotations;
 using RestAdventure.Core;
 using RestAdventure.Core.Characters;
 using RestAdventure.Core.Entities;
-using RestAdventure.Core.Gameplay.Actions;
 using RestAdventure.Core.Gameplay.Interactions;
 using RestAdventure.Core.Maps.Locations;
 using RestAdventure.Core.Players;
@@ -19,14 +18,12 @@ namespace RestAdventure.Game.Apis.GameApi.Controllers.Characters;
 public class TeamCharactersActionsController : GameApiController
 {
     readonly GameService _gameService;
-    readonly CharacterActionsService _characterActionsService;
 
     /// <summary>
     /// </summary>
-    public TeamCharactersActionsController(GameService gameService, CharacterActionsService characterActionsService)
+    public TeamCharactersActionsController(GameService gameService)
     {
         _gameService = gameService;
-        _characterActionsService = characterActionsService;
     }
 
     /// <summary>
@@ -57,7 +54,7 @@ public class TeamCharactersActionsController : GameApiController
             return NotFound();
         }
 
-        _characterActionsService.MoveToLocation(character, location);
+        state.Actions.MoveToLocation(character, location);
 
         return NoContent();
     }
@@ -96,7 +93,7 @@ public class TeamCharactersActionsController : GameApiController
             return NotFound();
         }
 
-        await state.Interactions.StartInteractionAsync(character, interaction, entity);
+        state.Interactions.StartInteraction(character, interaction, entity);
 
         return NoContent();
     }
