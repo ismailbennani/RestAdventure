@@ -17,7 +17,6 @@ public class MapLocation : IEquatable<MapLocation>
     public MapArea Area { get; }
     public int PositionX { get; }
     public int PositionY { get; }
-    public IEnumerable<MapLocation> ConnectedLocations => Area.GameMaps.GetConnectedLocations(this);
 
     public override string ToString() => $"{Area}[{PositionX}, {PositionY}] ({Id})";
 

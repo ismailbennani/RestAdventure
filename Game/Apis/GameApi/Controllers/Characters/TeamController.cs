@@ -34,6 +34,7 @@ public class TeamController : GameApiController
     public ActionResult<TeamDto> GetTeam()
     {
         PlayerId playerId = ControllerContext.RequirePlayerId();
+        GameContent content = _gameService.RequireGameContent();
         GameState state = _gameService.RequireGameState();
 
         Team team = state.Characters.GetTeams(playerId).FirstOrDefault() ?? state.Characters.CreateTeam(playerId);
@@ -43,6 +44,7 @@ public class TeamController : GameApiController
             Characters = team.Characters.ToList()
                 .Select(
                     c => c.ToDto(
+                        content,
                         new CharacterMappingOptions
                         {
                             LastActionResult = _characterActionsService.GetLastActionResult(c),

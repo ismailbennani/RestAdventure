@@ -6,19 +6,12 @@ public class GameMaps
     readonly Dictionary<MapLocationId, MapLocation> _locations = new();
     readonly List<(MapLocationId, MapLocationId)> _connections = [];
 
-    public GameMaps(GameContent gameContent)
-    {
-        GameContent = gameContent;
-    }
-
-    internal GameContent GameContent { get; }
-
     public IReadOnlyCollection<MapArea> Areas => _areas.Values;
     public IReadOnlyCollection<MapLocation> Locations => _locations.Values;
 
     public MapArea CreateArea(string name)
     {
-        MapArea area = new(this, name);
+        MapArea area = new(name);
         _areas[area.Id] = area;
 
         return area;
@@ -55,12 +48,15 @@ public class GameMaps
     public IEnumerable<MapLocation> GetConnectedLocations(MapLocation location) =>
         _connections.Where(l => l.Item1 == location.Id || l.Item2 == location.Id)
             .Select(connection => connection.Item1 == location.Id ? _locations[connection.Item2] : _locations[connection.Item1]);
+
+    public bool IsConnected(MapLocation location1, MapLocation location2) =>
+        _connections.Contains((location1.Id, location2.Id)) || _connections.Contains((location2.Id, location1.Id));
 }
 
-public static class GameMapStateExtensions
+public static class GameMapsExtensions
 {
-    public static MapArea RequireArea(this GameMaps state, MapAreaId areaId) => state.GetArea(areaId) ?? throw new InvalidOperationException($"Could not find area {areaId}");
+    public static MapArea RequireArea(this GameMaps maps, MapAreaId areaId) => maps.GetArea(areaId) ?? throw new InvalidOperationException($"Could not find area {areaId}");
 
-    public static MapLocation RequireLocation(this GameMaps state, MapLocationId locationId) =>
-        state.GetLocation(locationId) ?? throw new InvalidOperationException($"Could not find location {locationId}");
+    public static MapLocation RequireLocation(this GameMaps maps, MapLocationId locationId) =>
+        maps.GetLocation(locationId) ?? throw new InvalidOperationException($"Could not find location {locationId}");
 }

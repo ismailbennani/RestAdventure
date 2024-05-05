@@ -48,7 +48,7 @@ public class TeamCharactersController : GameApiController
             return Problem($"Could not create character: {result.ErrorMessage}", statusCode: StatusCodes.Status400BadRequest);
         }
 
-        return result.Character.ToDto();
+        return result.Character.ToDto(content);
     }
 
     /// <summary>

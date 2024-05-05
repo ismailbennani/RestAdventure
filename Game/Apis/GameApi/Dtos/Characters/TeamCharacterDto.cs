@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using RestAdventure.Core;
 using RestAdventure.Core.Characters;
 using RestAdventure.Core.Gameplay.Actions;
 using RestAdventure.Game.Apis.GameApi.Dtos.Characters.Actions;
@@ -54,13 +55,13 @@ public class TeamCharacterDto
 
 static class TeamCharacterMappingExtensions
 {
-    public static TeamCharacterDto ToDto(this Character character, CharacterMappingOptions? options = null) =>
+    public static TeamCharacterDto ToDto(this Character character, GameContent content, CharacterMappingOptions? options = null) =>
         new()
         {
             Id = character.Id.Guid,
             Name = character.Name,
             Class = character.Class,
-            Location = character.Location.ToDto(),
+            Location = character.Location.ToDto(content),
             Inventory = character.Inventory.ToDto(),
             LastActionResult = options?.LastActionResult?.ToDto(),
             NextAction = options?.NextAction?.ToDto()

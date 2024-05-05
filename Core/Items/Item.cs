@@ -11,22 +11,29 @@ public record ItemId(Guid Guid) : Id(Guid);
 /// </summary>
 public class Item : IEquatable<Item>
 {
+    internal Item(string name, string description, int weight)
+    {
+        Name = name;
+        Description = description;
+        Weight = weight;
+    }
+
     public ItemId Id { get; } = new(Guid.NewGuid());
 
     /// <summary>
     ///     The name of the item
     /// </summary>
-    public required string Name { get; init; }
+    public string Name { get; }
 
     /// <summary>
     ///     The description of the item
     /// </summary>
-    public required string Description { get; init; }
+    public string Description { get; }
 
     /// <summary>
     ///     The weight of the item
     /// </summary>
-    public required int Weight { get; init; }
+    public int Weight { get; }
 
     public bool Equals(Item? other)
     {

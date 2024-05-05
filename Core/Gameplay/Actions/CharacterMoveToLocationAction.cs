@@ -17,7 +17,7 @@ public class CharacterMoveToLocationAction : CharacterAction
         Character character = state.Characters.RequireCharacter(TeamId, CharacterId);
         MapLocation location = content.Maps.RequireLocation(LocationId);
 
-        bool isAccessible = character.Location.ConnectedLocations.Contains(location);
+        bool isAccessible = content.Maps.IsConnected(character.Location, location);
         if (!isAccessible)
         {
             return new CharacterActionResolution { Success = false, ErrorMessage = $"Map {location.Id} is inaccessible" };

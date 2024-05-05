@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using NSwag;
 using NSwag.Generation.Processors.Security;
 using RestAdventure.Core;
+using RestAdventure.Core.Items;
 using RestAdventure.Core.Maps;
 using RestAdventure.Core.Settings;
 using RestAdventure.Game.Apis.AdminApi;
@@ -136,6 +137,8 @@ GameState LoadGame(WebApplication app)
     MapLocation map2 = content.Maps.CreateLocation(startingArea, 0, 1);
 
     content.Maps.ConnectLocations(map1, map2);
+
+    Item item = content.Items.CreateItem("Apple", "A delicious apple.", 1);
 
     GameService gameService = app.Services.GetRequiredService<GameService>();
     GameState gameState = gameService.NewGame(content, new GameSettings());

@@ -6,17 +6,13 @@ public record MapAreaId(Guid Guid) : Id(Guid);
 
 public class MapArea : IEquatable<MapArea>
 {
-    internal MapArea(GameMaps gameMaps, string name)
+    internal MapArea(string name)
     {
-        GameMaps = gameMaps;
         Name = name;
     }
 
-    internal GameMaps GameMaps { get; }
-
     public MapAreaId Id { get; } = new(Guid.NewGuid());
     public string Name { get; set; }
-    public IEnumerable<MapLocation> Locations => GameMaps.GetAreaLocations(this);
 
     public override string ToString() => $"{Name} ({Id})";
 

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using RestAdventure.Core;
 using RestAdventure.Core.Maps;
 
 namespace RestAdventure.Game.Apis.GameApi.Dtos.Maps;
@@ -17,10 +18,10 @@ public class MapLocationDto : MapLocationMinimalDto
 
 static class MapLocationMappingExtensions
 {
-    public static MapLocationDto ToDto(this MapLocation location) =>
+    public static MapLocationDto ToDto(this MapLocation location, GameContent content) =>
         new()
         {
             Id = location.Id.Guid, Area = location.Area.ToDto(), PositionX = location.PositionX, PositionY = location.PositionY,
-            ConnectedLocations = location.ConnectedLocations.Select(l => l.ToMinimalDto()).ToArray()
+            ConnectedLocations = content.Maps.GetConnectedLocations(location).Select(l => l.ToMinimalDto()).ToArray()
         };
 }
