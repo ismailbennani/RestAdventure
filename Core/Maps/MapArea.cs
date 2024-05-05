@@ -6,13 +6,8 @@ public record MapAreaId(Guid Guid) : Id(Guid);
 
 public class MapArea : IEquatable<MapArea>
 {
-    internal MapArea(string name)
-    {
-        Name = name;
-    }
-
     public MapAreaId Id { get; } = new(Guid.NewGuid());
-    public string Name { get; set; }
+    public required string Name { get; init; }
 
     public override string ToString() => $"{Name} ({Id})";
 

@@ -6,17 +6,10 @@ public record MapLocationId(Guid Guid) : Id(Guid);
 
 public class MapLocation : IEquatable<MapLocation>
 {
-    internal MapLocation(MapArea area, int x, int y)
-    {
-        Area = area;
-        PositionX = x;
-        PositionY = y;
-    }
-
     public MapLocationId Id { get; } = new(Guid.NewGuid());
-    public MapArea Area { get; }
-    public int PositionX { get; }
-    public int PositionY { get; }
+    public required MapArea Area { get; init; }
+    public required int PositionX { get; init; }
+    public required int PositionY { get; init; }
 
     public override string ToString() => $"{Area}[{PositionX}, {PositionY}] ({Id})";
 

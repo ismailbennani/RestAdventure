@@ -9,21 +9,8 @@ public class GameMaps
     public IReadOnlyCollection<MapArea> Areas => _areas.Values;
     public IReadOnlyCollection<MapLocation> Locations => _locations.Values;
 
-    public MapArea CreateArea(string name)
-    {
-        MapArea area = new(name);
-        _areas[area.Id] = area;
-
-        return area;
-    }
-
-    public MapLocation CreateLocation(MapArea area, int x, int y)
-    {
-        MapLocation location = new(area, x, y);
-        _locations[location.Id] = location;
-
-        return location;
-    }
+    public void RegisterArea(MapArea area) => _areas[area.Id] = area;
+    public void RegisterLocation(MapLocation location) => _locations[location.Id] = location;
 
     public MapArea? GetArea(MapAreaId areaId) => _areas.GetValueOrDefault(areaId);
     public MapLocation? GetLocation(MapLocationId locationId) => _locations.GetValueOrDefault(locationId);

@@ -132,13 +132,17 @@ GameState LoadGame(WebApplication app)
 {
     GameContent content = new();
 
-    MapArea startingArea = content.Maps.CreateArea("Start");
-    MapLocation map1 = content.Maps.CreateLocation(startingArea, 0, 0);
-    MapLocation map2 = content.Maps.CreateLocation(startingArea, 0, 1);
+    MapArea area = new() { Name = "Start" };
+    content.Maps.RegisterArea(area);
 
-    content.Maps.ConnectLocations(map1, map2);
+    MapLocation location1 = new() { Area = area, PositionX = 0, PositionY = 0 };
+    MapLocation location2 = new() { Area = area, PositionX = 0, PositionY = 1 };
+    content.Maps.RegisterLocation(location1);
+    content.Maps.RegisterLocation(location2);
+    content.Maps.ConnectLocations(location1, location2);
 
-    Item item = content.Items.CreateItem("Apple", "A delicious apple.", 1);
+    Item item = new() { Name = "Apple", Description = "A delicious apple.", Weight = 1 };
+    content.Items.RegisterItem(item);
 
     GameService gameService = app.Services.GetRequiredService<GameService>();
     GameState gameState = gameService.NewGame(content, new GameSettings());

@@ -4,14 +4,7 @@ public class GameItems
 {
     readonly Dictionary<ItemId, Item> _items = [];
 
-    public Item CreateItem(string name, string description, int weight)
-    {
-        Item item = new(name, description, weight);
-        _items[item.Id] = item;
-
-        return item;
-    }
-
+    public void RegisterItem(Item item) => _items[item.Id] = item;
     public Item? GetItem(ItemId itemId) => _items.GetValueOrDefault(itemId);
 }
 
