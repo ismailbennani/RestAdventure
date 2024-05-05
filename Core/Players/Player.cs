@@ -1,59 +1,27 @@
-﻿using RestAdventure.Kernel;
+﻿using RestAdventure.Core.Items;
+using RestAdventure.Core.Maps;
+using RestAdventure.Kernel.Security;
 
 namespace RestAdventure.Core.Players;
 
-public record PlayerId(Guid Guid) : Id(Guid);
-
-public record ApiKey(Guid Guid);
-
-public class Player : IEquatable<Player>
+/// <summary>
+///     A user in a game
+/// </summary>
+public class Player
 {
-    public Player(PlayerId id, string name)
+    readonly HashSet<MapLocationId> _discoveredLocations = [];
+    readonly HashSet<ItemId> _discoveredItems = [];
+
+    public Player(User user)
     {
-        Id = id;
-        Name = name;
-        ApiKey = new ApiKey(Guid.NewGuid());
+        User = user;
     }
 
-    public PlayerId Id { get; }
-    public string Name { get; set; }
-    public ApiKey ApiKey { get; private set; }
+    public User User { get; }
 
-    public ApiKey RefreshApiKey() => ApiKey = new ApiKey(Guid.NewGuid());
+    public void Discover(MapLocation location) => _discoveredLocations.Add(location.Id);
+    public void Discover(Item item) => _discoveredItems.Add(item.Id);
 
-    public bool Equals(Player? other)
-    {
-        if (ReferenceEquals(null, other))
-        {
-            return false;
-        }
-        if (ReferenceEquals(this, other))
-        {
-            return true;
-        }
-        return Id.Equals(other.Id);
-    }
-
-    public override bool Equals(object? obj)
-    {
-        if (ReferenceEquals(null, obj))
-        {
-            return false;
-        }
-        if (ReferenceEquals(this, obj))
-        {
-            return true;
-        }
-        if (obj.GetType() != GetType())
-        {
-            return false;
-        }
-        return Equals((Player)obj);
-    }
-
-    public override int GetHashCode() => Id.GetHashCode();
-
-    public static bool operator ==(Player? left, Player? right) => Equals(left, right);
-
-    public static bool operator !=(Player? left, Player? right) => !Equals(left, right);
+    public bool HasDiscovered(MapLocation location) => _discoveredLocations.Contains(location.Id);
+    public bool HasDiscovered(Item item) => _discoveredItems.Contains(item.Id);
 }

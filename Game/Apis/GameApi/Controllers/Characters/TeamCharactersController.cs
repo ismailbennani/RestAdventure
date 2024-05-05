@@ -34,13 +34,13 @@ public class TeamCharactersController : GameApiController
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public ActionResult<TeamCharacterDto> CreateCharacter(CreateCharacterRequestDto request)
     {
-        PlayerId playerId = ControllerContext.RequirePlayerId();
         GameContent content = _gameService.RequireGameContent();
-        GameState state = _gameService.RequireGameState();
-
         MapLocation startingMap = content.Maps.Locations.First();
 
-        Team team = GetOrCreateTeam(state, playerId);
+        GameState state = _gameService.RequireGameState();
+        Player player = ControllerContext.RequirePlayer(state);
+
+        Team team = GetOrCreateTeam(state, player);
         CharacterCreationResult result = state.Characters.CreateCharacter(team, request.Name, request.Class, startingMap);
 
         if (!result.IsSuccess)
@@ -59,16 +59,16 @@ public class TeamCharactersController : GameApiController
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public ActionResult DeleteCharacter(Guid characterGuid)
     {
-        PlayerId playerId = ControllerContext.RequirePlayerId();
         GameState state = _gameService.RequireGameState();
-        CharacterId characterId = new(characterGuid);
+        Player player = ControllerContext.RequirePlayer(state);
 
-        Team? team = state.Characters.GetTeams(playerId).FirstOrDefault();
+        Team? team = state.Characters.GetTeams(player).FirstOrDefault();
         if (team == null)
         {
             return NotFound();
         }
 
+        CharacterId characterId = new(characterGuid);
         Character? character = state.Characters.GetCharacter(team, characterId);
         if (character == null)
         {
@@ -80,5 +80,5 @@ public class TeamCharactersController : GameApiController
         return NoContent();
     }
 
-    static Team GetOrCreateTeam(GameState state, PlayerId playerId) => state.Characters.GetTeams(playerId).FirstOrDefault() ?? state.Characters.CreateTeam(playerId);
+    static Team GetOrCreateTeam(GameState state, Player player) => state.Characters.GetTeams(player).FirstOrDefault() ?? state.Characters.CreateTeam(player);
 }

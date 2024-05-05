@@ -46,6 +46,12 @@ public class Character : IEquatable<Character>
     /// </summary>
     public CharacterInventory Inventory { get; private set; }
 
+    public void MoveTo(MapLocation location)
+    {
+        Location = location;
+        Team.Player.Discover(location);
+    }
+
     public bool Equals(Character? other)
     {
         if (ReferenceEquals(null, other))

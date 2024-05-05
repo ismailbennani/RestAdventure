@@ -35,10 +35,10 @@ public class CharactersController : GameApiController
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public ActionResult<IReadOnlyCollection<CharacterMinimalDto>> GetCharactersInRange()
     {
-        PlayerId playerId = ControllerContext.RequirePlayerId();
         GameState state = _gameService.RequireGameState();
+        Player player = ControllerContext.RequirePlayer(state);
 
-        Team? team = state.Characters.GetTeams(playerId).FirstOrDefault();
+        Team? team = state.Characters.GetTeams(player).FirstOrDefault();
         if (team == null)
         {
             return NotFound();

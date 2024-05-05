@@ -23,7 +23,8 @@ public class CharacterMoveToLocationAction : CharacterAction
             return new CharacterActionResolution { Success = false, ErrorMessage = $"Map {location.Id} is inaccessible" };
         }
 
-        character.Location = location;
+        character.MoveTo(location);
+
         return new CharacterActionResolution { Success = true };
     }
 }

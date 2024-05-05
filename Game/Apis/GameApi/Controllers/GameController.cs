@@ -1,12 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using NSwag.Annotations;
 using RestAdventure.Core;
 using RestAdventure.Core.Settings;
 using RestAdventure.Game.Apis.GameApi.Dtos;
 using RestAdventure.Game.Apis.GameApi.Services.Game;
-using RestAdventure.Game.Authentication;
 
 namespace RestAdventure.Game.Apis.GameApi.Controllers;
 
@@ -14,11 +12,8 @@ namespace RestAdventure.Game.Apis.GameApi.Controllers;
 ///     Game operations
 /// </summary>
 [Route("game")]
-[ApiController]
-[Authorize(AuthenticationSchemes = GameApiAuthenticationOptions.AuthenticationScheme)]
-[GameApi]
 [OpenApiTag("Game")]
-public class GameController : ControllerBase
+public class GameController : GameApiController
 {
     readonly GameService _gameService;
     readonly GameScheduler _gameScheduler;

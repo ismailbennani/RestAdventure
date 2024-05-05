@@ -35,24 +35,24 @@ public class TeamCharactersActionsController : GameApiController
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public ActionResult MoveToLocation(Guid characterGuid, Guid locationGuid)
     {
-        PlayerId playerId = ControllerContext.RequirePlayerId();
         GameContent content = _gameService.RequireGameContent();
         GameState state = _gameService.RequireGameState();
-        CharacterId characterId = new(characterGuid);
-        MapLocationId locationId = new(locationGuid);
+        Player player = ControllerContext.RequirePlayer(state);
 
-        Team? team = state.Characters.GetTeams(playerId).FirstOrDefault();
+        Team? team = state.Characters.GetTeams(player).FirstOrDefault();
         if (team == null)
         {
             return NotFound();
         }
 
+        CharacterId characterId = new(characterGuid);
         Character? character = state.Characters.GetCharacter(team, characterId);
         if (character == null)
         {
             return NotFound();
         }
 
+        MapLocationId locationId = new(locationGuid);
         MapLocation? location = content.Maps.GetLocation(locationId);
         if (location == null)
         {

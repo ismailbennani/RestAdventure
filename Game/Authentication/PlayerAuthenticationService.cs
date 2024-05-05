@@ -1,5 +1,6 @@
 ﻿using RestAdventure.Core;
 using RestAdventure.Core.Players;
+using RestAdventure.Kernel.Security;
 
 namespace RestAdventure.Game.Authentication;
 
@@ -17,13 +18,13 @@ class PlayerAuthenticationService
     {
         if (!_sessions.TryGetValue(apiKey, out PlayerSession? session))
         {
-            Player? player = _gameService.RequireGameState().Players.GetPlayerByApiKey(apiKey);
-            if (player == null)
+            Player? playerState = _gameService.RequireGameState().Players.GetPlayerByApiKey(apiKey);
+            if (playerState == null)
             {
                 return AuthenticationResult.Failure();
             }
 
-            session = new PlayerSession(player.Id, player.Name);
+            session = new PlayerSession(playerState.User.Id, playerState.User.Name);
             _sessions[apiKey] = session;
         }
 

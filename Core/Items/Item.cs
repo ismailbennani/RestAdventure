@@ -21,7 +21,7 @@ public class Item : IEquatable<Item>
     /// <summary>
     ///     The description of the item
     /// </summary>
-    public required string Description { get; init; }
+    public string? Description { get; init; }
 
     /// <summary>
     ///     The weight of the item

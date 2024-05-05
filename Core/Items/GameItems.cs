@@ -4,6 +4,8 @@ public class GameItems
 {
     readonly Dictionary<ItemId, Item> _items = [];
 
+    public IEnumerable<Item> All => _items.Values;
+
     public void RegisterItem(Item item) => _items[item.Id] = item;
     public Item? GetItem(ItemId itemId) => _items.GetValueOrDefault(itemId);
 }

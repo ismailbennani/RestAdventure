@@ -9,8 +9,8 @@ public class GameState
     public GameState(GameSettings settings)
     {
         Settings = settings;
-        Players = new GamePlayersState(this);
-        Characters = new GameCharactersState(this);
+        Players = new GamePlayers(this);
+        Characters = new GameCharacters(this);
     }
 
 
@@ -18,6 +18,6 @@ public class GameState
     public long Tick { get; set; }
 
     public GameSettings Settings { get; }
-    public GamePlayersState Players { get; }
-    public GameCharactersState Characters { get; }
+    public GamePlayers Players { get; }
+    public GameCharacters Characters { get; }
 }

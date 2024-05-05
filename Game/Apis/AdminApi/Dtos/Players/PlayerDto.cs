@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using RestAdventure.Core.Players;
+using RestAdventure.Kernel.Security;
 
 namespace RestAdventure.Game.Apis.AdminApi.Dtos.Players;
 
@@ -29,11 +30,19 @@ public class PlayerDto
 
 static class PlayerRegistrationMappingExtensions
 {
-    public static PlayerDto ToDto(this Player player) =>
+    public static PlayerDto ToDto(this User player) =>
         new()
         {
             Id = player.Id.Guid,
             Name = player.Name,
             ApiKey = player.ApiKey.Guid
+        };
+
+    public static PlayerDto ToDto(this Player state) =>
+        new()
+        {
+            Id = state.User.Id.Guid,
+            Name = state.User.Name,
+            ApiKey = state.User.ApiKey.Guid
         };
 }

@@ -7,17 +7,17 @@ public record TeamId(Guid Guid) : Id(Guid);
 
 public class Team : IEquatable<Team>
 {
-    internal Team(GameCharactersState gameCharactersState, PlayerId playerId)
+    internal Team(GameCharacters gameCharacters, Player player)
     {
-        GameCharactersState = gameCharactersState;
-        PlayerId = playerId;
+        GameCharacters = gameCharacters;
+        Player = player;
     }
 
-    internal GameCharactersState GameCharactersState { get; }
+    internal GameCharacters GameCharacters { get; }
 
     public TeamId Id { get; } = new(Guid.NewGuid());
-    public PlayerId PlayerId { get; private set; }
-    public IEnumerable<Character> Characters => GameCharactersState.GetCharactersInTeam(this);
+    public Player Player { get; private set; }
+    public IEnumerable<Character> Characters => GameCharacters.GetCharactersInTeam(this);
 
     public bool Equals(Team? other)
     {

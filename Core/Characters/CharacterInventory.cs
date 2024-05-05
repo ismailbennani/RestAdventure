@@ -18,7 +18,11 @@ public class CharacterInventory : IInventory
     public ItemStack Add(ItemInstance item, int count)
     {
         Weight += item.Item.Weight * count;
-        return _inventory.Add(item, count);
+        ItemStack result = _inventory.Add(item, count);
+
+        _character.Team.Player.Discover(item.Item);
+
+        return result;
     }
 
     public bool TryRemove(Item item, int count)

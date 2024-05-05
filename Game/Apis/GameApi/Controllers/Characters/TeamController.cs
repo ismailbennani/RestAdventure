@@ -33,11 +33,11 @@ public class TeamController : GameApiController
     [HttpGet]
     public ActionResult<TeamDto> GetTeam()
     {
-        PlayerId playerId = ControllerContext.RequirePlayerId();
         GameContent content = _gameService.RequireGameContent();
         GameState state = _gameService.RequireGameState();
+        Player player = ControllerContext.RequirePlayer(state);
 
-        Team team = state.Characters.GetTeams(playerId).FirstOrDefault() ?? state.Characters.CreateTeam(playerId);
+        Team team = state.Characters.GetTeams(player).FirstOrDefault() ?? state.Characters.CreateTeam(player);
 
         return new TeamDto
         {

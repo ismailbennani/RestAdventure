@@ -3,6 +3,7 @@ using NSwag.Annotations;
 using RestAdventure.Core;
 using RestAdventure.Core.Players;
 using RestAdventure.Game.Apis.AdminApi.Dtos.Players;
+using RestAdventure.Kernel.Security;
 
 namespace RestAdventure.Game.Apis.AdminApi.Controllers.Players;
 
@@ -35,29 +36,38 @@ public class PlayersController : AdminApiController
     /// <summary>
     ///     Register player
     /// </summary>
-    [HttpPost("{playerGuid:guid}")]
-    public ActionResult<PlayerDto> RegisterPlayer(Guid playerGuid, string playerName)
+    [HttpPost("{userGuid:guid}")]
+    public ActionResult<PlayerDto> RegisterPlayer(Guid userGuid, string playerName)
     {
-        PlayerId playerId = new(playerGuid);
+        UserId userId = new(userGuid);
 
         GameState state = _gameService.RequireGameState();
-        Player player = state.Players.RegisterPlayer(playerId, playerName);
+
+        Player? existingPlayer = state.Players.GetPlayer(userId);
+        if (existingPlayer != null)
+        {
+            return existingPlayer.ToDto();
+        }
+
+        User user = new(userId, playerName);
+        Player player = state.Players.RegisterPlayer(user);
+
         return player.ToDto();
     }
 
     /// <summary>
     ///     Get player
     /// </summary>
-    [HttpGet("{playerGuid:guid}")]
-    public ActionResult<PlayerDto> GetPlayer(Guid playerGuid)
+    [HttpGet("{userGuid:guid}")]
+    public ActionResult<PlayerDto> GetPlayer(Guid userGuid)
     {
-        PlayerId playerId = new(playerGuid);
+        UserId userId = new(userGuid);
 
         GameState state = _gameService.RequireGameState();
-        Player? player = state.Players.GetPlayer(playerId);
+        Player? player = state.Players.GetPlayer(userId);
         if (player == null)
         {
-            return Problem($"Could not find player {playerGuid}", statusCode: StatusCodes.Status400BadRequest);
+            return Problem($"Could not find player for {userGuid}", statusCode: StatusCodes.Status400BadRequest);
         }
 
         return player.ToDto();
@@ -66,19 +76,19 @@ public class PlayersController : AdminApiController
     /// <summary>
     ///     Refresh player key
     /// </summary>
-    [HttpPost("{playerGuid:guid}/refresh")]
-    public ActionResult<PlayerDto> RefreshPlayerKey(Guid playerGuid)
+    [HttpPost("{userGuid:guid}/refresh")]
+    public ActionResult<PlayerDto> RefreshPlayerKey(Guid userGuid)
     {
-        PlayerId playerId = new(playerGuid);
+        UserId userId = new(userGuid);
 
         GameState state = _gameService.RequireGameState();
-        Player? player = state.Players.GetPlayer(playerId);
+        Player? player = state.Players.GetPlayer(userId);
         if (player == null)
         {
-            return Problem($"Could not find player {playerId}", statusCode: StatusCodes.Status400BadRequest);
+            return Problem($"Could not find player for {userGuid}", statusCode: StatusCodes.Status400BadRequest);
         }
 
-        player.RefreshApiKey();
+        player.User.RefreshApiKey();
 
         return player.ToDto();
     }

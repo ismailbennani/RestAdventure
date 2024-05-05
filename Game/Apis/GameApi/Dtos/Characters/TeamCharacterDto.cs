@@ -61,7 +61,7 @@ static class TeamCharacterMappingExtensions
             Id = character.Id.Guid,
             Name = character.Name,
             Class = character.Class,
-            Location = character.Location.ToDto(content),
+            Location = character.Location.ToDiscoveredLocationDto(content),
             Inventory = character.Inventory.ToDto(),
             LastActionResult = options?.LastActionResult?.ToDto(),
             NextAction = options?.NextAction?.ToDto()

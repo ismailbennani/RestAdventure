@@ -3,7 +3,7 @@ using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
-using RestAdventure.Core.Players;
+using RestAdventure.Kernel.Security;
 
 namespace RestAdventure.Game.Authentication;
 
@@ -54,7 +54,7 @@ class GameApiAuthenticationHandler : AuthenticationHandler<GameApiAuthentication
     {
         List<Claim> claims =
         [
-            new Claim(ClaimTypes.NameIdentifier, session.PlayerId.Guid.ToString("D")),
+            new Claim(ClaimTypes.NameIdentifier, session.UserId.Guid.ToString("D")),
             new Claim(ClaimTypes.Name, session.PlayerName)
         ];
 

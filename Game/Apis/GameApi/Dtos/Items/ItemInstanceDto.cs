@@ -9,13 +9,13 @@ namespace RestAdventure.Game.Apis.GameApi.Dtos.Items;
 public class ItemInstanceDto
 {
     /// <summary>
-    ///     The ID of this instance
+    ///     The unique ID of this instance
     /// </summary>
     [Required]
     public Guid Id { get; init; }
 
     /// <summary>
-    ///     The ID of the item corresponding to this instance
+    ///     The unique ID of the item corresponding to this instance
     /// </summary>
     [Required]
     public Guid ItemId { get; init; }

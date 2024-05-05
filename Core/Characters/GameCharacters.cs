@@ -3,12 +3,12 @@ using RestAdventure.Core.Players;
 
 namespace RestAdventure.Core.Characters;
 
-public class GameCharactersState
+public class GameCharacters
 {
     readonly Dictionary<TeamId, Team> _teams = [];
     readonly Dictionary<CharacterId, Character> _characters = [];
 
-    public GameCharactersState(GameState gameState)
+    public GameCharacters(GameState gameState)
     {
         GameState = gameState;
     }
@@ -17,9 +17,9 @@ public class GameCharactersState
 
     public IReadOnlyCollection<Team> Teams => _teams.Values;
 
-    public Team CreateTeam(PlayerId playerId)
+    public Team CreateTeam(Player player)
     {
-        Team team = new(this, playerId);
+        Team team = new(this, player);
 
         _teams[team.Id] = team;
 
@@ -27,7 +27,7 @@ public class GameCharactersState
     }
 
     public Team? GetTeam(TeamId teamId) => _teams.GetValueOrDefault(teamId);
-    public IEnumerable<Team> GetTeams(PlayerId playerId) => _teams.Values.Where(t => t.PlayerId == playerId);
+    public IEnumerable<Team> GetTeams(Player player) => _teams.Values.Where(t => t.Player == player);
 
     public CharacterCreationResult CreateCharacter(Team team, string name, CharacterClass characterClass, MapLocation location)
     {
@@ -72,14 +72,14 @@ public class GameCharactersState
 
 public static class GameCharactersStateExtensions
 {
-    public static Team RequireTeam(this GameCharactersState state, TeamId teamId) => state.GetTeam(teamId) ?? throw new InvalidOperationException($"Could not find team {teamId}");
+    public static Team RequireTeam(this GameCharacters state, TeamId teamId) => state.GetTeam(teamId) ?? throw new InvalidOperationException($"Could not find team {teamId}");
 
-    public static Character RequireCharacter(this GameCharactersState state, TeamId teamId, CharacterId characterId)
+    public static Character RequireCharacter(this GameCharacters state, TeamId teamId, CharacterId characterId)
     {
         Team team = state.RequireTeam(teamId);
         return state.RequireCharacter(team, characterId);
     }
 
-    public static Character RequireCharacter(this GameCharactersState state, Team team, CharacterId characterId) =>
+    public static Character RequireCharacter(this GameCharacters state, Team team, CharacterId characterId) =>
         state.GetCharacter(team, characterId) ?? throw new InvalidOperationException($"Could not find character {characterId}");
 }
