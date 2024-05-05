@@ -1,5 +1,5 @@
 ﻿using RestAdventure.Core.Characters;
-using RestAdventure.Core.Interactions;
+using RestAdventure.Core.Gameplay.Interactions;
 
 namespace RestAdventure.Core.Maps.Harvestables;
 
@@ -7,7 +7,7 @@ public class HarvestInteraction : Interaction
 {
     public override string Name => "Harvest";
 
-    public override bool CanInteract(Character character, IEntityWithInteractions entity)
+    public override bool CanInteract(Character character, IGameEntityWithInteractions entity)
     {
         if (entity is not HarvestableInstance harvestableInstance)
         {
@@ -17,7 +17,7 @@ public class HarvestInteraction : Interaction
         return harvestableInstance.Harvestable.HarvestCondition?.Evaluate(character) ?? true;
     }
 
-    public override Task<InteractionInstance> InstantiateAsync(Character character, IEntityWithInteractions entity)
+    public override Task<InteractionInstance> InstantiateAsync(Character character, IGameEntityWithInteractions entity)
     {
         if (entity is not HarvestableInstance harvestableInstance)
         {

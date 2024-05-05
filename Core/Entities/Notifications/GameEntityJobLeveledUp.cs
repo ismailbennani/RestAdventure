@@ -5,7 +5,7 @@ namespace RestAdventure.Core.Entities.Notifications;
 
 public class GameEntityJobLeveledUp : INotification
 {
-    public required IEntityWithJobs Entity { get; init; }
+    public required IGameEntityWithJobs Entity { get; init; }
     public required Job Job { get; init; }
     public required int OldLevel { get; init; }
     public required int NewLevel { get; init; }

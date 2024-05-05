@@ -2,7 +2,7 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
 using RestAdventure.Core.Gameplay.Actions;
-using RestAdventure.Core.Interactions;
+using RestAdventure.Core.Gameplay.Interactions;
 using RestAdventure.Core.Settings;
 using RestAdventure.Core.Simulation.Notifications;
 

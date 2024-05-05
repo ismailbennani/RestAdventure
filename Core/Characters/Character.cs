@@ -8,7 +8,7 @@ namespace RestAdventure.Core.Characters;
 
 public record CharacterId(Guid Guid) : GameEntityId(Guid);
 
-public class Character : GameEntity<CharacterId>, IEntityWithInventory, IEntityWithJobs
+public class Character : GameEntity<CharacterId>, IGameEntityWithInventory, IGameEntityWithJobs
 {
     public Character(Player player, string name, CharacterClass characterClass, Location location) : base(new CharacterId(Guid.NewGuid()), name, location)
     {

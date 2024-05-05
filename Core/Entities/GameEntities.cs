@@ -24,12 +24,12 @@ public class GameEntities
 
         entity.Moved += (_, args) => PublishSync(new GameEntityMovedToLocation { Entity = entity, OldLocation = args.OldLocation, NewLocation = args.NewLocation });
 
-        if (entity is IEntityWithInventory withInventory)
+        if (entity is IGameEntityWithInventory withInventory)
         {
             RegisterInventoryEvents(withInventory);
         }
 
-        if (entity is IEntityWithJobs withJobs)
+        if (entity is IGameEntityWithJobs withJobs)
         {
             RegisterJobsEvents(withJobs);
         }
@@ -51,9 +51,9 @@ public class GameEntities
     }
 
     public GameEntity? Get(GameEntityId id) => _entities.GetValueOrDefault(id);
-    public TEntity? Get<TEntity>(GameEntityId id) where TEntity: GameEntity => Get(id) as TEntity;
+    public TEntity? Get<TEntity>(GameEntityId id) where TEntity: class, IGameEntity => Get(id) as TEntity;
 
-    void RegisterInventoryEvents(IEntityWithInventory entity) =>
+    void RegisterInventoryEvents(IGameEntityWithInventory entity) =>
         entity.Inventory.Changed += (_, args) => PublishSync(
             new GameEntityInventoryChanged
             {
@@ -64,7 +64,7 @@ public class GameEntities
             }
         );
 
-    void RegisterJobsEvents(IEntityWithJobs entity)
+    void RegisterJobsEvents(IGameEntityWithJobs entity)
     {
         entity.Jobs.JobLearned += (_, job) => PublishSync(new GameEntityLearnedJob { Entity = entity, Job = job });
         entity.Jobs.JobLeveldUp += (_, args) => PublishSync(new GameEntityJobLeveledUp { Entity = entity, Job = args.Job, OldLevel = args.OldLevel, NewLevel = args.NewLevel });

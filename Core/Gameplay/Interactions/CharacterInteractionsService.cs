@@ -1,8 +1,8 @@
 ﻿using MediatR;
 using RestAdventure.Core.Characters;
-using RestAdventure.Core.Interactions.Notifications;
+using RestAdventure.Core.Gameplay.Interactions.Notifications;
 
-namespace RestAdventure.Core.Interactions;
+namespace RestAdventure.Core.Gameplay.Interactions;
 
 public class CharacterInteractionsService
 {
@@ -15,7 +15,7 @@ public class CharacterInteractionsService
         _publisher = publisher;
     }
 
-    public async Task InteractAsync(Character character, Interaction interaction, IEntityWithInteractions entity)
+    public async Task StartInteractionAsync(Character character, Interaction interaction, IGameEntityWithInteractions entity)
     {
         if (entity.Interactions.Get(interaction.Id) == null)
         {

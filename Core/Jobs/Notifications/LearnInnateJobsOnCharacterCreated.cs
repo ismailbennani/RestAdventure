@@ -14,7 +14,7 @@ public class LearnInnateJobsOnEntityCreated : INotificationHandler<GameEntityCre
 
     public Task Handle(GameEntityCreated notification, CancellationToken cancellationToken)
     {
-        if (notification.Entity is not IEntityWithJobs withJobs)
+        if (notification.Entity is not IGameEntityWithJobs withJobs)
         {
             return Task.CompletedTask;
         }

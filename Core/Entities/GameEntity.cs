@@ -8,7 +8,7 @@ public record GameEntityId(Guid Guid);
 /// <remarks>
 ///     Common representation of all <see cref="GameEntity{TId}" /> instances
 /// </remarks>
-public abstract class GameEntity : IEquatable<GameEntity>
+public abstract class GameEntity : IEquatable<GameEntity>, IGameEntity
 {
     public GameEntity(GameEntityId id, string name, Location location)
     {

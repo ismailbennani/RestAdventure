@@ -1,6 +1,6 @@
 ﻿using RestAdventure.Core.Characters;
 
-namespace RestAdventure.Core.Interactions;
+namespace RestAdventure.Core.Gameplay.Interactions;
 
 public record InteractionId(Guid Guid);
 
@@ -16,6 +16,6 @@ public abstract class Interaction
     /// </summary>
     public abstract string Name { get; }
 
-    public abstract bool CanInteract(Character character, IEntityWithInteractions entity);
-    public abstract Task<InteractionInstance> InstantiateAsync(Character character, IEntityWithInteractions entity);
+    public abstract bool CanInteract(Character character, IGameEntityWithInteractions entity);
+    public abstract Task<InteractionInstance> InstantiateAsync(Character character, IGameEntityWithInteractions entity);
 }

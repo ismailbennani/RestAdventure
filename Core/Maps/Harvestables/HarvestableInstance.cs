@@ -1,5 +1,5 @@
 ﻿using RestAdventure.Core.Entities;
-using RestAdventure.Core.Interactions;
+using RestAdventure.Core.Gameplay.Interactions;
 using RestAdventure.Core.Maps.Locations;
 
 namespace RestAdventure.Core.Maps.Harvestables;
@@ -9,7 +9,7 @@ public record HarvestableInstanceId(Guid Guid) : GameEntityId(Guid);
 /// <summary>
 ///     Instance of a <see cref="Harvestables.Harvestable" />
 /// </summary>
-public class HarvestableInstance : GameEntity<HarvestableInstanceId>, IEntityWithInteractions
+public class HarvestableInstance : GameEntity<HarvestableInstanceId>, IGameEntityWithInteractions
 {
     public HarvestableInstance(Harvestable harvestable, Location location) : base(new HarvestableInstanceId(Guid.NewGuid()), harvestable.Name, location)
     {

@@ -1,4 +1,4 @@
-﻿namespace RestAdventure.Core.Interactions.Notifications;
+﻿namespace RestAdventure.Core.Gameplay.Interactions.Notifications;
 
 public class InteractionStarted
 {
