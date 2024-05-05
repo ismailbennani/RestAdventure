@@ -67,9 +67,9 @@ public class GameContentController : GameApiController
     ///     Get location
     /// </summary>
     [HttpGet("locations/{locationId:guid}")]
-    [ProducesResponseType<MapLocationDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType<LocationDto>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
-    public ActionResult<MapLocationDto> GetLocation(Guid locationId)
+    public ActionResult<LocationDto> GetLocation(Guid locationId)
     {
         GameContent content = _gameService.RequireGameContent();
         GameState state = _gameService.RequireGameState();

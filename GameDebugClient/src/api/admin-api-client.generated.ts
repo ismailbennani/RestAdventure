@@ -151,7 +151,7 @@ export class AdminGameContentApiClient {
      * @param pageNumber (optional) The page number
      * @param pageSize (optional) The page size
      */
-    searchLocations(pageNumber?: number | undefined, pageSize?: number | undefined): Observable<SearchResultOfMapLocation> {
+    searchLocations(pageNumber?: number | undefined, pageSize?: number | undefined): Observable<SearchResultOfLocation> {
         let url_ = this.baseUrl + "/admin/game/content/locations?";
         if (pageNumber === null)
             throw new Error("The parameter 'pageNumber' cannot be null.");
@@ -178,14 +178,14 @@ export class AdminGameContentApiClient {
                 try {
                     return this.processSearchLocations(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<SearchResultOfMapLocation>;
+                    return _observableThrow(e) as any as Observable<SearchResultOfLocation>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<SearchResultOfMapLocation>;
+                return _observableThrow(response_) as any as Observable<SearchResultOfLocation>;
         }));
     }
 
-    protected processSearchLocations(response: HttpResponseBase): Observable<SearchResultOfMapLocation> {
+    protected processSearchLocations(response: HttpResponseBase): Observable<SearchResultOfLocation> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -196,7 +196,129 @@ export class AdminGameContentApiClient {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = SearchResultOfMapLocation.fromJS(resultData200);
+            result200 = SearchResultOfLocation.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * Search jobs
+     * @param pageNumber (optional) The page number
+     * @param pageSize (optional) The page size
+     */
+    searchJobs(pageNumber?: number | undefined, pageSize?: number | undefined): Observable<SearchResultOfJob> {
+        let url_ = this.baseUrl + "/admin/game/content/jobs?";
+        if (pageNumber === null)
+            throw new Error("The parameter 'pageNumber' cannot be null.");
+        else if (pageNumber !== undefined)
+            url_ += "PageNumber=" + encodeURIComponent("" + pageNumber) + "&";
+        if (pageSize === null)
+            throw new Error("The parameter 'pageSize' cannot be null.");
+        else if (pageSize !== undefined)
+            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSearchJobs(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSearchJobs(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<SearchResultOfJob>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<SearchResultOfJob>;
+        }));
+    }
+
+    protected processSearchJobs(response: HttpResponseBase): Observable<SearchResultOfJob> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = SearchResultOfJob.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * Search harvestables
+     * @param pageNumber (optional) The page number
+     * @param pageSize (optional) The page size
+     */
+    searchHarvestables(pageNumber?: number | undefined, pageSize?: number | undefined): Observable<SearchResultOfHarvestable> {
+        let url_ = this.baseUrl + "/admin/game/content/harvestables?";
+        if (pageNumber === null)
+            throw new Error("The parameter 'pageNumber' cannot be null.");
+        else if (pageNumber !== undefined)
+            url_ += "PageNumber=" + encodeURIComponent("" + pageNumber) + "&";
+        if (pageSize === null)
+            throw new Error("The parameter 'pageSize' cannot be null.");
+        else if (pageSize !== undefined)
+            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSearchHarvestables(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSearchHarvestables(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<SearchResultOfHarvestable>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<SearchResultOfHarvestable>;
+        }));
+    }
+
+    protected processSearchHarvestables(response: HttpResponseBase): Observable<SearchResultOfHarvestable> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = SearchResultOfHarvestable.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -724,14 +846,14 @@ export interface IItem {
     weight: number;
 }
 
-export class SearchResultOfMapLocation implements ISearchResultOfMapLocation {
-    items?: MapLocation[];
+export class SearchResultOfLocation implements ISearchResultOfLocation {
+    items?: Location[];
     pageNumber?: number;
     pageSize?: number;
     totalItemsCount?: number;
     totalPagesCount?: number;
 
-    constructor(data?: ISearchResultOfMapLocation) {
+    constructor(data?: ISearchResultOfLocation) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -745,7 +867,7 @@ export class SearchResultOfMapLocation implements ISearchResultOfMapLocation {
             if (Array.isArray(_data["items"])) {
                 this.items = [] as any;
                 for (let item of _data["items"])
-                    this.items!.push(MapLocation.fromJS(item));
+                    this.items!.push(Location.fromJS(item));
             }
             this.pageNumber = _data["pageNumber"];
             this.pageSize = _data["pageSize"];
@@ -754,9 +876,9 @@ export class SearchResultOfMapLocation implements ISearchResultOfMapLocation {
         }
     }
 
-    static fromJS(data: any): SearchResultOfMapLocation {
+    static fromJS(data: any): SearchResultOfLocation {
         data = typeof data === 'object' ? data : {};
-        let result = new SearchResultOfMapLocation();
+        let result = new SearchResultOfLocation();
         result.init(data);
         return result;
     }
@@ -776,8 +898,8 @@ export class SearchResultOfMapLocation implements ISearchResultOfMapLocation {
     }
 }
 
-export interface ISearchResultOfMapLocation {
-    items?: MapLocation[];
+export interface ISearchResultOfLocation {
+    items?: Location[];
     pageNumber?: number;
     pageSize?: number;
     totalItemsCount?: number;
@@ -785,7 +907,7 @@ export interface ISearchResultOfMapLocation {
 }
 
 /** Map location minimal information */
-export class MapLocationMinimal implements IMapLocationMinimal {
+export class LocationMinimal implements ILocationMinimal {
     /** The unique ID of the location
              */
     id!: string;
@@ -799,7 +921,7 @@ export class MapLocationMinimal implements IMapLocationMinimal {
              */
     positionY!: number;
 
-    constructor(data?: IMapLocationMinimal) {
+    constructor(data?: ILocationMinimal) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -820,9 +942,9 @@ export class MapLocationMinimal implements IMapLocationMinimal {
         }
     }
 
-    static fromJS(data: any): MapLocationMinimal {
+    static fromJS(data: any): LocationMinimal {
         data = typeof data === 'object' ? data : {};
-        let result = new MapLocationMinimal();
+        let result = new LocationMinimal();
         result.init(data);
         return result;
     }
@@ -838,7 +960,7 @@ export class MapLocationMinimal implements IMapLocationMinimal {
 }
 
 /** Map location minimal information */
-export interface IMapLocationMinimal {
+export interface ILocationMinimal {
     /** The unique ID of the location
              */
     id: string;
@@ -854,16 +976,16 @@ export interface IMapLocationMinimal {
 }
 
 /** Map location */
-export class MapLocation extends MapLocationMinimal implements IMapLocation {
+export class Location extends LocationMinimal implements ILocation {
     /** Has this location been discovered by the player.
 If false, the connected locations will be hidden.
              */
     discovered!: boolean;
     /** The locations connected to this one
              */
-    connectedLocations!: MapLocationMinimal[];
+    connectedLocations!: LocationMinimal[];
 
-    constructor(data?: IMapLocation) {
+    constructor(data?: ILocation) {
         super(data);
         if (!data) {
             this.connectedLocations = [];
@@ -877,14 +999,14 @@ If false, the connected locations will be hidden.
             if (Array.isArray(_data["connectedLocations"])) {
                 this.connectedLocations = [] as any;
                 for (let item of _data["connectedLocations"])
-                    this.connectedLocations!.push(MapLocationMinimal.fromJS(item));
+                    this.connectedLocations!.push(LocationMinimal.fromJS(item));
             }
         }
     }
 
-    static override fromJS(data: any): MapLocation {
+    static override fromJS(data: any): Location {
         data = typeof data === 'object' ? data : {};
-        let result = new MapLocation();
+        let result = new Location();
         result.init(data);
         return result;
     }
@@ -903,14 +1025,14 @@ If false, the connected locations will be hidden.
 }
 
 /** Map location */
-export interface IMapLocation extends IMapLocationMinimal {
+export interface ILocation extends ILocationMinimal {
     /** Has this location been discovered by the player.
 If false, the connected locations will be hidden.
              */
     discovered: boolean;
     /** The locations connected to this one
              */
-    connectedLocations: MapLocationMinimal[];
+    connectedLocations: LocationMinimal[];
 }
 
 /** Map area */
@@ -961,6 +1083,300 @@ export interface IMapArea {
     /** The name of the area
              */
     name: string;
+}
+
+export class SearchResultOfJob implements ISearchResultOfJob {
+    items?: Job[];
+    pageNumber?: number;
+    pageSize?: number;
+    totalItemsCount?: number;
+    totalPagesCount?: number;
+
+    constructor(data?: ISearchResultOfJob) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(Job.fromJS(item));
+            }
+            this.pageNumber = _data["pageNumber"];
+            this.pageSize = _data["pageSize"];
+            this.totalItemsCount = _data["totalItemsCount"];
+            this.totalPagesCount = _data["totalPagesCount"];
+        }
+    }
+
+    static fromJS(data: any): SearchResultOfJob {
+        data = typeof data === 'object' ? data : {};
+        let result = new SearchResultOfJob();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        data["pageNumber"] = this.pageNumber;
+        data["pageSize"] = this.pageSize;
+        data["totalItemsCount"] = this.totalItemsCount;
+        data["totalPagesCount"] = this.totalPagesCount;
+        return data;
+    }
+}
+
+export interface ISearchResultOfJob {
+    items?: Job[];
+    pageNumber?: number;
+    pageSize?: number;
+    totalItemsCount?: number;
+    totalPagesCount?: number;
+}
+
+/** Job (minimal) */
+export class JobMinimal implements IJobMinimal {
+    /** The unique ID of the job
+             */
+    id!: string;
+    /** The name of the job
+             */
+    name!: string;
+
+    constructor(data?: IJobMinimal) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): JobMinimal {
+        data = typeof data === 'object' ? data : {};
+        let result = new JobMinimal();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        return data;
+    }
+}
+
+/** Job (minimal) */
+export interface IJobMinimal {
+    /** The unique ID of the job
+             */
+    id: string;
+    /** The name of the job
+             */
+    name: string;
+}
+
+/** Job */
+export class Job extends JobMinimal implements IJob {
+    /** The description of the job
+             */
+    description?: string | undefined;
+    /** Is the job innate?
+             */
+    innate!: boolean;
+    /** The experience to reach each level of the job.
+             */
+    levelsExperience!: number[];
+
+    constructor(data?: IJob) {
+        super(data);
+        if (!data) {
+            this.levelsExperience = [];
+        }
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.description = _data["description"];
+            this.innate = _data["innate"];
+            if (Array.isArray(_data["levelsExperience"])) {
+                this.levelsExperience = [] as any;
+                for (let item of _data["levelsExperience"])
+                    this.levelsExperience!.push(item);
+            }
+        }
+    }
+
+    static override fromJS(data: any): Job {
+        data = typeof data === 'object' ? data : {};
+        let result = new Job();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["description"] = this.description;
+        data["innate"] = this.innate;
+        if (Array.isArray(this.levelsExperience)) {
+            data["levelsExperience"] = [];
+            for (let item of this.levelsExperience)
+                data["levelsExperience"].push(item);
+        }
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Job */
+export interface IJob extends IJobMinimal {
+    /** The description of the job
+             */
+    description?: string | undefined;
+    /** Is the job innate?
+             */
+    innate: boolean;
+    /** The experience to reach each level of the job.
+             */
+    levelsExperience: number[];
+}
+
+export class SearchResultOfHarvestable implements ISearchResultOfHarvestable {
+    items?: Harvestable[];
+    pageNumber?: number;
+    pageSize?: number;
+    totalItemsCount?: number;
+    totalPagesCount?: number;
+
+    constructor(data?: ISearchResultOfHarvestable) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(Harvestable.fromJS(item));
+            }
+            this.pageNumber = _data["pageNumber"];
+            this.pageSize = _data["pageSize"];
+            this.totalItemsCount = _data["totalItemsCount"];
+            this.totalPagesCount = _data["totalPagesCount"];
+        }
+    }
+
+    static fromJS(data: any): SearchResultOfHarvestable {
+        data = typeof data === 'object' ? data : {};
+        let result = new SearchResultOfHarvestable();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        data["pageNumber"] = this.pageNumber;
+        data["pageSize"] = this.pageSize;
+        data["totalItemsCount"] = this.totalItemsCount;
+        data["totalPagesCount"] = this.totalPagesCount;
+        return data;
+    }
+}
+
+export interface ISearchResultOfHarvestable {
+    items?: Harvestable[];
+    pageNumber?: number;
+    pageSize?: number;
+    totalItemsCount?: number;
+    totalPagesCount?: number;
+}
+
+/** Harvestable */
+export class Harvestable implements IHarvestable {
+    /** The unique ID of the harvestable
+             */
+    id!: string;
+    /** The name of the harvestable
+             */
+    name!: string;
+    /** The description of the harvestable
+             */
+    description?: string | undefined;
+
+    constructor(data?: IHarvestable) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.description = _data["description"];
+        }
+    }
+
+    static fromJS(data: any): Harvestable {
+        data = typeof data === 'object' ? data : {};
+        let result = new Harvestable();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["description"] = this.description;
+        return data;
+    }
+}
+
+/** Harvestable */
+export interface IHarvestable {
+    /** The unique ID of the harvestable
+             */
+    id: string;
+    /** The name of the harvestable
+             */
+    name: string;
+    /** The description of the harvestable
+             */
+    description?: string | undefined;
 }
 
 /** A player */

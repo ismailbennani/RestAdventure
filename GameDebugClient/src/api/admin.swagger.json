@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Admin API",
-    "version": "0.0.0.0"
+    "version": "0.0.0-alpha.0.60+304e1092a0fa46bbaf53c1fc0feb187f2ce25058"
   },
   "servers": [
     {
@@ -103,7 +103,93 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SearchResultOfMapLocation"
+                  "$ref": "#/components/schemas/SearchResultOfLocation"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/game/content/jobs": {
+      "get": {
+        "tags": [
+          "Game"
+        ],
+        "summary": "Search jobs",
+        "operationId": "AdminGameContent_SearchJobs",
+        "parameters": [
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "description": "The page number\n            ",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "description": "The page size\n            ",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResultOfJob"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/game/content/harvestables": {
+      "get": {
+        "tags": [
+          "Game"
+        ],
+        "summary": "Search harvestables",
+        "operationId": "AdminGameContent_SearchHarvestables",
+        "parameters": [
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "description": "The page number\n            ",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "description": "The page size\n            ",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResultOfHarvestable"
                 }
               }
             }
@@ -346,14 +432,14 @@
           }
         }
       },
-      "SearchResultOfMapLocation": {
+      "SearchResultOfLocation": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
           "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/MapLocation"
+              "$ref": "#/components/schemas/Location"
             }
           },
           "pageNumber": {
@@ -374,10 +460,10 @@
           }
         }
       },
-      "MapLocation": {
+      "Location": {
         "allOf": [
           {
-            "$ref": "#/components/schemas/MapLocationMinimal"
+            "$ref": "#/components/schemas/LocationMinimal"
           },
           {
             "type": "object",
@@ -396,14 +482,14 @@
                 "type": "array",
                 "description": "The locations connected to this one\n            ",
                 "items": {
-                  "$ref": "#/components/schemas/MapLocationMinimal"
+                  "$ref": "#/components/schemas/LocationMinimal"
                 }
               }
             }
           }
         ]
       },
-      "MapLocationMinimal": {
+      "LocationMinimal": {
         "type": "object",
         "description": "Map location minimal information\n            ",
         "additionalProperties": false,
@@ -459,6 +545,146 @@
             "type": "string",
             "description": "The name of the area\n            ",
             "minLength": 1
+          }
+        }
+      },
+      "SearchResultOfJob": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Job"
+            }
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalItemsCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPagesCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "Job": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/JobMinimal"
+          },
+          {
+            "type": "object",
+            "description": "Job\n            ",
+            "additionalProperties": false,
+            "required": [
+              "innate",
+              "levelsExperience"
+            ],
+            "properties": {
+              "description": {
+                "type": "string",
+                "description": "The description of the job\n            ",
+                "nullable": true
+              },
+              "innate": {
+                "type": "boolean",
+                "description": "Is the job innate?\n            "
+              },
+              "levelsExperience": {
+                "type": "array",
+                "description": "The experience to reach each level of the job.\n            ",
+                "items": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "JobMinimal": {
+        "type": "object",
+        "description": "Job (minimal)\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the job\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the job\n            ",
+            "minLength": 1
+          }
+        }
+      },
+      "SearchResultOfHarvestable": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Harvestable"
+            }
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalItemsCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPagesCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "Harvestable": {
+        "type": "object",
+        "description": "Harvestable\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the harvestable\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the harvestable\n            ",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "description": "The description of the harvestable\n            ",
+            "nullable": true
           }
         }
       },

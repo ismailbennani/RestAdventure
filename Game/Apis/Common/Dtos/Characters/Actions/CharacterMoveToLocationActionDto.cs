@@ -13,7 +13,7 @@ public class CharacterMoveToLocationActionDto : CharacterActionDto
     ///     The location to which the character is moving
     /// </summary>
     [Required]
-    public required MapLocationMinimalDto Location { get; init; }
+    public required LocationMinimalDto Location { get; init; }
 }
 
 static class CharacterMoveToLocationActionMappingExtensions

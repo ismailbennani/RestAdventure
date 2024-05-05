@@ -45,7 +45,7 @@ public class AdminGameContentController : AdminApiController
     ///     Search locations
     /// </summary>
     [HttpGet("locations")]
-    public SearchResult<MapLocationDto> SearchLocations([FromQuery] SearchRequestDto request)
+    public SearchResult<LocationDto> SearchLocations([FromQuery] SearchRequestDto request)
     {
         GameContent content = _gameService.RequireGameContent();
         IEnumerable<Location> locations = content.Maps.Locations.All;

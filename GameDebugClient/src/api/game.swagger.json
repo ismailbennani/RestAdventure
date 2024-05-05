@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0.0"
+    "version": "0.0.0-alpha.0.60+304e1092a0fa46bbaf53c1fc0feb187f2ce25058"
   },
   "servers": [
     {
@@ -103,7 +103,103 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Item"
+                  "$ref": "#/components/schemas/Location"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ]
+      }
+    },
+    "/game/content/jobs/{jobId}": {
+      "get": {
+        "tags": [
+          "Game"
+        ],
+        "summary": "Get job",
+        "operationId": "GameContent_GetJob",
+        "parameters": [
+          {
+            "name": "jobId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ]
+      }
+    },
+    "/game/content/harvestables/{harvestableId}": {
+      "get": {
+        "tags": [
+          "Game"
+        ],
+        "summary": "Get harvestable",
+        "operationId": "GameContent_GetHarvestable",
+        "parameters": [
+          {
+            "name": "harvestableId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Harvestable"
                 }
               }
             }
@@ -178,45 +274,6 @@
         ]
       }
     },
-    "/game/characters": {
-      "get": {
-        "tags": [
-          "Characters"
-        ],
-        "summary": "Get characters in range",
-        "operationId": "Characters_GetCharactersInRange",
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CharacterMinimal"
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "api-key": []
-          }
-        ]
-      }
-    },
     "/game/team/characters/{characterGuid}/move/{locationGuid}": {
       "post": {
         "tags": [
@@ -249,6 +306,87 @@
         "responses": {
           "204": {
             "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ]
+      }
+    },
+    "/game/team/characters/{characterGuid}/entity/{entityGuid}/interact/{interactionGuid}": {
+      "post": {
+        "tags": [
+          "Team"
+        ],
+        "summary": "Interact",
+        "operationId": "TeamCharactersActions_Interact",
+        "parameters": [
+          {
+            "name": "characterGuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "entityGuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 2
+          },
+          {
+            "name": "interactionGuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           },
           "404": {
             "description": "",
@@ -448,168 +586,10 @@
           }
         }
       },
-      "GameSettings": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "maxTeamSize": {
-            "type": "integer",
-            "format": "int32"
-          }
-        }
-      },
-      "GameState": {
-        "type": "object",
-        "description": "Game state\n            ",
-        "additionalProperties": false,
-        "required": [
-          "tick",
-          "paused",
-          "lastTickDate",
-          "nextTickDate"
-        ],
-        "properties": {
-          "tick": {
-            "type": "integer",
-            "description": "The current game tick\n            ",
-            "format": "int64"
-          },
-          "paused": {
-            "type": "boolean",
-            "description": "Is the game paused?\n            "
-          },
-          "lastTickDate": {
-            "type": "string",
-            "description": "If the game is started, the date at which last tick has been computed\n            ",
-            "format": "date-time",
-            "minLength": 1
-          },
-          "nextTickDate": {
-            "type": "string",
-            "description": "If the game is not paused, the date at which next tick will be computed\n            ",
-            "format": "date-time",
-            "minLength": 1
-          }
-        }
-      },
-      "CharacterMinimal": {
-        "type": "object",
-        "description": "Minimal character information\n            ",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "name",
-          "class"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "The unique ID of the character\n            ",
-            "format": "guid",
-            "minLength": 1
-          },
-          "name": {
-            "type": "string",
-            "description": "The name of the character\n            ",
-            "minLength": 1
-          },
-          "class": {
-            "description": "The class of the character\n            ",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/CharacterClass"
-              }
-            ]
-          }
-        }
-      },
-      "CharacterClass": {
-        "type": "string",
-        "description": "",
-        "x-enumNames": [
-          "Knight",
-          "Mage",
-          "Scout",
-          "Dealer"
-        ],
-        "enum": [
-          "knight",
-          "mage",
-          "scout",
-          "dealer"
-        ]
-      },
-      "TeamCharacter": {
-        "type": "object",
-        "description": "Character\n            ",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "name",
-          "class",
-          "location",
-          "inventory"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "The unique ID of the character\n            ",
-            "format": "guid",
-            "minLength": 1
-          },
-          "name": {
-            "type": "string",
-            "description": "The name of the character\n            ",
-            "minLength": 1
-          },
-          "class": {
-            "description": "The class of the character\n            ",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/CharacterClass"
-              }
-            ]
-          },
-          "location": {
-            "description": "The current location of the character\n            ",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/MapLocation"
-              }
-            ]
-          },
-          "inventory": {
-            "description": "The inventory of the character\n            ",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/CharacterInventory"
-              }
-            ]
-          },
-          "lastActionResult": {
-            "description": "The result of the action that has been performed on last tick\n            ",
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/CharacterActionResult"
-              }
-            ]
-          },
-          "nextAction": {
-            "description": "The action that the character has planned for the next tick\n            ",
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/CharacterAction"
-              }
-            ]
-          }
-        }
-      },
-      "MapLocation": {
+      "Location": {
         "allOf": [
           {
-            "$ref": "#/components/schemas/MapLocationMinimal"
+            "$ref": "#/components/schemas/LocationMinimal"
           },
           {
             "type": "object",
@@ -628,14 +608,14 @@
                 "type": "array",
                 "description": "The locations connected to this one\n            ",
                 "items": {
-                  "$ref": "#/components/schemas/MapLocationMinimal"
+                  "$ref": "#/components/schemas/LocationMinimal"
                 }
               }
             }
           }
         ]
       },
-      "MapLocationMinimal": {
+      "LocationMinimal": {
         "type": "object",
         "description": "Map location minimal information\n            ",
         "additionalProperties": false,
@@ -694,26 +674,215 @@
           }
         }
       },
-      "CharacterInventory": {
+      "Job": {
         "allOf": [
           {
-            "$ref": "#/components/schemas/Inventory"
+            "$ref": "#/components/schemas/JobMinimal"
           },
           {
             "type": "object",
-            "description": "Character inventory\n            ",
+            "description": "Job\n            ",
             "additionalProperties": false,
             "required": [
-              "weight"
+              "innate",
+              "levelsExperience"
             ],
             "properties": {
-              "weight": {
-                "type": "integer",
-                "description": "The total weight of the items in the inventory\n            ",
-                "format": "int32"
+              "description": {
+                "type": "string",
+                "description": "The description of the job\n            ",
+                "nullable": true
+              },
+              "innate": {
+                "type": "boolean",
+                "description": "Is the job innate?\n            "
+              },
+              "levelsExperience": {
+                "type": "array",
+                "description": "The experience to reach each level of the job.\n            ",
+                "items": {
+                  "type": "integer",
+                  "format": "int32"
+                }
               }
             }
           }
+        ]
+      },
+      "JobMinimal": {
+        "type": "object",
+        "description": "Job (minimal)\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the job\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the job\n            ",
+            "minLength": 1
+          }
+        }
+      },
+      "Harvestable": {
+        "type": "object",
+        "description": "Harvestable\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the harvestable\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the harvestable\n            ",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "description": "The description of the harvestable\n            ",
+            "nullable": true
+          }
+        }
+      },
+      "GameSettings": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "maxTeamSize": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "GameState": {
+        "type": "object",
+        "description": "Game state\n            ",
+        "additionalProperties": false,
+        "required": [
+          "tick",
+          "paused",
+          "lastTickDate",
+          "nextTickDate"
+        ],
+        "properties": {
+          "tick": {
+            "type": "integer",
+            "description": "The current game tick\n            ",
+            "format": "int64"
+          },
+          "paused": {
+            "type": "boolean",
+            "description": "Is the game paused?\n            "
+          },
+          "lastTickDate": {
+            "type": "string",
+            "description": "If the game is started, the date at which last tick has been computed\n            ",
+            "format": "date-time",
+            "minLength": 1
+          },
+          "nextTickDate": {
+            "type": "string",
+            "description": "If the game is not paused, the date at which next tick will be computed\n            ",
+            "format": "date-time",
+            "minLength": 1
+          }
+        }
+      },
+      "TeamCharacter": {
+        "type": "object",
+        "description": "Character\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "class",
+          "location",
+          "inventory"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the character\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the character\n            ",
+            "minLength": 1
+          },
+          "class": {
+            "description": "The class of the character\n            ",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CharacterClass"
+              }
+            ]
+          },
+          "location": {
+            "description": "The current location of the character\n            ",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Location"
+              }
+            ]
+          },
+          "inventory": {
+            "description": "The inventory of the character\n            ",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Inventory"
+              }
+            ]
+          },
+          "lastActionResult": {
+            "description": "The result of the action that has been performed on last tick\n            ",
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CharacterActionResult"
+              }
+            ]
+          },
+          "nextAction": {
+            "description": "The action that the character has planned for the next tick\n            ",
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CharacterAction"
+              }
+            ]
+          }
+        }
+      },
+      "CharacterClass": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "Knight",
+          "Mage",
+          "Scout",
+          "Dealer"
+        ],
+        "enum": [
+          "knight",
+          "mage",
+          "scout",
+          "dealer"
         ]
       },
       "Inventory": {
@@ -721,7 +890,8 @@
         "description": "Inventory\n            ",
         "additionalProperties": false,
         "required": [
-          "entries"
+          "entries",
+          "weight"
         ],
         "properties": {
           "entries": {
@@ -730,6 +900,11 @@
             "items": {
               "$ref": "#/components/schemas/ItemStack"
             }
+          },
+          "weight": {
+            "type": "integer",
+            "description": "The total weight of the items in the inventory\n            ",
+            "format": "int32"
           }
         }
       },
@@ -819,7 +994,8 @@
         "discriminator": {
           "propertyName": "$type",
           "mapping": {
-            "move-to-location": "#/components/schemas/CharacterMoveToLocationAction"
+            "move": "#/components/schemas/CharacterMoveToLocationAction",
+            "interact": "#/components/schemas/CharacterInteractWithEntityAction"
           }
         },
         "description": "An action performed by a character\n            ",
@@ -843,18 +1019,98 @@
             "description": "Character moves to location\n            ",
             "additionalProperties": false,
             "required": [
-              "locationId"
+              "location"
             ],
             "properties": {
-              "locationId": {
-                "type": "string",
+              "location": {
                 "description": "The location to which the character is moving\n            ",
-                "format": "guid",
-                "minLength": 1
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/LocationMinimal"
+                  }
+                ]
               }
             }
           }
         ]
+      },
+      "CharacterInteractWithEntityAction": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CharacterAction"
+          },
+          {
+            "type": "object",
+            "description": "Character interact with entity\n            ",
+            "additionalProperties": false,
+            "required": [
+              "interaction",
+              "entity"
+            ],
+            "properties": {
+              "interaction": {
+                "description": "The interaction\n            ",
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/Interaction"
+                  }
+                ]
+              },
+              "entity": {
+                "description": "The subject of the interaction\n            ",
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/EntityMinimal"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "Interaction": {
+        "type": "object",
+        "description": "Interaction\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the interaction\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the interaction\n            ",
+            "minLength": 1
+          }
+        }
+      },
+      "EntityMinimal": {
+        "type": "object",
+        "description": "Entity (minimal)\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the entity\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the entity\n            ",
+            "minLength": 1
+          }
+        }
       },
       "CreateCharacterRequest": {
         "type": "object",
@@ -909,9 +1165,6 @@
   "tags": [
     {
       "name": "Game"
-    },
-    {
-      "name": "Characters"
     },
     {
       "name": "Team"

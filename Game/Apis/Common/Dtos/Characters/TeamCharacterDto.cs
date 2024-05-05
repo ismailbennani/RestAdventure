@@ -35,7 +35,7 @@ public class TeamCharacterDto
     ///     The current location of the character
     /// </summary>
     [Required]
-    public required MapLocationDto Location { get; init; }
+    public required LocationDto Location { get; init; }
 
     /// <summary>
     ///     The inventory of the character

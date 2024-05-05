@@ -149,7 +149,7 @@ export class GameContentApiClient {
     /**
      * Get location
      */
-    getLocation(locationId: string): Observable<Item> {
+    getLocation(locationId: string): Observable<Location> {
         let url_ = this.baseUrl + "/game/content/locations/{locationId}";
         if (locationId === undefined || locationId === null)
             throw new Error("The parameter 'locationId' must be defined.");
@@ -171,14 +171,14 @@ export class GameContentApiClient {
                 try {
                     return this.processGetLocation(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<Item>;
+                    return _observableThrow(e) as any as Observable<Location>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<Item>;
+                return _observableThrow(response_) as any as Observable<Location>;
         }));
     }
 
-    protected processGetLocation(response: HttpResponseBase): Observable<Item> {
+    protected processGetLocation(response: HttpResponseBase): Observable<Location> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -189,7 +189,129 @@ export class GameContentApiClient {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = Item.fromJS(resultData200);
+            result200 = Location.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 404) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ProblemDetails.fromJS(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * Get job
+     */
+    getJob(jobId: string): Observable<Job> {
+        let url_ = this.baseUrl + "/game/content/jobs/{jobId}";
+        if (jobId === undefined || jobId === null)
+            throw new Error("The parameter 'jobId' must be defined.");
+        url_ = url_.replace("{jobId}", encodeURIComponent("" + jobId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetJob(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetJob(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<Job>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<Job>;
+        }));
+    }
+
+    protected processGetJob(response: HttpResponseBase): Observable<Job> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = Job.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 404) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ProblemDetails.fromJS(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * Get harvestable
+     */
+    getHarvestable(harvestableId: string): Observable<Harvestable> {
+        let url_ = this.baseUrl + "/game/content/harvestables/{harvestableId}";
+        if (harvestableId === undefined || harvestableId === null)
+            throw new Error("The parameter 'harvestableId' must be defined.");
+        url_ = url_.replace("{harvestableId}", encodeURIComponent("" + harvestableId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetHarvestable(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetHarvestable(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<Harvestable>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<Harvestable>;
+        }));
+    }
+
+    protected processGetHarvestable(response: HttpResponseBase): Observable<Harvestable> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = Harvestable.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status === 404) {
@@ -323,83 +445,6 @@ export class GameApiClient {
 }
 
 @Injectable()
-export class CharactersApiClient {
-    private http: HttpClient;
-    private baseUrl: string;
-    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
-
-    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
-        this.http = http;
-        this.baseUrl = baseUrl ?? "https://localhost:7056";
-    }
-
-    /**
-     * Get characters in range
-     */
-    getCharactersInRange(): Observable<CharacterMinimal[]> {
-        let url_ = this.baseUrl + "/game/characters";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "application/json"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetCharactersInRange(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetCharactersInRange(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<CharacterMinimal[]>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<CharacterMinimal[]>;
-        }));
-    }
-
-    protected processGetCharactersInRange(response: HttpResponseBase): Observable<CharacterMinimal[]> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            if (Array.isArray(resultData200)) {
-                result200 = [] as any;
-                for (let item of resultData200)
-                    result200!.push(CharacterMinimal.fromJS(item));
-            }
-            else {
-                result200 = <any>null;
-            }
-            return _observableOf(result200);
-            }));
-        } else if (status === 404) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result404: any = null;
-            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result404 = ProblemDetails.fromJS(resultData404);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-}
-
-@Injectable()
 export class TeamCharactersActionsApiClient {
     private http: HttpClient;
     private baseUrl: string;
@@ -454,6 +499,83 @@ export class TeamCharactersActionsApiClient {
         if (status === 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             return _observableOf(null as any);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+            }));
+        } else if (status === 404) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ProblemDetails.fromJS(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * Interact
+     */
+    interact(characterGuid: string, entityGuid: string, interactionGuid: string): Observable<void> {
+        let url_ = this.baseUrl + "/game/team/characters/{characterGuid}/entity/{entityGuid}/interact/{interactionGuid}";
+        if (characterGuid === undefined || characterGuid === null)
+            throw new Error("The parameter 'characterGuid' must be defined.");
+        url_ = url_.replace("{characterGuid}", encodeURIComponent("" + characterGuid));
+        if (entityGuid === undefined || entityGuid === null)
+            throw new Error("The parameter 'entityGuid' must be defined.");
+        url_ = url_.replace("{entityGuid}", encodeURIComponent("" + entityGuid));
+        if (interactionGuid === undefined || interactionGuid === null)
+            throw new Error("The parameter 'interactionGuid' must be defined.");
+        url_ = url_.replace("{interactionGuid}", encodeURIComponent("" + interactionGuid));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processInteract(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processInteract(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processInteract(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 404) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -795,6 +917,359 @@ export interface IProblemDetails {
     [key: string]: any;
 }
 
+/** Map location minimal information */
+export class LocationMinimal implements ILocationMinimal {
+    /** The unique ID of the location
+             */
+    id!: string;
+    /** The area associated with the location
+             */
+    area!: MapArea;
+    /** The X coordinate associated with the location
+             */
+    positionX!: number;
+    /** The Y coordinate associated with the location
+             */
+    positionY!: number;
+
+    constructor(data?: ILocationMinimal) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.area = new MapArea();
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.area = _data["area"] ? MapArea.fromJS(_data["area"]) : new MapArea();
+            this.positionX = _data["positionX"];
+            this.positionY = _data["positionY"];
+        }
+    }
+
+    static fromJS(data: any): LocationMinimal {
+        data = typeof data === 'object' ? data : {};
+        let result = new LocationMinimal();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["area"] = this.area ? this.area.toJSON() : <any>undefined;
+        data["positionX"] = this.positionX;
+        data["positionY"] = this.positionY;
+        return data;
+    }
+}
+
+/** Map location minimal information */
+export interface ILocationMinimal {
+    /** The unique ID of the location
+             */
+    id: string;
+    /** The area associated with the location
+             */
+    area: MapArea;
+    /** The X coordinate associated with the location
+             */
+    positionX: number;
+    /** The Y coordinate associated with the location
+             */
+    positionY: number;
+}
+
+/** Map location */
+export class Location extends LocationMinimal implements ILocation {
+    /** Has this location been discovered by the player.
+If false, the connected locations will be hidden.
+             */
+    discovered!: boolean;
+    /** The locations connected to this one
+             */
+    connectedLocations!: LocationMinimal[];
+
+    constructor(data?: ILocation) {
+        super(data);
+        if (!data) {
+            this.connectedLocations = [];
+        }
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.discovered = _data["discovered"];
+            if (Array.isArray(_data["connectedLocations"])) {
+                this.connectedLocations = [] as any;
+                for (let item of _data["connectedLocations"])
+                    this.connectedLocations!.push(LocationMinimal.fromJS(item));
+            }
+        }
+    }
+
+    static override fromJS(data: any): Location {
+        data = typeof data === 'object' ? data : {};
+        let result = new Location();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["discovered"] = this.discovered;
+        if (Array.isArray(this.connectedLocations)) {
+            data["connectedLocations"] = [];
+            for (let item of this.connectedLocations)
+                data["connectedLocations"].push(item.toJSON());
+        }
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Map location */
+export interface ILocation extends ILocationMinimal {
+    /** Has this location been discovered by the player.
+If false, the connected locations will be hidden.
+             */
+    discovered: boolean;
+    /** The locations connected to this one
+             */
+    connectedLocations: LocationMinimal[];
+}
+
+/** Map area */
+export class MapArea implements IMapArea {
+    /** The unique ID of the area
+             */
+    id!: string;
+    /** The name of the area
+             */
+    name!: string;
+
+    constructor(data?: IMapArea) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): MapArea {
+        data = typeof data === 'object' ? data : {};
+        let result = new MapArea();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        return data;
+    }
+}
+
+/** Map area */
+export interface IMapArea {
+    /** The unique ID of the area
+             */
+    id: string;
+    /** The name of the area
+             */
+    name: string;
+}
+
+/** Job (minimal) */
+export class JobMinimal implements IJobMinimal {
+    /** The unique ID of the job
+             */
+    id!: string;
+    /** The name of the job
+             */
+    name!: string;
+
+    constructor(data?: IJobMinimal) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): JobMinimal {
+        data = typeof data === 'object' ? data : {};
+        let result = new JobMinimal();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        return data;
+    }
+}
+
+/** Job (minimal) */
+export interface IJobMinimal {
+    /** The unique ID of the job
+             */
+    id: string;
+    /** The name of the job
+             */
+    name: string;
+}
+
+/** Job */
+export class Job extends JobMinimal implements IJob {
+    /** The description of the job
+             */
+    description?: string | undefined;
+    /** Is the job innate?
+             */
+    innate!: boolean;
+    /** The experience to reach each level of the job.
+             */
+    levelsExperience!: number[];
+
+    constructor(data?: IJob) {
+        super(data);
+        if (!data) {
+            this.levelsExperience = [];
+        }
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.description = _data["description"];
+            this.innate = _data["innate"];
+            if (Array.isArray(_data["levelsExperience"])) {
+                this.levelsExperience = [] as any;
+                for (let item of _data["levelsExperience"])
+                    this.levelsExperience!.push(item);
+            }
+        }
+    }
+
+    static override fromJS(data: any): Job {
+        data = typeof data === 'object' ? data : {};
+        let result = new Job();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["description"] = this.description;
+        data["innate"] = this.innate;
+        if (Array.isArray(this.levelsExperience)) {
+            data["levelsExperience"] = [];
+            for (let item of this.levelsExperience)
+                data["levelsExperience"].push(item);
+        }
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Job */
+export interface IJob extends IJobMinimal {
+    /** The description of the job
+             */
+    description?: string | undefined;
+    /** Is the job innate?
+             */
+    innate: boolean;
+    /** The experience to reach each level of the job.
+             */
+    levelsExperience: number[];
+}
+
+/** Harvestable */
+export class Harvestable implements IHarvestable {
+    /** The unique ID of the harvestable
+             */
+    id!: string;
+    /** The name of the harvestable
+             */
+    name!: string;
+    /** The description of the harvestable
+             */
+    description?: string | undefined;
+
+    constructor(data?: IHarvestable) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.description = _data["description"];
+        }
+    }
+
+    static fromJS(data: any): Harvestable {
+        data = typeof data === 'object' ? data : {};
+        let result = new Harvestable();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["description"] = this.description;
+        return data;
+    }
+}
+
+/** Harvestable */
+export interface IHarvestable {
+    /** The unique ID of the harvestable
+             */
+    id: string;
+    /** The name of the harvestable
+             */
+    name: string;
+    /** The description of the harvestable
+             */
+    description?: string | undefined;
+}
+
 export class GameSettings implements IGameSettings {
     maxTeamSize?: number;
 
@@ -897,71 +1372,6 @@ export interface IGameState {
     nextTickDate: Date;
 }
 
-/** Minimal character information */
-export class CharacterMinimal implements ICharacterMinimal {
-    /** The unique ID of the character
-             */
-    id!: string;
-    /** The name of the character
-             */
-    name!: string;
-    /** The class of the character
-             */
-    class!: CharacterClass;
-
-    constructor(data?: ICharacterMinimal) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.name = _data["name"];
-            this.class = _data["class"];
-        }
-    }
-
-    static fromJS(data: any): CharacterMinimal {
-        data = typeof data === 'object' ? data : {};
-        let result = new CharacterMinimal();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["name"] = this.name;
-        data["class"] = this.class;
-        return data;
-    }
-}
-
-/** Minimal character information */
-export interface ICharacterMinimal {
-    /** The unique ID of the character
-             */
-    id: string;
-    /** The name of the character
-             */
-    name: string;
-    /** The class of the character
-             */
-    class: CharacterClass;
-}
-
-export enum CharacterClass {
-    Knight = "knight",
-    Mage = "mage",
-    Scout = "scout",
-    Dealer = "dealer",
-}
-
 /** Character */
 export class TeamCharacter implements ITeamCharacter {
     /** The unique ID of the character
@@ -975,10 +1385,10 @@ export class TeamCharacter implements ITeamCharacter {
     class!: CharacterClass;
     /** The current location of the character
              */
-    location!: MapLocation;
+    location!: Location;
     /** The inventory of the character
              */
-    inventory!: CharacterInventory;
+    inventory!: Inventory;
     /** The result of the action that has been performed on last tick
              */
     lastActionResult?: CharacterActionResult | undefined;
@@ -994,8 +1404,8 @@ export class TeamCharacter implements ITeamCharacter {
             }
         }
         if (!data) {
-            this.location = new MapLocation();
-            this.inventory = new CharacterInventory();
+            this.location = new Location();
+            this.inventory = new Inventory();
         }
     }
 
@@ -1004,8 +1414,8 @@ export class TeamCharacter implements ITeamCharacter {
             this.id = _data["id"];
             this.name = _data["name"];
             this.class = _data["class"];
-            this.location = _data["location"] ? MapLocation.fromJS(_data["location"]) : new MapLocation();
-            this.inventory = _data["inventory"] ? CharacterInventory.fromJS(_data["inventory"]) : new CharacterInventory();
+            this.location = _data["location"] ? Location.fromJS(_data["location"]) : new Location();
+            this.inventory = _data["inventory"] ? Inventory.fromJS(_data["inventory"]) : new Inventory();
             this.lastActionResult = _data["lastActionResult"] ? CharacterActionResult.fromJS(_data["lastActionResult"]) : <any>undefined;
             this.nextAction = _data["nextAction"] ? CharacterAction.fromJS(_data["nextAction"]) : <any>undefined;
         }
@@ -1044,10 +1454,10 @@ export interface ITeamCharacter {
     class: CharacterClass;
     /** The current location of the character
              */
-    location: MapLocation;
+    location: Location;
     /** The inventory of the character
              */
-    inventory: CharacterInventory;
+    inventory: Inventory;
     /** The result of the action that has been performed on last tick
              */
     lastActionResult?: CharacterActionResult | undefined;
@@ -1056,183 +1466,11 @@ export interface ITeamCharacter {
     nextAction?: CharacterAction | undefined;
 }
 
-/** Map location minimal information */
-export class MapLocationMinimal implements IMapLocationMinimal {
-    /** The unique ID of the location
-             */
-    id!: string;
-    /** The area associated with the location
-             */
-    area!: MapArea;
-    /** The X coordinate associated with the location
-             */
-    positionX!: number;
-    /** The Y coordinate associated with the location
-             */
-    positionY!: number;
-
-    constructor(data?: IMapLocationMinimal) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-        if (!data) {
-            this.area = new MapArea();
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.area = _data["area"] ? MapArea.fromJS(_data["area"]) : new MapArea();
-            this.positionX = _data["positionX"];
-            this.positionY = _data["positionY"];
-        }
-    }
-
-    static fromJS(data: any): MapLocationMinimal {
-        data = typeof data === 'object' ? data : {};
-        let result = new MapLocationMinimal();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["area"] = this.area ? this.area.toJSON() : <any>undefined;
-        data["positionX"] = this.positionX;
-        data["positionY"] = this.positionY;
-        return data;
-    }
-}
-
-/** Map location minimal information */
-export interface IMapLocationMinimal {
-    /** The unique ID of the location
-             */
-    id: string;
-    /** The area associated with the location
-             */
-    area: MapArea;
-    /** The X coordinate associated with the location
-             */
-    positionX: number;
-    /** The Y coordinate associated with the location
-             */
-    positionY: number;
-}
-
-/** Map location */
-export class MapLocation extends MapLocationMinimal implements IMapLocation {
-    /** Has this location been discovered by the player.
-If false, the connected locations will be hidden.
-             */
-    discovered!: boolean;
-    /** The locations connected to this one
-             */
-    connectedLocations!: MapLocationMinimal[];
-
-    constructor(data?: IMapLocation) {
-        super(data);
-        if (!data) {
-            this.connectedLocations = [];
-        }
-    }
-
-    override init(_data?: any) {
-        super.init(_data);
-        if (_data) {
-            this.discovered = _data["discovered"];
-            if (Array.isArray(_data["connectedLocations"])) {
-                this.connectedLocations = [] as any;
-                for (let item of _data["connectedLocations"])
-                    this.connectedLocations!.push(MapLocationMinimal.fromJS(item));
-            }
-        }
-    }
-
-    static override fromJS(data: any): MapLocation {
-        data = typeof data === 'object' ? data : {};
-        let result = new MapLocation();
-        result.init(data);
-        return result;
-    }
-
-    override toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["discovered"] = this.discovered;
-        if (Array.isArray(this.connectedLocations)) {
-            data["connectedLocations"] = [];
-            for (let item of this.connectedLocations)
-                data["connectedLocations"].push(item.toJSON());
-        }
-        super.toJSON(data);
-        return data;
-    }
-}
-
-/** Map location */
-export interface IMapLocation extends IMapLocationMinimal {
-    /** Has this location been discovered by the player.
-If false, the connected locations will be hidden.
-             */
-    discovered: boolean;
-    /** The locations connected to this one
-             */
-    connectedLocations: MapLocationMinimal[];
-}
-
-/** Map area */
-export class MapArea implements IMapArea {
-    /** The unique ID of the area
-             */
-    id!: string;
-    /** The name of the area
-             */
-    name!: string;
-
-    constructor(data?: IMapArea) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.name = _data["name"];
-        }
-    }
-
-    static fromJS(data: any): MapArea {
-        data = typeof data === 'object' ? data : {};
-        let result = new MapArea();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["name"] = this.name;
-        return data;
-    }
-}
-
-/** Map area */
-export interface IMapArea {
-    /** The unique ID of the area
-             */
-    id: string;
-    /** The name of the area
-             */
-    name: string;
+export enum CharacterClass {
+    Knight = "knight",
+    Mage = "mage",
+    Scout = "scout",
+    Dealer = "dealer",
 }
 
 /** Inventory */
@@ -1240,6 +1478,9 @@ export class Inventory implements IInventory {
     /** The entries of the inventory
              */
     entries!: ItemStack[];
+    /** The total weight of the items in the inventory
+             */
+    weight!: number;
 
     constructor(data?: IInventory) {
         if (data) {
@@ -1260,6 +1501,7 @@ export class Inventory implements IInventory {
                 for (let item of _data["entries"])
                     this.entries!.push(ItemStack.fromJS(item));
             }
+            this.weight = _data["weight"];
         }
     }
 
@@ -1277,6 +1519,7 @@ export class Inventory implements IInventory {
             for (let item of this.entries)
                 data["entries"].push(item.toJSON());
         }
+        data["weight"] = this.weight;
         return data;
     }
 }
@@ -1286,42 +1529,6 @@ export interface IInventory {
     /** The entries of the inventory
              */
     entries: ItemStack[];
-}
-
-/** Character inventory */
-export class CharacterInventory extends Inventory implements ICharacterInventory {
-    /** The total weight of the items in the inventory
-             */
-    weight!: number;
-
-    constructor(data?: ICharacterInventory) {
-        super(data);
-    }
-
-    override init(_data?: any) {
-        super.init(_data);
-        if (_data) {
-            this.weight = _data["weight"];
-        }
-    }
-
-    static override fromJS(data: any): CharacterInventory {
-        data = typeof data === 'object' ? data : {};
-        let result = new CharacterInventory();
-        result.init(data);
-        return result;
-    }
-
-    override toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["weight"] = this.weight;
-        super.toJSON(data);
-        return data;
-    }
-}
-
-/** Character inventory */
-export interface ICharacterInventory extends IInventory {
     /** The total weight of the items in the inventory
              */
     weight: number;
@@ -1519,8 +1726,13 @@ export class CharacterAction implements ICharacterAction {
 
     static fromJS(data: any): CharacterAction {
         data = typeof data === 'object' ? data : {};
-        if (data["$type"] === "move-to-location") {
+        if (data["$type"] === "move") {
             let result = new CharacterMoveToLocationAction();
+            result.init(data);
+            return result;
+        }
+        if (data["$type"] === "interact") {
+            let result = new CharacterInteractWithEntityAction();
             result.init(data);
             return result;
         }
@@ -1544,17 +1756,20 @@ export interface ICharacterAction {
 export class CharacterMoveToLocationAction extends CharacterAction implements ICharacterMoveToLocationAction {
     /** The location to which the character is moving
              */
-    locationId!: string;
+    location!: LocationMinimal;
 
     constructor(data?: ICharacterMoveToLocationAction) {
         super(data);
-        this._discriminator = "move-to-location";
+        if (!data) {
+            this.location = new LocationMinimal();
+        }
+        this._discriminator = "move";
     }
 
     override init(_data?: any) {
         super.init(_data);
         if (_data) {
-            this.locationId = _data["locationId"];
+            this.location = _data["location"] ? LocationMinimal.fromJS(_data["location"]) : new LocationMinimal();
         }
     }
 
@@ -1567,7 +1782,7 @@ export class CharacterMoveToLocationAction extends CharacterAction implements IC
 
     override toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["locationId"] = this.locationId;
+        data["location"] = this.location ? this.location.toJSON() : <any>undefined;
         super.toJSON(data);
         return data;
     }
@@ -1577,7 +1792,159 @@ export class CharacterMoveToLocationAction extends CharacterAction implements IC
 export interface ICharacterMoveToLocationAction extends ICharacterAction {
     /** The location to which the character is moving
              */
-    locationId: string;
+    location: LocationMinimal;
+}
+
+/** Character interact with entity */
+export class CharacterInteractWithEntityAction extends CharacterAction implements ICharacterInteractWithEntityAction {
+    /** The interaction
+             */
+    interaction!: Interaction;
+    /** The subject of the interaction
+             */
+    entity!: EntityMinimal;
+
+    constructor(data?: ICharacterInteractWithEntityAction) {
+        super(data);
+        if (!data) {
+            this.interaction = new Interaction();
+            this.entity = new EntityMinimal();
+        }
+        this._discriminator = "interact";
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.interaction = _data["interaction"] ? Interaction.fromJS(_data["interaction"]) : new Interaction();
+            this.entity = _data["entity"] ? EntityMinimal.fromJS(_data["entity"]) : new EntityMinimal();
+        }
+    }
+
+    static override fromJS(data: any): CharacterInteractWithEntityAction {
+        data = typeof data === 'object' ? data : {};
+        let result = new CharacterInteractWithEntityAction();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["interaction"] = this.interaction ? this.interaction.toJSON() : <any>undefined;
+        data["entity"] = this.entity ? this.entity.toJSON() : <any>undefined;
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Character interact with entity */
+export interface ICharacterInteractWithEntityAction extends ICharacterAction {
+    /** The interaction
+             */
+    interaction: Interaction;
+    /** The subject of the interaction
+             */
+    entity: EntityMinimal;
+}
+
+/** Interaction */
+export class Interaction implements IInteraction {
+    /** The unique ID of the interaction
+             */
+    id!: string;
+    /** The name of the interaction
+             */
+    name!: string;
+
+    constructor(data?: IInteraction) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): Interaction {
+        data = typeof data === 'object' ? data : {};
+        let result = new Interaction();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        return data;
+    }
+}
+
+/** Interaction */
+export interface IInteraction {
+    /** The unique ID of the interaction
+             */
+    id: string;
+    /** The name of the interaction
+             */
+    name: string;
+}
+
+/** Entity (minimal) */
+export class EntityMinimal implements IEntityMinimal {
+    /** The unique ID of the entity
+             */
+    id!: string;
+    /** The name of the entity
+             */
+    name!: string;
+
+    constructor(data?: IEntityMinimal) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): EntityMinimal {
+        data = typeof data === 'object' ? data : {};
+        let result = new EntityMinimal();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        return data;
+    }
+}
+
+/** Entity (minimal) */
+export interface IEntityMinimal {
+    /** The unique ID of the entity
+             */
+    id: string;
+    /** The name of the entity
+             */
+    name: string;
 }
 
 /** Character creation options */

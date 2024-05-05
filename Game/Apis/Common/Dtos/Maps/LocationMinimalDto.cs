@@ -6,7 +6,7 @@ namespace RestAdventure.Game.Apis.Common.Dtos.Maps;
 /// <summary>
 ///     Map location minimal information
 /// </summary>
-public class MapLocationMinimalDto
+public class LocationMinimalDto
 {
     /// <summary>
     ///     The unique ID of the location
@@ -35,6 +35,6 @@ public class MapLocationMinimalDto
 
 static class MapLocationMinimalMappingExtensions
 {
-    public static MapLocationMinimalDto ToMinimalDto(this Location location) =>
+    public static LocationMinimalDto ToMinimalDto(this Location location) =>
         new() { Id = location.Id.Guid, Area = location.Area.ToDto(), PositionX = location.PositionX, PositionY = location.PositionY };
 }

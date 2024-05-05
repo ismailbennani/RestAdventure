@@ -12,7 +12,7 @@ import {
   GameApiClient,
   GameSettings,
   GameState,
-  IMapLocationMinimal,
+  ILocationMinimal,
   Team,
   TeamApiClient,
   TeamCharacter,
@@ -127,7 +127,7 @@ export class GameClientComponent implements OnInit {
       .subscribe();
   }
 
-  moveToLocation(character: TeamCharacter, location: IMapLocationMinimal) {
+  moveToLocation(character: TeamCharacter, location: ILocationMinimal) {
     this.performingAction[character.id] = true;
     this.teamCharactersActionsApiClient
       .moveToLocation(character.id, location.id)
@@ -138,7 +138,7 @@ export class GameClientComponent implements OnInit {
       .subscribe();
   }
 
-  characterWillMoveToLocation(character: TeamCharacter, location: IMapLocationMinimal) {
+  characterWillMoveToLocation(character: TeamCharacter, location: ILocationMinimal) {
     if (!character.nextAction) {
       return false;
     }
@@ -147,7 +147,7 @@ export class GameClientComponent implements OnInit {
       return false;
     }
 
-    return character.nextAction.locationId == location.id;
+    return character.nextAction.location.id == location.id;
   }
 
   changePlayer() {
@@ -156,7 +156,7 @@ export class GameClientComponent implements OnInit {
 
   protected actionToString(action: CharacterAction) {
     if (action instanceof CharacterMoveToLocationAction) {
-      return `move to ${action.locationId}`;
+      return `move to ${action.location.id}`;
     }
 
     return '???';

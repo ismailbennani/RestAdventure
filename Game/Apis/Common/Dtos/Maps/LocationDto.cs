@@ -7,7 +7,7 @@ namespace RestAdventure.Game.Apis.Common.Dtos.Maps;
 /// <summary>
 ///     Map location
 /// </summary>
-public class MapLocationDto : MapLocationMinimalDto
+public class LocationDto : LocationMinimalDto
 {
     /// <summary>
     ///     Has this location been discovered by the player.
@@ -20,12 +20,12 @@ public class MapLocationDto : MapLocationMinimalDto
     ///     The locations connected to this one
     /// </summary>
     [Required]
-    public required IReadOnlyCollection<MapLocationMinimalDto> ConnectedLocations { get; init; }
+    public required IReadOnlyCollection<LocationMinimalDto> ConnectedLocations { get; init; }
 }
 
-static class MapLocationMappingExtensions
+static class LocationMappingExtensions
 {
-    public static MapLocationDto ToDiscoveredLocationDto(this Location location, GameContent content) =>
+    public static LocationDto ToDiscoveredLocationDto(this Location location, GameContent content) =>
         new()
         {
             Id = location.Id.Guid,
@@ -36,7 +36,7 @@ static class MapLocationMappingExtensions
             ConnectedLocations = content.Maps.Locations.GetConnectedTo(location).Select(l => l.ToMinimalDto()).ToArray()
         };
 
-    public static MapLocationDto ToUndiscoveredLocationDto(this Location location) =>
+    public static LocationDto ToUndiscoveredLocationDto(this Location location) =>
         new()
         {
             Id = location.Id.Guid,
@@ -44,6 +44,6 @@ static class MapLocationMappingExtensions
             PositionX = location.PositionX,
             PositionY = location.PositionY,
             Discovered = false,
-            ConnectedLocations = Array.Empty<MapLocationMinimalDto>()
+            ConnectedLocations = Array.Empty<LocationMinimalDto>()
         };
 }
