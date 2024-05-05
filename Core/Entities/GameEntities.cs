@@ -54,16 +54,15 @@ public class GameEntities
     public TEntity? Get<TEntity>(EntityId id) where TEntity: Entity => Get(id) as TEntity;
 
     void RegisterInventoryEvents(IEntityWithInventory entity) =>
-        entity.Inventory.Changed += (_, args) => GameState.Publisher.Publish(
-                new EntityInventoryChanged
-                {
-                    Entity = entity,
-                    ItemInstance = args.ItemInstance,
-                    OldCount = args.OldCount,
-                    NewCount = args.NewCount
-                }
-            )
-            .Wait();
+        entity.Inventory.Changed += (_, args) => PublishSync(
+            new EntityInventoryChanged
+            {
+                Entity = entity,
+                ItemInstance = args.ItemInstance,
+                OldCount = args.OldCount,
+                NewCount = args.NewCount
+            }
+        );
 
     void RegisterJobsEvents(IEntityWithJobs entity)
     {
