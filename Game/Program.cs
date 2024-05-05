@@ -159,13 +159,14 @@ GameState LoadGame(WebApplication app)
     content.Maps.Locations.Register(location2);
     content.Maps.Locations.Connect(location1, location2);
 
-    Item item = new() { Name = "Apple", Description = "A delicious apple.", Weight = 1 };
-    content.Items.Register(item);
+    Item apple = new() { Name = "Apple", Description = "A delicious apple.", Weight = 1 };
+    content.Items.Register(apple);
 
     Job gatherer = new() { Name = "Gatherer", Description = "Gather stuff", Innate = true };
     content.Jobs.Register(gatherer);
 
-    Harvestable harvestable = new() { Name = "Apple Tree", Description = "A tree that has apples.", HarvestCondition = new CharacterJobCondition(gatherer) };
+    Harvestable harvestable = new()
+        { Name = "Apple Tree", Description = "A tree that has apples.", HarvestCondition = new CharacterJobCondition(gatherer), Items = [new ItemStack(apple, 1)] };
     content.Harvestables.Register(harvestable);
 
     HarvestableInstance harvestableInstance = new(harvestable, location1);

@@ -1,16 +1,8 @@
-﻿using RestAdventure.Core.Entities;
-
-namespace RestAdventure.Core.Jobs;
+﻿namespace RestAdventure.Core.Jobs;
 
 public class EntityJobs
 {
-    readonly GameEntity _entity;
     readonly Dictionary<JobId, JobInstance> _jobs = new();
-
-    public EntityJobs(GameEntity entity)
-    {
-        _entity = entity;
-    }
 
     public event EventHandler<Job>? JobLearned;
     public event EventHandler<EntityJobLeveledUpEvent>? JobLeveldUp;

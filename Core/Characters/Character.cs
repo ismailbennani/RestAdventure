@@ -15,7 +15,7 @@ public class Character : GameEntity<CharacterId>, IEntityWithInventory, IEntityW
         Player = player;
         Class = characterClass;
         Inventory = new Inventory();
-        Jobs = new EntityJobs(this);
+        Jobs = new EntityJobs();
     }
 
     public Player Player { get; }

@@ -7,6 +7,11 @@ public record ItemInstanceId(Guid Guid);
 /// </summary>
 public class ItemInstance : IEquatable<ItemInstance>
 {
+    public ItemInstance(Item item)
+    {
+        Item = item;
+    }
+
     /// <summary>
     ///     The unique ID of the instance
     /// </summary>
@@ -15,7 +20,7 @@ public class ItemInstance : IEquatable<ItemInstance>
     /// <summary>
     ///     The item that is instantiated
     /// </summary>
-    public required Item Item { get; init; }
+    public Item Item { get; }
 
     public override string ToString() => $"{Id} ({Item})";
 

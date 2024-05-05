@@ -1,17 +1,17 @@
 ﻿namespace RestAdventure.Core.Items;
 
-public class ItemStack
+public class ItemInstanceStack
 {
-    public ItemStack(Item item, int count)
+    public ItemInstanceStack(ItemInstance itemInstance, int count)
     {
-        Item = item;
+        ItemInstance = itemInstance;
         Count = count;
     }
 
     /// <summary>
     ///     The item representing this stack. All the items in the stack are identical to this one.
     /// </summary>
-    public Item Item { get; }
+    public ItemInstance ItemInstance { get; }
 
     /// <summary>
     ///     The number of items in the stack. This value is always strictly positive.

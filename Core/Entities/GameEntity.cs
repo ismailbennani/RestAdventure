@@ -30,7 +30,7 @@ public abstract class GameEntity : IEquatable<GameEntity>
     /// <summary>
     ///     The location of the entity
     /// </summary>
-    public Location Location { get; protected set; }
+    public Location Location { get; private set; }
 
     public event EventHandler<EntityMovedEvent>? Moved;
 

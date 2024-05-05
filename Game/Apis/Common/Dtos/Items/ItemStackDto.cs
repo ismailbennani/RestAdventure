@@ -23,7 +23,7 @@ public class ItemStackDto
 
 static class ItemStackMappingExtensions
 {
-    public static ItemStackDto ToDto(this ItemStack stack) =>
+    public static ItemStackDto ToDto(this ItemInstanceStack stack) =>
         new()
         {
             ItemInstance = stack.ItemInstance.ToDto(),

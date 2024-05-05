@@ -8,7 +8,7 @@ public interface IReadOnlyInventory
     /// <summary>
     ///     The entries in the inventory
     /// </summary>
-    IReadOnlyCollection<ItemStack> Stacks { get; }
+    IReadOnlyCollection<ItemInstanceStack> Stacks { get; }
 
     /// <summary>
     ///     The total weight of all the items in the inventory
@@ -28,15 +28,15 @@ public interface IReadOnlyInventory
     /// <summary>
     ///     Find the first stack of the given item. There might be more stacks.
     /// </summary>
-    ItemStack? Find(Item item);
+    ItemInstanceStack? Find(Item item);
 
     /// <summary>
     ///     Find all the stacks of the given item.
     /// </summary>
-    IEnumerable<ItemStack> FindAll(Item item);
+    IEnumerable<ItemInstanceStack> FindAll(Item item);
 
     /// <summary>
     ///     Find the stack represented by the given item instance.
     /// </summary>
-    ItemStack? Find(ItemInstance itemInstance);
+    ItemInstanceStack? Find(ItemInstance itemInstance);
 }

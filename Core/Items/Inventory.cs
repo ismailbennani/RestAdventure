@@ -5,9 +5,9 @@
 /// </summary>
 public class Inventory : IReadOnlyInventory
 {
-    readonly List<ItemStack> _stacks = [];
+    readonly List<ItemInstanceStack> _stacks = [];
 
-    public IReadOnlyCollection<ItemStack> Stacks => _stacks;
+    public IReadOnlyCollection<ItemInstanceStack> Stacks => _stacks;
     public int Weight { get; private set; }
 
     public event EventHandler<InventoryItemStackChangedEvent>? Changed;
@@ -15,15 +15,15 @@ public class Inventory : IReadOnlyInventory
     /// <summary>
     ///     Add an item to the inventory. The item will be stacked with existing items if it is stackable.
     /// </summary>
-    public ItemStack Add(ItemInstance itemInstance, int count)
+    public ItemInstanceStack Add(ItemInstance itemInstance, int count)
     {
-        ItemStack? stack = Find(itemInstance.Item);
+        ItemInstanceStack? stack = Find(itemInstance.Item);
 
         int oldCount;
         if (stack == null)
         {
             oldCount = 0;
-            stack = new ItemStack(itemInstance, count);
+            stack = new ItemInstanceStack(itemInstance, count);
             _stacks.Add(stack);
         }
         else
@@ -55,7 +55,7 @@ public class Inventory : IReadOnlyInventory
         int removed = 0;
         while (removed < count)
         {
-            ItemStack? nextStack = Find(item);
+            ItemInstanceStack? nextStack = Find(item);
             if (nextStack == null)
             {
                 throw new InvalidOperationException("Internal error: there should be enough items to remove");
@@ -79,7 +79,7 @@ public class Inventory : IReadOnlyInventory
     /// <seealso cref="TryRemove(RestAdventure.Core.Items.Item,int)" />
     public bool TryRemove(ItemInstance itemInstance, int count)
     {
-        ItemStack? stack = Find(itemInstance);
+        ItemInstanceStack? stack = Find(itemInstance);
         if (stack == null || stack.Count < count)
         {
             return false;
@@ -103,13 +103,13 @@ public class Inventory : IReadOnlyInventory
     public int GetCountOf(Item item) => Find(item)?.Count ?? 0;
 
     /// <inheritdoc />
-    public ItemStack? Find(Item item) => _stacks.FirstOrDefault(e => e.ItemInstance.Item == item);
+    public ItemInstanceStack? Find(Item item) => _stacks.FirstOrDefault(e => e.ItemInstance.Item == item);
 
     /// <inheritdoc />
-    public IEnumerable<ItemStack> FindAll(Item item) => _stacks.Where(e => e.ItemInstance.Item == item);
+    public IEnumerable<ItemInstanceStack> FindAll(Item item) => _stacks.Where(e => e.ItemInstance.Item == item);
 
     /// <inheritdoc />
-    public ItemStack? Find(ItemInstance itemInstance) => _stacks.FirstOrDefault(e => e.ItemInstance == itemInstance);
+    public ItemInstanceStack? Find(ItemInstance itemInstance) => _stacks.FirstOrDefault(e => e.ItemInstance == itemInstance);
 }
 
 public class InventoryItemStackChangedEvent
@@ -117,4 +117,17 @@ public class InventoryItemStackChangedEvent
     public required ItemInstance ItemInstance { get; init; }
     public int OldCount { get; init; }
     public int NewCount { get; init; }
+}
+
+public static class InventoryExtensions
+{
+    public static ItemInstanceStack Add(this Inventory inventory, ItemInstanceStack stack) => inventory.Add(stack.ItemInstance, stack.Count);
+
+    public static IReadOnlyCollection<ItemInstanceStack> Add(this Inventory inventory, IEnumerable<ItemInstanceStack> stacks) =>
+        stacks.Select(inventory.Add).DistinctBy(s => s.ItemInstance).ToArray();
+
+    public static ItemInstanceStack Add(this Inventory inventory, ItemStack stack) => inventory.Add(new ItemInstance(stack.Item), stack.Count);
+
+    public static IReadOnlyCollection<ItemInstanceStack> Add(this Inventory inventory, IEnumerable<ItemStack> stacks) =>
+        stacks.Select(inventory.Add).DistinctBy(s => s.ItemInstance).ToArray();
 }

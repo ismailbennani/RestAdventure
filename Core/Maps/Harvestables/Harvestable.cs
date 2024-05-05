@@ -1,4 +1,5 @@
 ﻿using RestAdventure.Core.Conditions.Characters;
+using RestAdventure.Core.Items;
 using RestAdventure.Core.Resources;
 
 namespace RestAdventure.Core.Maps.Harvestables;
@@ -28,6 +29,11 @@ public class Harvestable : GameResource<HarvestableId>
     ///     The condition that a character should fulfill to harvest this entity
     /// </summary>
     public ICharacterCondition? HarvestCondition { get; init; }
+
+    /// <summary>
+    ///     The items that should be given to the character when they are done harvesting
+    /// </summary>
+    public required IReadOnlyCollection<ItemStack> Items { get; init; }
 
     public override string ToString() => $"Harvestable {Name} ({Id})";
 }
