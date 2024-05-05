@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using RestAdventure.Core.Items;
 
-namespace RestAdventure.Game.Apis.GameApi.Dtos.Items;
+namespace RestAdventure.Game.Apis.Common.Dtos.Items;
 
 /// <summary>
 ///     Item

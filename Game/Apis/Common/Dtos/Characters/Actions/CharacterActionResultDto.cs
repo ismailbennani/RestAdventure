@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using RestAdventure.Core.Gameplay.Actions;
 
-namespace RestAdventure.Game.Apis.GameApi.Dtos.Characters.Actions;
+namespace RestAdventure.Game.Apis.Common.Dtos.Characters.Actions;
 
 /// <summary>
 ///     The result of an action performed by a character

@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using RestAdventure.Core.Characters;
-using RestAdventure.Game.Apis.GameApi.Dtos.Items;
+using RestAdventure.Game.Apis.Common.Dtos.Items;
 
-namespace RestAdventure.Game.Apis.GameApi.Dtos.Characters;
+namespace RestAdventure.Game.Apis.Common.Dtos.Characters;
 
 /// <summary>
 ///     Character inventory

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace RestAdventure.Game.Apis.GameApi;
+namespace RestAdventure.Game.Apis.GameApi.Controllers;
 
 /// <summary>
 ///     Status

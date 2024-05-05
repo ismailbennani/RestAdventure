@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using RestAdventure.Core.Characters;
 
-namespace RestAdventure.Game.Apis.GameApi.Dtos.Characters;
+namespace RestAdventure.Game.Apis.Common.Dtos.Characters;
 
 /// <summary>
 ///     Minimal character information

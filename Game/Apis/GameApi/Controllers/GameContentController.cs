@@ -4,8 +4,8 @@ using RestAdventure.Core;
 using RestAdventure.Core.Items;
 using RestAdventure.Core.Maps.Locations;
 using RestAdventure.Core.Players;
-using RestAdventure.Game.Apis.GameApi.Dtos.Items;
-using RestAdventure.Game.Apis.GameApi.Dtos.Maps;
+using RestAdventure.Game.Apis.Common.Dtos.Items;
+using RestAdventure.Game.Apis.Common.Dtos.Maps;
 using RestAdventure.Game.Authentication;
 using RestAdventure.Kernel.Security;
 

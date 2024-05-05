@@ -4,7 +4,7 @@ using RestAdventure.Core;
 using RestAdventure.Core.Characters;
 using RestAdventure.Core.Gameplay.Actions;
 using RestAdventure.Core.Players;
-using RestAdventure.Game.Apis.GameApi.Dtos.Characters;
+using RestAdventure.Game.Apis.Common.Dtos.Characters;
 using RestAdventure.Game.Authentication;
 
 namespace RestAdventure.Game.Apis.GameApi.Controllers.Characters;

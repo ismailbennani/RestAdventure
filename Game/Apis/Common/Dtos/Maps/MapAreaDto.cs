@@ -1,8 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using RestAdventure.Core.Maps;
 using RestAdventure.Core.Maps.Areas;
 
-namespace RestAdventure.Game.Apis.GameApi.Dtos.Maps;
+namespace RestAdventure.Game.Apis.Common.Dtos.Maps;
 
 /// <summary>
 ///     Map area

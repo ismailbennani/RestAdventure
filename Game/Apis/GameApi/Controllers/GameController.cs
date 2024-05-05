@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 using NSwag.Annotations;
 using RestAdventure.Core;
 using RestAdventure.Core.Settings;
-using RestAdventure.Game.Apis.GameApi.Dtos;
+using RestAdventure.Game.Apis.Common.Dtos;
 using RestAdventure.Game.Apis.GameApi.Services.Game;
 
 namespace RestAdventure.Game.Apis.GameApi.Controllers;

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace RestAdventure.Game.Apis.GameApi.Dtos.Characters;
+namespace RestAdventure.Game.Apis.Common.Dtos.Characters;
 
 /// <summary>
 ///     Team of characters

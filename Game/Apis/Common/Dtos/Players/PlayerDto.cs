@@ -2,7 +2,7 @@
 using RestAdventure.Core.Players;
 using RestAdventure.Kernel.Security;
 
-namespace RestAdventure.Game.Apis.AdminApi.Dtos.Players;
+namespace RestAdventure.Game.Apis.Common.Dtos.Players;
 
 /// <summary>
 ///     A player

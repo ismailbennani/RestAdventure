@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace RestAdventure.Game.Apis.GameApi.Dtos;
+namespace RestAdventure.Game.Apis.Common.Dtos;
 
 /// <summary>
 ///     Game state

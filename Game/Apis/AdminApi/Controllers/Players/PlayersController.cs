@@ -2,7 +2,7 @@
 using NSwag.Annotations;
 using RestAdventure.Core;
 using RestAdventure.Core.Players;
-using RestAdventure.Game.Apis.AdminApi.Dtos.Players;
+using RestAdventure.Game.Apis.Common.Dtos.Players;
 using RestAdventure.Kernel.Security;
 
 namespace RestAdventure.Game.Apis.AdminApi.Controllers.Players;

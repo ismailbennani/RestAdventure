@@ -27,10 +27,6 @@
       <ProjectReference Include="..\Kernel\Kernel.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Apis\Common\Dtos\" />
-    </ItemGroup>
-
     <PropertyGroup>
         <MinVerTagPrefix>v</MinVerTagPrefix>
     </PropertyGroup>

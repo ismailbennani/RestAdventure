@@ -2,10 +2,10 @@
 using RestAdventure.Core;
 using RestAdventure.Core.Characters;
 using RestAdventure.Core.Gameplay.Actions;
-using RestAdventure.Game.Apis.GameApi.Dtos.Characters.Actions;
-using RestAdventure.Game.Apis.GameApi.Dtos.Maps;
+using RestAdventure.Game.Apis.Common.Dtos.Characters.Actions;
+using RestAdventure.Game.Apis.Common.Dtos.Maps;
 
-namespace RestAdventure.Game.Apis.GameApi.Dtos.Characters;
+namespace RestAdventure.Game.Apis.Common.Dtos.Characters;
 
 /// <summary>
 ///     Character

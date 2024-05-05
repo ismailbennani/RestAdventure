@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace RestAdventure.Game.Apis.GameApi.Dtos.Items;
+namespace RestAdventure.Game.Apis.Common.Dtos.Items;
 
 /// <summary>
 ///     Inventory
