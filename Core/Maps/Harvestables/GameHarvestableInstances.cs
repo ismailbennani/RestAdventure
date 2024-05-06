@@ -2,7 +2,7 @@
 
 namespace RestAdventure.Core.Maps.Harvestables;
 
-public class GameHarvestablesState
+public class GameHarvestableInstances
 {
     readonly Dictionary<HarvestableInstanceId, HarvestableInstance> _harvestables = new();
 
@@ -15,6 +15,6 @@ public class GameHarvestablesState
 
 public static class GameMapHarvestablesExtensions
 {
-    public static HarvestableInstance Require(this GameHarvestablesState harvestables, HarvestableInstanceId harvestableId) =>
+    public static HarvestableInstance Require(this GameHarvestableInstances harvestables, HarvestableInstanceId harvestableId) =>
         harvestables.Get(harvestableId) ?? throw new InvalidOperationException($"Could not find harvestable {harvestableId}");
 }
