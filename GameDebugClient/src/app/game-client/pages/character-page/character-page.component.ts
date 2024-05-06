@@ -4,7 +4,6 @@ import { ActivatedRoute } from '@angular/router';
 import { ReplaySubject, combineLatest, forkJoin, map, of, switchMap, tap } from 'rxjs';
 import { ILocationMinimal, LocationMinimal } from '../../../../api/admin-api-client.generated';
 import {
-  CharacterAction,
   CharacterInteractWithEntityAction,
   CharacterMoveToLocationAction,
   EntityWithInteractions,
@@ -19,13 +18,14 @@ import { CurrentPageService } from '../../services/current-page.service';
 import { GameService } from '../../services/game.service';
 import { PlayersService } from '../../services/players/players.service';
 import { TeamService } from '../../services/team/team.service';
+import { CharacterComponent } from '../../widgets/character/character.component';
 import { InventoryComponent } from '../../widgets/inventory/inventory.component';
 
 @Component({
   selector: 'app-character-page',
   templateUrl: './character-page.component.html',
   standalone: true,
-  imports: [CommonModule, SpinnerComponent, InventoryComponent],
+  imports: [CommonModule, SpinnerComponent, InventoryComponent, CharacterComponent],
 })
 export class CharacterPageComponent implements OnInit {
   protected loading: boolean = false;
@@ -58,9 +58,9 @@ export class CharacterPageComponent implements OnInit {
       this.refreshSubject.next();
     });
 
+    this.loading = true;
     this.refreshSubject
       .pipe(
-        tap(() => (this.loading = true)),
         switchMap(() => {
           this.character = this.team?.characters.find(c => c.id === this.characterId);
 
@@ -90,54 +90,74 @@ export class CharacterPageComponent implements OnInit {
       .subscribe();
   }
 
-  moveToLocation(character: TeamCharacter, location: LocationMinimal) {
+  moveToLocation(location: LocationMinimal) {
+    if (!this.character) {
+      return;
+    }
+
     this.charactersActionsApiClient
-      .moveToLocation(character.id, location.id)
-      .pipe(map(_ => this.gameService.refreshNow()))
+      .moveToLocation(this.character.id, location.id)
+      .pipe(map(_ => this.gameService.refreshNow(true)))
       .subscribe();
   }
 
-  interact(character: TeamCharacter, entity: EntityWithInteractions, interaction: InteractionMinimal) {
+  interact(entity: EntityWithInteractions, interaction: InteractionMinimal) {
+    if (!this.character) {
+      return;
+    }
+
     this.charactersActionsApiClient
-      .interact(character.id, entity.id, interaction.id)
-      .pipe(map(_ => this.gameService.refreshNow()))
+      .interact(this.character.id, entity.id, interaction.id)
+      .pipe(map(_ => this.gameService.refreshNow(true)))
       .subscribe();
   }
 
-  plansToMoveToLocation(character: TeamCharacter, location: ILocationMinimal) {
-    if (!character.plannedAction) {
+  plansToMove() {
+    if (!this.character?.plannedAction) {
       return false;
     }
 
-    if (!(character.plannedAction instanceof CharacterMoveToLocationAction)) {
-      return false;
-    }
-
-    return character.plannedAction.location.id == location.id;
+    return this.character.plannedAction instanceof CharacterMoveToLocationAction;
   }
 
-  plansToInteractWithEntity(character: TeamCharacter, entity: EntityWithInteractions) {
-    if (!character.plannedAction) {
+  plansToMoveToLocation(location: ILocationMinimal) {
+    if (!this.character?.plannedAction || !(this.character.plannedAction instanceof CharacterMoveToLocationAction)) {
       return false;
     }
 
-    if (!(character.plannedAction instanceof CharacterInteractWithEntityAction)) {
-      return false;
-    }
-
-    return character.plannedAction.entity.id == entity.id;
+    return this.character.plannedAction.location.id == location.id;
   }
 
-  plansToPerformInteraction(character: TeamCharacter, entity: EntityWithInteractions, interaction: InteractionMinimal) {
-    if (!character.plannedAction) {
+  plansToInteract() {
+    if (!this.character?.plannedAction) {
       return false;
     }
 
-    if (!(character.plannedAction instanceof CharacterInteractWithEntityAction)) {
+    return this.character.plannedAction instanceof CharacterInteractWithEntityAction;
+  }
+
+  plansToInteractWithEntity(entity: EntityWithInteractions) {
+    if (!this.character?.plannedAction || !(this.character.plannedAction instanceof CharacterInteractWithEntityAction)) {
       return false;
     }
 
-    return character.plannedAction.entity.id == entity.id && character.plannedAction.interaction.id == interaction.id;
+    return this.character.plannedAction.entity.id == entity.id;
+  }
+
+  plansToPerformInteraction(entity: EntityWithInteractions, interaction: InteractionMinimal) {
+    if (!this.character?.plannedAction || !(this.character.plannedAction instanceof CharacterInteractWithEntityAction)) {
+      return false;
+    }
+
+    return this.character.plannedAction.entity.id == entity.id && this.character.plannedAction.interaction.id == interaction.id;
+  }
+
+  isPerformingInteraction(entity: EntityWithInteractions, interaction: InteractionMinimal) {
+    if (!this.character?.currentInteraction) {
+      return false;
+    }
+
+    return this.character.currentInteraction.subject.id == entity.id && this.character.currentInteraction.interaction.id == interaction.id;
   }
 
   deleteCharacter() {
@@ -145,18 +165,6 @@ export class CharacterPageComponent implements OnInit {
       throw new Error('Character id not found');
     }
 
-    this.charactersApiClient.deleteCharacter(this.characterId).subscribe(() => this.gameService.refreshNow());
-  }
-
-  protected actionToString(action: CharacterAction) {
-    if (action instanceof CharacterMoveToLocationAction) {
-      return `move to ${action.location.positionX}, ${action.location.positionY} (${action.location.area.name})`;
-    }
-
-    if (action instanceof CharacterInteractWithEntityAction) {
-      return `interact with ${action.entity.name}: ${action.interaction.name}`;
-    }
-
-    return '???';
+    this.charactersApiClient.deleteCharacter(this.characterId).subscribe(() => this.gameService.refreshNow(true));
   }
 }

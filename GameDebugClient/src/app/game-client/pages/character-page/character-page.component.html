@@ -9,89 +9,78 @@
     </h1>
   </div>
 } @else {
-  <div class="w-100 h-100 d-flex">
-    <div class="p-4">
-      <div class="d-flex">
-        <h2>{{ character.name }}</h2>
-        <div class="flex-grow-1"></div>
-        <button class="btn btn-outline-danger" (click)="deleteCharacter()">
-          <i class="bi bi-trash"></i>
-        </button>
-      </div>
-      <ul>
-        <li>Class: {{ character.class }}</li>
-        <li>Location: {{ character.location.positionX }}, {{ character.location.positionY }} ({{ character.location.area.name }})</li>
-        <li>
-          Planned action:
-          @if (character.plannedAction) {
-            {{ actionToString(character.plannedAction) }}
-          } @else {
-            none
-          }
-        </li>
-        <li>
-          Last action result:
-          @if (character.lastActionResult) {
-            {{ actionToString(character.lastActionResult.action) }}
-            @if (character.lastActionResult.success) {
-              (success)
-            } @else {
-              <div class="text-danger">failed: {{ character.lastActionResult.failureReason }}</div>
-            }
-          } @else {
-            none
-          }
-        </li>
-        <li>
-          Current interaction:
-          @if (character.currentInteraction) {
-            {{ character.currentInteraction.interaction.name }}, {{ character.currentInteraction.subject.name }}
-          } @else {
-            none
-          }
-        </li>
-      </ul>
-    </div>
-    <div class="vr"></div>
-    <div class="py-2 px-4" style="width: 25%">
-      <h6>Inventory</h6>
-      <app-inventory [inventory]="character.inventory"></app-inventory>
-    </div>
-    <div class="vr"></div>
-    <div class="flex-grow-1"></div>
-    <div class="vr"></div>
-    <div class="d-flex flex-column py-2 px-4">
-      <h6>Move to</h6>
-      @for (accessibleLocation of accessibleLocations; track accessibleLocation.id) {
-        <button
-          class="btn"
-          [ngClass]="plansToMoveToLocation(character, accessibleLocation) ? 'btn-secondary' : 'btn-outline-secondary'"
-          (click)="moveToLocation(character, accessibleLocation)"
-        >
-          {{ accessibleLocation.area.name }}: {{ accessibleLocation.positionX }},
-          {{ accessibleLocation.positionY }}
-        </button>
-      }
-    </div>
-    <div class="vr"></div>
-    <div class="d-flex flex-column py-2 px-4">
-      <h6>Interactions</h6>
-      @for (entity of entitiesWithInteractions; track entity.id) {
-        <span [class.text-underline]="plansToInteractWithEntity(character, entity)">
-          {{ entity.name }}
-        </span>
-        <div class="d-flex flex-wrap">
-          @for (interaction of entity.interactions; track interaction.id) {
-            <button
-              class="btn"
-              [ngClass]="plansToPerformInteraction(character, entity, interaction) ? 'btn-secondary' : 'btn-outline-secondary'"
-              (click)="interact(character, entity, interaction)"
-            >
-              {{ interaction.name }}
-            </button>
-          }
+  <div class="w-100 h-100 p-4 vstack gap-4">
+    <div class="row">
+      <div class="col">
+        <div class="w-100 h-100 border p-4">
+          <app-character [character]="character"></app-character>
         </div>
-      }
+      </div>
+
+      <div class="col">
+        <div class="w-100 h-100 border py-2 px-4">
+          <h6>Inventory</h6>
+          <app-inventory [inventory]="character.inventory"></app-inventory>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <div class="w-100 h-100 border p-4">
+          <h4>Actions</h4>
+
+          <div class="row mb-3">
+            <div class="col-sm-2" [class.fw-bold]="plansToMove()">Move to</div>
+            <div class="col">
+              <div class="d-flex flex-wrap">
+                @for (accessibleLocation of accessibleLocations; track accessibleLocation.id) {
+                  <button
+                    class="btn btn-sm"
+                    [ngClass]="plansToMoveToLocation(accessibleLocation) ? 'btn-secondary' : 'btn-outline-secondary'"
+                    (click)="moveToLocation(accessibleLocation)"
+                  >
+                    {{ accessibleLocation.area.name }}: {{ accessibleLocation.positionX }},
+                    {{ accessibleLocation.positionY }}
+                  </button>
+                }
+              </div>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-sm-2" [class.fw-bold]="plansToInteract()">Interact with</div>
+            <div class="col">
+              <div class="d-flex flex-wrap">
+                @for (entity of entitiesWithInteractions; track entity.id) {
+                  <div class="border p-2">
+                    <span [class.text-underline]="plansToInteractWithEntity(entity)">
+                      {{ entity.name }}
+                    </span>
+                    <div class="d-flex flex-wrap">
+                      @for (interaction of entity.interactions; track interaction.id) {
+                        <button
+                          class="btn btn-sm"
+                          [ngClass]="
+                            plansToPerformInteraction(entity, interaction)
+                              ? 'btn-secondary'
+                              : isPerformingInteraction(entity, interaction)
+                                ? 'btn-primary'
+                                : 'btn-outline-secondary'
+                          "
+                          (click)="interact(entity, interaction)"
+                        >
+                          {{ interaction.name }}
+                        </button>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 }
