@@ -18,6 +18,7 @@ import { CurrentPageService } from '../../services/current-page.service';
 import { GameService } from '../../services/game.service';
 import { PlayersService } from '../../services/players/players.service';
 import { TeamService } from '../../services/team/team.service';
+import { CharacterHistoryComponent } from '../../widgets/character-history/character-history.component';
 import { CharacterComponent } from '../../widgets/character/character.component';
 import { InventoryComponent } from '../../widgets/inventory/inventory.component';
 
@@ -25,7 +26,7 @@ import { InventoryComponent } from '../../widgets/inventory/inventory.component'
   selector: 'app-character-page',
   templateUrl: './character-page.component.html',
   standalone: true,
-  imports: [CommonModule, SpinnerComponent, InventoryComponent, CharacterComponent],
+  imports: [CommonModule, SpinnerComponent, InventoryComponent, CharacterComponent, CharacterHistoryComponent],
 })
 export class CharacterPageComponent implements OnInit {
   protected loading: boolean = false;
@@ -70,7 +71,7 @@ export class CharacterPageComponent implements OnInit {
           }
 
           if (!this.character) {
-            this.character = undefined;
+            this.currentPageService.openHome();
             return of(undefined);
           }
 

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, ReplaySubject, catchError, combineLatest, filter, map, of, switchMap } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, combineLatest, filter, map, of, switchMap } from 'rxjs';
 import { Team, TeamApiClient } from '../../../../api/game-api-client.generated';
 import { GameService } from '../game.service';
 import { PlayersService } from '../players/players.service';
@@ -9,7 +9,7 @@ import { PlayersService } from '../players/players.service';
 })
 export class TeamService {
   private teamInternal: Team | undefined;
-  private teamSubject: ReplaySubject<Team> = new ReplaySubject<Team>(1);
+  private teamSubject: BehaviorSubject<Team | undefined> = new BehaviorSubject<Team | undefined>(undefined);
 
   constructor(gameService: GameService, playersService: PlayersService, teamApiClient: TeamApiClient) {
     combineLatest({ state: gameService.state$, player: playersService.selected$ })

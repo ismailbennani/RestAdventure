@@ -905,6 +905,77 @@ export class TeamCharactersApiClient {
         }
         return _observableOf(null as any);
     }
+
+    /**
+     * Get character history
+     * @param pageNumber (optional) The page number
+     * @param pageSize (optional) The page size
+     */
+    searchCharacterHistory(characterGuid: string, pageNumber?: number | undefined, pageSize?: number | undefined): Observable<SearchResultOfCharacterHistoryEntry> {
+        let url_ = this.baseUrl + "/game/team/characters/{characterGuid}/history?";
+        if (characterGuid === undefined || characterGuid === null)
+            throw new Error("The parameter 'characterGuid' must be defined.");
+        url_ = url_.replace("{characterGuid}", encodeURIComponent("" + characterGuid));
+        if (pageNumber === null)
+            throw new Error("The parameter 'pageNumber' cannot be null.");
+        else if (pageNumber !== undefined)
+            url_ += "PageNumber=" + encodeURIComponent("" + pageNumber) + "&";
+        if (pageSize === null)
+            throw new Error("The parameter 'pageSize' cannot be null.");
+        else if (pageSize !== undefined)
+            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSearchCharacterHistory(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSearchCharacterHistory(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<SearchResultOfCharacterHistoryEntry>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<SearchResultOfCharacterHistoryEntry>;
+        }));
+    }
+
+    protected processSearchCharacterHistory(response: HttpResponseBase): Observable<SearchResultOfCharacterHistoryEntry> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = SearchResultOfCharacterHistoryEntry.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 404) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ProblemDetails.fromJS(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
 }
 
 @Injectable()
@@ -2377,6 +2448,469 @@ export interface ICreateCharacterRequest {
     /** The class of the character
              */
     class: CharacterClass;
+}
+
+/** Search result */
+export class SearchResultOfCharacterHistoryEntry implements ISearchResultOfCharacterHistoryEntry {
+    /** The items found by the query
+             */
+    items!: CharacterHistoryEntry[];
+    /** The page number corresponding to the results that have been selected
+             */
+    pageNumber!: number;
+    /** The page size used by the search
+             */
+    pageSize!: number;
+    /** The total number of items matching the query
+             */
+    totalItemsCount!: number;
+    /** The total number of pages
+             */
+    totalPagesCount!: number;
+
+    constructor(data?: ISearchResultOfCharacterHistoryEntry) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.items = [];
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(CharacterHistoryEntry.fromJS(item));
+            }
+            this.pageNumber = _data["pageNumber"];
+            this.pageSize = _data["pageSize"];
+            this.totalItemsCount = _data["totalItemsCount"];
+            this.totalPagesCount = _data["totalPagesCount"];
+        }
+    }
+
+    static fromJS(data: any): SearchResultOfCharacterHistoryEntry {
+        data = typeof data === 'object' ? data : {};
+        let result = new SearchResultOfCharacterHistoryEntry();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        data["pageNumber"] = this.pageNumber;
+        data["pageSize"] = this.pageSize;
+        data["totalItemsCount"] = this.totalItemsCount;
+        data["totalPagesCount"] = this.totalPagesCount;
+        return data;
+    }
+}
+
+/** Search result */
+export interface ISearchResultOfCharacterHistoryEntry {
+    /** The items found by the query
+             */
+    items: CharacterHistoryEntry[];
+    /** The page number corresponding to the results that have been selected
+             */
+    pageNumber: number;
+    /** The page size used by the search
+             */
+    pageSize: number;
+    /** The total number of items matching the query
+             */
+    totalItemsCount: number;
+    /** The total number of pages
+             */
+    totalPagesCount: number;
+}
+
+/** Character history entry */
+export class CharacterHistoryEntry implements ICharacterHistoryEntry {
+    /** The tick at which the event happened
+             */
+    tick!: number;
+
+    protected _discriminator: string;
+
+    constructor(data?: ICharacterHistoryEntry) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        this._discriminator = "CharacterHistoryEntry";
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.tick = _data["tick"];
+        }
+    }
+
+    static fromJS(data: any): CharacterHistoryEntry {
+        data = typeof data === 'object' ? data : {};
+        if (data["$type"] === "moved") {
+            let result = new CharacterMoveLocationHistoryEntry();
+            result.init(data);
+            return result;
+        }
+        if (data["$type"] === "inventory-changed") {
+            let result = new CharacterInventoryChangedHistoryEntry();
+            result.init(data);
+            return result;
+        }
+        if (data["$type"] === "interaction-started") {
+            let result = new CharacterStartedInteractionHistoryEntry();
+            result.init(data);
+            return result;
+        }
+        if (data["$type"] === "interaction-ended") {
+            let result = new CharacterEndedInteractionHistoryEntry();
+            result.init(data);
+            return result;
+        }
+        let result = new CharacterHistoryEntry();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["$type"] = this._discriminator;
+        data["tick"] = this.tick;
+        return data;
+    }
+}
+
+/** Character history entry */
+export interface ICharacterHistoryEntry {
+    /** The tick at which the event happened
+             */
+    tick: number;
+}
+
+/** Character moved to location history entry */
+export class CharacterMoveLocationHistoryEntry extends CharacterHistoryEntry implements ICharacterMoveLocationHistoryEntry {
+    /** The unique ID of the old location
+             */
+    oldLocationId!: string;
+    /** The X position of the old location
+             */
+    oldLocationPositionX!: number;
+    /** The Y position of the old location
+             */
+    oldLocationPositionY!: number;
+    /** The unique ID of the area of the old location
+             */
+    oldLocationAreaId!: string;
+    /** The name of the area of the old location
+             */
+    oldLocationAreaName!: string;
+    /** The unique ID of the new location
+             */
+    newLocationId!: string;
+    /** The X position of the new location
+             */
+    newLocationPositionX!: number;
+    /** The Y position of the new location
+             */
+    newLocationPositionY!: number;
+    /** The unique ID of the area of the new location
+             */
+    newLocationAreaId!: string;
+    /** The name of the area of the new location
+             */
+    newLocationAreaName!: string;
+
+    constructor(data?: ICharacterMoveLocationHistoryEntry) {
+        super(data);
+        this._discriminator = "moved";
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.oldLocationId = _data["oldLocationId"];
+            this.oldLocationPositionX = _data["oldLocationPositionX"];
+            this.oldLocationPositionY = _data["oldLocationPositionY"];
+            this.oldLocationAreaId = _data["oldLocationAreaId"];
+            this.oldLocationAreaName = _data["oldLocationAreaName"];
+            this.newLocationId = _data["newLocationId"];
+            this.newLocationPositionX = _data["newLocationPositionX"];
+            this.newLocationPositionY = _data["newLocationPositionY"];
+            this.newLocationAreaId = _data["newLocationAreaId"];
+            this.newLocationAreaName = _data["newLocationAreaName"];
+        }
+    }
+
+    static override fromJS(data: any): CharacterMoveLocationHistoryEntry {
+        data = typeof data === 'object' ? data : {};
+        let result = new CharacterMoveLocationHistoryEntry();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["oldLocationId"] = this.oldLocationId;
+        data["oldLocationPositionX"] = this.oldLocationPositionX;
+        data["oldLocationPositionY"] = this.oldLocationPositionY;
+        data["oldLocationAreaId"] = this.oldLocationAreaId;
+        data["oldLocationAreaName"] = this.oldLocationAreaName;
+        data["newLocationId"] = this.newLocationId;
+        data["newLocationPositionX"] = this.newLocationPositionX;
+        data["newLocationPositionY"] = this.newLocationPositionY;
+        data["newLocationAreaId"] = this.newLocationAreaId;
+        data["newLocationAreaName"] = this.newLocationAreaName;
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Character moved to location history entry */
+export interface ICharacterMoveLocationHistoryEntry extends ICharacterHistoryEntry {
+    /** The unique ID of the old location
+             */
+    oldLocationId: string;
+    /** The X position of the old location
+             */
+    oldLocationPositionX: number;
+    /** The Y position of the old location
+             */
+    oldLocationPositionY: number;
+    /** The unique ID of the area of the old location
+             */
+    oldLocationAreaId: string;
+    /** The name of the area of the old location
+             */
+    oldLocationAreaName: string;
+    /** The unique ID of the new location
+             */
+    newLocationId: string;
+    /** The X position of the new location
+             */
+    newLocationPositionX: number;
+    /** The Y position of the new location
+             */
+    newLocationPositionY: number;
+    /** The unique ID of the area of the new location
+             */
+    newLocationAreaId: string;
+    /** The name of the area of the new location
+             */
+    newLocationAreaName: string;
+}
+
+/** Character inventory changed history entry */
+export class CharacterInventoryChangedHistoryEntry extends CharacterHistoryEntry implements ICharacterInventoryChangedHistoryEntry {
+    /** The
+             */
+    itemInstanceId!: string;
+    /** The
+             */
+    itemId!: string;
+    /** The
+             */
+    itemName!: string;
+    /** The
+             */
+    oldCount!: number;
+    /** The
+             */
+    newCount!: number;
+
+    constructor(data?: ICharacterInventoryChangedHistoryEntry) {
+        super(data);
+        this._discriminator = "inventory-changed";
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.itemInstanceId = _data["itemInstanceId"];
+            this.itemId = _data["itemId"];
+            this.itemName = _data["itemName"];
+            this.oldCount = _data["oldCount"];
+            this.newCount = _data["newCount"];
+        }
+    }
+
+    static override fromJS(data: any): CharacterInventoryChangedHistoryEntry {
+        data = typeof data === 'object' ? data : {};
+        let result = new CharacterInventoryChangedHistoryEntry();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["itemInstanceId"] = this.itemInstanceId;
+        data["itemId"] = this.itemId;
+        data["itemName"] = this.itemName;
+        data["oldCount"] = this.oldCount;
+        data["newCount"] = this.newCount;
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Character inventory changed history entry */
+export interface ICharacterInventoryChangedHistoryEntry extends ICharacterHistoryEntry {
+    /** The
+             */
+    itemInstanceId: string;
+    /** The
+             */
+    itemId: string;
+    /** The
+             */
+    itemName: string;
+    /** The
+             */
+    oldCount: number;
+    /** The
+             */
+    newCount: number;
+}
+
+/** Character started interaction history entry */
+export class CharacterStartedInteractionHistoryEntry extends CharacterHistoryEntry implements ICharacterStartedInteractionHistoryEntry {
+    /** The unique ID of the interaction that has been started
+             */
+    interactionId!: string;
+    /** The name of the interaction that has been started
+             */
+    interactionName!: string;
+    /** The entity that was the subject of the interaction
+             */
+    subjectId!: string;
+    /** The name of the entity that was the subject of the interaction
+             */
+    subjectName!: string;
+
+    constructor(data?: ICharacterStartedInteractionHistoryEntry) {
+        super(data);
+        this._discriminator = "interaction-started";
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.interactionId = _data["interactionId"];
+            this.interactionName = _data["interactionName"];
+            this.subjectId = _data["subjectId"];
+            this.subjectName = _data["subjectName"];
+        }
+    }
+
+    static override fromJS(data: any): CharacterStartedInteractionHistoryEntry {
+        data = typeof data === 'object' ? data : {};
+        let result = new CharacterStartedInteractionHistoryEntry();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["interactionId"] = this.interactionId;
+        data["interactionName"] = this.interactionName;
+        data["subjectId"] = this.subjectId;
+        data["subjectName"] = this.subjectName;
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Character started interaction history entry */
+export interface ICharacterStartedInteractionHistoryEntry extends ICharacterHistoryEntry {
+    /** The unique ID of the interaction that has been started
+             */
+    interactionId: string;
+    /** The name of the interaction that has been started
+             */
+    interactionName: string;
+    /** The entity that was the subject of the interaction
+             */
+    subjectId: string;
+    /** The name of the entity that was the subject of the interaction
+             */
+    subjectName: string;
+}
+
+/** Character ended interaction history entry */
+export class CharacterEndedInteractionHistoryEntry extends CharacterHistoryEntry implements ICharacterEndedInteractionHistoryEntry {
+    /** The unique ID of the interaction that has been started
+             */
+    interactionId!: string;
+    /** The name of the interaction that has been started
+             */
+    interactionName!: string;
+    /** The entity that was the subject of the interaction
+             */
+    subjectId!: string;
+    /** The name of the entity that was the subject of the interaction
+             */
+    subjectName!: string;
+
+    constructor(data?: ICharacterEndedInteractionHistoryEntry) {
+        super(data);
+        this._discriminator = "interaction-ended";
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.interactionId = _data["interactionId"];
+            this.interactionName = _data["interactionName"];
+            this.subjectId = _data["subjectId"];
+            this.subjectName = _data["subjectName"];
+        }
+    }
+
+    static override fromJS(data: any): CharacterEndedInteractionHistoryEntry {
+        data = typeof data === 'object' ? data : {};
+        let result = new CharacterEndedInteractionHistoryEntry();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["interactionId"] = this.interactionId;
+        data["interactionName"] = this.interactionName;
+        data["subjectId"] = this.subjectId;
+        data["subjectName"] = this.subjectName;
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Character ended interaction history entry */
+export interface ICharacterEndedInteractionHistoryEntry extends ICharacterHistoryEntry {
+    /** The unique ID of the interaction that has been started
+             */
+    interactionId: string;
+    /** The name of the interaction that has been started
+             */
+    interactionName: string;
+    /** The entity that was the subject of the interaction
+             */
+    subjectId: string;
+    /** The name of the entity that was the subject of the interaction
+             */
+    subjectName: string;
 }
 
 /** Team of characters */

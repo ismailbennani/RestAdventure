@@ -9,75 +9,93 @@
     </h1>
   </div>
 } @else {
-  <div class="w-100 h-100 p-4 vstack gap-4">
-    <div class="row">
+  <div class="w-100 h-100 p-4">
+    <div class="w-100 h-100 row">
       <div class="col">
-        <div class="w-100 h-100 border p-4">
-          <app-character [character]="character"></app-character>
-        </div>
-      </div>
-
-      <div class="col">
-        <div class="w-100 h-100 border py-2 px-4">
-          <h6>Inventory</h6>
-          <app-inventory [inventory]="character.inventory"></app-inventory>
-        </div>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="col">
-        <div class="w-100 h-100 border p-4">
-          <h4>Actions</h4>
-
-          <div class="row mb-3">
-            <div class="col-sm-2" [class.fw-bold]="plansToMove()">Move to</div>
+        <div class="vstack gap-4">
+          <div class="row">
             <div class="col">
-              <div class="d-flex flex-wrap">
-                @for (accessibleLocation of accessibleLocations; track accessibleLocation.id) {
-                  <button
-                    class="btn btn-sm"
-                    [ngClass]="plansToMoveToLocation(accessibleLocation) ? 'btn-secondary' : 'btn-outline-secondary'"
-                    (click)="moveToLocation(accessibleLocation)"
-                  >
-                    {{ accessibleLocation.area.name }}: {{ accessibleLocation.positionX }},
-                    {{ accessibleLocation.positionY }}
-                  </button>
-                }
+              <div class="w-100 h-100 border p-4">
+                <app-character [character]="character"></app-character>
+              </div>
+            </div>
+
+            <div class="col">
+              <div class="w-100 h-100 border py-2 px-4">
+                <h6>Inventory</h6>
+                <app-inventory [inventory]="character.inventory"></app-inventory>
               </div>
             </div>
           </div>
 
-          <div class="row mb-3">
-            <div class="col-sm-2" [class.fw-bold]="plansToInteract()">Interact with</div>
+          <div class="row">
             <div class="col">
-              <div class="d-flex flex-wrap">
-                @for (entity of entitiesWithInteractions; track entity.id) {
-                  <div class="border p-2">
-                    <span [class.text-underline]="plansToInteractWithEntity(entity)">
-                      {{ entity.name }}
-                    </span>
+              <div class="w-100 h-100 border p-4">
+                <h4>Actions</h4>
+
+                <div class="row mb-3">
+                  <div class="col-sm-2" [class.fw-bold]="plansToMove()">Move to</div>
+                  <div class="col">
                     <div class="d-flex flex-wrap">
-                      @for (interaction of entity.interactions; track interaction.id) {
+                      @for (accessibleLocation of accessibleLocations; track accessibleLocation.id) {
                         <button
                           class="btn btn-sm"
-                          [ngClass]="
-                            plansToPerformInteraction(entity, interaction)
-                              ? 'btn-secondary'
-                              : isPerformingInteraction(entity, interaction)
-                                ? 'btn-primary'
-                                : 'btn-outline-secondary'
-                          "
-                          (click)="interact(entity, interaction)"
+                          [ngClass]="plansToMoveToLocation(accessibleLocation) ? 'btn-secondary' : 'btn-outline-secondary'"
+                          (click)="moveToLocation(accessibleLocation)"
                         >
-                          {{ interaction.name }}
+                          {{ accessibleLocation.area.name }}: {{ accessibleLocation.positionX }},
+                          {{ accessibleLocation.positionY }}
                         </button>
                       }
                     </div>
                   </div>
-                }
+                </div>
+
+                <div class="row mb-3">
+                  <div class="col-sm-2" [class.fw-bold]="plansToInteract()">Interact with</div>
+                  <div class="col">
+                    <div class="d-flex flex-wrap">
+                      @for (entity of entitiesWithInteractions; track entity.id) {
+                        <div class="border p-2">
+                          <span [class.text-underline]="plansToInteractWithEntity(entity)">
+                            {{ entity.name }}
+                          </span>
+                          <div class="d-flex flex-wrap">
+                            @for (interaction of entity.interactions; track interaction.id) {
+                              <button
+                                class="btn btn-sm"
+                                [ngClass]="
+                                  plansToPerformInteraction(entity, interaction)
+                                    ? 'btn-secondary'
+                                    : isPerformingInteraction(entity, interaction)
+                                      ? 'btn-primary'
+                                      : 'btn-outline-secondary'
+                                "
+                                (click)="interact(entity, interaction)"
+                              >
+                                {{ interaction.name }}
+                              </button>
+                            }
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 h-100">
+        <div class="w-100 h-100 border d-flex flex-column">
+          <div class="p-2">
+            <h6 class="m-0">History</h6>
+          </div>
+          <hr class="m-0" />
+          <div class="flex-grow-1 overflow-auto">
+            <app-character-history [character]="character" [nEntries]="40"></app-character-history>
           </div>
         </div>
       </div>

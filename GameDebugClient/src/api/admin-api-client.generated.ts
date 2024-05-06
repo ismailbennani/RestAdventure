@@ -822,12 +822,23 @@ export class AdminPlayersApiClient {
     }
 }
 
+/** Search result */
 export class SearchResultOfItem implements ISearchResultOfItem {
-    items?: Item[];
-    pageNumber?: number;
-    pageSize?: number;
-    totalItemsCount?: number;
-    totalPagesCount?: number;
+    /** The items found by the query
+             */
+    items!: Item[];
+    /** The page number corresponding to the results that have been selected
+             */
+    pageNumber!: number;
+    /** The page size used by the search
+             */
+    pageSize!: number;
+    /** The total number of items matching the query
+             */
+    totalItemsCount!: number;
+    /** The total number of pages
+             */
+    totalPagesCount!: number;
 
     constructor(data?: ISearchResultOfItem) {
         if (data) {
@@ -835,6 +846,9 @@ export class SearchResultOfItem implements ISearchResultOfItem {
                 if (data.hasOwnProperty(property))
                     (<any>this)[property] = (<any>data)[property];
             }
+        }
+        if (!data) {
+            this.items = [];
         }
     }
 
@@ -874,12 +888,23 @@ export class SearchResultOfItem implements ISearchResultOfItem {
     }
 }
 
+/** Search result */
 export interface ISearchResultOfItem {
-    items?: Item[];
-    pageNumber?: number;
-    pageSize?: number;
-    totalItemsCount?: number;
-    totalPagesCount?: number;
+    /** The items found by the query
+             */
+    items: Item[];
+    /** The page number corresponding to the results that have been selected
+             */
+    pageNumber: number;
+    /** The page size used by the search
+             */
+    pageSize: number;
+    /** The total number of items matching the query
+             */
+    totalItemsCount: number;
+    /** The total number of pages
+             */
+    totalPagesCount: number;
 }
 
 /** Item (minimal) */
@@ -979,12 +1004,23 @@ export interface IItem extends IItemMinimal {
     weight: number;
 }
 
+/** Search result */
 export class SearchResultOfLocation implements ISearchResultOfLocation {
-    items?: Location[];
-    pageNumber?: number;
-    pageSize?: number;
-    totalItemsCount?: number;
-    totalPagesCount?: number;
+    /** The items found by the query
+             */
+    items!: Location[];
+    /** The page number corresponding to the results that have been selected
+             */
+    pageNumber!: number;
+    /** The page size used by the search
+             */
+    pageSize!: number;
+    /** The total number of items matching the query
+             */
+    totalItemsCount!: number;
+    /** The total number of pages
+             */
+    totalPagesCount!: number;
 
     constructor(data?: ISearchResultOfLocation) {
         if (data) {
@@ -992,6 +1028,9 @@ export class SearchResultOfLocation implements ISearchResultOfLocation {
                 if (data.hasOwnProperty(property))
                     (<any>this)[property] = (<any>data)[property];
             }
+        }
+        if (!data) {
+            this.items = [];
         }
     }
 
@@ -1031,12 +1070,23 @@ export class SearchResultOfLocation implements ISearchResultOfLocation {
     }
 }
 
+/** Search result */
 export interface ISearchResultOfLocation {
-    items?: Location[];
-    pageNumber?: number;
-    pageSize?: number;
-    totalItemsCount?: number;
-    totalPagesCount?: number;
+    /** The items found by the query
+             */
+    items: Location[];
+    /** The page number corresponding to the results that have been selected
+             */
+    pageNumber: number;
+    /** The page size used by the search
+             */
+    pageSize: number;
+    /** The total number of items matching the query
+             */
+    totalItemsCount: number;
+    /** The total number of pages
+             */
+    totalPagesCount: number;
 }
 
 /** Map location minimal information */
@@ -1218,12 +1268,23 @@ export interface IMapArea {
     name: string;
 }
 
+/** Search result */
 export class SearchResultOfJob implements ISearchResultOfJob {
-    items?: Job[];
-    pageNumber?: number;
-    pageSize?: number;
-    totalItemsCount?: number;
-    totalPagesCount?: number;
+    /** The items found by the query
+             */
+    items!: Job[];
+    /** The page number corresponding to the results that have been selected
+             */
+    pageNumber!: number;
+    /** The page size used by the search
+             */
+    pageSize!: number;
+    /** The total number of items matching the query
+             */
+    totalItemsCount!: number;
+    /** The total number of pages
+             */
+    totalPagesCount!: number;
 
     constructor(data?: ISearchResultOfJob) {
         if (data) {
@@ -1231,6 +1292,9 @@ export class SearchResultOfJob implements ISearchResultOfJob {
                 if (data.hasOwnProperty(property))
                     (<any>this)[property] = (<any>data)[property];
             }
+        }
+        if (!data) {
+            this.items = [];
         }
     }
 
@@ -1270,12 +1334,23 @@ export class SearchResultOfJob implements ISearchResultOfJob {
     }
 }
 
+/** Search result */
 export interface ISearchResultOfJob {
-    items?: Job[];
-    pageNumber?: number;
-    pageSize?: number;
-    totalItemsCount?: number;
-    totalPagesCount?: number;
+    /** The items found by the query
+             */
+    items: Job[];
+    /** The page number corresponding to the results that have been selected
+             */
+    pageNumber: number;
+    /** The page size used by the search
+             */
+    pageSize: number;
+    /** The total number of items matching the query
+             */
+    totalItemsCount: number;
+    /** The total number of pages
+             */
+    totalPagesCount: number;
 }
 
 /** Job (minimal) */
@@ -1394,12 +1469,23 @@ export interface IJob extends IJobMinimal {
     levelsExperience: number[];
 }
 
+/** Search result */
 export class SearchResultOfHarvestable implements ISearchResultOfHarvestable {
-    items?: Harvestable[];
-    pageNumber?: number;
-    pageSize?: number;
-    totalItemsCount?: number;
-    totalPagesCount?: number;
+    /** The items found by the query
+             */
+    items!: Harvestable[];
+    /** The page number corresponding to the results that have been selected
+             */
+    pageNumber!: number;
+    /** The page size used by the search
+             */
+    pageSize!: number;
+    /** The total number of items matching the query
+             */
+    totalItemsCount!: number;
+    /** The total number of pages
+             */
+    totalPagesCount!: number;
 
     constructor(data?: ISearchResultOfHarvestable) {
         if (data) {
@@ -1407,6 +1493,9 @@ export class SearchResultOfHarvestable implements ISearchResultOfHarvestable {
                 if (data.hasOwnProperty(property))
                     (<any>this)[property] = (<any>data)[property];
             }
+        }
+        if (!data) {
+            this.items = [];
         }
     }
 
@@ -1446,12 +1535,23 @@ export class SearchResultOfHarvestable implements ISearchResultOfHarvestable {
     }
 }
 
+/** Search result */
 export interface ISearchResultOfHarvestable {
-    items?: Harvestable[];
-    pageNumber?: number;
-    pageSize?: number;
-    totalItemsCount?: number;
-    totalPagesCount?: number;
+    /** The items found by the query
+             */
+    items: Harvestable[];
+    /** The page number corresponding to the results that have been selected
+             */
+    pageNumber: number;
+    /** The page size used by the search
+             */
+    pageSize: number;
+    /** The total number of items matching the query
+             */
+    totalItemsCount: number;
+    /** The total number of pages
+             */
+    totalPagesCount: number;
 }
 
 /** Harvestable */

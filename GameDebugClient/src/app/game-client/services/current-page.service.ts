@@ -11,6 +11,10 @@ export class CurrentPageService {
     private route: ActivatedRoute,
   ) {}
 
+  openHome() {
+    this.router.navigate(['']);
+  }
+
   openCharacter(character: TeamCharacter) {
     this.router.navigate(['characters', character.id], { relativeTo: this.route });
   }

@@ -3,10 +3,14 @@ using NSwag.Annotations;
 using RestAdventure.Core;
 using RestAdventure.Core.Characters;
 using RestAdventure.Core.Characters.Services;
+using RestAdventure.Core.History.Entities;
 using RestAdventure.Core.Players;
 using RestAdventure.Game.Apis.Common.Dtos.Characters;
+using RestAdventure.Game.Apis.Common.Dtos.History;
+using RestAdventure.Game.Apis.Common.Dtos.Queries;
 using RestAdventure.Game.Apis.GameApi.Controllers.Characters.Requests;
 using RestAdventure.Game.Authentication;
+using RestAdventure.Kernel.Queries;
 
 namespace RestAdventure.Game.Apis.GameApi.Controllers.Characters;
 
@@ -32,8 +36,8 @@ public class TeamCharactersController : GameApiController
     ///     Create character
     /// </summary>
     [HttpPost]
-    [ProducesResponseType(typeof(TeamCharacterDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType<TeamCharacterDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<TeamCharacterDto>> CreateCharacterAsync(CreateCharacterRequestDto request)
     {
         GameState state = _gameService.RequireGameState();
@@ -53,8 +57,8 @@ public class TeamCharactersController : GameApiController
     ///     Get character
     /// </summary>
     [HttpGet("{characterGuid:guid}")]
-    [ProducesResponseType(typeof(TeamCharacterDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType<TeamCharacterDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public ActionResult<TeamCharacterDto> GetCharacter(Guid characterGuid)
     {
         GameState state = _gameService.RequireGameState();
@@ -72,11 +76,35 @@ public class TeamCharactersController : GameApiController
     }
 
     /// <summary>
+    ///     Get character history
+    /// </summary>
+    [HttpGet("{characterGuid:guid}/history")]
+    [ProducesResponseType<SearchResultDto<CharacterHistoryEntryDto>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    public ActionResult<SearchResultDto<CharacterHistoryEntryDto>> SearchCharacterHistory(Guid characterGuid, [FromQuery] SearchRequestDto request)
+    {
+        GameState state = _gameService.RequireGameState();
+
+        Player player = ControllerContext.RequirePlayer(state);
+
+        CharacterId characterId = new(characterGuid);
+        Character? character = state.Entities.Get<Character>(characterId);
+        if (character == null || character.Player != player)
+        {
+            return NotFound();
+        }
+
+        IEnumerable<EntityHistoryEntry> allEntries = state.History.Character(character).OrderByDescending(he => he.Tick);
+
+        return Search.Paginate(allEntries, request.ToPaginationParameters()).ToDto(c => c.ToDto());
+    }
+
+    /// <summary>
     ///     Delete character
     /// </summary>
     [HttpDelete("{characterGuid:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> DeleteCharacterAsync(Guid characterGuid)
     {
         GameState state = _gameService.RequireGameState();

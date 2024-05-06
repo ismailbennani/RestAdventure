@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Admin API",
-    "version": "0.0.0-alpha.0.70+472c46ba7fcd043c6a914d05a46bcc4e55c84c33"
+    "version": "0.0.0-alpha.0.74+b575d5b023b14d7f035727988d3ec0933388bc7e"
   },
   "servers": [
     {
@@ -415,28 +415,41 @@
     "schemas": {
       "SearchResultOfItem": {
         "type": "object",
+        "description": "Search result\n            ",
         "additionalProperties": false,
+        "required": [
+          "items",
+          "pageNumber",
+          "pageSize",
+          "totalItemsCount",
+          "totalPagesCount"
+        ],
         "properties": {
           "items": {
             "type": "array",
+            "description": "The items found by the query\n            ",
             "items": {
               "$ref": "#/components/schemas/Item"
             }
           },
           "pageNumber": {
             "type": "integer",
+            "description": "The page number corresponding to the results that have been selected\n            ",
             "format": "int32"
           },
           "pageSize": {
             "type": "integer",
+            "description": "The page size used by the search\n            ",
             "format": "int32"
           },
           "totalItemsCount": {
             "type": "integer",
+            "description": "The total number of items matching the query\n            ",
             "format": "int32"
           },
           "totalPagesCount": {
             "type": "integer",
+            "description": "The total number of pages\n            ",
             "format": "int32"
           }
         }
@@ -492,28 +505,41 @@
       },
       "SearchResultOfLocation": {
         "type": "object",
+        "description": "Search result\n            ",
         "additionalProperties": false,
+        "required": [
+          "items",
+          "pageNumber",
+          "pageSize",
+          "totalItemsCount",
+          "totalPagesCount"
+        ],
         "properties": {
           "items": {
             "type": "array",
+            "description": "The items found by the query\n            ",
             "items": {
               "$ref": "#/components/schemas/Location"
             }
           },
           "pageNumber": {
             "type": "integer",
+            "description": "The page number corresponding to the results that have been selected\n            ",
             "format": "int32"
           },
           "pageSize": {
             "type": "integer",
+            "description": "The page size used by the search\n            ",
             "format": "int32"
           },
           "totalItemsCount": {
             "type": "integer",
+            "description": "The total number of items matching the query\n            ",
             "format": "int32"
           },
           "totalPagesCount": {
             "type": "integer",
+            "description": "The total number of pages\n            ",
             "format": "int32"
           }
         }
@@ -608,28 +634,41 @@
       },
       "SearchResultOfJob": {
         "type": "object",
+        "description": "Search result\n            ",
         "additionalProperties": false,
+        "required": [
+          "items",
+          "pageNumber",
+          "pageSize",
+          "totalItemsCount",
+          "totalPagesCount"
+        ],
         "properties": {
           "items": {
             "type": "array",
+            "description": "The items found by the query\n            ",
             "items": {
               "$ref": "#/components/schemas/Job"
             }
           },
           "pageNumber": {
             "type": "integer",
+            "description": "The page number corresponding to the results that have been selected\n            ",
             "format": "int32"
           },
           "pageSize": {
             "type": "integer",
+            "description": "The page size used by the search\n            ",
             "format": "int32"
           },
           "totalItemsCount": {
             "type": "integer",
+            "description": "The total number of items matching the query\n            ",
             "format": "int32"
           },
           "totalPagesCount": {
             "type": "integer",
+            "description": "The total number of pages\n            ",
             "format": "int32"
           }
         }
@@ -693,28 +732,41 @@
       },
       "SearchResultOfHarvestable": {
         "type": "object",
+        "description": "Search result\n            ",
         "additionalProperties": false,
+        "required": [
+          "items",
+          "pageNumber",
+          "pageSize",
+          "totalItemsCount",
+          "totalPagesCount"
+        ],
         "properties": {
           "items": {
             "type": "array",
+            "description": "The items found by the query\n            ",
             "items": {
               "$ref": "#/components/schemas/Harvestable"
             }
           },
           "pageNumber": {
             "type": "integer",
+            "description": "The page number corresponding to the results that have been selected\n            ",
             "format": "int32"
           },
           "pageSize": {
             "type": "integer",
+            "description": "The page size used by the search\n            ",
             "format": "int32"
           },
           "totalItemsCount": {
             "type": "integer",
+            "description": "The total number of items matching the query\n            ",
             "format": "int32"
           },
           "totalPagesCount": {
             "type": "integer",
+            "description": "The total number of pages\n            ",
             "format": "int32"
           }
         }

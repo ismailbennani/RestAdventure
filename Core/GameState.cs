@@ -2,6 +2,7 @@
 using RestAdventure.Core.Entities;
 using RestAdventure.Core.Gameplay.Actions;
 using RestAdventure.Core.Gameplay.Interactions;
+using RestAdventure.Core.History;
 using RestAdventure.Core.Players;
 using RestAdventure.Core.Settings;
 
@@ -13,6 +14,7 @@ public class GameState
     {
         Publisher = publisher;
         Settings = settings;
+        History = new GameHistory(this);
         Players = new GamePlayers(this);
         Entities = new GameEntities(this);
         Actions = new GameActions(this);
@@ -25,6 +27,7 @@ public class GameState
 
     public IPublisher Publisher { get; }
     public GameSettings Settings { get; }
+    public GameHistory History { get; }
     public GamePlayers Players { get; }
     public GameEntities Entities { get; }
     public GameActions Actions { get; }

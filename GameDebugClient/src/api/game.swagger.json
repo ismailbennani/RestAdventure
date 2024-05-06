@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0-alpha.0.70+472c46ba7fcd043c6a914d05a46bcc4e55c84c33"
+    "version": "0.0.0-alpha.0.74+b575d5b023b14d7f035727988d3ec0933388bc7e"
   },
   "servers": [
     {
@@ -604,6 +604,74 @@
         "responses": {
           "204": {
             "description": ""
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ]
+      }
+    },
+    "/game/team/characters/{characterGuid}/history": {
+      "get": {
+        "tags": [
+          "Team"
+        ],
+        "summary": "Get character history",
+        "operationId": "TeamCharacters_SearchCharacterHistory",
+        "parameters": [
+          {
+            "name": "characterGuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "description": "The page number\n            ",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "description": "The page size\n            ",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResultOfCharacterHistoryEntry"
+                }
+              }
+            }
           },
           "404": {
             "description": "",
@@ -1372,6 +1440,287 @@
             ]
           }
         }
+      },
+      "SearchResultOfCharacterHistoryEntry": {
+        "type": "object",
+        "description": "Search result\n            ",
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "pageNumber",
+          "pageSize",
+          "totalItemsCount",
+          "totalPagesCount"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "description": "The items found by the query\n            ",
+            "items": {
+              "$ref": "#/components/schemas/CharacterHistoryEntry"
+            }
+          },
+          "pageNumber": {
+            "type": "integer",
+            "description": "The page number corresponding to the results that have been selected\n            ",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "The page size used by the search\n            ",
+            "format": "int32"
+          },
+          "totalItemsCount": {
+            "type": "integer",
+            "description": "The total number of items matching the query\n            ",
+            "format": "int32"
+          },
+          "totalPagesCount": {
+            "type": "integer",
+            "description": "The total number of pages\n            ",
+            "format": "int32"
+          }
+        }
+      },
+      "CharacterHistoryEntry": {
+        "type": "object",
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "moved": "#/components/schemas/CharacterMoveLocationHistoryEntry",
+            "inventory-changed": "#/components/schemas/CharacterInventoryChangedHistoryEntry",
+            "interaction-started": "#/components/schemas/CharacterStartedInteractionHistoryEntry",
+            "interaction-ended": "#/components/schemas/CharacterEndedInteractionHistoryEntry"
+          }
+        },
+        "description": "Character history entry\n            ",
+        "additionalProperties": false,
+        "required": [
+          "tick",
+          "$type"
+        ],
+        "properties": {
+          "tick": {
+            "type": "integer",
+            "description": "The tick at which the event happened\n            ",
+            "format": "int64"
+          },
+          "$type": {
+            "type": "string"
+          }
+        }
+      },
+      "CharacterMoveLocationHistoryEntry": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CharacterHistoryEntry"
+          },
+          {
+            "type": "object",
+            "description": "Character moved to location history entry\n            ",
+            "additionalProperties": false,
+            "required": [
+              "oldLocationId",
+              "oldLocationPositionX",
+              "oldLocationPositionY",
+              "oldLocationAreaId",
+              "oldLocationAreaName",
+              "newLocationId",
+              "newLocationPositionX",
+              "newLocationPositionY",
+              "newLocationAreaId",
+              "newLocationAreaName"
+            ],
+            "properties": {
+              "oldLocationId": {
+                "type": "string",
+                "description": "The unique ID of the old location\n            ",
+                "format": "guid",
+                "minLength": 1
+              },
+              "oldLocationPositionX": {
+                "type": "integer",
+                "description": "The X position of the old location\n            ",
+                "format": "int32"
+              },
+              "oldLocationPositionY": {
+                "type": "integer",
+                "description": "The Y position of the old location\n            ",
+                "format": "int32"
+              },
+              "oldLocationAreaId": {
+                "type": "string",
+                "description": "The unique ID of the area of the old location\n            ",
+                "format": "guid",
+                "minLength": 1
+              },
+              "oldLocationAreaName": {
+                "type": "string",
+                "description": "The name of the area of the old location\n            ",
+                "minLength": 1
+              },
+              "newLocationId": {
+                "type": "string",
+                "description": "The unique ID of the new location\n            ",
+                "format": "guid",
+                "minLength": 1
+              },
+              "newLocationPositionX": {
+                "type": "integer",
+                "description": "The X position of the new location\n            ",
+                "format": "int32"
+              },
+              "newLocationPositionY": {
+                "type": "integer",
+                "description": "The Y position of the new location\n            ",
+                "format": "int32"
+              },
+              "newLocationAreaId": {
+                "type": "string",
+                "description": "The unique ID of the area of the new location\n            ",
+                "format": "guid",
+                "minLength": 1
+              },
+              "newLocationAreaName": {
+                "type": "string",
+                "description": "The name of the area of the new location\n            ",
+                "minLength": 1
+              }
+            }
+          }
+        ]
+      },
+      "CharacterInventoryChangedHistoryEntry": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CharacterHistoryEntry"
+          },
+          {
+            "type": "object",
+            "description": "Character inventory changed history entry\n            ",
+            "additionalProperties": false,
+            "required": [
+              "itemInstanceId",
+              "itemId",
+              "itemName",
+              "oldCount",
+              "newCount"
+            ],
+            "properties": {
+              "itemInstanceId": {
+                "type": "string",
+                "description": "The\n            ",
+                "format": "guid",
+                "minLength": 1
+              },
+              "itemId": {
+                "type": "string",
+                "description": "The\n            ",
+                "format": "guid",
+                "minLength": 1
+              },
+              "itemName": {
+                "type": "string",
+                "description": "The\n            ",
+                "minLength": 1
+              },
+              "oldCount": {
+                "type": "integer",
+                "description": "The\n            ",
+                "format": "int32"
+              },
+              "newCount": {
+                "type": "integer",
+                "description": "The\n            ",
+                "format": "int32"
+              }
+            }
+          }
+        ]
+      },
+      "CharacterStartedInteractionHistoryEntry": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CharacterHistoryEntry"
+          },
+          {
+            "type": "object",
+            "description": "Character started interaction history entry\n            ",
+            "additionalProperties": false,
+            "required": [
+              "interactionId",
+              "interactionName",
+              "subjectId",
+              "subjectName"
+            ],
+            "properties": {
+              "interactionId": {
+                "type": "string",
+                "description": "The unique ID of the interaction that has been started\n            ",
+                "format": "guid",
+                "minLength": 1
+              },
+              "interactionName": {
+                "type": "string",
+                "description": "The name of the interaction that has been started\n            ",
+                "minLength": 1
+              },
+              "subjectId": {
+                "type": "string",
+                "description": "The entity that was the subject of the interaction\n            ",
+                "format": "guid",
+                "minLength": 1
+              },
+              "subjectName": {
+                "type": "string",
+                "description": "The name of the entity that was the subject of the interaction\n            ",
+                "minLength": 1
+              }
+            }
+          }
+        ]
+      },
+      "CharacterEndedInteractionHistoryEntry": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CharacterHistoryEntry"
+          },
+          {
+            "type": "object",
+            "description": "Character ended interaction history entry\n            ",
+            "additionalProperties": false,
+            "required": [
+              "interactionId",
+              "interactionName",
+              "subjectId",
+              "subjectName"
+            ],
+            "properties": {
+              "interactionId": {
+                "type": "string",
+                "description": "The unique ID of the interaction that has been started\n            ",
+                "format": "guid",
+                "minLength": 1
+              },
+              "interactionName": {
+                "type": "string",
+                "description": "The name of the interaction that has been started\n            ",
+                "minLength": 1
+              },
+              "subjectId": {
+                "type": "string",
+                "description": "The entity that was the subject of the interaction\n            ",
+                "format": "guid",
+                "minLength": 1
+              },
+              "subjectName": {
+                "type": "string",
+                "description": "The name of the entity that was the subject of the interaction\n            ",
+                "minLength": 1
+              }
+            }
+          }
+        ]
       },
       "Team": {
         "type": "object",

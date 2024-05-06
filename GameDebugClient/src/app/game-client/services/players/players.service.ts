@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, ReplaySubject, filter, map, switchMap } from 'rxjs';
+import { BehaviorSubject, Observable, filter, map, switchMap } from 'rxjs';
 import { AdminPlayersApiClient, Player } from '../../../../api/admin-api-client.generated';
 import { GameService } from '../game.service';
 
@@ -10,10 +10,10 @@ export class PlayersService {
   static LOCAL_STORAGE_KEY = 'player';
 
   private playersInternal: Player[] = [];
-  private playersSubject: ReplaySubject<Player[]> = new ReplaySubject<Player[]>(1);
+  private playersSubject: BehaviorSubject<Player[]> = new BehaviorSubject<Player[]>([]);
 
   private selectedPlayerInternal: Player | undefined;
-  private selectedPlayerSubject: ReplaySubject<Player | undefined> = new ReplaySubject<Player | undefined>(1);
+  private selectedPlayerSubject: BehaviorSubject<Player | undefined> = new BehaviorSubject<Player | undefined>(undefined);
 
   constructor(
     gameService: GameService,

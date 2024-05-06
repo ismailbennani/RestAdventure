@@ -12,13 +12,13 @@ public class SearchRequestDto
     ///     The page number
     /// </summary>
     [Required]
-    public required int PageNumber { get; init; }
+    public required int PageNumber { get; init; } = 1;
 
     /// <summary>
     ///     The page size
     /// </summary>
     [Required]
-    public required int PageSize { get; init; }
+    public required int PageSize { get; init; } = 10;
 }
 
 static class SearchRequestMappingExtensions
