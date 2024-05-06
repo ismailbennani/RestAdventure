@@ -8,7 +8,6 @@ import { Inventory } from '../../../api/game-api-client.generated';
   standalone: true,
   imports: [CommonModule, NgbTooltipModule],
   templateUrl: './inventory.component.html',
-  styleUrl: './inventory.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InventoryComponent {

@@ -2,14 +2,12 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbDropdownModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
-import { Observable, catchError, finalize, forkJoin, map, of, switchMap, tap } from 'rxjs';
+import { Observable, finalize, forkJoin, map, of, switchMap, tap } from 'rxjs';
 import { AdminGameApiClient, LocationMinimal, Player } from '../../../api/admin-api-client.generated';
 import {
   CharacterAction,
-  CharacterClass,
   CharacterInteractWithEntityAction,
   CharacterMoveToLocationAction,
-  CreateCharacterRequest,
   EntityWithInteractions,
   GameApiClient,
   GameSettings,
@@ -24,13 +22,14 @@ import {
 import { SpinnerComponent } from '../../common/spinner/spinner.component';
 import { SELECT_PLAYER_ROUTE } from '../../routes';
 import { InventoryComponent } from '../../widgets/inventory/inventory.component';
+import { CreateCharacterPageComponent } from '../create-character/create-character-page.component';
 import { SelectedPlayerService } from '../select-player/selected-player.service';
 
 @Component({
   selector: 'app-game-client',
   standalone: true,
   templateUrl: './game-client.component.html',
-  imports: [CommonModule, NgbDropdownModule, NgbTooltipModule, SpinnerComponent, InventoryComponent],
+  imports: [CommonModule, NgbDropdownModule, NgbTooltipModule, SpinnerComponent, InventoryComponent, CreateCharacterPageComponent],
 })
 export class GameClientComponent implements OnInit {
   protected settings: GameSettings = new GameSettings();
@@ -42,25 +41,6 @@ export class GameClientComponent implements OnInit {
   protected accessibleLocations: { [characterId: string]: LocationMinimal[] } = {};
   protected entitiesWithInteractions: { [characterId: string]: EntityWithInteractions[] } = {};
   protected performingAction: { [characterId: string]: boolean } = {};
-
-  protected characterClasses: { value: CharacterClass; display: string }[] = [
-    {
-      value: CharacterClass.Knight,
-      display: 'Knight',
-    },
-    {
-      value: CharacterClass.Mage,
-      display: 'Mage',
-    },
-    {
-      value: CharacterClass.Scout,
-      display: 'Scout',
-    },
-    {
-      value: CharacterClass.Dealer,
-      display: 'Dealer',
-    },
-  ];
 
   constructor(
     selectedPlayerService: SelectedPlayerService,
@@ -109,26 +89,6 @@ export class GameClientComponent implements OnInit {
     this.adminGameApiClient
       .tickNow()
       .pipe(map(_ => this.refreshGameState()))
-      .subscribe();
-  }
-
-  createCharacter(name: string, cls: string) {
-    const index = this.characters.findIndex(c => !c);
-    if (index < 0) {
-      throw new Error('Max team size reached already');
-    }
-
-    this.characters[index] = 'loading';
-    this.teamCharactersApiClient
-      .createCharacter(new CreateCharacterRequest({ name, class: cls as CharacterClass }))
-      .pipe(
-        map(character => (this.characters[index] = character)),
-        catchError(e => {
-          console.error('Error while creating character.', e);
-          this.characters[index] = undefined;
-          return of(void 0);
-        }),
-      )
       .subscribe();
   }
 
@@ -204,6 +164,17 @@ export class GameClientComponent implements OnInit {
     }
 
     return '???';
+  }
+
+  protected addCharacter(character: TeamCharacter, index: number) {
+    this.refreshCharacters().subscribe();
+  }
+
+  protected deleteCharacter(character: TeamCharacter) {
+    this.teamCharactersApiClient
+      .deleteCharacter(character.id)
+      .pipe(switchMap(() => this.refreshCharacters()))
+      .subscribe();
   }
 
   private refreshGameState() {

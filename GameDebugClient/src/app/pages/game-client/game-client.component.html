@@ -57,7 +57,13 @@
             @if (character && character !== 'loading') {
               <div class="w-100 h-100 d-flex">
                 <div class="p-4">
-                  <h2>{{ character.name }}</h2>
+                  <div class="d-flex">
+                    <h2>{{ character.name }}</h2>
+                    <div class="flex-grow-1"></div>
+                    <button class="btn btn-outline-danger" (click)="deleteCharacter(character)">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
                   <ul>
                     <li>Class: {{ character.class }}</li>
                     <li>Location: {{ character.location.positionX }}, {{ character.location.positionY }} ({{ character.location.area.name }})</li>
@@ -137,25 +143,7 @@
             } @else if (character === 'loading') {
               <app-spinner></app-spinner>
             } @else {
-              <div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center p-4">
-                <h2>Create character</h2>
-                <form>
-                  <div class="mb-3">
-                    <label for="name">Name</label>
-                    <input #name id="name" class="form-control" />
-                  </div>
-                  <div class="mb-3">
-                    <label for="class">Class</label>
-                    <select #class id="class" class="form-select">
-                      <option selected>Choose a class</option>
-                      @for (characterClass of characterClasses; track characterClass.value) {
-                        <option [value]="characterClass.value">{{ characterClass.display }}</option>
-                      }
-                    </select>
-                  </div>
-                  <button class="btn btn-outline-dark" (click)="createCharacter(name.value, class.value)">Create</button>
-                </form>
-              </div>
+              <app-create-character (character)="addCharacter($event, $index)"></app-create-character>
             }
           </div>
           <hr class="m-0" />
