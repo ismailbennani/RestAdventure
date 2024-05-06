@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using RestAdventure.Core.Characters;
 
 namespace RestAdventure.Game.Apis.GameApi.Controllers.Characters.Requests;
 
@@ -18,5 +17,5 @@ public class CreateCharacterRequestDto
     ///     The class of the character
     /// </summary>
     [Required]
-    public required CharacterClass Class { get; init; }
+    public required Guid ClassId { get; init; }
 }

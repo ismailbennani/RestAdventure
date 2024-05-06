@@ -23,7 +23,7 @@ public class JobDto : JobMinimalDto
     ///     The experience to reach each level of the job.
     /// </summary>
     [Required]
-    public required IReadOnlyList<int> LevelsExperience { get; init; }
+    public required IReadOnlyList<int> LevelCaps { get; init; }
 }
 
 static class JobMappingExtensions
@@ -35,6 +35,6 @@ static class JobMappingExtensions
             Name = job.Name,
             Description = job.Description,
             Innate = job.Innate,
-            LevelsExperience = job.LevelsExperience
+            LevelCaps = job.LevelCaps
         };
 }

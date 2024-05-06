@@ -41,7 +41,7 @@ public class Job : GameResource<JobId>
     ///         <item>Level 4 is the max level</item>
     ///     </list>
     /// </example>
-    public IReadOnlyList<int> LevelsExperience { get; init; } = Array.Empty<int>();
+    public IReadOnlyList<int> LevelCaps { get; init; } = Array.Empty<int>();
 
     public override string ToString() => $"Job {Name} ({Id})";
 }

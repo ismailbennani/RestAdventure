@@ -86,6 +86,67 @@ export class GameContentApiClient {
     }
 
     /**
+     * Get character class
+     */
+    getCharacterClass(characterClassId: string): Observable<CharacterClass> {
+        let url_ = this.baseUrl + "/game/content/characters/classes/{characterClassId}";
+        if (characterClassId === undefined || characterClassId === null)
+            throw new Error("The parameter 'characterClassId' must be defined.");
+        url_ = url_.replace("{characterClassId}", encodeURIComponent("" + characterClassId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetCharacterClass(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetCharacterClass(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<CharacterClass>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<CharacterClass>;
+        }));
+    }
+
+    protected processGetCharacterClass(response: HttpResponseBase): Observable<CharacterClass> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = CharacterClass.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 404) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ProblemDetails.fromJS(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * Get item
      */
     getItem(itemId: string): Observable<Item> {
@@ -1041,6 +1102,178 @@ export class TeamApiClient {
     }
 }
 
+/** Character class (minimal) */
+export class CharacterClassMinimal implements ICharacterClassMinimal {
+    /** The unique ID of the character class
+             */
+    id!: string;
+    /** The name of the character class
+             */
+    name!: string;
+
+    constructor(data?: ICharacterClassMinimal) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): CharacterClassMinimal {
+        data = typeof data === 'object' ? data : {};
+        let result = new CharacterClassMinimal();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        return data;
+    }
+}
+
+/** Character class (minimal) */
+export interface ICharacterClassMinimal {
+    /** The unique ID of the character class
+             */
+    id: string;
+    /** The name of the character class
+             */
+    name: string;
+}
+
+/** Character class */
+export class CharacterClass extends CharacterClassMinimal implements ICharacterClass {
+    /** The description of the character class
+             */
+    description!: string;
+    /** The level caps of the character class
+             */
+    levelCaps!: number[];
+
+    constructor(data?: ICharacterClass) {
+        super(data);
+        if (!data) {
+            this.levelCaps = [];
+        }
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.description = _data["description"];
+            if (Array.isArray(_data["levelCaps"])) {
+                this.levelCaps = [] as any;
+                for (let item of _data["levelCaps"])
+                    this.levelCaps!.push(item);
+            }
+        }
+    }
+
+    static override fromJS(data: any): CharacterClass {
+        data = typeof data === 'object' ? data : {};
+        let result = new CharacterClass();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["description"] = this.description;
+        if (Array.isArray(this.levelCaps)) {
+            data["levelCaps"] = [];
+            for (let item of this.levelCaps)
+                data["levelCaps"].push(item);
+        }
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Character class */
+export interface ICharacterClass extends ICharacterClassMinimal {
+    /** The description of the character class
+             */
+    description: string;
+    /** The level caps of the character class
+             */
+    levelCaps: number[];
+}
+
+export class ProblemDetails implements IProblemDetails {
+    type?: string | undefined;
+    title?: string | undefined;
+    status?: number | undefined;
+    detail?: string | undefined;
+    instance?: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IProblemDetails) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.type = _data["type"];
+            this.title = _data["title"];
+            this.status = _data["status"];
+            this.detail = _data["detail"];
+            this.instance = _data["instance"];
+        }
+    }
+
+    static fromJS(data: any): ProblemDetails {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProblemDetails();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["type"] = this.type;
+        data["title"] = this.title;
+        data["status"] = this.status;
+        data["detail"] = this.detail;
+        data["instance"] = this.instance;
+        return data;
+    }
+}
+
+export interface IProblemDetails {
+    type?: string | undefined;
+    title?: string | undefined;
+    status?: number | undefined;
+    detail?: string | undefined;
+    instance?: string | undefined;
+
+    [key: string]: any;
+}
+
 /** Item (minimal) */
 export class ItemMinimal implements IItemMinimal {
     /** The unique ID of the item
@@ -1136,70 +1369,6 @@ export interface IItem extends IItemMinimal {
     /** The description of the item
              */
     description?: string | undefined;
-}
-
-export class ProblemDetails implements IProblemDetails {
-    type?: string | undefined;
-    title?: string | undefined;
-    status?: number | undefined;
-    detail?: string | undefined;
-    instance?: string | undefined;
-
-    [key: string]: any;
-
-    constructor(data?: IProblemDetails) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.type = _data["type"];
-            this.title = _data["title"];
-            this.status = _data["status"];
-            this.detail = _data["detail"];
-            this.instance = _data["instance"];
-        }
-    }
-
-    static fromJS(data: any): ProblemDetails {
-        data = typeof data === 'object' ? data : {};
-        let result = new ProblemDetails();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["type"] = this.type;
-        data["title"] = this.title;
-        data["status"] = this.status;
-        data["detail"] = this.detail;
-        data["instance"] = this.instance;
-        return data;
-    }
-}
-
-export interface IProblemDetails {
-    type?: string | undefined;
-    title?: string | undefined;
-    status?: number | undefined;
-    detail?: string | undefined;
-    instance?: string | undefined;
-
-    [key: string]: any;
 }
 
 /** Map location minimal information */
@@ -1441,12 +1610,12 @@ export class Job extends JobMinimal implements IJob {
     innate!: boolean;
     /** The experience to reach each level of the job.
              */
-    levelsExperience!: number[];
+    levelCaps!: number[];
 
     constructor(data?: IJob) {
         super(data);
         if (!data) {
-            this.levelsExperience = [];
+            this.levelCaps = [];
         }
     }
 
@@ -1455,10 +1624,10 @@ export class Job extends JobMinimal implements IJob {
         if (_data) {
             this.description = _data["description"];
             this.innate = _data["innate"];
-            if (Array.isArray(_data["levelsExperience"])) {
-                this.levelsExperience = [] as any;
-                for (let item of _data["levelsExperience"])
-                    this.levelsExperience!.push(item);
+            if (Array.isArray(_data["levelCaps"])) {
+                this.levelCaps = [] as any;
+                for (let item of _data["levelCaps"])
+                    this.levelCaps!.push(item);
             }
         }
     }
@@ -1474,10 +1643,10 @@ export class Job extends JobMinimal implements IJob {
         data = typeof data === 'object' ? data : {};
         data["description"] = this.description;
         data["innate"] = this.innate;
-        if (Array.isArray(this.levelsExperience)) {
-            data["levelsExperience"] = [];
-            for (let item of this.levelsExperience)
-                data["levelsExperience"].push(item);
+        if (Array.isArray(this.levelCaps)) {
+            data["levelCaps"] = [];
+            for (let item of this.levelCaps)
+                data["levelCaps"].push(item);
         }
         super.toJSON(data);
         return data;
@@ -1494,7 +1663,7 @@ export interface IJob extends IJobMinimal {
     innate: boolean;
     /** The experience to reach each level of the job.
              */
-    levelsExperience: number[];
+    levelCaps: number[];
 }
 
 /** Harvestable */
@@ -1862,7 +2031,10 @@ export class TeamCharacter implements ITeamCharacter {
     name!: string;
     /** The class of the character
              */
-    class!: CharacterClass;
+    class!: CharacterClassMinimal;
+    /** The progression of the character
+             */
+    progression!: ProgressionBarMinimal;
     /** The current location of the character
              */
     location!: LocationMinimal;
@@ -1890,6 +2062,8 @@ export class TeamCharacter implements ITeamCharacter {
             }
         }
         if (!data) {
+            this.class = new CharacterClassMinimal();
+            this.progression = new ProgressionBarMinimal();
             this.location = new LocationMinimal();
             this.inventory = new Inventory();
             this.jobs = [];
@@ -1900,7 +2074,8 @@ export class TeamCharacter implements ITeamCharacter {
         if (_data) {
             this.id = _data["id"];
             this.name = _data["name"];
-            this.class = _data["class"];
+            this.class = _data["class"] ? CharacterClassMinimal.fromJS(_data["class"]) : new CharacterClassMinimal();
+            this.progression = _data["progression"] ? ProgressionBarMinimal.fromJS(_data["progression"]) : new ProgressionBarMinimal();
             this.location = _data["location"] ? LocationMinimal.fromJS(_data["location"]) : new LocationMinimal();
             this.inventory = _data["inventory"] ? Inventory.fromJS(_data["inventory"]) : new Inventory();
             if (Array.isArray(_data["jobs"])) {
@@ -1925,7 +2100,8 @@ export class TeamCharacter implements ITeamCharacter {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
         data["name"] = this.name;
-        data["class"] = this.class;
+        data["class"] = this.class ? this.class.toJSON() : <any>undefined;
+        data["progression"] = this.progression ? this.progression.toJSON() : <any>undefined;
         data["location"] = this.location ? this.location.toJSON() : <any>undefined;
         data["inventory"] = this.inventory ? this.inventory.toJSON() : <any>undefined;
         if (Array.isArray(this.jobs)) {
@@ -1950,7 +2126,10 @@ export interface ITeamCharacter {
     name: string;
     /** The class of the character
              */
-    class: CharacterClass;
+    class: CharacterClassMinimal;
+    /** The progression of the character
+             */
+    progression: ProgressionBarMinimal;
     /** The current location of the character
              */
     location: LocationMinimal;
@@ -1971,11 +2150,54 @@ export interface ITeamCharacter {
     plannedAction?: CharacterAction | undefined;
 }
 
-export enum CharacterClass {
-    Knight = "knight",
-    Mage = "mage",
-    Scout = "scout",
-    Dealer = "dealer",
+/** Progression bar (minimal) */
+export class ProgressionBarMinimal implements IProgressionBarMinimal {
+    /** The level of progression
+             */
+    level!: number;
+    /** The experience acquired
+             */
+    experience!: number;
+
+    constructor(data?: IProgressionBarMinimal) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.level = _data["level"];
+            this.experience = _data["experience"];
+        }
+    }
+
+    static fromJS(data: any): ProgressionBarMinimal {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProgressionBarMinimal();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["level"] = this.level;
+        data["experience"] = this.experience;
+        return data;
+    }
+}
+
+/** Progression bar (minimal) */
+export interface IProgressionBarMinimal {
+    /** The level of progression
+             */
+    level: number;
+    /** The experience acquired
+             */
+    experience: number;
 }
 
 /** Inventory */
@@ -2150,12 +2372,9 @@ export class JobInstance implements IJobInstance {
     /** The job that is instantiated
              */
     job!: JobMinimal;
-    /** The level of the job
+    /** The progression of the job
              */
-    level!: number;
-    /** The experience of the job
-             */
-    experience!: number;
+    progression!: ProgressionBarMinimal;
 
     constructor(data?: IJobInstance) {
         if (data) {
@@ -2166,14 +2385,14 @@ export class JobInstance implements IJobInstance {
         }
         if (!data) {
             this.job = new JobMinimal();
+            this.progression = new ProgressionBarMinimal();
         }
     }
 
     init(_data?: any) {
         if (_data) {
             this.job = _data["job"] ? JobMinimal.fromJS(_data["job"]) : new JobMinimal();
-            this.level = _data["level"];
-            this.experience = _data["experience"];
+            this.progression = _data["progression"] ? ProgressionBarMinimal.fromJS(_data["progression"]) : new ProgressionBarMinimal();
         }
     }
 
@@ -2187,8 +2406,7 @@ export class JobInstance implements IJobInstance {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["job"] = this.job ? this.job.toJSON() : <any>undefined;
-        data["level"] = this.level;
-        data["experience"] = this.experience;
+        data["progression"] = this.progression ? this.progression.toJSON() : <any>undefined;
         return data;
     }
 }
@@ -2198,12 +2416,9 @@ export interface IJobInstance {
     /** The job that is instantiated
              */
     job: JobMinimal;
-    /** The level of the job
+    /** The progression of the job
              */
-    level: number;
-    /** The experience of the job
-             */
-    experience: number;
+    progression: ProgressionBarMinimal;
 }
 
 /** The result of an action performed by a character */
@@ -2485,7 +2700,7 @@ export class CreateCharacterRequest implements ICreateCharacterRequest {
     name!: string;
     /** The class of the character
              */
-    class!: CharacterClass;
+    classId!: string;
 
     constructor(data?: ICreateCharacterRequest) {
         if (data) {
@@ -2499,7 +2714,7 @@ export class CreateCharacterRequest implements ICreateCharacterRequest {
     init(_data?: any) {
         if (_data) {
             this.name = _data["name"];
-            this.class = _data["class"];
+            this.classId = _data["classId"];
         }
     }
 
@@ -2513,7 +2728,7 @@ export class CreateCharacterRequest implements ICreateCharacterRequest {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["name"] = this.name;
-        data["class"] = this.class;
+        data["classId"] = this.classId;
         return data;
     }
 }
@@ -2525,7 +2740,7 @@ export interface ICreateCharacterRequest {
     name: string;
     /** The class of the character
              */
-    class: CharacterClass;
+    classId: string;
 }
 
 /** Search result */

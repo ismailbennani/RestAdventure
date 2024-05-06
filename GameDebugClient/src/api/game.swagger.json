@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0-alpha.0.82+cb400518f455568a7edea80764e43e18bff7ffb6"
+    "version": "0.0.0-alpha.0.83+629bc97dc9f6a0c80c177b5b046ff3ebb207daca"
   },
   "servers": [
     {
@@ -21,6 +21,54 @@
         "responses": {
           "200": {
             "description": ""
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ]
+      }
+    },
+    "/game/content/characters/classes/{characterClassId}": {
+      "get": {
+        "tags": [
+          "Game"
+        ],
+        "summary": "Get character class",
+        "operationId": "GameContent_GetCharacterClass",
+        "parameters": [
+          {
+            "name": "characterClassId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CharacterClass"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -720,6 +768,88 @@
   },
   "components": {
     "schemas": {
+      "CharacterClass": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CharacterClassMinimal"
+          },
+          {
+            "type": "object",
+            "description": "Character class\n            ",
+            "additionalProperties": false,
+            "required": [
+              "description",
+              "levelCaps"
+            ],
+            "properties": {
+              "description": {
+                "type": "string",
+                "description": "The description of the character class\n            ",
+                "minLength": 1
+              },
+              "levelCaps": {
+                "type": "array",
+                "description": "The level caps of the character class\n            ",
+                "items": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "CharacterClassMinimal": {
+        "type": "object",
+        "description": "Character class (minimal)\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the character class\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the character class\n            ",
+            "minLength": 1
+          }
+        }
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "additionalProperties": {
+          "nullable": true
+        },
+        "properties": {
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
       "Item": {
         "allOf": [
           {
@@ -764,35 +894,6 @@
             "type": "integer",
             "description": "The weight of the item\n            ",
             "format": "int32"
-          }
-        }
-      },
-      "ProblemDetails": {
-        "type": "object",
-        "additionalProperties": {
-          "nullable": true
-        },
-        "properties": {
-          "type": {
-            "type": "string",
-            "nullable": true
-          },
-          "title": {
-            "type": "string",
-            "nullable": true
-          },
-          "status": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "detail": {
-            "type": "string",
-            "nullable": true
-          },
-          "instance": {
-            "type": "string",
-            "nullable": true
           }
         }
       },
@@ -895,7 +996,7 @@
             "additionalProperties": false,
             "required": [
               "innate",
-              "levelsExperience"
+              "levelCaps"
             ],
             "properties": {
               "description": {
@@ -907,7 +1008,7 @@
                 "type": "boolean",
                 "description": "Is the job innate?\n            "
               },
-              "levelsExperience": {
+              "levelCaps": {
                 "type": "array",
                 "description": "The experience to reach each level of the job.\n            ",
                 "items": {
@@ -1112,6 +1213,7 @@
           "id",
           "name",
           "class",
+          "progression",
           "location",
           "inventory",
           "jobs"
@@ -1132,7 +1234,15 @@
             "description": "The class of the character\n            ",
             "oneOf": [
               {
-                "$ref": "#/components/schemas/CharacterClass"
+                "$ref": "#/components/schemas/CharacterClassMinimal"
+              }
+            ]
+          },
+          "progression": {
+            "description": "The progression of the character\n            ",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ProgressionBarMinimal"
               }
             ]
           },
@@ -1188,21 +1298,26 @@
           }
         }
       },
-      "CharacterClass": {
-        "type": "string",
-        "description": "",
-        "x-enumNames": [
-          "Knight",
-          "Mage",
-          "Scout",
-          "Dealer"
+      "ProgressionBarMinimal": {
+        "type": "object",
+        "description": "Progression bar (minimal)\n            ",
+        "additionalProperties": false,
+        "required": [
+          "level",
+          "experience"
         ],
-        "enum": [
-          "knight",
-          "mage",
-          "scout",
-          "dealer"
-        ]
+        "properties": {
+          "level": {
+            "type": "integer",
+            "description": "The level of progression\n            ",
+            "format": "int32"
+          },
+          "experience": {
+            "type": "integer",
+            "description": "The experience acquired\n            ",
+            "format": "int32"
+          }
+        }
       },
       "Inventory": {
         "type": "object",
@@ -1282,8 +1397,7 @@
         "additionalProperties": false,
         "required": [
           "job",
-          "level",
-          "experience"
+          "progression"
         ],
         "properties": {
           "job": {
@@ -1294,15 +1408,13 @@
               }
             ]
           },
-          "level": {
-            "type": "integer",
-            "description": "The level of the job\n            ",
-            "format": "int32"
-          },
-          "experience": {
-            "type": "integer",
-            "description": "The experience of the job\n            ",
-            "format": "int32"
+          "progression": {
+            "description": "The progression of the job\n            ",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ProgressionBarMinimal"
+              }
+            ]
           }
         }
       },
@@ -1459,7 +1571,7 @@
         "additionalProperties": false,
         "required": [
           "name",
-          "class"
+          "classId"
         ],
         "properties": {
           "name": {
@@ -1467,13 +1579,11 @@
             "description": "The name of the character\n            ",
             "minLength": 1
           },
-          "class": {
+          "classId": {
+            "type": "string",
             "description": "The class of the character\n            ",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/CharacterClass"
-              }
-            ]
+            "format": "guid",
+            "minLength": 1
           }
         }
       },

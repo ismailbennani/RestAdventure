@@ -14,5 +14,9 @@ public class CharacterJobCondition : ICharacterCondition
     public Job Job { get; }
     public int MinLevel { get; }
 
-    public bool Evaluate(Character character) => character.Jobs.Get(Job)?.Level >= MinLevel;
+    public bool Evaluate(Character character)
+    {
+        JobInstance tempQualifier = character.Jobs.Get(Job);
+        return (tempQualifier != null ? tempQualifier.Progression.Level : null) >= MinLevel;
+    }
 }

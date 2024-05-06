@@ -7,6 +7,7 @@ using RestAdventure.Game.Apis.Common.Dtos.Interactions;
 using RestAdventure.Game.Apis.Common.Dtos.Items;
 using RestAdventure.Game.Apis.Common.Dtos.Jobs;
 using RestAdventure.Game.Apis.Common.Dtos.Maps;
+using RestAdventure.Game.Apis.Common.Dtos.Utils;
 
 namespace RestAdventure.Game.Apis.Common.Dtos.Characters;
 
@@ -31,7 +32,13 @@ public class TeamCharacterDto
     ///     The class of the character
     /// </summary>
     [Required]
-    public required CharacterClass Class { get; init; }
+    public required CharacterClassMinimalDto Class { get; init; }
+
+    /// <summary>
+    ///     The progression of the character
+    /// </summary>
+    [Required]
+    public required ProgressionBarMinimalDto Progression { get; init; }
 
     /// <summary>
     ///     The current location of the character
@@ -74,7 +81,8 @@ static class TeamCharacterMappingExtensions
         {
             Id = character.Id.Guid,
             Name = character.Name,
-            Class = character.Class,
+            Class = character.Class.ToMinimalDto(),
+            Progression = character.Progression.ToMinimalDto(),
             Location = character.Location.ToMinimalDto(),
             Inventory = character.Inventory.ToDto(),
             Jobs = character.Jobs.All.Select(j => j.ToDto()).ToArray(),

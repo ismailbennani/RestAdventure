@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using RestAdventure.Core;
-using RestAdventure.Core.Items;
-using RestAdventure.Core.Jobs;
-using RestAdventure.Core.Maps.Harvestables;
-using RestAdventure.Core.Maps.Locations;
+using RestAdventure.Game.Apis.Common.Dtos.Characters;
 using RestAdventure.Game.Apis.Common.Dtos.Harvestables;
 using RestAdventure.Game.Apis.Common.Dtos.Items;
 using RestAdventure.Game.Apis.Common.Dtos.Jobs;
@@ -31,47 +28,46 @@ public class AdminGameContentController : AdminApiController
     }
 
     /// <summary>
+    ///     Search character classes
+    /// </summary>
+    [HttpGet("characters/classes")]
+    public SearchResultDto<CharacterClassDto> SearchCharacterClasses([FromQuery] SearchRequestDto request) =>
+        SearchResources(request, content => content.Characters.Classes.All, (_, i) => i.ToDto());
+
+    /// <summary>
     ///     Search items
     /// </summary>
     [HttpGet("items")]
-    public SearchResultDto<ItemDto> SearchItems([FromQuery] SearchRequestDto request)
-    {
-        GameContent content = _gameService.RequireGameContent();
-        IEnumerable<Item> items = content.Items.All;
-        return Search.Paginate(items, request.ToPaginationParameters()).ToDto(i => i.ToDto());
-    }
+    public SearchResultDto<ItemDto> SearchItems([FromQuery] SearchRequestDto request) => SearchResources(request, content => content.Items.All, (_, i) => i.ToDto());
 
     /// <summary>
     ///     Search locations
     /// </summary>
     [HttpGet("locations")]
-    public SearchResultDto<LocationDto> SearchLocations([FromQuery] SearchRequestDto request)
-    {
-        GameContent content = _gameService.RequireGameContent();
-        GameState state = _gameService.RequireGameState();
-        IEnumerable<Location> locations = content.Maps.Locations.All;
-        return Search.Paginate(locations, request.ToPaginationParameters()).ToDto(i => i.ToDiscoveredLocationDto(content));
-    }
+    public SearchResultDto<LocationDto> SearchLocations([FromQuery] SearchRequestDto request) =>
+        SearchResources(request, content => content.Maps.Locations.All, (content, l) => l.ToDiscoveredLocationDto(content));
 
     /// <summary>
     ///     Search jobs
     /// </summary>
     [HttpGet("jobs")]
-    public SearchResultDto<JobDto> SearchJobs([FromQuery] SearchRequestDto request)
-    {
-        GameContent content = _gameService.RequireGameContent();
-        IEnumerable<Job> jobs = content.Jobs.All;
-        return Search.Paginate(jobs, request.ToPaginationParameters()).ToDto(i => i.ToDto());
-    }
+    public SearchResultDto<JobDto> SearchJobs([FromQuery] SearchRequestDto request) => SearchResources(request, content => content.Jobs.All, (_, j) => j.ToDto());
 
     /// <summary>
     ///     Search harvestables
     /// </summary>
     [HttpGet("harvestables")]
-    public SearchResultDto<HarvestableDto> SearchHarvestables([FromQuery] SearchRequestDto request)
+    public SearchResultDto<HarvestableDto> SearchHarvestables([FromQuery] SearchRequestDto request) =>
+        SearchResources(request, content => content.Harvestables.All, (_, h) => h.ToDto());
+
+    SearchResultDto<TDto> SearchResources<TResource, TDto>(
+        [FromQuery] SearchRequestDto request,
+        Func<GameContent, IEnumerable<TResource>> getResources,
+        Func<GameContent, TResource, TDto> selector
+    )
     {
         GameContent content = _gameService.RequireGameContent();
-        IEnumerable<Harvestable> harvestables = content.Harvestables.All;
-        return Search.Paginate(harvestables, request.ToPaginationParameters()).ToDto(i => i.ToDto());
+        IEnumerable<TResource> harvestables = getResources(content);
+        return Search.Paginate(harvestables, request.ToPaginationParameters()).ToDto(r => selector(content, r));
     }
 }

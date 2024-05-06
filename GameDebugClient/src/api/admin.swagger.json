@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Admin API",
-    "version": "0.0.0-alpha.0.82+cb400518f455568a7edea80764e43e18bff7ffb6"
+    "version": "0.0.0-alpha.0.83+629bc97dc9f6a0c80c177b5b046ff3ebb207daca"
   },
   "servers": [
     {
@@ -21,6 +21,49 @@
         "responses": {
           "200": {
             "description": ""
+          }
+        }
+      }
+    },
+    "/admin/game/content/characters/classes": {
+      "get": {
+        "tags": [
+          "Game"
+        ],
+        "summary": "Search character classes",
+        "operationId": "AdminGameContent_SearchCharacterClasses",
+        "parameters": [
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "description": "The page number\n            ",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "description": "The page size\n            ",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResultOfCharacterClass"
+                }
+              }
+            }
           }
         }
       }
@@ -413,6 +456,100 @@
   },
   "components": {
     "schemas": {
+      "SearchResultOfCharacterClass": {
+        "type": "object",
+        "description": "Search result\n            ",
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "pageNumber",
+          "pageSize",
+          "totalItemsCount",
+          "totalPagesCount"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "description": "The items found by the query\n            ",
+            "items": {
+              "$ref": "#/components/schemas/CharacterClass"
+            }
+          },
+          "pageNumber": {
+            "type": "integer",
+            "description": "The page number corresponding to the results that have been selected\n            ",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "The page size used by the search\n            ",
+            "format": "int32"
+          },
+          "totalItemsCount": {
+            "type": "integer",
+            "description": "The total number of items matching the query\n            ",
+            "format": "int32"
+          },
+          "totalPagesCount": {
+            "type": "integer",
+            "description": "The total number of pages\n            ",
+            "format": "int32"
+          }
+        }
+      },
+      "CharacterClass": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CharacterClassMinimal"
+          },
+          {
+            "type": "object",
+            "description": "Character class\n            ",
+            "additionalProperties": false,
+            "required": [
+              "description",
+              "levelCaps"
+            ],
+            "properties": {
+              "description": {
+                "type": "string",
+                "description": "The description of the character class\n            ",
+                "minLength": 1
+              },
+              "levelCaps": {
+                "type": "array",
+                "description": "The level caps of the character class\n            ",
+                "items": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "CharacterClassMinimal": {
+        "type": "object",
+        "description": "Character class (minimal)\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the character class\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the character class\n            ",
+            "minLength": 1
+          }
+        }
+      },
       "SearchResultOfItem": {
         "type": "object",
         "description": "Search result\n            ",
@@ -682,7 +819,7 @@
             "additionalProperties": false,
             "required": [
               "innate",
-              "levelsExperience"
+              "levelCaps"
             ],
             "properties": {
               "description": {
@@ -694,7 +831,7 @@
                 "type": "boolean",
                 "description": "Is the job innate?\n            "
               },
-              "levelsExperience": {
+              "levelCaps": {
                 "type": "array",
                 "description": "The experience to reach each level of the job.\n            ",
                 "items": {

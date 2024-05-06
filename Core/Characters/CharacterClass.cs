@@ -1,9 +1,16 @@
-﻿namespace RestAdventure.Core.Characters;
+﻿using RestAdventure.Core.Resources;
 
-public enum CharacterClass
+namespace RestAdventure.Core.Characters;
+
+public record CharacterClassId(Guid Guid) : ResourceId(Guid);
+
+public class CharacterClass : GameResource<CharacterClassId>
 {
-    Knight,
-    Mage,
-    Scout,
-    Dealer
+    public CharacterClass() : base(new CharacterClassId(Guid.NewGuid()))
+    {
+    }
+
+    public required string Name { get; init; }
+    public string? Description { get; init; }
+    public required IReadOnlyList<int> LevelCaps { get; init; }
 }

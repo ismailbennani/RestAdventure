@@ -4,7 +4,7 @@ public class EntityJobs
 {
     readonly Dictionary<JobId, JobInstance> _jobs = new();
 
-    public IEnumerable<JobInstance> All => _jobs.Values.Where(j => j.Level > 0);
+    public IEnumerable<JobInstance> All => _jobs.Values.Where(j => j.Progression.Level > 0);
     public event EventHandler<Job>? JobLearned;
     public event EventHandler<EntityJobGainedExperienceEvent>? JobGainedExperience;
     public event EventHandler<EntityJobLeveledUpEvent>? JobLeveledUp;
@@ -16,7 +16,7 @@ public class EntityJobs
 
         JobLearned?.Invoke(this, job);
 
-        jobInstance.GainedExperience += (_, args) => JobGainedExperience?.Invoke(
+        jobInstance.Progression.Progressed += (_, args) => JobGainedExperience?.Invoke(
             this,
             new EntityJobGainedExperienceEvent
             {
@@ -26,7 +26,7 @@ public class EntityJobs
             }
         );
 
-        jobInstance.LeveledUp += (_, args) => JobLeveledUp?.Invoke(
+        jobInstance.Progression.LeveledUp += (_, args) => JobLeveledUp?.Invoke(
             this,
             new EntityJobLeveledUpEvent
             {
@@ -63,7 +63,7 @@ public static class EntityJobsExtensions
         foreach (JobExperienceStack stack in stacks)
         {
             JobInstance? instance = jobs.Get(stack.Job);
-            instance?.GainExperience(stack.Amount);
+            instance?.Progression.Progress(stack.Amount);
         }
     }
 }

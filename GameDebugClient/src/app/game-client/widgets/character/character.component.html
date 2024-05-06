@@ -2,11 +2,14 @@
   <div class="col">
     <div class="hstack">
       <h2>
-        <span class="text-uppercase">{{ character.class }}</span> {{ character.name }}
+        <span class="text-uppercase">{{ character.class.name }}</span>
+        {{ character.name }}
+        lv.{{ character.progression.level }}
       </h2>
       <div class="flex-grow-1"></div>
     </div>
     <ul>
+      <li>Experience: {{ character.progression.experience }}</li>
       <li>Location: {{ character.location.positionX }}, {{ character.location.positionY }} ({{ character.location.area.name }})</li>
       <li>
         Planned action:

@@ -86,6 +86,67 @@ export class AdminGameContentApiClient {
     }
 
     /**
+     * Search character classes
+     * @param pageNumber (optional) The page number
+     * @param pageSize (optional) The page size
+     */
+    searchCharacterClasses(pageNumber?: number | undefined, pageSize?: number | undefined): Observable<SearchResultOfCharacterClass> {
+        let url_ = this.baseUrl + "/admin/game/content/characters/classes?";
+        if (pageNumber === null)
+            throw new Error("The parameter 'pageNumber' cannot be null.");
+        else if (pageNumber !== undefined)
+            url_ += "PageNumber=" + encodeURIComponent("" + pageNumber) + "&";
+        if (pageSize === null)
+            throw new Error("The parameter 'pageSize' cannot be null.");
+        else if (pageSize !== undefined)
+            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSearchCharacterClasses(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSearchCharacterClasses(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<SearchResultOfCharacterClass>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<SearchResultOfCharacterClass>;
+        }));
+    }
+
+    protected processSearchCharacterClasses(response: HttpResponseBase): Observable<SearchResultOfCharacterClass> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = SearchResultOfCharacterClass.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * Search items
      * @param pageNumber (optional) The page number
      * @param pageSize (optional) The page size
@@ -823,6 +884,199 @@ export class AdminPlayersApiClient {
 }
 
 /** Search result */
+export class SearchResultOfCharacterClass implements ISearchResultOfCharacterClass {
+    /** The items found by the query
+             */
+    items!: CharacterClass[];
+    /** The page number corresponding to the results that have been selected
+             */
+    pageNumber!: number;
+    /** The page size used by the search
+             */
+    pageSize!: number;
+    /** The total number of items matching the query
+             */
+    totalItemsCount!: number;
+    /** The total number of pages
+             */
+    totalPagesCount!: number;
+
+    constructor(data?: ISearchResultOfCharacterClass) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.items = [];
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(CharacterClass.fromJS(item));
+            }
+            this.pageNumber = _data["pageNumber"];
+            this.pageSize = _data["pageSize"];
+            this.totalItemsCount = _data["totalItemsCount"];
+            this.totalPagesCount = _data["totalPagesCount"];
+        }
+    }
+
+    static fromJS(data: any): SearchResultOfCharacterClass {
+        data = typeof data === 'object' ? data : {};
+        let result = new SearchResultOfCharacterClass();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        data["pageNumber"] = this.pageNumber;
+        data["pageSize"] = this.pageSize;
+        data["totalItemsCount"] = this.totalItemsCount;
+        data["totalPagesCount"] = this.totalPagesCount;
+        return data;
+    }
+}
+
+/** Search result */
+export interface ISearchResultOfCharacterClass {
+    /** The items found by the query
+             */
+    items: CharacterClass[];
+    /** The page number corresponding to the results that have been selected
+             */
+    pageNumber: number;
+    /** The page size used by the search
+             */
+    pageSize: number;
+    /** The total number of items matching the query
+             */
+    totalItemsCount: number;
+    /** The total number of pages
+             */
+    totalPagesCount: number;
+}
+
+/** Character class (minimal) */
+export class CharacterClassMinimal implements ICharacterClassMinimal {
+    /** The unique ID of the character class
+             */
+    id!: string;
+    /** The name of the character class
+             */
+    name!: string;
+
+    constructor(data?: ICharacterClassMinimal) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): CharacterClassMinimal {
+        data = typeof data === 'object' ? data : {};
+        let result = new CharacterClassMinimal();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        return data;
+    }
+}
+
+/** Character class (minimal) */
+export interface ICharacterClassMinimal {
+    /** The unique ID of the character class
+             */
+    id: string;
+    /** The name of the character class
+             */
+    name: string;
+}
+
+/** Character class */
+export class CharacterClass extends CharacterClassMinimal implements ICharacterClass {
+    /** The description of the character class
+             */
+    description!: string;
+    /** The level caps of the character class
+             */
+    levelCaps!: number[];
+
+    constructor(data?: ICharacterClass) {
+        super(data);
+        if (!data) {
+            this.levelCaps = [];
+        }
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.description = _data["description"];
+            if (Array.isArray(_data["levelCaps"])) {
+                this.levelCaps = [] as any;
+                for (let item of _data["levelCaps"])
+                    this.levelCaps!.push(item);
+            }
+        }
+    }
+
+    static override fromJS(data: any): CharacterClass {
+        data = typeof data === 'object' ? data : {};
+        let result = new CharacterClass();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["description"] = this.description;
+        if (Array.isArray(this.levelCaps)) {
+            data["levelCaps"] = [];
+            for (let item of this.levelCaps)
+                data["levelCaps"].push(item);
+        }
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Character class */
+export interface ICharacterClass extends ICharacterClassMinimal {
+    /** The description of the character class
+             */
+    description: string;
+    /** The level caps of the character class
+             */
+    levelCaps: number[];
+}
+
+/** Search result */
 export class SearchResultOfItem implements ISearchResultOfItem {
     /** The items found by the query
              */
@@ -1413,12 +1667,12 @@ export class Job extends JobMinimal implements IJob {
     innate!: boolean;
     /** The experience to reach each level of the job.
              */
-    levelsExperience!: number[];
+    levelCaps!: number[];
 
     constructor(data?: IJob) {
         super(data);
         if (!data) {
-            this.levelsExperience = [];
+            this.levelCaps = [];
         }
     }
 
@@ -1427,10 +1681,10 @@ export class Job extends JobMinimal implements IJob {
         if (_data) {
             this.description = _data["description"];
             this.innate = _data["innate"];
-            if (Array.isArray(_data["levelsExperience"])) {
-                this.levelsExperience = [] as any;
-                for (let item of _data["levelsExperience"])
-                    this.levelsExperience!.push(item);
+            if (Array.isArray(_data["levelCaps"])) {
+                this.levelCaps = [] as any;
+                for (let item of _data["levelCaps"])
+                    this.levelCaps!.push(item);
             }
         }
     }
@@ -1446,10 +1700,10 @@ export class Job extends JobMinimal implements IJob {
         data = typeof data === 'object' ? data : {};
         data["description"] = this.description;
         data["innate"] = this.innate;
-        if (Array.isArray(this.levelsExperience)) {
-            data["levelsExperience"] = [];
-            for (let item of this.levelsExperience)
-                data["levelsExperience"].push(item);
+        if (Array.isArray(this.levelCaps)) {
+            data["levelCaps"] = [];
+            for (let item of this.levelCaps)
+                data["levelCaps"].push(item);
         }
         super.toJSON(data);
         return data;
@@ -1466,7 +1720,7 @@ export interface IJob extends IJobMinimal {
     innate: boolean;
     /** The experience to reach each level of the job.
              */
-    levelsExperience: number[];
+    levelCaps: number[];
 }
 
 /** Search result */

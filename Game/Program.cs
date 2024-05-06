@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 using NSwag;
 using NSwag.Generation.Processors.Security;
 using RestAdventure.Core;
+using RestAdventure.Core.Characters;
 using RestAdventure.Core.Conditions.Characters;
 using RestAdventure.Core.Items;
 using RestAdventure.Core.Jobs;
@@ -150,6 +151,44 @@ async Task<GameState> LoadGameAsync(WebApplication app)
 {
     GameContent content = new();
 
+    CharacterClass knight = new()
+    {
+        Name = "Knight",
+        Description = "The Knight, the one who carries the weight of the world on their shoulders, or at least all the blows from enemies. "
+                      + "Sturdy as a fortress, tough as nails, and about as subtle as a charging rhino.",
+        LevelCaps = [2, 5, 10]
+    };
+    content.Characters.Classes.Register(knight);
+
+    CharacterClass mage = new()
+    {
+        Name = "Mage",
+        Description = "Behold, the Mage! Their power rivals that of the gods themselves, yet one swift breeze could knock them over. "
+                      + "Fragile as a butterfly's wing, but with a mind as sharp as a wizard's hat.",
+        LevelCaps = [2, 5, 10]
+    };
+    content.Characters.Classes.Register(mage);
+
+    CharacterClass scout = new()
+    {
+        Name = "Scout",
+        Description = "Presenting the Scout, the embodiment of speed and stealth, with a touch of sass thrown in for good measure. "
+                      + "Quick as lightning and sneaky as a pickpocket in a crowded market, they dance through danger with all the grace of a cat on a hot tin roof. "
+                      + "Sure, they might not bench-press boulders, but who needs muscles when you can outsmart your foes before they even know you're there? Fragile? Maybe. "
+                      + "But they'll have you eating their dust faster than you can say 'gotcha'.",
+        LevelCaps = [2, 5, 10]
+    };
+    content.Characters.Classes.Register(scout);
+
+    CharacterClass dealer = new()
+    {
+        Name = "Dealer",
+        Description = "Ah, the Dealer, not one for brawls but they'll haggle the pants off a troll. Their weapon of choice? The art of the deal. "
+                      + "While others swing swords, they wield contracts and coin purses with finesse. Just don't expect them to throw down in a fistfight unless it's over prices.",
+        LevelCaps = [2, 5, 10]
+    };
+    content.Characters.Classes.Register(dealer);
+
     MapArea area = new() { Name = "Start" };
     content.Maps.Areas.Register(area);
 
@@ -165,7 +204,7 @@ async Task<GameState> LoadGameAsync(WebApplication app)
     Item pear = new() { Name = "Pear", Description = "A very delicious pear.", Weight = 1 };
     content.Items.Register(pear);
 
-    Job gatherer = new() { Name = "Gatherer", Description = "Gather stuff", Innate = true, LevelsExperience = [2, 5, 10] };
+    Job gatherer = new() { Name = "Gatherer", Description = "Gather stuff", Innate = true, LevelCaps = [2, 5, 10] };
     content.Jobs.Register(gatherer);
 
     Harvestable appleTree = new()

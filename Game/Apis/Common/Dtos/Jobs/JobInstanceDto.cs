@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using RestAdventure.Core.Jobs;
+using RestAdventure.Game.Apis.Common.Dtos.Utils;
 
 namespace RestAdventure.Game.Apis.Common.Dtos.Jobs;
 
@@ -15,16 +16,10 @@ public class JobInstanceDto
     public required JobMinimalDto Job { get; init; }
 
     /// <summary>
-    ///     The level of the job
+    ///     The progression of the job
     /// </summary>
     [Required]
-    public required int Level { get; init; }
-
-    /// <summary>
-    ///     The experience of the job
-    /// </summary>
-    [Required]
-    public required int Experience { get; init; }
+    public required ProgressionBarMinimalDto Progression { get; init; }
 }
 
 static class JobInstanceMappingExtensions
@@ -33,7 +28,6 @@ static class JobInstanceMappingExtensions
         new()
         {
             Job = jobInstance.Job.ToDto(),
-            Level = jobInstance.Level,
-            Experience = jobInstance.Experience
+            Progression = jobInstance.Progression.ToMinimalDto()
         };
 }

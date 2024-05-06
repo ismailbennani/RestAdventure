@@ -3,6 +3,7 @@ using RestAdventure.Core.Items;
 using RestAdventure.Core.Jobs;
 using RestAdventure.Core.Maps.Locations;
 using RestAdventure.Core.Players;
+using RestAdventure.Core.Utils;
 
 namespace RestAdventure.Core.Characters;
 
@@ -14,6 +15,7 @@ public class Character : GameEntity<CharacterId>, IGameEntityWithInventory, IGam
     {
         Player = player;
         Class = characterClass;
+        Progression = new ProgressionBar(characterClass.LevelCaps);
         Inventory = new Inventory();
         Jobs = new EntityJobs();
     }
@@ -24,6 +26,11 @@ public class Character : GameEntity<CharacterId>, IGameEntityWithInventory, IGam
     ///     The class of the character
     /// </summary>
     public CharacterClass Class { get; private set; }
+
+    /// <summary>
+    ///     The progression of the character
+    /// </summary>
+    public ProgressionBar Progression { get; private set; }
 
     /// <summary>
     ///     The inventory of the character

@@ -24,10 +24,11 @@ public class CharacterMinimalDto
     ///     The class of the character
     /// </summary>
     [Required]
-    public required CharacterClass Class { get; init; }
+    public required CharacterClassMinimalDto Class { get; init; }
 }
 
 static class CharacterMappingExtensions
 {
-    public static CharacterMinimalDto ToMinimalCharacterDto(this Character character) => new() { Id = character.Id.Guid, Name = character.Name, Class = character.Class };
+    public static CharacterMinimalDto ToMinimalCharacterDto(this Character character) =>
+        new() { Id = character.Id.Guid, Name = character.Name, Class = character.Class.ToMinimalDto() };
 }
