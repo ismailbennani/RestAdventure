@@ -153,40 +153,40 @@ export class GameClientComponent implements OnInit {
       .subscribe();
   }
 
-  characterWillMoveToLocation(character: TeamCharacter, location: ILocationMinimal) {
-    if (!character.nextAction) {
+  characterPlansToMoveToLocation(character: TeamCharacter, location: ILocationMinimal) {
+    if (!character.plannedAction) {
       return false;
     }
 
-    if (!(character.nextAction instanceof CharacterMoveToLocationAction)) {
+    if (!(character.plannedAction instanceof CharacterMoveToLocationAction)) {
       return false;
     }
 
-    return character.nextAction.location.id == location.id;
+    return character.plannedAction.location.id == location.id;
   }
 
-  characterWillInteractWith(character: TeamCharacter, entity: EntityWithInteractions) {
-    if (!character.nextAction) {
+  characterPlansToInteractWithEntity(character: TeamCharacter, entity: EntityWithInteractions) {
+    if (!character.plannedAction) {
       return false;
     }
 
-    if (!(character.nextAction instanceof CharacterInteractWithEntityAction)) {
+    if (!(character.plannedAction instanceof CharacterInteractWithEntityAction)) {
       return false;
     }
 
-    return character.nextAction.entity.id == entity.id;
+    return character.plannedAction.entity.id == entity.id;
   }
 
-  characterWillPerformInteraction(character: TeamCharacter, entity: EntityWithInteractions, interaction: InteractionMinimal) {
-    if (!character.nextAction) {
+  characterPlansToPerformInteraction(character: TeamCharacter, entity: EntityWithInteractions, interaction: InteractionMinimal) {
+    if (!character.plannedAction) {
       return false;
     }
 
-    if (!(character.nextAction instanceof CharacterInteractWithEntityAction)) {
+    if (!(character.plannedAction instanceof CharacterInteractWithEntityAction)) {
       return false;
     }
 
-    return character.nextAction.entity.id == entity.id && character.nextAction.interaction.id == interaction.id;
+    return character.plannedAction.entity.id == entity.id && character.plannedAction.interaction.id == interaction.id;
   }
 
   changePlayer() {
@@ -195,7 +195,11 @@ export class GameClientComponent implements OnInit {
 
   protected actionToString(action: CharacterAction) {
     if (action instanceof CharacterMoveToLocationAction) {
-      return `move to ${action.location.id}`;
+      return `move to ${action.location.positionX}, ${action.location.positionY} (${action.location.area})`;
+    }
+
+    if (action instanceof CharacterInteractWithEntityAction) {
+      return `interact with ${action.entity.name}: ${action.interaction.name}`;
     }
 
     return '???';

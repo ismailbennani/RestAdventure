@@ -1703,9 +1703,12 @@ export class TeamCharacter implements ITeamCharacter {
     /** The result of the action that has been performed on last tick
              */
     lastActionResult?: CharacterActionResult | undefined;
+    /** The interaction being performed by the character
+             */
+    currentInteraction?: InteractionInstance | undefined;
     /** The action that the character has planned for the next tick
              */
-    nextAction?: CharacterAction | undefined;
+    plannedAction?: CharacterAction | undefined;
 
     constructor(data?: ITeamCharacter) {
         if (data) {
@@ -1728,7 +1731,8 @@ export class TeamCharacter implements ITeamCharacter {
             this.location = _data["location"] ? LocationMinimal.fromJS(_data["location"]) : new LocationMinimal();
             this.inventory = _data["inventory"] ? Inventory.fromJS(_data["inventory"]) : new Inventory();
             this.lastActionResult = _data["lastActionResult"] ? CharacterActionResult.fromJS(_data["lastActionResult"]) : <any>undefined;
-            this.nextAction = _data["nextAction"] ? CharacterAction.fromJS(_data["nextAction"]) : <any>undefined;
+            this.currentInteraction = _data["currentInteraction"] ? InteractionInstance.fromJS(_data["currentInteraction"]) : <any>undefined;
+            this.plannedAction = _data["plannedAction"] ? CharacterAction.fromJS(_data["plannedAction"]) : <any>undefined;
         }
     }
 
@@ -1747,7 +1751,8 @@ export class TeamCharacter implements ITeamCharacter {
         data["location"] = this.location ? this.location.toJSON() : <any>undefined;
         data["inventory"] = this.inventory ? this.inventory.toJSON() : <any>undefined;
         data["lastActionResult"] = this.lastActionResult ? this.lastActionResult.toJSON() : <any>undefined;
-        data["nextAction"] = this.nextAction ? this.nextAction.toJSON() : <any>undefined;
+        data["currentInteraction"] = this.currentInteraction ? this.currentInteraction.toJSON() : <any>undefined;
+        data["plannedAction"] = this.plannedAction ? this.plannedAction.toJSON() : <any>undefined;
         return data;
     }
 }
@@ -1772,9 +1777,12 @@ export interface ITeamCharacter {
     /** The result of the action that has been performed on last tick
              */
     lastActionResult?: CharacterActionResult | undefined;
+    /** The interaction being performed by the character
+             */
+    currentInteraction?: InteractionInstance | undefined;
     /** The action that the character has planned for the next tick
              */
-    nextAction?: CharacterAction | undefined;
+    plannedAction?: CharacterAction | undefined;
 }
 
 export enum CharacterClass {
@@ -2156,6 +2164,68 @@ export interface ICharacterInteractWithEntityAction extends ICharacterAction {
     /** The subject of the interaction
              */
     entity: EntityMinimal;
+}
+
+/** Interaction instance */
+export class InteractionInstance implements IInteractionInstance {
+    /** The unique ID of the instance
+             */
+    id!: string;
+    /** The interaction associated with the instance
+             */
+    interaction!: InteractionMinimal;
+    /** The subject of the interaction
+             */
+    subject!: EntityMinimal;
+
+    constructor(data?: IInteractionInstance) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.interaction = new InteractionMinimal();
+            this.subject = new EntityMinimal();
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.interaction = _data["interaction"] ? InteractionMinimal.fromJS(_data["interaction"]) : new InteractionMinimal();
+            this.subject = _data["subject"] ? EntityMinimal.fromJS(_data["subject"]) : new EntityMinimal();
+        }
+    }
+
+    static fromJS(data: any): InteractionInstance {
+        data = typeof data === 'object' ? data : {};
+        let result = new InteractionInstance();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["interaction"] = this.interaction ? this.interaction.toJSON() : <any>undefined;
+        data["subject"] = this.subject ? this.subject.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+/** Interaction instance */
+export interface IInteractionInstance {
+    /** The unique ID of the instance
+             */
+    id: string;
+    /** The interaction associated with the instance
+             */
+    interaction: InteractionMinimal;
+    /** The subject of the interaction
+             */
+    subject: EntityMinimal;
 }
 
 /** Character creation options */

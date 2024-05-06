@@ -1,7 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using RestAdventure.Core.Characters;
 using RestAdventure.Core.Gameplay.Actions;
+using RestAdventure.Core.Gameplay.Interactions;
 using RestAdventure.Game.Apis.Common.Dtos.Characters.Actions;
+using RestAdventure.Game.Apis.Common.Dtos.Interactions;
 using RestAdventure.Game.Apis.Common.Dtos.Items;
 using RestAdventure.Game.Apis.Common.Dtos.Maps;
 
@@ -48,9 +50,14 @@ public class TeamCharacterDto
     public CharacterActionResultDto? LastActionResult { get; init; }
 
     /// <summary>
+    ///     The interaction being performed by the character
+    /// </summary>
+    public InteractionInstanceDto? CurrentInteraction { get; init; }
+
+    /// <summary>
     ///     The action that the character has planned for the next tick
     /// </summary>
-    public CharacterActionDto? NextAction { get; init; }
+    public CharacterActionDto? PlannedAction { get; init; }
 }
 
 static class TeamCharacterMappingExtensions
@@ -64,12 +71,14 @@ static class TeamCharacterMappingExtensions
             Location = character.Location.ToMinimalDto(),
             Inventory = character.Inventory.ToDto(),
             LastActionResult = options?.LastActionResult?.ToDto(),
-            NextAction = options?.NextAction?.ToDto()
+            CurrentInteraction = options?.InteractionInstance?.ToDto(),
+            PlannedAction = options?.NextAction?.ToDto()
         };
 }
 
 class CharacterMappingOptions
 {
     public CharacterActionResult? LastActionResult { get; init; }
+    public InteractionInstance? InteractionInstance { get; init; }
     public CharacterAction? NextAction { get; init; }
 }

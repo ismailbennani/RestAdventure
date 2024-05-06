@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0-alpha.0.61+852a3600d5c5975f01b3b0319a5cb6edb21fa00e"
+    "version": "0.0.0-alpha.0.62+e07e1ada9bf4ca442429defe77cc4feb73d8c5ff"
   },
   "servers": [
     {
@@ -1029,7 +1029,16 @@
               }
             ]
           },
-          "nextAction": {
+          "currentInteraction": {
+            "description": "The interaction being performed by the character\n            ",
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/InteractionInstance"
+              }
+            ]
+          },
+          "plannedAction": {
             "description": "The action that the character has planned for the next tick\n            ",
             "nullable": true,
             "oneOf": [
@@ -1238,6 +1247,40 @@
             }
           }
         ]
+      },
+      "InteractionInstance": {
+        "type": "object",
+        "description": "Interaction instance\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "interaction",
+          "subject"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the instance\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "interaction": {
+            "description": "The interaction associated with the instance\n            ",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/InteractionMinimal"
+              }
+            ]
+          },
+          "subject": {
+            "description": "The subject of the interaction\n            ",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/EntityMinimal"
+              }
+            ]
+          }
+        }
       },
       "CreateCharacterRequest": {
         "type": "object",
