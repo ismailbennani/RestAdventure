@@ -49,7 +49,10 @@ public class JobInstance
         if (Job.LevelsExperience.Any())
         {
             int oldLevel = Level;
-            Level = Job.LevelsExperience.Last(levelExperience => Experience > levelExperience) + 2;
+            Level = Job.LevelsExperience.Select((exp, index) => new { Index = index, Experience = exp })
+                        .LastOrDefault(x => Experience >= x.Experience, new { Index = -1, Experience = 0 })
+                        .Index
+                    + 2;
 
             if (Level > oldLevel)
             {

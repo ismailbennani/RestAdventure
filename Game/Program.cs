@@ -162,11 +162,17 @@ async Task<GameState> LoadGameAsync(WebApplication app)
     Item apple = new() { Name = "Apple", Description = "A delicious apple.", Weight = 1 };
     content.Items.Register(apple);
 
-    Job gatherer = new() { Name = "Gatherer", Description = "Gather stuff", Innate = true };
+    Job gatherer = new() { Name = "Gatherer", Description = "Gather stuff", Innate = true, LevelsExperience = [2, 5, 10] };
     content.Jobs.Register(gatherer);
 
     Harvestable harvestable = new()
-        { Name = "Apple Tree", Description = "A tree that has apples.", HarvestCondition = new CharacterJobCondition(gatherer), Items = [new ItemStack(apple, 1)] };
+    {
+        Name = "Apple Tree",
+        Description = "A tree that has apples.",
+        HarvestCondition = new CharacterJobCondition(gatherer),
+        Items = [new ItemStack(apple, 1)],
+        Experience = [new JobExperienceStack(gatherer, 1)]
+    };
     content.Harvestables.Register(harvestable);
 
 

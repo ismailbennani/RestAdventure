@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0-alpha.0.79+8b40953660dec6418a152a1982adbad32856e2c3"
+    "version": "0.0.0-alpha.0.80+edab9443cb8ed7e5c53ff1436f40adc5ffce3f7d"
   },
   "servers": [
     {
@@ -1113,7 +1113,8 @@
           "name",
           "class",
           "location",
-          "inventory"
+          "inventory",
+          "jobs"
         ],
         "properties": {
           "id": {
@@ -1150,6 +1151,13 @@
                 "$ref": "#/components/schemas/Inventory"
               }
             ]
+          },
+          "jobs": {
+            "type": "array",
+            "description": "The jobs of the character\n            ",
+            "items": {
+              "$ref": "#/components/schemas/JobInstance"
+            }
           },
           "lastActionResult": {
             "description": "The result of the action that has been performed on last tick\n            ",
@@ -1265,6 +1273,36 @@
                 "$ref": "#/components/schemas/ItemMinimal"
               }
             ]
+          }
+        }
+      },
+      "JobInstance": {
+        "type": "object",
+        "description": "Job instance\n            ",
+        "additionalProperties": false,
+        "required": [
+          "job",
+          "level",
+          "experience"
+        ],
+        "properties": {
+          "job": {
+            "description": "The job that is instantiated\n            ",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/JobMinimal"
+              }
+            ]
+          },
+          "level": {
+            "type": "integer",
+            "description": "The level of the job\n            ",
+            "format": "int32"
+          },
+          "experience": {
+            "type": "integer",
+            "description": "The experience of the job\n            ",
+            "format": "int32"
           }
         }
       },

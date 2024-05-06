@@ -1869,6 +1869,9 @@ export class TeamCharacter implements ITeamCharacter {
     /** The inventory of the character
              */
     inventory!: Inventory;
+    /** The jobs of the character
+             */
+    jobs!: JobInstance[];
     /** The result of the action that has been performed on last tick
              */
     lastActionResult?: CharacterActionResult | undefined;
@@ -1889,6 +1892,7 @@ export class TeamCharacter implements ITeamCharacter {
         if (!data) {
             this.location = new LocationMinimal();
             this.inventory = new Inventory();
+            this.jobs = [];
         }
     }
 
@@ -1899,6 +1903,11 @@ export class TeamCharacter implements ITeamCharacter {
             this.class = _data["class"];
             this.location = _data["location"] ? LocationMinimal.fromJS(_data["location"]) : new LocationMinimal();
             this.inventory = _data["inventory"] ? Inventory.fromJS(_data["inventory"]) : new Inventory();
+            if (Array.isArray(_data["jobs"])) {
+                this.jobs = [] as any;
+                for (let item of _data["jobs"])
+                    this.jobs!.push(JobInstance.fromJS(item));
+            }
             this.lastActionResult = _data["lastActionResult"] ? CharacterActionResult.fromJS(_data["lastActionResult"]) : <any>undefined;
             this.currentInteraction = _data["currentInteraction"] ? InteractionInstance.fromJS(_data["currentInteraction"]) : <any>undefined;
             this.plannedAction = _data["plannedAction"] ? CharacterAction.fromJS(_data["plannedAction"]) : <any>undefined;
@@ -1919,6 +1928,11 @@ export class TeamCharacter implements ITeamCharacter {
         data["class"] = this.class;
         data["location"] = this.location ? this.location.toJSON() : <any>undefined;
         data["inventory"] = this.inventory ? this.inventory.toJSON() : <any>undefined;
+        if (Array.isArray(this.jobs)) {
+            data["jobs"] = [];
+            for (let item of this.jobs)
+                data["jobs"].push(item.toJSON());
+        }
         data["lastActionResult"] = this.lastActionResult ? this.lastActionResult.toJSON() : <any>undefined;
         data["currentInteraction"] = this.currentInteraction ? this.currentInteraction.toJSON() : <any>undefined;
         data["plannedAction"] = this.plannedAction ? this.plannedAction.toJSON() : <any>undefined;
@@ -1943,6 +1957,9 @@ export interface ITeamCharacter {
     /** The inventory of the character
              */
     inventory: Inventory;
+    /** The jobs of the character
+             */
+    jobs: JobInstance[];
     /** The result of the action that has been performed on last tick
              */
     lastActionResult?: CharacterActionResult | undefined;
@@ -2126,6 +2143,67 @@ export interface IItemInstance {
     /** The unique ID of the item corresponding to this instance
              */
     item: ItemMinimal;
+}
+
+/** Job instance */
+export class JobInstance implements IJobInstance {
+    /** The job that is instantiated
+             */
+    job!: JobMinimal;
+    /** The level of the job
+             */
+    level!: number;
+    /** The experience of the job
+             */
+    experience!: number;
+
+    constructor(data?: IJobInstance) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.job = new JobMinimal();
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.job = _data["job"] ? JobMinimal.fromJS(_data["job"]) : new JobMinimal();
+            this.level = _data["level"];
+            this.experience = _data["experience"];
+        }
+    }
+
+    static fromJS(data: any): JobInstance {
+        data = typeof data === 'object' ? data : {};
+        let result = new JobInstance();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["job"] = this.job ? this.job.toJSON() : <any>undefined;
+        data["level"] = this.level;
+        data["experience"] = this.experience;
+        return data;
+    }
+}
+
+/** Job instance */
+export interface IJobInstance {
+    /** The job that is instantiated
+             */
+    job: JobMinimal;
+    /** The level of the job
+             */
+    level: number;
+    /** The experience of the job
+             */
+    experience: number;
 }
 
 /** The result of an action performed by a character */

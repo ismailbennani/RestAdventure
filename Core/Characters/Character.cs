@@ -36,40 +36,4 @@ public class Character : GameEntity<CharacterId>, IGameEntityWithInventory, IGam
     public EntityJobs Jobs { get; private set; }
 
     public override string ToString() => $"{Class} {Name} ({Player})";
-
-    public bool Equals(Character? other)
-    {
-        if (ReferenceEquals(null, other))
-        {
-            return false;
-        }
-        if (ReferenceEquals(this, other))
-        {
-            return true;
-        }
-        return Id.Equals(other.Id);
-    }
-
-    public override bool Equals(object? obj)
-    {
-        if (ReferenceEquals(null, obj))
-        {
-            return false;
-        }
-        if (ReferenceEquals(this, obj))
-        {
-            return true;
-        }
-        if (obj.GetType() != GetType())
-        {
-            return false;
-        }
-        return Equals((Character)obj);
-    }
-
-    public override int GetHashCode() => Id.GetHashCode();
-
-    public static bool operator ==(Character? left, Character? right) => Equals(left, right);
-
-    public static bool operator !=(Character? left, Character? right) => !Equals(left, right);
 }

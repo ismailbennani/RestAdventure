@@ -1,39 +1,51 @@
-<div class="d-flex">
-  <h2>
-    <span class="text-uppercase">{{ character.class }}</span> {{ character.name }}
-  </h2>
-  <div class="flex-grow-1"></div>
-</div>
-<ul>
-  <li>Location: {{ character.location.positionX }}, {{ character.location.positionY }} ({{ character.location.area.name }})</li>
-  <li>
-    Planned action:
-    @if (character.plannedAction) {
-      {{ actionToString(character.plannedAction) }}
-    } @else {
-      none
-    }
-  </li>
-  <li>
-    Last action result:
-    @if (character.lastActionResult) {
-      {{ actionToString(character.lastActionResult.action) }}
-      @if (character.lastActionResult.success) {
-        (success)
-      } @else {
-        <div class="text-danger">failed: {{ character.lastActionResult.failureReason }}</div>
+<div class="row">
+  <div class="col">
+    <div class="hstack">
+      <h2>
+        <span class="text-uppercase">{{ character.class }}</span> {{ character.name }}
+      </h2>
+      <div class="flex-grow-1"></div>
+    </div>
+    <ul>
+      <li>Location: {{ character.location.positionX }}, {{ character.location.positionY }} ({{ character.location.area.name }})</li>
+      <li>
+        Planned action:
+        @if (character.plannedAction) {
+          {{ actionToString(character.plannedAction) }}
+        } @else {
+          none
+        }
+      </li>
+      <li>
+        Last action result:
+        @if (character.lastActionResult) {
+          {{ actionToString(character.lastActionResult.action) }}
+          @if (character.lastActionResult.success) {
+            (success)
+          } @else {
+            <div class="text-danger">failed: {{ character.lastActionResult.failureReason }}</div>
+          }
+        } @else {
+          none
+        }
+      </li>
+      <li>
+        Current interaction:
+        @if (character.currentInteraction) {
+          {{ character.currentInteraction.interaction.name }}, {{ character.currentInteraction.subject.name }}
+        } @else {
+          none
+        }
+      </li>
+      <li>Weight: {{ character.inventory.weight }}</li>
+    </ul>
+  </div>
+  <div class="col">
+    <h6>Jobs</h6>
+    <ul>
+      @for (jobInstance of character.jobs; track jobInstance.job.id) {
+        <li>{{ jobInstance.job.name | titlecase }}: lv. {{ jobInstance.level }} ({{ jobInstance.experience }} exp)</li>
       }
-    } @else {
-      none
-    }
-  </li>
-  <li>
-    Current interaction:
-    @if (character.currentInteraction) {
-      {{ character.currentInteraction.interaction.name }}, {{ character.currentInteraction.subject.name }}
-    } @else {
-      none
-    }
-  </li>
-  <li>Weight: {{ character.inventory.weight }}</li>
-</ul>
+    </ul>
+  </div>
+</div>

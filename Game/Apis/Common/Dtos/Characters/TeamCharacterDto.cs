@@ -5,6 +5,7 @@ using RestAdventure.Core.Gameplay.Interactions;
 using RestAdventure.Game.Apis.Common.Dtos.Characters.Actions;
 using RestAdventure.Game.Apis.Common.Dtos.Interactions;
 using RestAdventure.Game.Apis.Common.Dtos.Items;
+using RestAdventure.Game.Apis.Common.Dtos.Jobs;
 using RestAdventure.Game.Apis.Common.Dtos.Maps;
 
 namespace RestAdventure.Game.Apis.Common.Dtos.Characters;
@@ -45,6 +46,12 @@ public class TeamCharacterDto
     public required InventoryDto Inventory { get; init; }
 
     /// <summary>
+    ///     The jobs of the character
+    /// </summary>
+    [Required]
+    public required IReadOnlyCollection<JobInstanceDto> Jobs { get; init; }
+
+    /// <summary>
     ///     The result of the action that has been performed on last tick
     /// </summary>
     public CharacterActionResultDto? LastActionResult { get; init; }
@@ -70,6 +77,7 @@ static class TeamCharacterMappingExtensions
             Class = character.Class,
             Location = character.Location.ToMinimalDto(),
             Inventory = character.Inventory.ToDto(),
+            Jobs = character.Jobs.All.Select(j => j.ToDto()).ToArray(),
             LastActionResult = options?.LastActionResult?.ToDto(),
             CurrentInteraction = options?.InteractionInstance?.ToDto(),
             PlannedAction = options?.NextAction?.ToDto()

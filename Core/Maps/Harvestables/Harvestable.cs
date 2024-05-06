@@ -1,5 +1,6 @@
 ﻿using RestAdventure.Core.Conditions.Characters;
 using RestAdventure.Core.Items;
+using RestAdventure.Core.Jobs;
 using RestAdventure.Core.Resources;
 
 namespace RestAdventure.Core.Maps.Harvestables;
@@ -34,6 +35,11 @@ public class Harvestable : GameResource<HarvestableId>
     ///     The items that should be given to the character when they are done harvesting
     /// </summary>
     public required IReadOnlyCollection<ItemStack> Items { get; init; }
+
+    /// <summary>
+    ///     The experience that should be given to the player when they are done harvesting
+    /// </summary>
+    public required IReadOnlyCollection<JobExperienceStack> Experience { get; init; }
 
     public override string ToString() => $"Harvestable {Name} ({Id})";
 }
