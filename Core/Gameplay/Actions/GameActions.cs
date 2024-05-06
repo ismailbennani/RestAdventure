@@ -1,4 +1,6 @@
-﻿using RestAdventure.Core.Characters;
+﻿using Microsoft.Extensions.Logging;
+using RestAdventure.Core.Characters;
+using RestAdventure.Core.Gameplay.Actions.Notifications;
 using RestAdventure.Core.Gameplay.Interactions;
 using RestAdventure.Core.Maps.Locations;
 
@@ -9,12 +11,14 @@ namespace RestAdventure.Core.Gameplay.Actions;
 /// </summary>
 public class GameActions
 {
+    readonly ILogger<GameActions> _logger;
     readonly Dictionary<CharacterId, CharacterAction> _actions = new();
     readonly Dictionary<CharacterId, CharacterActionResult> _results = new();
 
-    public GameActions(GameState gameState)
+    public GameActions(GameState gameState, ILogger<GameActions> logger)
     {
         GameState = gameState;
+        _logger = logger;
     }
 
     internal GameState GameState { get; }
@@ -25,7 +29,7 @@ public class GameActions
     public void MoveToLocation(Character character, Location location)
     {
         AssertCharacterCanPerformAction(character);
-        _actions[character.Id] = new CharacterMoveToLocationAction(character, location);
+        _actions[character.Id] = new CharacterMoveToLocationAction(location);
     }
 
     /// <summary>
@@ -34,7 +38,7 @@ public class GameActions
     public void Interact(Character character, Interaction interaction, IGameEntityWithInteractions entity)
     {
         AssertCharacterCanPerformAction(character);
-        _actions[character.Id] = new CharacterInteractWithEntityAction(character, interaction, entity);
+        _actions[character.Id] = new CharacterInteractWithEntityAction(interaction, entity);
     }
 
     public void Cancel(Character character) => _actions.Remove(character.Id);
@@ -43,21 +47,30 @@ public class GameActions
 
     public CharacterAction? GetNextAction(Character character) => _actions.GetValueOrDefault(character.Id);
 
-    public void ResolveActions(GameContent content, GameState state)
+    public async Task ResolveActionsAsync(GameContent content, GameState state)
     {
         _results.Clear();
 
         foreach ((CharacterId characterId, CharacterAction action) in _actions)
         {
-            CharacterActionResolution resolution = action.Perform(content, state);
-            _results[characterId] = new CharacterActionResult
+            Character? character = state.Entities.Get<Character>(characterId);
+            if (character == null)
+            {
+                _logger.LogWarning("Cannot find character {id}", characterId);
+                continue;
+            }
+
+            CharacterActionResolution resolution = action.Perform(content, state, character);
+            CharacterActionResult result = new()
             {
                 Tick = state.Tick,
-                CharacterId = characterId,
                 Action = action,
                 Success = resolution.Success,
                 FailureReason = resolution.ErrorMessage
             };
+            _results[characterId] = result;
+
+            await GameState.Publisher.Publish(new ActionPerformed { Character = character, Result = result });
         }
 
         _actions.Clear();

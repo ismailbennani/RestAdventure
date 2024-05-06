@@ -162,10 +162,13 @@ async Task<GameState> LoadGameAsync(WebApplication app)
     Item apple = new() { Name = "Apple", Description = "A delicious apple.", Weight = 1 };
     content.Items.Register(apple);
 
+    Item pear = new() { Name = "Pear", Description = "A very delicious pear.", Weight = 1 };
+    content.Items.Register(pear);
+
     Job gatherer = new() { Name = "Gatherer", Description = "Gather stuff", Innate = true, LevelsExperience = [2, 5, 10] };
     content.Jobs.Register(gatherer);
 
-    Harvestable harvestable = new()
+    Harvestable appleTree = new()
     {
         Name = "Apple Tree",
         Description = "A tree that has apples.",
@@ -174,14 +177,27 @@ async Task<GameState> LoadGameAsync(WebApplication app)
         Items = [new ItemStack(apple, 1)],
         Experience = [new JobExperienceStack(gatherer, 1)]
     };
-    content.Harvestables.Register(harvestable);
+    content.Harvestables.Register(appleTree);
 
+    Harvestable pearTree = new()
+    {
+        Name = "Pear Tree",
+        Description = "A tree that has pears.",
+        HarvestCondition = new CharacterJobCondition(gatherer, 2),
+        HarvestDuration = 10,
+        Items = [new ItemStack(pear, 1)],
+        Experience = [new JobExperienceStack(gatherer, 5)]
+    };
+    content.Harvestables.Register(pearTree);
 
     GameService gameService = app.Services.GetRequiredService<GameService>();
     GameState state = gameService.NewGame(content, new GameSettings());
 
-    HarvestableInstance harvestableInstance = new(harvestable, location1);
-    await state.Entities.RegisterAsync(harvestableInstance);
+    HarvestableInstance appleTreeInstance = new(appleTree, location1);
+    await state.Entities.RegisterAsync(appleTreeInstance);
+
+    HarvestableInstance pearTreeInstance = new(pearTree, location1);
+    await state.Entities.RegisterAsync(pearTreeInstance);
 
     return state;
 }

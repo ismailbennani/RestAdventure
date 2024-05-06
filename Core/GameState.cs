@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.Extensions.Logging;
 using RestAdventure.Core.Entities;
 using RestAdventure.Core.Gameplay.Actions;
 using RestAdventure.Core.Gameplay.Interactions;
@@ -10,14 +11,14 @@ namespace RestAdventure.Core;
 
 public class GameState
 {
-    public GameState(IPublisher publisher, GameSettings settings)
+    public GameState(GameSettings settings, IPublisher publisher, ILoggerFactory loggerFactory)
     {
         Publisher = publisher;
         Settings = settings;
         History = new GameHistory(this);
         Players = new GamePlayers(this);
         Entities = new GameEntities(this);
-        Actions = new GameActions(this);
+        Actions = new GameActions(this, loggerFactory.CreateLogger<GameActions>());
         Interactions = new GameInteractions(this);
     }
 

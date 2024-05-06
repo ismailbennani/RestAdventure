@@ -5,10 +5,10 @@ namespace RestAdventure.Core.History.Characters;
 
 public abstract class CharacterHistoryEntry : EntityHistoryEntry
 {
-    protected CharacterHistoryEntry(Character entity, long tick) : base(entity, tick)
+    protected CharacterHistoryEntry(Character character, long tick) : base(character, tick)
     {
-        CharacterId = entity.Id;
-        CharacterName = entity.Name;
+        CharacterId = character.Id;
+        CharacterName = character.Name;
     }
 
     public CharacterId CharacterId { get; }

@@ -18,4 +18,6 @@ public abstract class Interaction
 
     public abstract bool CanInteract(Character character, IGameEntityWithInteractions entity);
     public abstract InteractionInstance Instantiate(Character character, IGameEntityWithInteractions entity);
+
+    public override string ToString() => Name;
 }

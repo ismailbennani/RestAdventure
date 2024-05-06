@@ -11,11 +11,13 @@ import {
   CharacterJobLeveledUpHistoryEntry,
   CharacterLearnedJobHistoryEntry,
   CharacterMoveLocationHistoryEntry,
+  CharacterPerformedActionHistoryEntry,
   CharacterStartedInteractionHistoryEntry,
   TeamCharacter,
   TeamCharactersApiClient,
 } from '../../../../api/game-api-client.generated';
 import { GameService } from '../../services/game.service';
+import { CharacterActionUtils } from '../../utils/character-action-utils';
 
 @Component({
   selector: 'app-character-history',
@@ -98,6 +100,14 @@ export class CharacterHistoryComponent implements OnInit {
         return `Picked ${entry.newCount - entry.oldCount}x ${entry.itemName}`;
       } else {
         return `Dropped ${entry.oldCount - entry.newCount}x ${entry.itemName}`;
+      }
+    }
+
+    if (entry instanceof CharacterPerformedActionHistoryEntry) {
+      if (entry.success) {
+        return `Performed action successfully: ${CharacterActionUtils.toString(entry.action)}`;
+      } else {
+        return `Failed to perform action: ${CharacterActionUtils.toString(entry.action)}. Reason: ${entry.failureReason}`;
       }
     }
 

@@ -5,7 +5,7 @@ namespace RestAdventure.Core.Gameplay.Actions;
 
 public class CharacterInteractWithEntityAction : CharacterAction
 {
-    public CharacterInteractWithEntityAction(Character character, Interaction interaction, IGameEntityWithInteractions entity) : base(character)
+    public CharacterInteractWithEntityAction(Interaction interaction, IGameEntityWithInteractions entity)
     {
         Interaction = interaction;
         Entity = entity;
@@ -14,9 +14,9 @@ public class CharacterInteractWithEntityAction : CharacterAction
     public Interaction Interaction { get; }
     public IGameEntityWithInteractions Entity { get; }
 
-    public override CharacterActionResolution Perform(GameContent content, GameState state)
+    public override CharacterActionResolution Perform(GameContent content, GameState state, Character character)
     {
-        if (!state.Interactions.TryStartInteraction(Character, Interaction, Entity, out string? whyNot))
+        if (!state.Interactions.TryStartInteraction(character, Interaction, Entity, out string? whyNot))
         {
             return new CharacterActionResolution { Success = false, ErrorMessage = whyNot };
         }

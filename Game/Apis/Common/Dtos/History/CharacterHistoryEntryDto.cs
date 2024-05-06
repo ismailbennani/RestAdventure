@@ -13,6 +13,7 @@ namespace RestAdventure.Game.Apis.Common.Dtos.History;
 [JsonDerivedType(typeof(CharacterDeletedHistoryEntryDto), "deleted")]
 [JsonDerivedType(typeof(CharacterMovedToLocationHistoryEntryDto), "moved")]
 [JsonDerivedType(typeof(CharacterInventoryChangedHistoryEntryDto), "inventory-changed")]
+[JsonDerivedType(typeof(CharacterPerformedActionHistoryEntryDto), "action-performed")]
 [JsonDerivedType(typeof(CharacterStartedInteractionHistoryEntryDto), "interaction-started")]
 [JsonDerivedType(typeof(CharacterEndedInteractionHistoryEntryDto), "interaction-ended")]
 [JsonDerivedType(typeof(CharacterLearnedJobHistoryEntryDto), "job-learned")]
@@ -34,8 +35,9 @@ static class CharacterHistoryEntryMappingExtensions
         {
             EntityCreatedHistoryEntry entityCreatedHistoryEntry => entityCreatedHistoryEntry.ToDto(),
             EntityDeletedHistoryEntry entityDeletedHistoryEntry => entityDeletedHistoryEntry.ToDto(),
-            CharacterEndedInteractionHistoryEntry characterEndedInteractionHistoryEntry => characterEndedInteractionHistoryEntry.ToDto(),
+            CharacterPerformedActionHistoryEntry characterPerformedActionHistoryEntry => characterPerformedActionHistoryEntry.ToDto(),
             CharacterStartedInteractionHistoryEntry characterStartedInteractionHistoryEntry => characterStartedInteractionHistoryEntry.ToDto(),
+            CharacterEndedInteractionHistoryEntry characterEndedInteractionHistoryEntry => characterEndedInteractionHistoryEntry.ToDto(),
             EntityInventoryChangedHistoryEntry entityInventoryChangedHistoryEntry => entityInventoryChangedHistoryEntry.ToDto(),
             EntityMovedToLocationHistoryEntry entityMovedToLocationHistoryEntry => entityMovedToLocationHistoryEntry.ToDto(),
             EntityLearnedJobHistoryEntry entityLearnedJobHistoryEntry => entityLearnedJobHistoryEntry.ToDto(),

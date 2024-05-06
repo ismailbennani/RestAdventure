@@ -9,21 +9,23 @@ namespace RestAdventure.Core;
 public class GameService
 {
     readonly IPublisher _publisher;
+    readonly ILoggerFactory _loggerFactory;
     readonly ILogger<GameService> _logger;
 
     GameContent? _gameContent;
     GameState? _gameState;
 
-    public GameService(IPublisher publisher, ILogger<GameService> logger)
+    public GameService(IPublisher publisher, ILoggerFactory loggerFactory)
     {
         _publisher = publisher;
-        _logger = logger;
+        _loggerFactory = loggerFactory;
+        _logger = loggerFactory.CreateLogger<GameService>();
     }
 
     public GameState NewGame(GameContent content, GameSettings settings)
     {
         _gameContent = content;
-        _gameState = new GameState(_publisher, settings);
+        _gameState = new GameState(settings, _publisher, _loggerFactory);
 
         _logger.LogInformation("Game state has been initialized with settings: {settingsJson}.", JsonSerializer.Serialize(settings));
 
@@ -59,7 +61,7 @@ public class GameService
 
         state.Tick++;
 
-        state.Actions.ResolveActions(content, state);
+        await state.Actions.ResolveActionsAsync(content, state);
         await state.Interactions.ResolveInteractionsAsync(content, state);
 
         await _publisher.Publish(new GameTick { GameState = state });

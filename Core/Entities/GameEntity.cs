@@ -42,6 +42,8 @@ public abstract class GameEntity : IEquatable<GameEntity>, IGameEntity
         Moved?.Invoke(this, new EntityMovedEvent { OldLocation = oldLocation, NewLocation = Location });
     }
 
+    public override string ToString() => Name;
+
     public bool Equals(GameEntity? other)
     {
         if (ReferenceEquals(null, other))

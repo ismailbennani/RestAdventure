@@ -2659,6 +2659,11 @@ export class CharacterHistoryEntry implements ICharacterHistoryEntry {
             result.init(data);
             return result;
         }
+        if (data["$type"] === "action-performed") {
+            let result = new CharacterPerformedActionHistoryEntry();
+            result.init(data);
+            return result;
+        }
         if (data["$type"] === "interaction-started") {
             let result = new CharacterStartedInteractionHistoryEntry();
             result.init(data);
@@ -2946,6 +2951,65 @@ export interface ICharacterInventoryChangedHistoryEntry extends ICharacterHistor
     /** The
              */
     newCount: number;
+}
+
+/** Character performed action */
+export class CharacterPerformedActionHistoryEntry extends CharacterHistoryEntry implements ICharacterPerformedActionHistoryEntry {
+    /** The action that has been performed
+             */
+    action!: CharacterAction;
+    /** Has the action been successful
+             */
+    success!: boolean;
+    /** The reason of the failure
+             */
+    failureReason?: string | undefined;
+
+    constructor(data?: ICharacterPerformedActionHistoryEntry) {
+        super(data);
+        if (!data) {
+            this.action = new CharacterAction();
+        }
+        this._discriminator = "action-performed";
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.action = _data["action"] ? CharacterAction.fromJS(_data["action"]) : new CharacterAction();
+            this.success = _data["success"];
+            this.failureReason = _data["failureReason"];
+        }
+    }
+
+    static override fromJS(data: any): CharacterPerformedActionHistoryEntry {
+        data = typeof data === 'object' ? data : {};
+        let result = new CharacterPerformedActionHistoryEntry();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["action"] = this.action ? this.action.toJSON() : <any>undefined;
+        data["success"] = this.success;
+        data["failureReason"] = this.failureReason;
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Character performed action */
+export interface ICharacterPerformedActionHistoryEntry extends ICharacterHistoryEntry {
+    /** The action that has been performed
+             */
+    action: CharacterAction;
+    /** Has the action been successful
+             */
+    success: boolean;
+    /** The reason of the failure
+             */
+    failureReason?: string | undefined;
 }
 
 /** Character started interaction history entry */

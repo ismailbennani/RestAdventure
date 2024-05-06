@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0-alpha.0.80+edab9443cb8ed7e5c53ff1436f40adc5ffce3f7d"
+    "version": "0.0.0-alpha.0.82+cb400518f455568a7edea80764e43e18bff7ffb6"
   },
   "servers": [
     {
@@ -1527,6 +1527,7 @@
             "deleted": "#/components/schemas/CharacterDeletedHistoryEntry",
             "moved": "#/components/schemas/CharacterMoveLocationHistoryEntry",
             "inventory-changed": "#/components/schemas/CharacterInventoryChangedHistoryEntry",
+            "action-performed": "#/components/schemas/CharacterPerformedActionHistoryEntry",
             "interaction-started": "#/components/schemas/CharacterStartedInteractionHistoryEntry",
             "interaction-ended": "#/components/schemas/CharacterEndedInteractionHistoryEntry",
             "job-learned": "#/components/schemas/CharacterLearnedJobHistoryEntry",
@@ -1698,6 +1699,41 @@
                 "type": "integer",
                 "description": "The\n            ",
                 "format": "int32"
+              }
+            }
+          }
+        ]
+      },
+      "CharacterPerformedActionHistoryEntry": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CharacterHistoryEntry"
+          },
+          {
+            "type": "object",
+            "description": "Character performed action\n            ",
+            "additionalProperties": false,
+            "required": [
+              "action",
+              "success"
+            ],
+            "properties": {
+              "action": {
+                "description": "The action that has been performed\n            ",
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/CharacterAction"
+                  }
+                ]
+              },
+              "success": {
+                "type": "boolean",
+                "description": "Has the action been successful\n            "
+              },
+              "failureReason": {
+                "type": "string",
+                "description": "The reason of the failure\n            ",
+                "nullable": true
               }
             }
           }
