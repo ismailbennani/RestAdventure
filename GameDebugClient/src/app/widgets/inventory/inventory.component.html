@@ -1,0 +1,8 @@
+<div class="d-flex flex-wrap">
+  @for (stack of inventory.stacks; track stack.itemInstance.id) {
+    <button class="btn btn-outline-secondary">
+      {{ stack.count }}x
+      {{ stack.itemInstance.item.name }}
+    </button>
+  }
+</div>

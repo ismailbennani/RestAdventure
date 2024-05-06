@@ -6,20 +6,8 @@ namespace RestAdventure.Game.Apis.Common.Dtos.Items;
 /// <summary>
 ///     Item
 /// </summary>
-public class ItemDto
+public class ItemDto : ItemMinimalDto
 {
-    /// <summary>
-    ///     The unique ID of the item
-    /// </summary>
-    [Required]
-    public required Guid Id { get; init; }
-
-    /// <summary>
-    ///     The name of the item
-    /// </summary>
-    [Required]
-    public required string Name { get; init; }
-
     /// <summary>
     ///     The description of the item
     /// </summary>

@@ -780,22 +780,16 @@ export interface ISearchResultOfItem {
     totalPagesCount?: number;
 }
 
-/** Item */
-export class Item implements IItem {
+/** Item (minimal) */
+export class ItemMinimal implements IItemMinimal {
     /** The unique ID of the item
              */
     id!: string;
     /** The name of the item
              */
     name!: string;
-    /** The description of the item
-             */
-    description?: string | undefined;
-    /** The weight of the item
-             */
-    weight!: number;
 
-    constructor(data?: IItem) {
+    constructor(data?: IItemMinimal) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -808,14 +802,12 @@ export class Item implements IItem {
         if (_data) {
             this.id = _data["id"];
             this.name = _data["name"];
-            this.description = _data["description"];
-            this.weight = _data["weight"];
         }
     }
 
-    static fromJS(data: any): Item {
+    static fromJS(data: any): ItemMinimal {
         data = typeof data === 'object' ? data : {};
-        let result = new Item();
+        let result = new ItemMinimal();
         result.init(data);
         return result;
     }
@@ -824,20 +816,59 @@ export class Item implements IItem {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
         data["name"] = this.name;
-        data["description"] = this.description;
-        data["weight"] = this.weight;
         return data;
     }
 }
 
-/** Item */
-export interface IItem {
+/** Item (minimal) */
+export interface IItemMinimal {
     /** The unique ID of the item
              */
     id: string;
     /** The name of the item
              */
     name: string;
+}
+
+/** Item */
+export class Item extends ItemMinimal implements IItem {
+    /** The description of the item
+             */
+    description?: string | undefined;
+    /** The weight of the item
+             */
+    weight!: number;
+
+    constructor(data?: IItem) {
+        super(data);
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.description = _data["description"];
+            this.weight = _data["weight"];
+        }
+    }
+
+    static override fromJS(data: any): Item {
+        data = typeof data === 'object' ? data : {};
+        let result = new Item();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["description"] = this.description;
+        data["weight"] = this.weight;
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Item */
+export interface IItem extends IItemMinimal {
     /** The description of the item
              */
     description?: string | undefined;

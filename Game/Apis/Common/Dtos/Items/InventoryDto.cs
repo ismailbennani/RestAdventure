@@ -12,7 +12,7 @@ public class InventoryDto
     ///     The entries of the inventory
     /// </summary>
     [Required]
-    public required IReadOnlyCollection<ItemStackDto> Entries { get; init; }
+    public required IReadOnlyCollection<ItemInstanceStackDto> Stacks { get; init; }
 
     /// <summary>
     ///     The total weight of the items in the inventory
@@ -26,7 +26,7 @@ static class InventoryMappingExtensions
     public static InventoryDto ToDto(this IReadOnlyInventory inventory) =>
         new()
         {
-            Entries = inventory.Stacks.Select(s => s.ToDto()).ToArray(),
+            Stacks = inventory.Stacks.Select(s => s.ToDto()).ToArray(),
             Weight = inventory.Weight
         };
 }

@@ -6,13 +6,13 @@ namespace RestAdventure.Game.Apis.Common.Dtos.Items;
 /// <summary>
 ///     Item stack
 /// </summary>
-public class ItemStackDto
+public class ItemInstanceStackDto
 {
     /// <summary>
     ///     The item instance representing this stack
     /// </summary>
     [Required]
-    public required ItemDto Item { get; init; }
+    public required ItemInstanceDto ItemInstance { get; init; }
 
     /// <summary>
     ///     The number of instances in this stack
@@ -21,12 +21,12 @@ public class ItemStackDto
     public int Count { get; init; }
 }
 
-static class ItemStackMappingExtensions
+static class ItemInstanceStackMappingExtensions
 {
-    public static ItemStackDto ToDto(this ItemStack stack) =>
+    public static ItemInstanceStackDto ToDto(this ItemInstanceStack stack) =>
         new()
         {
-            Item = stack.Item.ToDto(),
+            ItemInstance = stack.ItemInstance.ToDto(),
             Count = stack.Count
         };
 }

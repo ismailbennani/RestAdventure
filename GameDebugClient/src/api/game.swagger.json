@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0-alpha.0.62+e07e1ada9bf4ca442429defe77cc4feb73d8c5ff"
+    "version": "0.0.0-alpha.0.63+4948711c7b26c7a6dd720a9cc8db55799dda4fa1"
   },
   "servers": [
     {
@@ -607,13 +607,39 @@
   "components": {
     "schemas": {
       "Item": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ItemMinimal"
+          },
+          {
+            "type": "object",
+            "description": "Item\n            ",
+            "additionalProperties": false,
+            "required": [
+              "weight"
+            ],
+            "properties": {
+              "description": {
+                "type": "string",
+                "description": "The description of the item\n            ",
+                "nullable": true
+              },
+              "weight": {
+                "type": "integer",
+                "description": "The weight of the item\n            ",
+                "format": "int32"
+              }
+            }
+          }
+        ]
+      },
+      "ItemMinimal": {
         "type": "object",
-        "description": "Item\n            ",
+        "description": "Item (minimal)\n            ",
         "additionalProperties": false,
         "required": [
           "id",
-          "name",
-          "weight"
+          "name"
         ],
         "properties": {
           "id": {
@@ -626,16 +652,6 @@
             "type": "string",
             "description": "The name of the item\n            ",
             "minLength": 1
-          },
-          "description": {
-            "type": "string",
-            "description": "The description of the item\n            ",
-            "nullable": true
-          },
-          "weight": {
-            "type": "integer",
-            "description": "The weight of the item\n            ",
-            "format": "int32"
           }
         }
       },
@@ -1070,15 +1086,15 @@
         "description": "Inventory\n            ",
         "additionalProperties": false,
         "required": [
-          "entries",
+          "stacks",
           "weight"
         ],
         "properties": {
-          "entries": {
+          "stacks": {
             "type": "array",
             "description": "The entries of the inventory\n            ",
             "items": {
-              "$ref": "#/components/schemas/ItemStack"
+              "$ref": "#/components/schemas/ItemInstanceStack"
             }
           },
           "weight": {
@@ -1088,7 +1104,7 @@
           }
         }
       },
-      "ItemStack": {
+      "ItemInstanceStack": {
         "type": "object",
         "description": "Item stack\n            ",
         "additionalProperties": false,
@@ -1118,7 +1134,7 @@
         "additionalProperties": false,
         "required": [
           "id",
-          "itemId"
+          "item"
         ],
         "properties": {
           "id": {
@@ -1127,11 +1143,13 @@
             "format": "guid",
             "minLength": 1
           },
-          "itemId": {
-            "type": "string",
+          "item": {
             "description": "The unique ID of the item corresponding to this instance\n            ",
-            "format": "guid",
-            "minLength": 1
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ItemMinimal"
+              }
+            ]
           }
         }
       },

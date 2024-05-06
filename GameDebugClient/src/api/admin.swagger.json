@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Admin API",
-    "version": "0.0.0-alpha.0.62+e07e1ada9bf4ca442429defe77cc4feb73d8c5ff"
+    "version": "0.0.0-alpha.0.63+4948711c7b26c7a6dd720a9cc8db55799dda4fa1"
   },
   "servers": [
     {
@@ -400,13 +400,39 @@
         }
       },
       "Item": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ItemMinimal"
+          },
+          {
+            "type": "object",
+            "description": "Item\n            ",
+            "additionalProperties": false,
+            "required": [
+              "weight"
+            ],
+            "properties": {
+              "description": {
+                "type": "string",
+                "description": "The description of the item\n            ",
+                "nullable": true
+              },
+              "weight": {
+                "type": "integer",
+                "description": "The weight of the item\n            ",
+                "format": "int32"
+              }
+            }
+          }
+        ]
+      },
+      "ItemMinimal": {
         "type": "object",
-        "description": "Item\n            ",
+        "description": "Item (minimal)\n            ",
         "additionalProperties": false,
         "required": [
           "id",
-          "name",
-          "weight"
+          "name"
         ],
         "properties": {
           "id": {
@@ -419,16 +445,6 @@
             "type": "string",
             "description": "The name of the item\n            ",
             "minLength": 1
-          },
-          "description": {
-            "type": "string",
-            "description": "The description of the item\n            ",
-            "nullable": true
-          },
-          "weight": {
-            "type": "integer",
-            "description": "The weight of the item\n            ",
-            "format": "int32"
           }
         }
       },

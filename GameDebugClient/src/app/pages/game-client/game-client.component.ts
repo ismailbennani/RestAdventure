@@ -23,13 +23,14 @@ import {
 } from '../../../api/game-api-client.generated';
 import { SpinnerComponent } from '../../common/spinner/spinner.component';
 import { SELECT_PLAYER_ROUTE } from '../../routes';
+import { InventoryComponent } from '../../widgets/inventory/inventory.component';
 import { SelectedPlayerService } from '../select-player/selected-player.service';
 
 @Component({
   selector: 'app-game-client',
   standalone: true,
   templateUrl: './game-client.component.html',
-  imports: [CommonModule, NgbDropdownModule, NgbTooltipModule, SpinnerComponent],
+  imports: [CommonModule, NgbDropdownModule, NgbTooltipModule, SpinnerComponent, InventoryComponent],
 })
 export class GameClientComponent implements OnInit {
   protected settings: GameSettings = new GameSettings();

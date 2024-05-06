@@ -12,13 +12,13 @@ public class ItemInstanceDto
     ///     The unique ID of this instance
     /// </summary>
     [Required]
-    public Guid Id { get; init; }
+    public required Guid Id { get; init; }
 
     /// <summary>
     ///     The unique ID of the item corresponding to this instance
     /// </summary>
     [Required]
-    public Guid ItemId { get; init; }
+    public required ItemMinimalDto Item { get; init; }
 }
 
 static class ItemInstanceMappingExtensions
@@ -27,6 +27,6 @@ static class ItemInstanceMappingExtensions
         new()
         {
             Id = itemInstance.Id.Guid,
-            ItemId = itemInstance.Item.Id.Guid
+            Item = itemInstance.Item.ToMinimalDto()
         };
 }

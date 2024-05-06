@@ -909,22 +909,16 @@ export class TeamApiClient {
     }
 }
 
-/** Item */
-export class Item implements IItem {
+/** Item (minimal) */
+export class ItemMinimal implements IItemMinimal {
     /** The unique ID of the item
              */
     id!: string;
     /** The name of the item
              */
     name!: string;
-    /** The description of the item
-             */
-    description?: string | undefined;
-    /** The weight of the item
-             */
-    weight!: number;
 
-    constructor(data?: IItem) {
+    constructor(data?: IItemMinimal) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -937,14 +931,12 @@ export class Item implements IItem {
         if (_data) {
             this.id = _data["id"];
             this.name = _data["name"];
-            this.description = _data["description"];
-            this.weight = _data["weight"];
         }
     }
 
-    static fromJS(data: any): Item {
+    static fromJS(data: any): ItemMinimal {
         data = typeof data === 'object' ? data : {};
-        let result = new Item();
+        let result = new ItemMinimal();
         result.init(data);
         return result;
     }
@@ -953,20 +945,59 @@ export class Item implements IItem {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
         data["name"] = this.name;
-        data["description"] = this.description;
-        data["weight"] = this.weight;
         return data;
     }
 }
 
-/** Item */
-export interface IItem {
+/** Item (minimal) */
+export interface IItemMinimal {
     /** The unique ID of the item
              */
     id: string;
     /** The name of the item
              */
     name: string;
+}
+
+/** Item */
+export class Item extends ItemMinimal implements IItem {
+    /** The description of the item
+             */
+    description?: string | undefined;
+    /** The weight of the item
+             */
+    weight!: number;
+
+    constructor(data?: IItem) {
+        super(data);
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.description = _data["description"];
+            this.weight = _data["weight"];
+        }
+    }
+
+    static override fromJS(data: any): Item {
+        data = typeof data === 'object' ? data : {};
+        let result = new Item();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["description"] = this.description;
+        data["weight"] = this.weight;
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Item */
+export interface IItem extends IItemMinimal {
     /** The description of the item
              */
     description?: string | undefined;
@@ -1796,7 +1827,7 @@ export enum CharacterClass {
 export class Inventory implements IInventory {
     /** The entries of the inventory
              */
-    entries!: ItemStack[];
+    stacks!: ItemInstanceStack[];
     /** The total weight of the items in the inventory
              */
     weight!: number;
@@ -1809,16 +1840,16 @@ export class Inventory implements IInventory {
             }
         }
         if (!data) {
-            this.entries = [];
+            this.stacks = [];
         }
     }
 
     init(_data?: any) {
         if (_data) {
-            if (Array.isArray(_data["entries"])) {
-                this.entries = [] as any;
-                for (let item of _data["entries"])
-                    this.entries!.push(ItemStack.fromJS(item));
+            if (Array.isArray(_data["stacks"])) {
+                this.stacks = [] as any;
+                for (let item of _data["stacks"])
+                    this.stacks!.push(ItemInstanceStack.fromJS(item));
             }
             this.weight = _data["weight"];
         }
@@ -1833,10 +1864,10 @@ export class Inventory implements IInventory {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        if (Array.isArray(this.entries)) {
-            data["entries"] = [];
-            for (let item of this.entries)
-                data["entries"].push(item.toJSON());
+        if (Array.isArray(this.stacks)) {
+            data["stacks"] = [];
+            for (let item of this.stacks)
+                data["stacks"].push(item.toJSON());
         }
         data["weight"] = this.weight;
         return data;
@@ -1847,14 +1878,14 @@ export class Inventory implements IInventory {
 export interface IInventory {
     /** The entries of the inventory
              */
-    entries: ItemStack[];
+    stacks: ItemInstanceStack[];
     /** The total weight of the items in the inventory
              */
     weight: number;
 }
 
 /** Item stack */
-export class ItemStack implements IItemStack {
+export class ItemInstanceStack implements IItemInstanceStack {
     /** The item instance representing this stack
              */
     itemInstance!: ItemInstance;
@@ -1862,7 +1893,7 @@ export class ItemStack implements IItemStack {
              */
     count!: number;
 
-    constructor(data?: IItemStack) {
+    constructor(data?: IItemInstanceStack) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -1881,9 +1912,9 @@ export class ItemStack implements IItemStack {
         }
     }
 
-    static fromJS(data: any): ItemStack {
+    static fromJS(data: any): ItemInstanceStack {
         data = typeof data === 'object' ? data : {};
-        let result = new ItemStack();
+        let result = new ItemInstanceStack();
         result.init(data);
         return result;
     }
@@ -1897,7 +1928,7 @@ export class ItemStack implements IItemStack {
 }
 
 /** Item stack */
-export interface IItemStack {
+export interface IItemInstanceStack {
     /** The item instance representing this stack
              */
     itemInstance: ItemInstance;
@@ -1913,7 +1944,7 @@ export class ItemInstance implements IItemInstance {
     id!: string;
     /** The unique ID of the item corresponding to this instance
              */
-    itemId!: string;
+    item!: ItemMinimal;
 
     constructor(data?: IItemInstance) {
         if (data) {
@@ -1922,12 +1953,15 @@ export class ItemInstance implements IItemInstance {
                     (<any>this)[property] = (<any>data)[property];
             }
         }
+        if (!data) {
+            this.item = new ItemMinimal();
+        }
     }
 
     init(_data?: any) {
         if (_data) {
             this.id = _data["id"];
-            this.itemId = _data["itemId"];
+            this.item = _data["item"] ? ItemMinimal.fromJS(_data["item"]) : new ItemMinimal();
         }
     }
 
@@ -1941,7 +1975,7 @@ export class ItemInstance implements IItemInstance {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
-        data["itemId"] = this.itemId;
+        data["item"] = this.item ? this.item.toJSON() : <any>undefined;
         return data;
     }
 }
@@ -1953,7 +1987,7 @@ export interface IItemInstance {
     id: string;
     /** The unique ID of the item corresponding to this instance
              */
-    itemId: string;
+    item: ItemMinimal;
 }
 
 /** The result of an action performed by a character */
