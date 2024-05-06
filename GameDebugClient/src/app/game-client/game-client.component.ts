@@ -1,9 +1,7 @@
-import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { NgbDropdownModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { Observable, finalize, forkJoin, map, of, switchMap, tap } from 'rxjs';
-import { AdminGameApiClient, LocationMinimal, Player } from '../../../api/admin-api-client.generated';
+import { AdminGameApiClient, LocationMinimal, Player } from '../../api/admin-api-client.generated';
 import {
   CharacterAction,
   CharacterInteractWithEntityAction,
@@ -19,20 +17,13 @@ import {
   TeamCharacter,
   TeamCharactersActionsApiClient,
   TeamCharactersApiClient,
-} from '../../../api/game-api-client.generated';
-import { SpinnerComponent } from '../../common/spinner/spinner.component';
-import { SELECT_PLAYER_ROUTE } from '../../routes';
-import { CreateCharacterComponent } from '../../widgets/create-character/create-character.component';
-import { InventoryComponent } from '../../widgets/inventory/inventory.component';
-import { SimulationComponent } from '../../widgets/simulation/simulation.component';
-import { TeamComponent } from '../../widgets/team/team.component';
-import { SelectedPlayerService } from '../select-player/selected-player.service';
+} from '../../api/game-api-client.generated';
+import { SelectedPlayerService } from '../pages/select-player/selected-player.service';
+import { SELECT_PLAYER_ROUTE } from '../routes';
 
 @Component({
   selector: 'app-game-client',
-  standalone: true,
   templateUrl: './game-client.component.html',
-  imports: [CommonModule, NgbDropdownModule, NgbTooltipModule, SpinnerComponent, InventoryComponent, CreateCharacterComponent, SimulationComponent, TeamComponent],
 })
 export class GameClientComponent implements OnInit {
   protected settings: GameSettings = new GameSettings();

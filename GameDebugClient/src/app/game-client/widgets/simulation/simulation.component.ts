@@ -1,13 +1,10 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { map } from 'rxjs';
-import { AdminGameApiClient } from '../../../api/admin-api-client.generated';
-import { GameState } from '../../../api/game-api-client.generated';
+import { AdminGameApiClient } from '../../../../api/admin-api-client.generated';
+import { GameState } from '../../../../api/game-api-client.generated';
 
 @Component({
   selector: 'app-simulation',
-  standalone: true,
-  imports: [CommonModule],
   templateUrl: './simulation.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

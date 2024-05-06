@@ -1,12 +1,9 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, Output } from '@angular/core';
 import { catchError, finalize, of } from 'rxjs';
-import { CharacterClass, CreateCharacterRequest, TeamCharacter, TeamCharactersApiClient } from '../../../api/game-api-client.generated';
+import { CharacterClass, CreateCharacterRequest, TeamCharacter, TeamCharactersApiClient } from '../../../../api/game-api-client.generated';
 
 @Component({
   selector: 'app-create-character',
-  standalone: true,
-  imports: [CommonModule],
   templateUrl: './create-character.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

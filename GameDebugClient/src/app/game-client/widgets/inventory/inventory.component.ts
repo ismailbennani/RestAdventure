@@ -1,12 +1,8 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
-import { Inventory } from '../../../api/game-api-client.generated';
+import { Inventory } from '../../../../api/game-api-client.generated';
 
 @Component({
   selector: 'app-inventory',
-  standalone: true,
-  imports: [CommonModule, NgbTooltipModule],
   templateUrl: './inventory.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
