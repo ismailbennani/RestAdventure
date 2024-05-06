@@ -12,13 +12,13 @@ namespace RestAdventure.Game.Apis.AdminApi.Controllers.Players;
 /// </summary>
 [Route("admin/players")]
 [OpenApiTag("Players")]
-public class PlayersController : AdminApiController
+public class AdminPlayersController : AdminApiController
 {
     readonly GameService _gameService;
 
     /// <summary>
     /// </summary>
-    public PlayersController(GameService gameService)
+    public AdminPlayersController(GameService gameService)
     {
         _gameService = gameService;
     }

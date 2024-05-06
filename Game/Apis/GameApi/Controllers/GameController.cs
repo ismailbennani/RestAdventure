@@ -27,14 +27,12 @@ public class GameController : GameApiController
     /// <summary>
     ///     Get game settings
     /// </summary>
-    /// <returns></returns>
     [HttpGet("settings")]
     public GameSettingsDto GetGameSettings() => _gameService.RequireGameState().Settings.ToDto();
 
     /// <summary>
     ///     Get game state
     /// </summary>
-    /// <returns></returns>
     [HttpGet("state")]
     public GameStateDto GetGameState()
     {

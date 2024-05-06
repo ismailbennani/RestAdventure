@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Admin API",
-    "version": "0.0.0-alpha.0.68+7021d942453a9813027edfdadb4c35f8a0f12d71"
+    "version": "0.0.0-alpha.0.70+472c46ba7fcd043c6a914d05a46bcc4e55c84c33"
   },
   "servers": [
     {
@@ -197,6 +197,48 @@
         }
       }
     },
+    "/admin/game/settings": {
+      "get": {
+        "tags": [
+          "Game"
+        ],
+        "summary": "Get game settings",
+        "operationId": "AdminGame_GetGameSettings",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GameSettings"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/game/state": {
+      "get": {
+        "tags": [
+          "Game"
+        ],
+        "summary": "Get game state",
+        "operationId": "AdminGame_GetGameState",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GameState"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/admin/game/start": {
       "post": {
         "tags": [
@@ -245,7 +287,7 @@
           "Players"
         ],
         "summary": "Get players",
-        "operationId": "Players_GetPlayers",
+        "operationId": "AdminPlayers_GetPlayers",
         "responses": {
           "200": {
             "description": "",
@@ -269,7 +311,7 @@
           "Players"
         ],
         "summary": "Register player",
-        "operationId": "Players_RegisterPlayer",
+        "operationId": "AdminPlayers_RegisterPlayer",
         "parameters": [
           {
             "name": "userGuid",
@@ -308,7 +350,7 @@
           "Players"
         ],
         "summary": "Get player",
-        "operationId": "Players_GetPlayer",
+        "operationId": "AdminPlayers_GetPlayer",
         "parameters": [
           {
             "name": "userGuid",
@@ -341,7 +383,7 @@
           "Players"
         ],
         "summary": "Refresh player key",
-        "operationId": "Players_RefreshPlayerKey",
+        "operationId": "AdminPlayers_RefreshPlayerKey",
         "parameters": [
           {
             "name": "userGuid",
@@ -700,6 +742,53 @@
           "description": {
             "type": "string",
             "description": "The description of the harvestable\n            ",
+            "nullable": true
+          }
+        }
+      },
+      "GameSettings": {
+        "type": "object",
+        "description": "Game settings\n            ",
+        "additionalProperties": false,
+        "required": [
+          "maxTeamSize"
+        ],
+        "properties": {
+          "maxTeamSize": {
+            "type": "integer",
+            "description": "The max number of characters in a team\n            ",
+            "format": "int32"
+          }
+        }
+      },
+      "GameState": {
+        "type": "object",
+        "description": "Game state\n            ",
+        "additionalProperties": false,
+        "required": [
+          "tick",
+          "paused"
+        ],
+        "properties": {
+          "tick": {
+            "type": "integer",
+            "description": "The current game tick\n            ",
+            "format": "int64"
+          },
+          "paused": {
+            "type": "boolean",
+            "description": "Is the game paused?\n            "
+          },
+          "lastTickDate": {
+            "type": "string",
+            "description": "If the game is started, the date at which last tick has been computed\n            ",
+            "format": "date-time",
+            "nullable": true
+          },
+          "nextTickDate": {
+            "type": "string",
+            "description": "If the game is not paused, the date at which next tick will be computed\n            ",
+            "format": "date-time",
             "nullable": true
           }
         }

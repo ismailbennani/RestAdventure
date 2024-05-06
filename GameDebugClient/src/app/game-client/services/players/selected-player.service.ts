@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Player } from '../../../api/admin-api-client.generated';
+import { Player } from '../../../../api/admin-api-client.generated';
 
 @Injectable({
   providedIn: 'root',

@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0-alpha.0.68+7021d942453a9813027edfdadb4c35f8a0f12d71"
+    "version": "0.0.0-alpha.0.70+472c46ba7fcd043c6a914d05a46bcc4e55c84c33"
   },
   "servers": [
     {

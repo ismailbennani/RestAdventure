@@ -342,6 +342,108 @@ export class AdminGameApiClient {
     }
 
     /**
+     * Get game settings
+     */
+    getGameSettings(): Observable<GameSettings> {
+        let url_ = this.baseUrl + "/admin/game/settings";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetGameSettings(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetGameSettings(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GameSettings>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GameSettings>;
+        }));
+    }
+
+    protected processGetGameSettings(response: HttpResponseBase): Observable<GameSettings> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GameSettings.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * Get game state
+     */
+    getGameState(): Observable<GameState> {
+        let url_ = this.baseUrl + "/admin/game/state";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetGameState(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetGameState(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GameState>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GameState>;
+        }));
+    }
+
+    protected processGetGameState(response: HttpResponseBase): Observable<GameState> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GameState.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * Start simulation
      */
     startSimulation(): Observable<void> {
@@ -484,7 +586,7 @@ export class AdminGameApiClient {
 }
 
 @Injectable()
-export class PlayersApiClient {
+export class AdminPlayersApiClient {
     private http: HttpClient;
     private baseUrl: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
@@ -1408,6 +1510,114 @@ export interface IHarvestable {
     /** The description of the harvestable
              */
     description?: string | undefined;
+}
+
+/** Game settings */
+export class GameSettings implements IGameSettings {
+    /** The max number of characters in a team
+             */
+    maxTeamSize!: number;
+
+    constructor(data?: IGameSettings) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.maxTeamSize = _data["maxTeamSize"];
+        }
+    }
+
+    static fromJS(data: any): GameSettings {
+        data = typeof data === 'object' ? data : {};
+        let result = new GameSettings();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["maxTeamSize"] = this.maxTeamSize;
+        return data;
+    }
+}
+
+/** Game settings */
+export interface IGameSettings {
+    /** The max number of characters in a team
+             */
+    maxTeamSize: number;
+}
+
+/** Game state */
+export class GameState implements IGameState {
+    /** The current game tick
+             */
+    tick!: number;
+    /** Is the game paused?
+             */
+    paused!: boolean;
+    /** If the game is started, the date at which last tick has been computed
+             */
+    lastTickDate?: Date | undefined;
+    /** If the game is not paused, the date at which next tick will be computed
+             */
+    nextTickDate?: Date | undefined;
+
+    constructor(data?: IGameState) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.tick = _data["tick"];
+            this.paused = _data["paused"];
+            this.lastTickDate = _data["lastTickDate"] ? new Date(_data["lastTickDate"].toString()) : <any>undefined;
+            this.nextTickDate = _data["nextTickDate"] ? new Date(_data["nextTickDate"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): GameState {
+        data = typeof data === 'object' ? data : {};
+        let result = new GameState();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["tick"] = this.tick;
+        data["paused"] = this.paused;
+        data["lastTickDate"] = this.lastTickDate ? this.lastTickDate.toISOString() : <any>undefined;
+        data["nextTickDate"] = this.nextTickDate ? this.nextTickDate.toISOString() : <any>undefined;
+        return data;
+    }
+}
+
+/** Game state */
+export interface IGameState {
+    /** The current game tick
+             */
+    tick: number;
+    /** Is the game paused?
+             */
+    paused: boolean;
+    /** If the game is started, the date at which last tick has been computed
+             */
+    lastTickDate?: Date | undefined;
+    /** If the game is not paused, the date at which next tick will be computed
+             */
+    nextTickDate?: Date | undefined;
 }
 
 /** A player */

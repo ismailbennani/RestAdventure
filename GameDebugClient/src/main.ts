@@ -6,7 +6,7 @@ import { bootstrapApplication } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
 import { ApiModule } from './api/api.module';
 import { AppComponent } from './app/app.component';
-import { gameApiInterceptor } from './app/pages/select-player/game-api.interceptor';
+import { gameApiInterceptor } from './app/game-client/services/players/game-api.interceptor';
 import { routes } from './app/routes';
 
 bootstrapApplication(AppComponent, {

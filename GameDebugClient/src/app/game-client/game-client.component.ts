@@ -2,10 +2,9 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
-import { LocationMinimal, Player } from '../../api/admin-api-client.generated';
+import { LocationMinimal } from '../../api/admin-api-client.generated';
 import { EntityWithInteractions, GameSettings, GameState, Team, TeamCharacter } from '../../api/game-api-client.generated';
 import { SpinnerComponent } from '../common/spinner/spinner.component';
-import { SelectedPlayerService } from '../pages/select-player/selected-player.service';
 import { SELECT_PLAYER_ROUTE } from '../routes';
 import { CurrentPageService } from './services/current-page.service';
 import { GameService } from './services/game.service';
@@ -25,7 +24,6 @@ export class GameClientComponent implements OnInit {
   protected settings: GameSettings = new GameSettings();
 
   protected loading: boolean = false;
-  protected player: Player;
   protected characters: (TeamCharacter | undefined)[] = [];
   protected accessibleLocations: { [characterId: string]: LocationMinimal[] } = {};
   protected entitiesWithInteractions: { [characterId: string]: EntityWithInteractions[] } = {};
@@ -39,13 +37,10 @@ export class GameClientComponent implements OnInit {
   }
 
   constructor(
-    selectedPlayerService: SelectedPlayerService,
     private gameService: GameService,
     protected currentPageService: CurrentPageService,
     private router: Router,
-  ) {
-    this.player = selectedPlayerService.get();
-  }
+  ) {}
 
   ngOnInit(): void {
     this.loading = true;
