@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ReplaySubject, combineLatest, forkJoin, map, of, switchMap, tap } from 'rxjs';
+import { ReplaySubject, combineLatest, forkJoin, map, of, switchMap } from 'rxjs';
 import { ILocationMinimal, LocationMinimal } from '../../../../api/admin-api-client.generated';
 import {
   CharacterInteractWithEntityAction,
@@ -63,6 +63,11 @@ export class CharacterPageComponent implements OnInit {
     this.refreshSubject
       .pipe(
         switchMap(() => {
+          if (!this.characterId || !this.team) {
+            this.loading = true;
+            return of(undefined);
+          }
+
           this.character = this.team?.characters.find(c => c.id === this.characterId);
 
           if (!this.character && this.team && this.team.characters.length > 0) {
@@ -75,7 +80,7 @@ export class CharacterPageComponent implements OnInit {
             return of(undefined);
           }
 
-          this.currentPageService.setOpenedCharacter(this.character);
+          this.loading = false;
 
           return forkJoin({
             locations: this.charactersActionsApiClient.getAccessibleLocations(this.character.id),
@@ -86,7 +91,6 @@ export class CharacterPageComponent implements OnInit {
           this.accessibleLocations = result?.locations ?? [];
           this.entitiesWithInteractions = result?.interactions ?? [];
         }),
-        tap(() => (this.loading = false)),
       )
       .subscribe();
   }
@@ -98,7 +102,7 @@ export class CharacterPageComponent implements OnInit {
 
     this.charactersActionsApiClient
       .moveToLocation(this.character.id, location.id)
-      .pipe(map(_ => this.gameService.refreshNow(true)))
+      .pipe(switchMap(_ => this.gameService.refreshNow(true)))
       .subscribe();
   }
 
@@ -109,7 +113,7 @@ export class CharacterPageComponent implements OnInit {
 
     this.charactersActionsApiClient
       .interact(this.character.id, entity.id, interaction.id)
-      .pipe(map(_ => this.gameService.refreshNow(true)))
+      .pipe(switchMap(_ => this.gameService.refreshNow(true)))
       .subscribe();
   }
 
@@ -166,6 +170,9 @@ export class CharacterPageComponent implements OnInit {
       throw new Error('Character id not found');
     }
 
-    this.charactersApiClient.deleteCharacter(this.characterId).subscribe(() => this.gameService.refreshNow(true));
+    this.charactersApiClient
+      .deleteCharacter(this.characterId)
+      .pipe(switchMap(() => this.gameService.refreshNow(true)))
+      .subscribe();
   }
 }

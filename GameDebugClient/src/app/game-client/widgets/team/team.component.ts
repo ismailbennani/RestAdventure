@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { catchError, finalize, of, tap } from 'rxjs';
+import { catchError, finalize, map, of, switchMap, tap } from 'rxjs';
 import { CharacterClass, CreateCharacterRequest, TeamCharactersApiClient } from '../../../../api/game-api-client.generated';
 import { SpinnerComponent } from '../../../common/spinner/spinner.component';
 import { CurrentPageService } from '../../services/current-page.service';
@@ -49,10 +49,8 @@ export class TeamComponent {
     this.teamCharactersApiClient
       .createCharacter(new CreateCharacterRequest({ name, class: cls as CharacterClass }))
       .pipe(
-        tap(character => {
-          this.gameService.refreshNow(true);
-          this.currentPageService.openCharacter(character);
-        }),
+        switchMap(character => this.gameService.refreshNow(true).pipe(map(_ => character))),
+        tap(character => this.currentPageService.openCharacter(character)),
         finalize(() => {
           this.creating = false;
           this.inCreation = false;

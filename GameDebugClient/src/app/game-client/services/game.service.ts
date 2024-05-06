@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, ReplaySubject, Subject, catchError, debounceTime, delay, map, of, switchMap, takeUntil, tap } from 'rxjs';
+import { Observable, ReplaySubject, Subject, catchError, debounceTime, delay, first, map, of, switchMap, takeUntil, tap } from 'rxjs';
 import { AdminGameApiClient } from '../../../api/admin-api-client.generated';
 import { GameSettings, GameState } from '../../../api/game-api-client.generated';
 
@@ -12,6 +12,7 @@ export class GameService {
 
   private refreshingInternal: boolean = false;
   private refreshSubject: Subject<boolean> = new Subject<boolean>();
+  private refreshedSubject: Subject<void> = new Subject<void>();
 
   private gameSettings: GameSettings | undefined;
 
@@ -78,7 +79,10 @@ export class GameService {
 
           return of({});
         }),
-        tap(() => (this.refreshingInternal = false)),
+        tap(() => {
+          this.refreshingInternal = false;
+          this.refreshedSubject.next();
+        }),
       )
       .subscribe();
 
@@ -93,26 +97,27 @@ export class GameService {
   resume() {
     this.adminGameApiClient
       .startSimulation()
-      .pipe(map(_ => this.refreshNow()))
+      .pipe(switchMap(_ => this.refreshNow()))
       .subscribe();
   }
 
   pause() {
     this.adminGameApiClient
       .stopSimulation()
-      .pipe(map(_ => this.refreshNow()))
+      .pipe(switchMap(_ => this.refreshNow()))
       .subscribe();
   }
 
   step() {
     this.adminGameApiClient
       .tickNow()
-      .pipe(map(_ => this.refreshNow()))
+      .pipe(switchMap(_ => this.refreshNow()))
       .subscribe();
   }
 
-  refreshNow(force: boolean = false) {
+  refreshNow(force: boolean = false): Observable<void> {
     this.refreshSubject.next(force);
+    return this.refreshedSubject.pipe(first());
   }
 
   refreshIn(delayMs: number) {
@@ -120,7 +125,7 @@ export class GameService {
       .pipe(
         delay(delayMs),
         takeUntil(this.refreshSubject),
-        map(() => this.refreshNow()),
+        switchMap(() => this.refreshNow()),
       )
       .subscribe();
   }
@@ -130,7 +135,7 @@ export class GameService {
       .pipe(
         delay(date),
         takeUntil(this.refreshSubject),
-        map(() => this.refreshNow()),
+        switchMap(() => this.refreshNow()),
       )
       .subscribe();
   }

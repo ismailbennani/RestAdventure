@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
-import { ReplaySubject, combineLatest, map, of, switchMap, tap } from 'rxjs';
+import { Component, Input, OnInit } from '@angular/core';
+import { ReplaySubject, combineLatest, map, switchMap, tap } from 'rxjs';
 import {
   CharacterEndedInteractionHistoryEntry,
   CharacterHistoryEntry,
@@ -17,7 +17,6 @@ import { GameService } from '../../services/game.service';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './character-history.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CharacterHistoryComponent implements OnInit {
   @Input({ required: true })
@@ -40,7 +39,6 @@ export class CharacterHistoryComponent implements OnInit {
   ngOnInit(): void {
     this.loading = true;
     combineLatest({
-      now: of({}),
       state: this.gameService.state$,
       character: this.characterSubject,
     })
