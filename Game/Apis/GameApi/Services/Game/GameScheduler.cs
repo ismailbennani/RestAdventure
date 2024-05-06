@@ -50,7 +50,7 @@ public class GameScheduler : IDisposable
         }
 
         Paused = false;
-        NextStepDate = DateTime.Now;
+        NextStepDate = DateTime.Now + (firstTickDelay ?? TimeSpan.Zero);
 
         _mainLoopCancellationSource = new CancellationTokenSource();
         CancellationToken token = _mainLoopCancellationSource.Token;
