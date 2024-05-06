@@ -1,5 +1,4 @@
-﻿using RestAdventure.Core.Maps.Locations;
-using RestAdventure.Core.Players;
+﻿using RestAdventure.Core.Players;
 
 namespace RestAdventure.Core.Characters.Services;
 
@@ -23,10 +22,7 @@ public class CharactersService
             return new CharacterCreationResult { IsSuccess = false, ErrorMessage = $"reached max team size (max:{maxTeamSize})" };
         }
 
-        GameContent content = _gameService.RequireGameContent();
-        Location startLocation = content.Maps.Locations.All.First();
-
-        Character character = new(player, name, cls, startLocation);
+        Character character = new(player, cls, name);
         await state.Entities.RegisterAsync(character);
 
         return new CharacterCreationResult { IsSuccess = true, Character = character };

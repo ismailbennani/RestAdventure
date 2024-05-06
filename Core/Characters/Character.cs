@@ -1,7 +1,6 @@
 ﻿using RestAdventure.Core.Entities;
 using RestAdventure.Core.Items;
 using RestAdventure.Core.Jobs;
-using RestAdventure.Core.Maps.Locations;
 using RestAdventure.Core.Players;
 using RestAdventure.Core.Utils;
 
@@ -11,7 +10,7 @@ public record CharacterId(Guid Guid) : GameEntityId(Guid);
 
 public class Character : GameEntity<CharacterId>, IGameEntityWithInventory, IGameEntityWithJobs
 {
-    public Character(Player player, string name, CharacterClass characterClass, Location location) : base(new CharacterId(Guid.NewGuid()), name, location)
+    public Character(Player player, CharacterClass characterClass, string name) : base(new CharacterId(Guid.NewGuid()), name, characterClass.StartLocation)
     {
         Player = player;
         Class = characterClass;

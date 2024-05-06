@@ -14,20 +14,19 @@ public class BaseGameContent : ContentPlugin
 {
     public override Task AddContentAsync(GameContent content)
     {
-        CharacterClasses characterClasses = new();
-        RegisterCharacterClasses(content, characterClasses.All);
-
+        MapGenerator mapGenerator = new();
+        GeneratedMaps generatedMaps = mapGenerator.GenerateMaps();
+        CharacterClasses characterClasses = new(generatedMaps);
         Items items = new();
-        RegisterItems(content, items.All);
-
         Jobs jobs = new();
-        RegisterJobs(content, jobs.All);
-
         Harvestables harvestables = new(items, jobs);
-        RegisterHarvestables(content, harvestables.All);
 
-        GeneratedMaps generatedMaps = new MapGenerator(harvestables).GenerateMaps();
         RegisterMaps(content, generatedMaps);
+        RegisterCharacterClasses(content, characterClasses.All);
+        RegisterItems(content, items.All);
+        RegisterJobs(content, jobs.All);
+        RegisterHarvestables(content, harvestables.All);
+        RegisterHarvestableInstances(content, mapGenerator.GenerateHarvestables(generatedMaps, harvestables));
 
         return Task.CompletedTask;
     }
@@ -80,8 +79,11 @@ public class BaseGameContent : ContentPlugin
         {
             content.Maps.Locations.Connect(location1, location2);
         }
+    }
 
-        foreach (HarvestableInstance harvestableInstance in generatedMaps.Harvestables)
+    static void RegisterHarvestableInstances(GameContent content, IEnumerable<HarvestableInstance> harvestables)
+    {
+        foreach (HarvestableInstance harvestableInstance in harvestables)
         {
             content.Maps.Harvestables.Register(harvestableInstance);
         }

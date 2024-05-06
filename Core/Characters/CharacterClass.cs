@@ -1,4 +1,5 @@
-﻿using RestAdventure.Core.Resources;
+﻿using RestAdventure.Core.Maps.Locations;
+using RestAdventure.Core.Resources;
 
 namespace RestAdventure.Core.Characters;
 
@@ -12,5 +13,6 @@ public class CharacterClass : GameResource<CharacterClassId>
 
     public required string Name { get; init; }
     public string? Description { get; init; }
+    public required Location StartLocation { get; init; }
     public required IReadOnlyList<int> LevelCaps { get; init; }
 }
