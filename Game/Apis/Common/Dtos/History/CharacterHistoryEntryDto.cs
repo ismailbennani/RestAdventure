@@ -9,6 +9,8 @@ namespace RestAdventure.Game.Apis.Common.Dtos.History;
 ///     Character history entry
 /// </summary>
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "$type", IgnoreUnrecognizedTypeDiscriminators = true)]
+[JsonDerivedType(typeof(CharacterCreatedHistoryEntryDto), "created")]
+[JsonDerivedType(typeof(CharacterDeletedHistoryEntryDto), "deleted")]
 [JsonDerivedType(typeof(CharacterMovedToLocationHistoryEntryDto), "moved")]
 [JsonDerivedType(typeof(CharacterInventoryChangedHistoryEntryDto), "inventory-changed")]
 [JsonDerivedType(typeof(CharacterStartedInteractionHistoryEntryDto), "interaction-started")]
@@ -30,6 +32,8 @@ static class CharacterHistoryEntryMappingExtensions
     public static CharacterHistoryEntryDto ToDto(this EntityHistoryEntry entry) =>
         entry switch
         {
+            EntityCreatedHistoryEntry entityCreatedHistoryEntry => entityCreatedHistoryEntry.ToDto(),
+            EntityDeletedHistoryEntry entityDeletedHistoryEntry => entityDeletedHistoryEntry.ToDto(),
             CharacterEndedInteractionHistoryEntry characterEndedInteractionHistoryEntry => characterEndedInteractionHistoryEntry.ToDto(),
             CharacterStartedInteractionHistoryEntry characterStartedInteractionHistoryEntry => characterStartedInteractionHistoryEntry.ToDto(),
             EntityInventoryChangedHistoryEntry entityInventoryChangedHistoryEntry => entityInventoryChangedHistoryEntry.ToDto(),

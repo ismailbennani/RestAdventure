@@ -2,6 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { ReplaySubject, combineLatest, map, switchMap, tap } from 'rxjs';
 import {
+  CharacterCreatedHistoryEntry,
+  CharacterDeletedHistoryEntry,
   CharacterEndedInteractionHistoryEntry,
   CharacterHistoryEntry,
   CharacterInventoryChangedHistoryEntry,
@@ -71,6 +73,14 @@ export class CharacterHistoryComponent implements OnInit {
   }
 
   protected getMessage(entry: CharacterHistoryEntry) {
+    if (entry instanceof CharacterCreatedHistoryEntry) {
+      return `Character created`;
+    }
+
+    if (entry instanceof CharacterDeletedHistoryEntry) {
+      return `Character deleted`;
+    }
+
     if (entry instanceof CharacterMoveLocationHistoryEntry) {
       if (entry.oldLocationId) {
         if (entry.oldLocationAreaId !== entry.newLocationAreaId) {

@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0-alpha.0.78+401c56c4ccc5d69f9340ea3766559297d6936627"
+    "version": "0.0.0-alpha.0.79+8b40953660dec6418a152a1982adbad32856e2c3"
   },
   "servers": [
     {
@@ -1485,6 +1485,8 @@
         "discriminator": {
           "propertyName": "$type",
           "mapping": {
+            "created": "#/components/schemas/CharacterCreatedHistoryEntry",
+            "deleted": "#/components/schemas/CharacterDeletedHistoryEntry",
             "moved": "#/components/schemas/CharacterMoveLocationHistoryEntry",
             "inventory-changed": "#/components/schemas/CharacterInventoryChangedHistoryEntry",
             "interaction-started": "#/components/schemas/CharacterStartedInteractionHistoryEntry",
@@ -1510,6 +1512,30 @@
             "type": "string"
           }
         }
+      },
+      "CharacterCreatedHistoryEntry": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CharacterHistoryEntry"
+          },
+          {
+            "type": "object",
+            "description": "Character created history entry\n            ",
+            "additionalProperties": false
+          }
+        ]
+      },
+      "CharacterDeletedHistoryEntry": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CharacterHistoryEntry"
+          },
+          {
+            "type": "object",
+            "description": "Character deleted history entry\n            ",
+            "additionalProperties": false
+          }
+        ]
       },
       "CharacterMoveLocationHistoryEntry": {
         "allOf": [

@@ -2561,6 +2561,16 @@ export class CharacterHistoryEntry implements ICharacterHistoryEntry {
 
     static fromJS(data: any): CharacterHistoryEntry {
         data = typeof data === 'object' ? data : {};
+        if (data["$type"] === "created") {
+            let result = new CharacterCreatedHistoryEntry();
+            result.init(data);
+            return result;
+        }
+        if (data["$type"] === "deleted") {
+            let result = new CharacterDeletedHistoryEntry();
+            result.init(data);
+            return result;
+        }
         if (data["$type"] === "moved") {
             let result = new CharacterMoveLocationHistoryEntry();
             result.init(data);
@@ -2614,6 +2624,66 @@ export interface ICharacterHistoryEntry {
     /** The tick at which the event happened
              */
     tick: number;
+}
+
+/** Character created history entry */
+export class CharacterCreatedHistoryEntry extends CharacterHistoryEntry implements ICharacterCreatedHistoryEntry {
+
+    constructor(data?: ICharacterCreatedHistoryEntry) {
+        super(data);
+        this._discriminator = "created";
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+    }
+
+    static override fromJS(data: any): CharacterCreatedHistoryEntry {
+        data = typeof data === 'object' ? data : {};
+        let result = new CharacterCreatedHistoryEntry();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Character created history entry */
+export interface ICharacterCreatedHistoryEntry extends ICharacterHistoryEntry {
+}
+
+/** Character deleted history entry */
+export class CharacterDeletedHistoryEntry extends CharacterHistoryEntry implements ICharacterDeletedHistoryEntry {
+
+    constructor(data?: ICharacterDeletedHistoryEntry) {
+        super(data);
+        this._discriminator = "deleted";
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+    }
+
+    static override fromJS(data: any): CharacterDeletedHistoryEntry {
+        data = typeof data === 'object' ? data : {};
+        let result = new CharacterDeletedHistoryEntry();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Character deleted history entry */
+export interface ICharacterDeletedHistoryEntry extends ICharacterHistoryEntry {
 }
 
 /** Character moved to location history entry */
