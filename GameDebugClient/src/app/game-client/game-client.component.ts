@@ -8,8 +8,6 @@ import { SpinnerComponent } from '../common/spinner/spinner.component';
 import { SELECT_PLAYER_ROUTE } from '../routes';
 import { CurrentPageService } from './services/current-page.service';
 import { GameService } from './services/game.service';
-import { CreateCharacterComponent } from './widgets/create-character/create-character.component';
-import { InventoryComponent } from './widgets/inventory/inventory.component';
 import { PlayersComponent } from './widgets/players/players.component';
 import { SimulationComponent } from './widgets/simulation/simulation.component';
 import { TeamComponent } from './widgets/team/team.component';
@@ -19,7 +17,7 @@ import { TeamComponent } from './widgets/team/team.component';
   templateUrl: './game-client.component.html',
   standalone: true,
   providers: [CurrentPageService],
-  imports: [CommonModule, RouterOutlet, NgbDropdownModule, SpinnerComponent, InventoryComponent, CreateCharacterComponent, SimulationComponent, TeamComponent, PlayersComponent],
+  imports: [CommonModule, RouterOutlet, NgbDropdownModule, SpinnerComponent, SimulationComponent, TeamComponent, PlayersComponent],
 })
 export class GameClientComponent implements OnInit {
   protected settings: GameSettings = new GameSettings();

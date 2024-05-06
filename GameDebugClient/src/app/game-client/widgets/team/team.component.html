@@ -34,7 +34,34 @@
       @if (inCreation) {
         <div class="p-2">
           <h6>Create character</h6>
-          <app-create-character (character)="onCharacterCreated($event)"></app-create-character>
+          <form>
+            <div class="row mb-3">
+              <label for="name" class="col-sm-2 col-form-label col-form-label-sm">Name</label>
+              <div class="col-sm">
+                <input #name id="name" class="form-control form-control-sm" />
+              </div>
+            </div>
+            <div class="row mb-3">
+              <label for="class" class="col-sm-2 col-form-label col-form-label-sm">Class</label>
+              <div class="col-sm">
+                <select #class id="class" class="form-select form-select-sm">
+                  <option selected>Choose a class</option>
+                  @for (characterClass of characterClasses; track characterClass.value) {
+                    <option [value]="characterClass.value">{{ characterClass.display }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+            <div class="d-flex justify-content-end">
+              <button type="button" class="btn btn-sm btn-outline-dark" (click)="createCharacter(name.value, class.value)" [disabled]="creating">
+                @if (creating) {
+                  <app-spinner size="sm"></app-spinner>
+                } @else {
+                  Create
+                }
+              </button>
+            </div>
+          </form>
         </div>
       } @else {
         <a type="button" class="list-group-item list-group-item-action" (click)="inCreation = true">

@@ -6,13 +6,12 @@ import { SpinnerComponent } from '../../../common/spinner/spinner.component';
 import { CurrentPageService } from '../../services/current-page.service';
 import { GameService } from '../../services/game.service';
 import { PlayersService } from '../../services/players/players.service';
-import { CreateCharacterComponent } from '../create-character/create-character.component';
 
 @Component({
   selector: 'app-players',
   templateUrl: './players.component.html',
   standalone: true,
-  imports: [SpinnerComponent, CreateCharacterComponent],
+  imports: [SpinnerComponent],
 })
 export class PlayersComponent {
   protected inCreation: boolean = false;
