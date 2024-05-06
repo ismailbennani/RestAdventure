@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0-alpha.0.63+4948711c7b26c7a6dd720a9cc8db55799dda4fa1"
+    "version": "0.0.0-alpha.0.66+a379f97f49a9d7d9bec2e8d304fde2e219461277"
   },
   "servers": [
     {
@@ -14,7 +14,7 @@
     "/game/status/ping": {
       "get": {
         "tags": [
-          "GameApiStatus"
+          "Status"
         ],
         "summary": "Ping",
         "operationId": "GameApiStatus_Ping",
@@ -858,10 +858,15 @@
       },
       "GameSettings": {
         "type": "object",
+        "description": "Game settings\n            ",
         "additionalProperties": false,
+        "required": [
+          "maxTeamSize"
+        ],
         "properties": {
           "maxTeamSize": {
             "type": "integer",
+            "description": "The max number of characters in a team\n            ",
             "format": "int32"
           }
         }
@@ -1351,6 +1356,9 @@
     }
   },
   "tags": [
+    {
+      "name": "Status"
+    },
     {
       "name": "Game"
     },

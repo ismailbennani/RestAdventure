@@ -4,8 +4,18 @@
     <ng-container [ngTemplateOutlet]="menuTitle" [ngTemplateOutletContext]="{ icon: 'globe', name: 'Game' }"> </ng-container>
     @if (gameState) {
       <app-simulation [state]="gameState" (refresh)="refreshGameState()"></app-simulation>
+    } @else {
+      <div class="text-center">Not found</div>
     }
-    <hr />
+
+    <ng-container [ngTemplateOutlet]="menuTitle" [ngTemplateOutletContext]="{ icon: 'people', name: 'Team' }"> </ng-container>
+    @if (team) {
+      <app-team [team]="team" [slots]="settings.maxTeamSize"></app-team>
+    } @else {
+      <div class="text-center">Not found</div>
+    }
+
+    <hr class="m-0" />
 
     <hr class="mt-auto" />
     <div ngbDropdown class="d-flex justify-content-between px-3 pb-3">
@@ -29,7 +39,7 @@
       } @else {
         @for (character of characters; track $index) {
           <div class="flex-grow-1">
-            @if (character && character !== 'loading') {
+            @if (character) {
               <div class="w-100 h-100 d-flex">
                 <div class="p-4">
                   <div class="d-flex">
@@ -115,8 +125,6 @@
                   }
                 </div>
               </div>
-            } @else if (character === 'loading') {
-              <app-spinner></app-spinner>
             } @else {
               <app-create-character (character)="addCharacter($event, $index)"></app-create-character>
             }
@@ -137,5 +145,5 @@
     }
     {{ name }}
   </h4>
-  <hr class="my-1" />
+  <hr class="m-0" />
 </ng-template>

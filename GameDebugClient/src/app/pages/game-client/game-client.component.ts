@@ -14,6 +14,7 @@ import {
   GameState,
   ILocationMinimal,
   InteractionMinimal,
+  Team,
   TeamApiClient,
   TeamCharacter,
   TeamCharactersActionsApiClient,
@@ -21,16 +22,17 @@ import {
 } from '../../../api/game-api-client.generated';
 import { SpinnerComponent } from '../../common/spinner/spinner.component';
 import { SELECT_PLAYER_ROUTE } from '../../routes';
+import { CreateCharacterComponent } from '../../widgets/create-character/create-character.component';
 import { InventoryComponent } from '../../widgets/inventory/inventory.component';
 import { SimulationComponent } from '../../widgets/simulation/simulation.component';
-import { CreateCharacterPageComponent } from '../create-character/create-character-page.component';
+import { TeamComponent } from '../../widgets/team/team.component';
 import { SelectedPlayerService } from '../select-player/selected-player.service';
 
 @Component({
   selector: 'app-game-client',
   standalone: true,
   templateUrl: './game-client.component.html',
-  imports: [CommonModule, NgbDropdownModule, NgbTooltipModule, SpinnerComponent, InventoryComponent, CreateCharacterPageComponent, SimulationComponent],
+  imports: [CommonModule, NgbDropdownModule, NgbTooltipModule, SpinnerComponent, InventoryComponent, CreateCharacterComponent, SimulationComponent, TeamComponent],
 })
 export class GameClientComponent implements OnInit {
   protected settings: GameSettings = new GameSettings();
@@ -38,7 +40,8 @@ export class GameClientComponent implements OnInit {
   protected loading: boolean = false;
   protected player: Player;
   protected gameState: GameState | undefined;
-  protected characters: (TeamCharacter | 'loading' | undefined)[] = [];
+  protected team: Team | undefined;
+  protected characters: (TeamCharacter | undefined)[] = [];
   protected accessibleLocations: { [characterId: string]: LocationMinimal[] } = {};
   protected entitiesWithInteractions: { [characterId: string]: EntityWithInteractions[] } = {};
   protected performingAction: { [characterId: string]: boolean } = {};
@@ -136,7 +139,7 @@ export class GameClientComponent implements OnInit {
 
   protected actionToString(action: CharacterAction) {
     if (action instanceof CharacterMoveToLocationAction) {
-      return `move to ${action.location.positionX}, ${action.location.positionY} (${action.location.area})`;
+      return `move to ${action.location.positionX}, ${action.location.positionY} (${action.location.area.name})`;
     }
 
     if (action instanceof CharacterInteractWithEntityAction) {
@@ -181,6 +184,7 @@ export class GameClientComponent implements OnInit {
   private refreshCharacters(): Observable<unknown> {
     return this.teamApiClient.getTeam().pipe(
       map(team => {
+        this.team = team;
         this.characters = new Array(this.settings.maxTeamSize);
         for (let i = 0; i < team.characters.length; i++) {
           this.characters[i] = team.characters[i];
@@ -194,7 +198,7 @@ export class GameClientComponent implements OnInit {
   }
 
   private refreshAccessibleLocations(): Observable<unknown> {
-    const characters: TeamCharacter[] = this.characters.filter(c => Boolean(c) && c != 'loading').map(c => c as TeamCharacter);
+    const characters: TeamCharacter[] = this.characters.filter(c => Boolean(c)).map(c => c as TeamCharacter);
     if (characters.length === 0) {
       return of(void 0);
     }
@@ -210,7 +214,7 @@ export class GameClientComponent implements OnInit {
   }
 
   private refreshAvailableInteractions(): Observable<unknown> {
-    const characters: TeamCharacter[] = this.characters.filter(c => Boolean(c) && c != 'loading').map(c => c as TeamCharacter);
+    const characters: TeamCharacter[] = this.characters.filter(c => Boolean(c)).map(c => c as TeamCharacter);
     if (characters.length === 0) {
       return of(void 0);
     }

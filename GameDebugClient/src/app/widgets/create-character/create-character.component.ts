@@ -7,10 +7,10 @@ import { CharacterClass, CreateCharacterRequest, TeamCharacter, TeamCharactersAp
   selector: 'app-create-character',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './create-character-page.component.html',
+  templateUrl: './create-character.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CreateCharacterPageComponent {
+export class CreateCharacterComponent {
   protected creating: boolean = false;
 
   @Output() character: EventEmitter<TeamCharacter> = new EventEmitter<TeamCharacter>();

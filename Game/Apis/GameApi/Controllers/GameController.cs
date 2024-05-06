@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using NSwag.Annotations;
 using RestAdventure.Core;
-using RestAdventure.Core.Settings;
 using RestAdventure.Game.Apis.Common.Dtos;
 using RestAdventure.Game.Apis.GameApi.Services.Game;
 
@@ -17,13 +15,11 @@ public class GameController : GameApiController
 {
     readonly GameService _gameService;
     readonly GameScheduler _gameScheduler;
-    readonly IOptions<GameSettings> _gameSettings;
 
     /// <summary>
     /// </summary>
-    public GameController(GameService gameService, GameScheduler gameScheduler, IOptions<GameSettings> gameSettings)
+    public GameController(GameService gameService, GameScheduler gameScheduler)
     {
-        _gameSettings = gameSettings;
         _gameService = gameService;
         _gameScheduler = gameScheduler;
     }
@@ -33,7 +29,7 @@ public class GameController : GameApiController
     /// </summary>
     /// <returns></returns>
     [HttpGet("settings")]
-    public GameSettings GetGameSettings() => _gameSettings.Value;
+    public GameSettingsDto GetGameSettings() => _gameService.RequireGameState().Settings.ToDto();
 
     /// <summary>
     ///     Get game state

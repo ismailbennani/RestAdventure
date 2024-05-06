@@ -1423,8 +1423,11 @@ export interface IHarvestable {
     description?: string | undefined;
 }
 
+/** Game settings */
 export class GameSettings implements IGameSettings {
-    maxTeamSize?: number;
+    /** The max number of characters in a team
+             */
+    maxTeamSize!: number;
 
     constructor(data?: IGameSettings) {
         if (data) {
@@ -1455,8 +1458,11 @@ export class GameSettings implements IGameSettings {
     }
 }
 
+/** Game settings */
 export interface IGameSettings {
-    maxTeamSize?: number;
+    /** The max number of characters in a team
+             */
+    maxTeamSize: number;
 }
 
 /** Game state */
