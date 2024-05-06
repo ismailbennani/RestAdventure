@@ -1,8 +1,17 @@
 <div class="d-flex flex-wrap">
   @for (stack of inventory.stacks; track stack.itemInstance.id) {
     <button class="btn btn-outline-secondary">
-      {{ stack.count }}x
-      {{ stack.itemInstance.item.name }}
+      <div class="d-flex gap-2">
+        <div>
+          {{ stack.count }}x
+          {{ stack.itemInstance.item.name }}
+        </div>
+        <div class="vr"></div>
+        <div>
+          <i class="bi bi-duffle-fill" ngbTooltip="Weight"></i>
+          {{ stack.itemInstance.item.weight * stack.count }}
+        </div>
+      </div>
     </button>
   }
 </div>

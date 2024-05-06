@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ReplaySubject, combineLatest, forkJoin, map, of, switchMap } from 'rxjs';
-import { ILocationMinimal, LocationMinimal } from '../../../../api/admin-api-client.generated';
+import { ILocationMinimal, LocationMinimal, Player } from '../../../../api/admin-api-client.generated';
 import {
   CharacterInteractWithEntityAction,
   CharacterMoveToLocationAction,
@@ -35,6 +35,7 @@ export class CharacterPageComponent implements OnInit {
   protected accessibleLocations: LocationMinimal[] = [];
   protected entitiesWithInteractions: EntityWithInteractions[] = [];
 
+  private player: Player | undefined;
   private team: Team | undefined;
   private refreshSubject: ReplaySubject<void> = new ReplaySubject<void>(1);
 
@@ -53,8 +54,9 @@ export class CharacterPageComponent implements OnInit {
       characterId: this.route.paramMap.pipe(map(paramMap => paramMap.get('character-id') ?? undefined)),
       player: this.playersService.selected$,
       team: this.teamService.team$,
-    }).subscribe(({ characterId, team }) => {
+    }).subscribe(({ characterId, player, team }) => {
       this.characterId = characterId;
+      this.player = player;
       this.team = team;
       this.refreshSubject.next();
     });

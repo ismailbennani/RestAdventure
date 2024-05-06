@@ -19,6 +19,12 @@ public class ItemMinimalDto
     /// </summary>
     [Required]
     public required string Name { get; init; }
+
+    /// <summary>
+    ///     The weight of the item
+    /// </summary>
+    [Required]
+    public required int Weight { get; init; }
 }
 
 static class ItemMinimalMappingExtensions
@@ -27,6 +33,7 @@ static class ItemMinimalMappingExtensions
         new()
         {
             Id = item.Id.Guid,
-            Name = item.Name
+            Name = item.Name,
+            Weight = item.Weight
         };
 }

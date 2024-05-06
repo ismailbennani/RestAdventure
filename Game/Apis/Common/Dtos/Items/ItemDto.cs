@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using RestAdventure.Core.Items;
+﻿using RestAdventure.Core.Items;
 
 namespace RestAdventure.Game.Apis.Common.Dtos.Items;
 
@@ -12,12 +11,6 @@ public class ItemDto : ItemMinimalDto
     ///     The description of the item
     /// </summary>
     public string? Description { get; init; }
-
-    /// <summary>
-    ///     The weight of the item
-    /// </summary>
-    [Required]
-    public required int Weight { get; init; }
 }
 
 static class ItemMappingExtensions

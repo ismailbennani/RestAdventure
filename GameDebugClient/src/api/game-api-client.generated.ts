@@ -1049,6 +1049,9 @@ export class ItemMinimal implements IItemMinimal {
     /** The name of the item
              */
     name!: string;
+    /** The weight of the item
+             */
+    weight!: number;
 
     constructor(data?: IItemMinimal) {
         if (data) {
@@ -1063,6 +1066,7 @@ export class ItemMinimal implements IItemMinimal {
         if (_data) {
             this.id = _data["id"];
             this.name = _data["name"];
+            this.weight = _data["weight"];
         }
     }
 
@@ -1077,6 +1081,7 @@ export class ItemMinimal implements IItemMinimal {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
         data["name"] = this.name;
+        data["weight"] = this.weight;
         return data;
     }
 }
@@ -1089,6 +1094,9 @@ export interface IItemMinimal {
     /** The name of the item
              */
     name: string;
+    /** The weight of the item
+             */
+    weight: number;
 }
 
 /** Item */
@@ -1096,9 +1104,6 @@ export class Item extends ItemMinimal implements IItem {
     /** The description of the item
              */
     description?: string | undefined;
-    /** The weight of the item
-             */
-    weight!: number;
 
     constructor(data?: IItem) {
         super(data);
@@ -1108,7 +1113,6 @@ export class Item extends ItemMinimal implements IItem {
         super.init(_data);
         if (_data) {
             this.description = _data["description"];
-            this.weight = _data["weight"];
         }
     }
 
@@ -1122,7 +1126,6 @@ export class Item extends ItemMinimal implements IItem {
     override toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["description"] = this.description;
-        data["weight"] = this.weight;
         super.toJSON(data);
         return data;
     }
@@ -1133,9 +1136,6 @@ export interface IItem extends IItemMinimal {
     /** The description of the item
              */
     description?: string | undefined;
-    /** The weight of the item
-             */
-    weight: number;
 }
 
 export class ProblemDetails implements IProblemDetails {

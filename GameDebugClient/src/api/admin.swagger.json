@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Admin API",
-    "version": "0.0.0-alpha.0.74+b575d5b023b14d7f035727988d3ec0933388bc7e"
+    "version": "0.0.0-alpha.0.77+c01c756bb7145935e94ec8298bc73a7d128ff504"
   },
   "servers": [
     {
@@ -463,19 +463,11 @@
             "type": "object",
             "description": "Item\n            ",
             "additionalProperties": false,
-            "required": [
-              "weight"
-            ],
             "properties": {
               "description": {
                 "type": "string",
                 "description": "The description of the item\n            ",
                 "nullable": true
-              },
-              "weight": {
-                "type": "integer",
-                "description": "The weight of the item\n            ",
-                "format": "int32"
               }
             }
           }
@@ -487,7 +479,8 @@
         "additionalProperties": false,
         "required": [
           "id",
-          "name"
+          "name",
+          "weight"
         ],
         "properties": {
           "id": {
@@ -500,6 +493,11 @@
             "type": "string",
             "description": "The name of the item\n            ",
             "minLength": 1
+          },
+          "weight": {
+            "type": "integer",
+            "description": "The weight of the item\n            ",
+            "format": "int32"
           }
         }
       },
