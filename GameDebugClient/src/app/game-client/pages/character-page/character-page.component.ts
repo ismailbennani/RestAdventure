@@ -21,12 +21,13 @@ import { TeamService } from '../../services/team/team.service';
 import { CharacterHistoryComponent } from '../../widgets/character-history/character-history.component';
 import { CharacterComponent } from '../../widgets/character/character.component';
 import { InventoryComponent } from '../../widgets/inventory/inventory.component';
+import { JobsComponent } from '../../widgets/jobs/jobs.component';
 
 @Component({
   selector: 'app-character-page',
   templateUrl: './character-page.component.html',
   standalone: true,
-  imports: [CommonModule, SpinnerComponent, InventoryComponent, CharacterComponent, CharacterHistoryComponent],
+  imports: [CommonModule, SpinnerComponent, InventoryComponent, CharacterComponent, CharacterHistoryComponent, JobsComponent],
 })
 export class CharacterPageComponent implements OnInit {
   protected loading: boolean = false;

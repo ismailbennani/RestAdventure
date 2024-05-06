@@ -26,11 +26,7 @@ public class HarvestInteractionInstance : InteractionInstance
         return Task.CompletedTask;
     }
 
-    public override bool IsOver(GameContent content, GameState state)
-    {
-        const int duration = 10;
-        return state.Tick - _startTick >= duration;
-    }
+    public override bool IsOver(GameContent content, GameState state) => state.Tick - _startTick >= HarvestableInstance.Harvestable.HarvestDuration;
 
     public override Task OnEndAsync(GameContent content, GameState state)
     {

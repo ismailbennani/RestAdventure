@@ -1,0 +1,5 @@
+<ul>
+  @for (jobInstance of jobs; track jobInstance.job.id) {
+    <li>{{ jobInstance.job.name | titlecase }}: lv. {{ jobInstance.level }} ({{ jobInstance.experience }} exp)</li>
+  }
+</ul>

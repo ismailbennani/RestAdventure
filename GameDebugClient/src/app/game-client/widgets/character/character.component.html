@@ -40,12 +40,4 @@
       <li>Weight: {{ character.inventory.weight }}</li>
     </ul>
   </div>
-  <div class="col">
-    <h6>Jobs</h6>
-    <ul>
-      @for (jobInstance of character.jobs; track jobInstance.job.id) {
-        <li>{{ jobInstance.job.name | titlecase }}: lv. {{ jobInstance.level }} ({{ jobInstance.experience }} exp)</li>
-      }
-    </ul>
-  </div>
 </div>

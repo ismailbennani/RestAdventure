@@ -27,9 +27,14 @@ public class Harvestable : GameResource<HarvestableId>
     public string? Description { get; init; }
 
     /// <summary>
-    ///     The condition that a character should fulfill to harvest this entity
+    ///     The condition that a character should fulfill to harvest the entity
     /// </summary>
     public ICharacterCondition? HarvestCondition { get; init; }
+
+    /// <summary>
+    ///     The number of ticks it takes the player to harvest the entity
+    /// </summary>
+    public required int HarvestDuration { get; init; }
 
     /// <summary>
     ///     The items that should be given to the character when they are done harvesting

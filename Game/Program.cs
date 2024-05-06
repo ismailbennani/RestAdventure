@@ -170,6 +170,7 @@ async Task<GameState> LoadGameAsync(WebApplication app)
         Name = "Apple Tree",
         Description = "A tree that has apples.",
         HarvestCondition = new CharacterJobCondition(gatherer),
+        HarvestDuration = 10,
         Items = [new ItemStack(apple, 1)],
         Experience = [new JobExperienceStack(gatherer, 1)]
     };
