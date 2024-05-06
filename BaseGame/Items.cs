@@ -1,4 +1,5 @@
-﻿using RestAdventure.Core.Items;
+﻿using System.Reflection;
+using RestAdventure.Core.Items;
 
 public class Items
 {
@@ -10,4 +11,7 @@ public class Items
 
     public Item Apple { get; }
     public Item Pear { get; }
+
+    public IEnumerable<Item> All =>
+        typeof(Items).GetProperties(BindingFlags.Instance | BindingFlags.Public).Where(p => p.PropertyType == typeof(Item)).Select(p => p.GetValue(this)).OfType<Item>();
 }

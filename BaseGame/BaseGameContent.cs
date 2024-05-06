@@ -1,5 +1,8 @@
 ﻿using BaseGame.Maps;
 using RestAdventure.Core;
+using RestAdventure.Core.Characters;
+using RestAdventure.Core.Items;
+using RestAdventure.Core.Jobs;
 using RestAdventure.Core.Maps.Areas;
 using RestAdventure.Core.Maps.Harvestables;
 using RestAdventure.Core.Maps.Locations;
@@ -12,26 +15,53 @@ public class BaseGameContent : ContentPlugin
     public override Task AddContentAsync(GameContent content)
     {
         CharacterClasses characterClasses = new();
-        content.Characters.Classes.Register(characterClasses.Knight);
-        content.Characters.Classes.Register(characterClasses.Mage);
-        content.Characters.Classes.Register(characterClasses.Scout);
-        content.Characters.Classes.Register(characterClasses.Dealer);
+        RegisterCharacterClasses(content, characterClasses.All);
 
         Items items = new();
-        content.Items.Register(items.Apple);
-        content.Items.Register(items.Pear);
+        RegisterItems(content, items.All);
 
         Jobs jobs = new();
-        content.Jobs.Register(jobs.Gatherer);
+        RegisterJobs(content, jobs.All);
 
         Harvestables harvestables = new(items, jobs);
-        content.Harvestables.Register(harvestables.AppleTree);
-        content.Harvestables.Register(harvestables.PearTree);
+        RegisterHarvestables(content, harvestables.All);
 
         GeneratedMaps generatedMaps = new MapGenerator(harvestables).GenerateMaps();
         RegisterMaps(content, generatedMaps);
 
         return Task.CompletedTask;
+    }
+
+    static void RegisterCharacterClasses(GameContent content, IEnumerable<CharacterClass> classes)
+    {
+        foreach (CharacterClass cls in classes)
+        {
+            content.Characters.Classes.Register(cls);
+        }
+    }
+
+    static void RegisterItems(GameContent content, IEnumerable<Item> items)
+    {
+        foreach (Item item in items)
+        {
+            content.Items.Register(item);
+        }
+    }
+
+    static void RegisterJobs(GameContent content, IEnumerable<Job> jobs)
+    {
+        foreach (Job job in jobs)
+        {
+            content.Jobs.Register(job);
+        }
+    }
+
+    static void RegisterHarvestables(GameContent content, IEnumerable<Harvestable> harvestables)
+    {
+        foreach (Harvestable harvestable in harvestables)
+        {
+            content.Harvestables.Register(harvestable);
+        }
     }
 
     static void RegisterMaps(GameContent content, GeneratedMaps generatedMaps)

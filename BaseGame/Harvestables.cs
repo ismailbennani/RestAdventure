@@ -1,4 +1,5 @@
-﻿using RestAdventure.Core.Conditions.Characters;
+﻿using System.Reflection;
+using RestAdventure.Core.Conditions.Characters;
 using RestAdventure.Core.Items;
 using RestAdventure.Core.Jobs;
 using RestAdventure.Core.Maps.Harvestables;
@@ -7,9 +8,6 @@ namespace BaseGame;
 
 public class Harvestables
 {
-    public Harvestable AppleTree { get; }
-    public Harvestable PearTree { get; }
-
     public Harvestables(Items items, Jobs jobs)
     {
         AppleTree = new Harvestable
@@ -32,4 +30,13 @@ public class Harvestables
             Experience = [new JobExperienceStack(jobs.Gatherer, 5)]
         };
     }
+
+    public Harvestable AppleTree { get; }
+    public Harvestable PearTree { get; }
+
+    public IEnumerable<Harvestable> All =>
+        typeof(Harvestables).GetProperties(BindingFlags.Instance | BindingFlags.Public)
+            .Where(p => p.PropertyType == typeof(Harvestable))
+            .Select(p => p.GetValue(this))
+            .OfType<Harvestable>();
 }
