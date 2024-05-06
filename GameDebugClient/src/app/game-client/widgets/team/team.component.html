@@ -1,45 +1,49 @@
-<div class="list-group list-group-flush">
-  @for (character of team.characters; track $index) {
-    <a
-      type="button"
-      class="list-group-item list-group-item-action"
-      [class.active]="currentPageService.isCharacterOpened(character)"
-      (click)="currentPageService.openCharacter(character)"
-    >
-      <div class="d-flex gap-1">
-        <div>
-          <i class="bi bi-person"></i>
-        </div>
-        <div>
+@if (teamService.team) {
+  <div class="list-group list-group-flush">
+    @for (character of teamService.team.characters; track $index) {
+      <a
+        type="button"
+        class="list-group-item list-group-item-action"
+        [class.active]="currentPageService.isCharacterOpened(character)"
+        (click)="currentPageService.openCharacter(character)"
+      >
+        <div class="d-flex gap-1">
           <div>
-            <span class="text-uppercase">{{ character.class }}</span>
-            {{ character.name }}
+            <i class="bi bi-person"></i>
           </div>
-          <div>{{ character.location.area.name }}: [{{ character.location.positionX }}, {{ character.location.positionY }}]</div>
+          <div>
+            <div>
+              <span class="text-uppercase">{{ character.class }}</span>
+              {{ character.name }}
+            </div>
+            <div>{{ character.location.area.name }}: [{{ character.location.positionX }}, {{ character.location.positionY }}]</div>
+          </div>
+          <div class="flex-grow-1"></div>
+          <div class="d-flex align-items-center justify-content-center">
+            @if (character.currentInteraction) {
+              <app-spinner></app-spinner>
+            } @else if (character.plannedAction) {
+              <i class="fs-1 lh-1 bi bi-dot"></i>
+            }
+          </div>
         </div>
-        <div class="flex-grow-1"></div>
-        <div class="d-flex align-items-center justify-content-center">
-          @if (character.currentInteraction) {
-            <app-spinner></app-spinner>
-          } @else if (character.plannedAction) {
-            <i class="fs-1 lh-1 bi bi-dot"></i>
-          }
-        </div>
-      </div>
-    </a>
-  }
-
-  @if (slots && team.characters.length < slots) {
-    @if (inCreation) {
-      <div class="p-2">
-        <h6>Create character</h6>
-        <app-create-character (character)="onCharacterCreated($event)"></app-create-character>
-      </div>
-    } @else {
-      <a type="button" class="list-group-item list-group-item-action" (click)="inCreation = true">
-        <i class="bi bi-plus"></i>
-        Create new ({{ team.characters.length }}/{{ slots }})
       </a>
     }
-  }
-</div>
+
+    @if (gameService.settings.maxTeamSize && teamService.team.characters.length < gameService.settings.maxTeamSize) {
+      @if (inCreation) {
+        <div class="p-2">
+          <h6>Create character</h6>
+          <app-create-character (character)="onCharacterCreated($event)"></app-create-character>
+        </div>
+      } @else {
+        <a type="button" class="list-group-item list-group-item-action" (click)="inCreation = true">
+          <i class="bi bi-plus"></i>
+          Create new character ({{ teamService.team.characters.length }}/{{ gameService.settings.maxTeamSize }})
+        </a>
+      }
+    }
+  </div>
+} @else {
+  <div class="text-center">Not found</div>
+}

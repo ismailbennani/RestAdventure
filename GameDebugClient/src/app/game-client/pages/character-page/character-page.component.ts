@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ReplaySubject, forkJoin, map, of, switchMap } from 'rxjs';
+import { ReplaySubject, combineLatest, forkJoin, map, of, switchMap, tap } from 'rxjs';
 import { ILocationMinimal, LocationMinimal } from '../../../../api/admin-api-client.generated';
 import {
   CharacterAction,
@@ -17,6 +17,8 @@ import {
 import { SpinnerComponent } from '../../../common/spinner/spinner.component';
 import { CurrentPageService } from '../../services/current-page.service';
 import { GameService } from '../../services/game.service';
+import { PlayersService } from '../../services/players/players.service';
+import { TeamService } from '../../services/team/team.service';
 import { InventoryComponent } from '../../widgets/inventory/inventory.component';
 
 @Component({
@@ -27,11 +29,11 @@ import { InventoryComponent } from '../../widgets/inventory/inventory.component'
 })
 export class CharacterPageComponent implements OnInit {
   protected loading: boolean = false;
+  protected characterId: string | undefined;
   protected character: TeamCharacter | undefined;
   protected accessibleLocations: LocationMinimal[] = [];
   protected entitiesWithInteractions: EntityWithInteractions[] = [];
 
-  private characterId: string | undefined;
   private team: Team | undefined;
   private refreshSubject: ReplaySubject<void> = new ReplaySubject<void>(1);
 
@@ -39,26 +41,36 @@ export class CharacterPageComponent implements OnInit {
     private route: ActivatedRoute,
     private currentPageService: CurrentPageService,
     private gameService: GameService,
+    private playersService: PlayersService,
+    private teamService: TeamService,
     private charactersApiClient: TeamCharactersApiClient,
     private charactersActionsApiClient: TeamCharactersActionsApiClient,
   ) {}
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe(paramMap => {
-      this.characterId = paramMap.get('character-id') ?? undefined;
-      this.refreshSubject.next();
-    });
-
-    this.gameService.team$.subscribe(team => {
+    combineLatest({
+      characterId: this.route.paramMap.pipe(map(paramMap => paramMap.get('character-id') ?? undefined)),
+      player: this.playersService.selected$,
+      team: this.teamService.team$,
+    }).subscribe(({ characterId, team }) => {
+      this.characterId = characterId;
       this.team = team;
       this.refreshSubject.next();
     });
 
     this.refreshSubject
       .pipe(
+        tap(() => (this.loading = true)),
         switchMap(() => {
           this.character = this.team?.characters.find(c => c.id === this.characterId);
+
+          if (!this.character && this.team && this.team.characters.length > 0) {
+            this.currentPageService.openCharacter(this.team.characters[0]);
+            return of(undefined);
+          }
+
           if (!this.character) {
+            this.character = undefined;
             return of(undefined);
           }
 
@@ -73,6 +85,7 @@ export class CharacterPageComponent implements OnInit {
           this.accessibleLocations = result?.locations ?? [];
           this.entitiesWithInteractions = result?.interactions ?? [];
         }),
+        tap(() => (this.loading = false)),
       )
       .subscribe();
   }

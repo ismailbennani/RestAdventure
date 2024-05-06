@@ -1,6 +1,12 @@
-@if (!character) {
+@if (loading) {
   <div class="w-100 h-100 d-flex align-items-center justify-content-center">
     <app-spinner></app-spinner>
+  </div>
+} @else if (!character) {
+  <div class="w-100 h-100 d-flex align-items-center justify-content-center">
+    <h1>
+      Character <code>{{ characterId }}</code> not found
+    </h1>
   </div>
 } @else {
   <div class="w-100 h-100 d-flex">

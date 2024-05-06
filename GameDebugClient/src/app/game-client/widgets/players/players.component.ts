@@ -1,30 +1,41 @@
 import { Component } from '@angular/core';
-import { TeamCharacter } from '../../../../api/game-api-client.generated';
+import { finalize, map } from 'rxjs';
+import { v4 as uuidv4 } from 'uuid';
+import { AdminPlayersApiClient } from '../../../../api/admin-api-client.generated';
 import { SpinnerComponent } from '../../../common/spinner/spinner.component';
 import { CurrentPageService } from '../../services/current-page.service';
 import { GameService } from '../../services/game.service';
 import { PlayersService } from '../../services/players/players.service';
-import { TeamService } from '../../services/team/team.service';
 import { CreateCharacterComponent } from '../create-character/create-character.component';
 
 @Component({
-  selector: 'app-team',
-  templateUrl: './team.component.html',
+  selector: 'app-players',
+  templateUrl: './players.component.html',
   standalone: true,
   imports: [SpinnerComponent, CreateCharacterComponent],
 })
-export class TeamComponent {
+export class PlayersComponent {
   protected inCreation: boolean = false;
+  protected creating: boolean = false;
 
   constructor(
     protected currentPageService: CurrentPageService,
     protected gameService: GameService,
     protected playersService: PlayersService,
-    protected teamService: TeamService,
+    protected playersApiClient: AdminPlayersApiClient,
   ) {}
 
-  protected onCharacterCreated(character: TeamCharacter) {
-    this.currentPageService.openCharacter(character);
-    this.inCreation = false;
+  protected createPlayer(name: string) {
+    var id = uuidv4();
+    this.playersApiClient
+      .registerPlayer(id, name)
+      .pipe(
+        map(player => this.playersService.refreshAndSelect(player.id)),
+        finalize(() => {
+          this.creating = false;
+          this.inCreation = false;
+        }),
+      )
+      .subscribe();
   }
 }

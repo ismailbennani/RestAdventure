@@ -3,13 +3,14 @@ import { Component, OnInit } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { LocationMinimal } from '../../api/admin-api-client.generated';
-import { EntityWithInteractions, GameSettings, GameState, Team, TeamCharacter } from '../../api/game-api-client.generated';
+import { EntityWithInteractions, GameSettings, GameState, TeamCharacter } from '../../api/game-api-client.generated';
 import { SpinnerComponent } from '../common/spinner/spinner.component';
 import { SELECT_PLAYER_ROUTE } from '../routes';
 import { CurrentPageService } from './services/current-page.service';
 import { GameService } from './services/game.service';
 import { CreateCharacterComponent } from './widgets/create-character/create-character.component';
 import { InventoryComponent } from './widgets/inventory/inventory.component';
+import { PlayersComponent } from './widgets/players/players.component';
 import { SimulationComponent } from './widgets/simulation/simulation.component';
 import { TeamComponent } from './widgets/team/team.component';
 
@@ -17,8 +18,8 @@ import { TeamComponent } from './widgets/team/team.component';
   selector: 'app-game-client',
   templateUrl: './game-client.component.html',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, NgbDropdownModule, SpinnerComponent, InventoryComponent, CreateCharacterComponent, SimulationComponent, TeamComponent],
   providers: [CurrentPageService],
+  imports: [CommonModule, RouterOutlet, NgbDropdownModule, SpinnerComponent, InventoryComponent, CreateCharacterComponent, SimulationComponent, TeamComponent, PlayersComponent],
 })
 export class GameClientComponent implements OnInit {
   protected settings: GameSettings = new GameSettings();
@@ -31,9 +32,6 @@ export class GameClientComponent implements OnInit {
 
   protected get gameState(): GameState | undefined {
     return this.gameService.state;
-  }
-  protected get team(): Team | undefined {
-    return this.gameService.team;
   }
 
   constructor(

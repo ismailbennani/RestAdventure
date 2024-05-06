@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, ReplaySubject, Subject, catchError, debounceTime, delay, map, of, switchMap, takeUntil, tap } from 'rxjs';
 import { AdminGameApiClient } from '../../../api/admin-api-client.generated';
-import { GameSettings, GameState, Team, TeamApiClient } from '../../../api/game-api-client.generated';
+import { GameSettings, GameState } from '../../../api/game-api-client.generated';
 
 @Injectable({
   providedIn: 'root',
@@ -21,16 +21,14 @@ export class GameService {
   private stateInternal: GameState | undefined;
   private stateSubject: ReplaySubject<GameState> = new ReplaySubject<GameState>(1);
 
-  private teamInternal: Team | undefined;
-  private teamSubject: ReplaySubject<Team> = new ReplaySubject<Team>(1);
-
-  constructor(
-    private adminGameApiClient: AdminGameApiClient,
-    private teamApiClient: TeamApiClient,
-  ) {}
+  constructor(private adminGameApiClient: AdminGameApiClient) {}
 
   public get connected(): boolean {
     return this.connectedInternal;
+  }
+
+  public get connected$(): Observable<boolean> {
+    return this.connectedSubject;
   }
 
   public get refreshing(): boolean {
@@ -47,14 +45,6 @@ export class GameService {
 
   public get state$(): Observable<GameState | undefined> {
     return this.stateSubject.asObservable();
-  }
-
-  public get team(): Team | undefined {
-    return this.teamInternal;
-  }
-
-  public get team$(): Observable<Team | undefined> {
-    return this.teamSubject.asObservable();
   }
 
   start() {
@@ -89,16 +79,6 @@ export class GameService {
           return of({});
         }),
         tap(() => (this.refreshingInternal = false)),
-      )
-      .subscribe();
-
-    this.stateSubject
-      .pipe(
-        switchMap(() => this.teamApiClient.getTeam()),
-        map(team => {
-          this.teamInternal = team;
-          this.teamSubject.next(team);
-        }),
       )
       .subscribe();
 

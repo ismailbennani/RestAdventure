@@ -1,0 +1,49 @@
+@if (playersService.players) {
+  <div class="list-group list-group-flush">
+    @for (player of playersService.players; track $index) {
+      <a type="button" class="list-group-item list-group-item-action" [class.active]="playersService.selected?.id === player.id" (click)="playersService.select(player.id)">
+        <div class="overflow-hidden d-flex gap-1">
+          <div>
+            <i class="bi bi-person"></i>
+          </div>
+          <div class="overflow-hidden">
+            <div>
+              {{ player.name }}
+            </div>
+            <div class="text-truncate small">{{ player.id }}</div>
+          </div>
+        </div>
+      </a>
+    }
+
+    @if (inCreation) {
+      <div class="p-2">
+        <h6>Create player</h6>
+        <form>
+          <div class="row mb-3">
+            <label for="name" class="col-sm-2 col-form-label col-form-label-sm">Name</label>
+            <div class="col-sm">
+              <input #name id="name" class="form-control form-control-sm" />
+            </div>
+          </div>
+          <div class="d-flex justify-content-end">
+            <button type="button" class="btn btn-sm btn-outline-dark" (click)="createPlayer(name.value)" [disabled]="creating">
+              @if (creating) {
+                <app-spinner size="sm"></app-spinner>
+              } @else {
+                Create
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    } @else {
+      <a type="button" class="list-group-item list-group-item-action" (click)="inCreation = true">
+        <i class="bi bi-plus"></i>
+        Create new player
+      </a>
+    }
+  </div>
+} @else {
+  <div class="text-center">Not found</div>
+}

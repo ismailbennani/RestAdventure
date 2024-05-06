@@ -2,19 +2,16 @@
   <div class="vr ms-1"></div>
   <div class="d-flex flex-column" style="width: 280px">
     <ng-container [ngTemplateOutlet]="menuTitle" [ngTemplateOutletContext]="{ icon: 'globe', name: 'Game' }"> </ng-container>
-    @if (gameState) {
-      <app-simulation></app-simulation>
-    } @else {
-      <div class="text-center">Not found</div>
-    }
+    <app-simulation></app-simulation>
 
-    <ng-container [ngTemplateOutlet]="menuTitle" [ngTemplateOutletContext]="{ icon: 'people', name: 'Team', active: this.currentPageService.isAnyCharacterOpened() }">
-    </ng-container>
-    @if (team) {
-      <app-team [team]="team" [slots]="settings.maxTeamSize"></app-team>
-    } @else {
-      <div class="text-center">Not found</div>
-    }
+    <ng-container [ngTemplateOutlet]="menuTitle" [ngTemplateOutletContext]="{ icon: 'people', name: 'Players' }"></ng-container>
+    <app-players></app-players>
+
+    <ng-container
+      [ngTemplateOutlet]="menuTitle"
+      [ngTemplateOutletContext]="{ icon: 'people', name: 'Team', active: this.currentPageService.isAnyCharacterOpened() }"
+    ></ng-container>
+    <app-team></app-team>
 
     <hr class="m-0" />
   </div>
