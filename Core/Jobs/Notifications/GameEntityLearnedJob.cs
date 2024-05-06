@@ -1,7 +1,6 @@
 ﻿using MediatR;
-using RestAdventure.Core.Jobs;
 
-namespace RestAdventure.Core.Entities.Notifications;
+namespace RestAdventure.Core.Jobs.Notifications;
 
 public class GameEntityLearnedJob : INotification
 {

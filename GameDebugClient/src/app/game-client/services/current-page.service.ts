@@ -14,8 +14,6 @@ export class CurrentPageService {
     this.router.events
       .pipe(
         tap(evt => {
-          console.log(evt);
-
           if (evt.type === EventType.NavigationEnd) {
             const characterIdPrefix = '/game/characters/';
             if (evt.urlAfterRedirects.startsWith(characterIdPrefix)) {

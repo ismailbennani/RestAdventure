@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using RestAdventure.Core.Entities.Notifications;
+using RestAdventure.Core.Jobs.Notifications;
 
 namespace RestAdventure.Core.Characters.Notifications;
 

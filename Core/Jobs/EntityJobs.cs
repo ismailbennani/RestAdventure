@@ -5,7 +5,8 @@ public class EntityJobs
     readonly Dictionary<JobId, JobInstance> _jobs = new();
 
     public event EventHandler<Job>? JobLearned;
-    public event EventHandler<EntityJobLeveledUpEvent>? JobLeveldUp;
+    public event EventHandler<EntityJobGainedExperienceEvent>? JobGainedExperience;
+    public event EventHandler<EntityJobLeveledUpEvent>? JobLeveledUp;
 
     public JobInstance Learn(Job job)
     {
@@ -14,7 +15,17 @@ public class EntityJobs
 
         JobLearned?.Invoke(this, job);
 
-        jobInstance.LeveledUp += (_, args) => JobLeveldUp?.Invoke(
+        jobInstance.GainedExperience += (_, args) => JobGainedExperience?.Invoke(
+            this,
+            new EntityJobGainedExperienceEvent
+            {
+                Job = jobInstance.Job,
+                OldExperience = args.OldExperience,
+                NewExperience = args.NewExperience
+            }
+        );
+
+        jobInstance.LeveledUp += (_, args) => JobLeveledUp?.Invoke(
             this,
             new EntityJobLeveledUpEvent
             {
@@ -28,6 +39,13 @@ public class EntityJobs
     }
 
     public JobInstance? Get(Job job) => _jobs.GetValueOrDefault(job.Id);
+}
+
+public class EntityJobGainedExperienceEvent
+{
+    public required Job Job { get; init; }
+    public required int OldExperience { get; init; }
+    public required int NewExperience { get; init; }
 }
 
 public class EntityJobLeveledUpEvent

@@ -2,6 +2,7 @@
 using RestAdventure.Core.Entities.Notifications;
 using RestAdventure.Core.Items;
 using RestAdventure.Core.Jobs;
+using RestAdventure.Core.Jobs.Notifications;
 using RestAdventure.Core.Maps.Locations;
 
 namespace RestAdventure.Core.Entities;
@@ -70,7 +71,9 @@ public class GameEntities
     void RegisterJobsEvents(IGameEntityWithJobs entity)
     {
         entity.Jobs.JobLearned += (_, job) => PublishSync(new GameEntityLearnedJob { Entity = entity, Job = job });
-        entity.Jobs.JobLeveldUp += (_, args) => PublishSync(new GameEntityJobLeveledUp { Entity = entity, Job = args.Job, OldLevel = args.OldLevel, NewLevel = args.NewLevel });
+        entity.Jobs.JobGainedExperience += (_, args) =>
+            PublishSync(new GameEntityJobGainedExperience { Entity = entity, Job = args.Job, OldExperience = args.OldExperience, NewExperience = args.NewExperience });
+        entity.Jobs.JobLeveledUp += (_, args) => PublishSync(new GameEntityJobLeveledUp { Entity = entity, Job = args.Job, OldLevel = args.OldLevel, NewLevel = args.NewLevel });
     }
 
     void PublishSync(INotification notification) => GameState.Publisher.Publish(notification).Wait();

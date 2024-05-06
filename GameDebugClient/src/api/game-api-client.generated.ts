@@ -2581,6 +2581,21 @@ export class CharacterHistoryEntry implements ICharacterHistoryEntry {
             result.init(data);
             return result;
         }
+        if (data["$type"] === "job-learned") {
+            let result = new CharacterLearnedJobHistoryEntry();
+            result.init(data);
+            return result;
+        }
+        if (data["$type"] === "job-gained-experience") {
+            let result = new CharacterJobGainedExperienceHistoryEntry();
+            result.init(data);
+            return result;
+        }
+        if (data["$type"] === "job-leveled-up") {
+            let result = new CharacterJobLeveledUpHistoryEntry();
+            result.init(data);
+            return result;
+        }
         let result = new CharacterHistoryEntry();
         result.init(data);
         return result;
@@ -2911,6 +2926,182 @@ export interface ICharacterEndedInteractionHistoryEntry extends ICharacterHistor
     /** The name of the entity that was the subject of the interaction
              */
     subjectName: string;
+}
+
+/** Character learned job history entry */
+export class CharacterLearnedJobHistoryEntry extends CharacterHistoryEntry implements ICharacterLearnedJobHistoryEntry {
+    /** The unique ID of the job
+             */
+    jobId!: string;
+    /** The name of the job
+             */
+    jobName!: string;
+
+    constructor(data?: ICharacterLearnedJobHistoryEntry) {
+        super(data);
+        this._discriminator = "job-learned";
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.jobId = _data["jobId"];
+            this.jobName = _data["jobName"];
+        }
+    }
+
+    static override fromJS(data: any): CharacterLearnedJobHistoryEntry {
+        data = typeof data === 'object' ? data : {};
+        let result = new CharacterLearnedJobHistoryEntry();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["jobId"] = this.jobId;
+        data["jobName"] = this.jobName;
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Character learned job history entry */
+export interface ICharacterLearnedJobHistoryEntry extends ICharacterHistoryEntry {
+    /** The unique ID of the job
+             */
+    jobId: string;
+    /** The name of the job
+             */
+    jobName: string;
+}
+
+/** Character learned job history entry */
+export class CharacterJobGainedExperienceHistoryEntry extends CharacterHistoryEntry implements ICharacterJobGainedExperienceHistoryEntry {
+    /** The unique ID of the job
+             */
+    jobId!: string;
+    /** The name of the job
+             */
+    jobName!: string;
+    /** The old level of the job
+             */
+    oldExperience!: number;
+    /** The new level of the job
+             */
+    newExperience!: number;
+
+    constructor(data?: ICharacterJobGainedExperienceHistoryEntry) {
+        super(data);
+        this._discriminator = "job-gained-experience";
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.jobId = _data["jobId"];
+            this.jobName = _data["jobName"];
+            this.oldExperience = _data["oldExperience"];
+            this.newExperience = _data["newExperience"];
+        }
+    }
+
+    static override fromJS(data: any): CharacterJobGainedExperienceHistoryEntry {
+        data = typeof data === 'object' ? data : {};
+        let result = new CharacterJobGainedExperienceHistoryEntry();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["jobId"] = this.jobId;
+        data["jobName"] = this.jobName;
+        data["oldExperience"] = this.oldExperience;
+        data["newExperience"] = this.newExperience;
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Character learned job history entry */
+export interface ICharacterJobGainedExperienceHistoryEntry extends ICharacterHistoryEntry {
+    /** The unique ID of the job
+             */
+    jobId: string;
+    /** The name of the job
+             */
+    jobName: string;
+    /** The old level of the job
+             */
+    oldExperience: number;
+    /** The new level of the job
+             */
+    newExperience: number;
+}
+
+/** Character learned job history entry */
+export class CharacterJobLeveledUpHistoryEntry extends CharacterHistoryEntry implements ICharacterJobLeveledUpHistoryEntry {
+    /** The unique ID of the job
+             */
+    jobId!: string;
+    /** The name of the job
+             */
+    jobName!: string;
+    /** The old level of the job
+             */
+    oldLevel!: number;
+    /** The new level of the job
+             */
+    newLevel!: number;
+
+    constructor(data?: ICharacterJobLeveledUpHistoryEntry) {
+        super(data);
+        this._discriminator = "job-leveled-up";
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.jobId = _data["jobId"];
+            this.jobName = _data["jobName"];
+            this.oldLevel = _data["oldLevel"];
+            this.newLevel = _data["newLevel"];
+        }
+    }
+
+    static override fromJS(data: any): CharacterJobLeveledUpHistoryEntry {
+        data = typeof data === 'object' ? data : {};
+        let result = new CharacterJobLeveledUpHistoryEntry();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["jobId"] = this.jobId;
+        data["jobName"] = this.jobName;
+        data["oldLevel"] = this.oldLevel;
+        data["newLevel"] = this.newLevel;
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Character learned job history entry */
+export interface ICharacterJobLeveledUpHistoryEntry extends ICharacterHistoryEntry {
+    /** The unique ID of the job
+             */
+    jobId: string;
+    /** The name of the job
+             */
+    jobName: string;
+    /** The old level of the job
+             */
+    oldLevel: number;
+    /** The new level of the job
+             */
+    newLevel: number;
 }
 
 /** Team of characters */

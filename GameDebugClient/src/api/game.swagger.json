@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0-alpha.0.77+c01c756bb7145935e94ec8298bc73a7d128ff504"
+    "version": "0.0.0-alpha.0.78+401c56c4ccc5d69f9340ea3766559297d6936627"
   },
   "servers": [
     {
@@ -1488,7 +1488,10 @@
             "moved": "#/components/schemas/CharacterMoveLocationHistoryEntry",
             "inventory-changed": "#/components/schemas/CharacterInventoryChangedHistoryEntry",
             "interaction-started": "#/components/schemas/CharacterStartedInteractionHistoryEntry",
-            "interaction-ended": "#/components/schemas/CharacterEndedInteractionHistoryEntry"
+            "interaction-ended": "#/components/schemas/CharacterEndedInteractionHistoryEntry",
+            "job-learned": "#/components/schemas/CharacterLearnedJobHistoryEntry",
+            "job-gained-experience": "#/components/schemas/CharacterJobGainedExperienceHistoryEntry",
+            "job-leveled-up": "#/components/schemas/CharacterJobLeveledUpHistoryEntry"
           }
         },
         "description": "Character history entry\n            ",
@@ -1715,6 +1718,117 @@
                 "type": "string",
                 "description": "The name of the entity that was the subject of the interaction\n            ",
                 "minLength": 1
+              }
+            }
+          }
+        ]
+      },
+      "CharacterLearnedJobHistoryEntry": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CharacterHistoryEntry"
+          },
+          {
+            "type": "object",
+            "description": "Character learned job history entry\n            ",
+            "additionalProperties": false,
+            "required": [
+              "jobId",
+              "jobName"
+            ],
+            "properties": {
+              "jobId": {
+                "type": "string",
+                "description": "The unique ID of the job\n            ",
+                "format": "guid",
+                "minLength": 1
+              },
+              "jobName": {
+                "type": "string",
+                "description": "The name of the job\n            ",
+                "minLength": 1
+              }
+            }
+          }
+        ]
+      },
+      "CharacterJobGainedExperienceHistoryEntry": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CharacterHistoryEntry"
+          },
+          {
+            "type": "object",
+            "description": "Character learned job history entry\n            ",
+            "additionalProperties": false,
+            "required": [
+              "jobId",
+              "jobName",
+              "oldExperience",
+              "newExperience"
+            ],
+            "properties": {
+              "jobId": {
+                "type": "string",
+                "description": "The unique ID of the job\n            ",
+                "format": "guid",
+                "minLength": 1
+              },
+              "jobName": {
+                "type": "string",
+                "description": "The name of the job\n            ",
+                "minLength": 1
+              },
+              "oldExperience": {
+                "type": "integer",
+                "description": "The old level of the job\n            ",
+                "format": "int32"
+              },
+              "newExperience": {
+                "type": "integer",
+                "description": "The new level of the job\n            ",
+                "format": "int32"
+              }
+            }
+          }
+        ]
+      },
+      "CharacterJobLeveledUpHistoryEntry": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CharacterHistoryEntry"
+          },
+          {
+            "type": "object",
+            "description": "Character learned job history entry\n            ",
+            "additionalProperties": false,
+            "required": [
+              "jobId",
+              "jobName",
+              "oldLevel",
+              "newLevel"
+            ],
+            "properties": {
+              "jobId": {
+                "type": "string",
+                "description": "The unique ID of the job\n            ",
+                "format": "guid",
+                "minLength": 1
+              },
+              "jobName": {
+                "type": "string",
+                "description": "The name of the job\n            ",
+                "minLength": 1
+              },
+              "oldLevel": {
+                "type": "integer",
+                "description": "The old level of the job\n            ",
+                "format": "int32"
+              },
+              "newLevel": {
+                "type": "integer",
+                "description": "The new level of the job\n            ",
+                "format": "int32"
               }
             }
           }

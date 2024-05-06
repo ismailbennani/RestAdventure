@@ -5,6 +5,9 @@ import {
   CharacterEndedInteractionHistoryEntry,
   CharacterHistoryEntry,
   CharacterInventoryChangedHistoryEntry,
+  CharacterJobGainedExperienceHistoryEntry,
+  CharacterJobLeveledUpHistoryEntry,
+  CharacterLearnedJobHistoryEntry,
   CharacterMoveLocationHistoryEntry,
   CharacterStartedInteractionHistoryEntry,
   TeamCharacter,
@@ -94,6 +97,18 @@ export class CharacterHistoryComponent implements OnInit {
 
     if (entry instanceof CharacterEndedInteractionHistoryEntry) {
       return `Ended interaction ${entry.interactionName} with ${entry.subjectName}`;
+    }
+
+    if (entry instanceof CharacterLearnedJobHistoryEntry) {
+      return `Learned job ${entry.jobName}`;
+    }
+
+    if (entry instanceof CharacterJobGainedExperienceHistoryEntry) {
+      return `${entry.jobName}: +${entry.newExperience - entry.oldExperience} exp (${entry.newExperience})`;
+    }
+
+    if (entry instanceof CharacterJobLeveledUpHistoryEntry) {
+      return `${entry.jobName}: +${entry.newLevel - entry.oldLevel} lv. (${entry.newLevel})`;
     }
 
     return '???';

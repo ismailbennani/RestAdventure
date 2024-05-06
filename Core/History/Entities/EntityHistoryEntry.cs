@@ -4,10 +4,10 @@ namespace RestAdventure.Core.History.Entities;
 
 public abstract class EntityHistoryEntry : HistoryEntry
 {
-    protected EntityHistoryEntry(IGameEntity character, long tick) : base(tick)
+    protected EntityHistoryEntry(IGameEntity entity, long tick) : base(tick)
     {
-        EntityId = character.Id;
-        EntityName = character.Name;
+        EntityId = entity.Id;
+        EntityName = entity.Name;
     }
 
     public GameEntityId EntityId { get; }

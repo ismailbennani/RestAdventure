@@ -25,18 +25,27 @@ public class JobInstance
     public int Experience { get; private set; }
 
     /// <summary>
+    ///     Event fired each time the job gains experience.
+    /// </summary>
+    public event EventHandler<JobGainedExperienceEvent>? GainedExperience;
+
+    /// <summary>
     ///     Event fired each time the job levels up.
     /// </summary>
     public event EventHandler<JobLeveledUpEvent>? LeveledUp;
 
     public void GainExperience(int experience)
     {
-        if (experience < 0)
+        if (experience <= 0)
         {
             throw new ArgumentException($"Expected experience to be positive, but got {experience}.");
         }
 
+        int oldExperience = Experience;
         Experience += experience;
+
+        GainedExperience?.Invoke(this, new JobGainedExperienceEvent { OldExperience = oldExperience, NewExperience = Experience });
+
         if (Job.LevelsExperience.Any())
         {
             int oldLevel = Level;
@@ -50,6 +59,12 @@ public class JobInstance
     }
 
     public override string ToString() => $"{Job}[lv. {Level}, {Experience}xp]";
+}
+
+public class JobGainedExperienceEvent
+{
+    public required int OldExperience { get; init; }
+    public required int NewExperience { get; init; }
 }
 
 public class JobLeveledUpEvent
