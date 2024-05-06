@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { GameClientComponent } from './pages/game-client/game-client.component';
 import { playerSelectedGuard } from './pages/select-player/player-selected.guard';
-import { SelectPlayerComponent } from './pages/select-player/select-player.component';
+import { SelectPlayerPageComponent } from './pages/select-player/select-player-page.component';
 
 export const GAME_PATH = 'game';
 export const SELECT_PLAYER_ROUTE = 'select-player';
@@ -19,6 +19,6 @@ export const routeConfig: Routes = [
   },
   {
     path: SELECT_PLAYER_ROUTE,
-    component: SelectPlayerComponent,
+    component: SelectPlayerPageComponent,
   },
 ];

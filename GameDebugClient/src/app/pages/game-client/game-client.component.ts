@@ -22,6 +22,7 @@ import {
 import { SpinnerComponent } from '../../common/spinner/spinner.component';
 import { SELECT_PLAYER_ROUTE } from '../../routes';
 import { InventoryComponent } from '../../widgets/inventory/inventory.component';
+import { SimulationComponent } from '../../widgets/simulation/simulation.component';
 import { CreateCharacterPageComponent } from '../create-character/create-character-page.component';
 import { SelectedPlayerService } from '../select-player/selected-player.service';
 
@@ -29,7 +30,7 @@ import { SelectedPlayerService } from '../select-player/selected-player.service'
   selector: 'app-game-client',
   standalone: true,
   templateUrl: './game-client.component.html',
-  imports: [CommonModule, NgbDropdownModule, NgbTooltipModule, SpinnerComponent, InventoryComponent, CreateCharacterPageComponent],
+  imports: [CommonModule, NgbDropdownModule, NgbTooltipModule, SpinnerComponent, InventoryComponent, CreateCharacterPageComponent, SimulationComponent],
 })
 export class GameClientComponent implements OnInit {
   protected settings: GameSettings = new GameSettings();
@@ -69,27 +70,6 @@ export class GameClientComponent implements OnInit {
       .subscribe();
 
     this.refreshGameState();
-  }
-
-  play() {
-    this.adminGameApiClient
-      .startSimulation()
-      .pipe(map(_ => this.refreshGameState()))
-      .subscribe();
-  }
-
-  pause() {
-    this.adminGameApiClient
-      .stopSimulation()
-      .pipe(map(_ => this.refreshGameState()))
-      .subscribe();
-  }
-
-  step() {
-    this.adminGameApiClient
-      .tickNow()
-      .pipe(map(_ => this.refreshGameState()))
-      .subscribe();
   }
 
   moveToLocation(character: TeamCharacter, location: ILocationMinimal) {
@@ -177,7 +157,7 @@ export class GameClientComponent implements OnInit {
       .subscribe();
   }
 
-  private refreshGameState() {
+  protected refreshGameState() {
     this.gameApiClient
       .getGameState()
       .pipe(

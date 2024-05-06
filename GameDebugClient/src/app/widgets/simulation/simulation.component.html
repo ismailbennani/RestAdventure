@@ -1,0 +1,27 @@
+<div class="text-center small text-uppercase">
+  @if (state.paused) {
+    paused
+  } @else {
+    running
+  }
+</div>
+<hr class="mt-1 mb-0" />
+<div class="d-flex">
+  @if (state.paused) {
+    <a role="button" class="flex-grow-1 text-center" ngbTooltip="Play" (click)="play()">
+      <i class="bi bi-play"></i>
+    </a>
+    <div class="vr"></div>
+  }
+  @if (!state.paused) {
+    <a role="button" class="flex-grow-1 text-center" ngbTooltip="Pause" (click)="pause()">
+      <i class="bi bi-pause"></i>
+    </a>
+    <div class="vr"></div>
+  }
+  <a role="button" class="flex-grow-1 text-center" ngbTooltip="Step" (click)="step()">
+    <i class="bi bi-skip-end"></i>
+  </a>
+</div>
+<hr class="mt-0 mb-1" />
+<div class="p-4"><span class="fw-semibold">Tick:</span> {{ state.tick }}</div>

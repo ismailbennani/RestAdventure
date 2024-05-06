@@ -12,10 +12,10 @@ import { SelectedPlayerService } from './selected-player.service';
 @Component({
   selector: 'app-select-player',
   standalone: true,
-  templateUrl: './select-player.component.html',
+  templateUrl: './select-player-page.component.html',
   imports: [CommonModule, NgbDropdownModule, SpinnerComponent],
 })
-export class SelectPlayerComponent implements OnInit {
+export class SelectPlayerPageComponent implements OnInit {
   protected loading: boolean = false;
   protected players: Player[] = [];
   protected creating: boolean = false;
