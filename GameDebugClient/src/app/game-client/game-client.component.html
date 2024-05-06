@@ -3,12 +3,13 @@
   <div class="d-flex flex-column" style="width: 280px">
     <ng-container [ngTemplateOutlet]="menuTitle" [ngTemplateOutletContext]="{ icon: 'globe', name: 'Game' }"> </ng-container>
     @if (gameState) {
-      <app-simulation [state]="gameState" (refresh)="refreshGameState()"></app-simulation>
+      <app-simulation></app-simulation>
     } @else {
       <div class="text-center">Not found</div>
     }
 
-    <ng-container [ngTemplateOutlet]="menuTitle" [ngTemplateOutletContext]="{ icon: 'people', name: 'Team' }"> </ng-container>
+    <ng-container [ngTemplateOutlet]="menuTitle" [ngTemplateOutletContext]="{ icon: 'people', name: 'Team', active: this.currentPageService.isAnyCharacterOpened() }">
+    </ng-container>
     @if (team) {
       <app-team [team]="team" [slots]="settings.maxTeamSize"></app-team>
     } @else {
@@ -31,115 +32,14 @@
   <div class="vr"></div>
   <div class="vr ms-1"></div>
   <div class="flex-grow-1">
-    <div class="h-100 d-flex flex-column justify-content-center">
-      <h4 class="pt-1 text-center"><i class="bi bi-people"></i> Team</h4>
-      <hr class="my-1" />
-      @if (loading) {
-        <app-spinner></app-spinner>
-      } @else {
-        @for (character of characters; track $index) {
-          <div class="flex-grow-1">
-            @if (character) {
-              <div class="w-100 h-100 d-flex">
-                <div class="p-4">
-                  <div class="d-flex">
-                    <h2>{{ character.name }}</h2>
-                    <div class="flex-grow-1"></div>
-                    <button class="btn btn-outline-danger" (click)="deleteCharacter(character)">
-                      <i class="bi bi-trash"></i>
-                    </button>
-                  </div>
-                  <ul>
-                    <li>Class: {{ character.class }}</li>
-                    <li>Location: {{ character.location.positionX }}, {{ character.location.positionY }} ({{ character.location.area.name }})</li>
-                    <li>
-                      Planned action:
-                      @if (character.plannedAction) {
-                        {{ actionToString(character.plannedAction) }}
-                      } @else {
-                        none
-                      }
-                    </li>
-                    <li>
-                      Last action result:
-                      @if (character.lastActionResult) {
-                        {{ actionToString(character.lastActionResult.action) }}
-                        @if (character.lastActionResult.success) {
-                          (success)
-                        } @else {
-                          <div class="text-danger">failed: {{ character.lastActionResult.failureReason }}</div>
-                        }
-                      } @else {
-                        none
-                      }
-                    </li>
-                    <li>
-                      Current interaction:
-                      @if (character.currentInteraction) {
-                        {{ character.currentInteraction.interaction.name }}, {{ character.currentInteraction.subject.name }}
-                      } @else {
-                        none
-                      }
-                    </li>
-                  </ul>
-                </div>
-                <div class="vr"></div>
-                <div class="py-2 px-4" style="width: 25%">
-                  <h6>Inventory</h6>
-                  <app-inventory [inventory]="character.inventory"></app-inventory>
-                </div>
-                <div class="vr"></div>
-                <div class="flex-grow-1"></div>
-                <div class="vr"></div>
-                <div class="d-flex flex-column py-2 px-4">
-                  <h6>Move to</h6>
-                  @for (accessibleLocation of accessibleLocations[character.id]; track accessibleLocation.id) {
-                    <button
-                      class="btn"
-                      [ngClass]="characterPlansToMoveToLocation(character, accessibleLocation) ? 'btn-secondary' : 'btn-outline-secondary'"
-                      (click)="moveToLocation(character, accessibleLocation)"
-                    >
-                      {{ accessibleLocation.area.name }}: {{ accessibleLocation.positionX }},
-                      {{ accessibleLocation.positionY }}
-                    </button>
-                  }
-                </div>
-                <div class="vr"></div>
-                <div class="d-flex flex-column py-2 px-4">
-                  <h6>Interactions</h6>
-                  @for (entity of entitiesWithInteractions[character.id]; track entity.id) {
-                    <span [class.text-underline]="characterPlansToInteractWithEntity(character, entity)">
-                      {{ entity.name }}
-                    </span>
-                    <div class="d-flex flex-wrap">
-                      @for (interaction of entity.interactions; track interaction.id) {
-                        <button
-                          class="btn"
-                          [ngClass]="characterPlansToPerformInteraction(character, entity, interaction) ? 'btn-secondary' : 'btn-outline-secondary'"
-                          (click)="interact(character, entity, interaction)"
-                        >
-                          {{ interaction.name }}
-                        </button>
-                      }
-                    </div>
-                  }
-                </div>
-              </div>
-            } @else {
-              <app-create-character (character)="addCharacter($event, $index)"></app-create-character>
-            }
-          </div>
-          <hr class="m-0" />
-        }
-      }
-    </div>
+    <router-outlet></router-outlet>
   </div>
   <div class="vr me-1"></div>
 </div>
 
-<ng-template #menuTitle let-name="name" let-icon="icon">
+<ng-template #menuTitle let-name="name" let-icon="icon" let-active="active">
   <hr class="my-1" />
-  <h4 class="pt-1 text-center">
+  <h4 class="pt-1 text-center" [class.fw-bold]="active">
     @if (icon) {
       <i class="bi bi-{{ icon }}"></i>
     }

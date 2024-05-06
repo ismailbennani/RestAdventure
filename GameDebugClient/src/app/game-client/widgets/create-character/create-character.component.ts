@@ -1,18 +1,24 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Output } from '@angular/core';
-import { catchError, finalize, of } from 'rxjs';
+import { Component, EventEmitter, Output } from '@angular/core';
+import { catchError, finalize, of, tap } from 'rxjs';
 import { CharacterClass, CreateCharacterRequest, TeamCharacter, TeamCharactersApiClient } from '../../../../api/game-api-client.generated';
+import { SpinnerComponent } from '../../../common/spinner/spinner.component';
+import { GameService } from '../../services/game.service';
 
 @Component({
   selector: 'app-create-character',
   templateUrl: './create-character.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true,
+  imports: [SpinnerComponent],
 })
 export class CreateCharacterComponent {
   protected creating: boolean = false;
 
   @Output() character: EventEmitter<TeamCharacter> = new EventEmitter<TeamCharacter>();
 
-  constructor(private teamCharactersApiClient: TeamCharactersApiClient) {}
+  constructor(
+    private gameService: GameService,
+    private teamCharactersApiClient: TeamCharactersApiClient,
+  ) {}
 
   protected characterClasses: { value: CharacterClass; display: string }[] = [
     {
@@ -38,6 +44,7 @@ export class CreateCharacterComponent {
     this.teamCharactersApiClient
       .createCharacter(new CreateCharacterRequest({ name, class: cls as CharacterClass }))
       .pipe(
+        tap(() => this.gameService.refreshNow(true)),
         finalize(() => (this.creating = false)),
         catchError(e => {
           console.error('Error while creating character.', e);

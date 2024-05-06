@@ -36,7 +36,6 @@ public class TeamCharactersController : GameApiController
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<TeamCharacterDto>> CreateCharacterAsync(CreateCharacterRequestDto request)
     {
-        GameContent content = _gameService.RequireGameContent();
         GameState state = _gameService.RequireGameState();
 
         Player player = ControllerContext.RequirePlayer(state);
@@ -48,6 +47,28 @@ public class TeamCharactersController : GameApiController
         }
 
         return result.Character.ToDto();
+    }
+
+    /// <summary>
+    ///     Get character
+    /// </summary>
+    [HttpGet("{characterGuid:guid}")]
+    [ProducesResponseType(typeof(TeamCharacterDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public ActionResult<TeamCharacterDto> GetCharacter(Guid characterGuid)
+    {
+        GameState state = _gameService.RequireGameState();
+
+        Player player = ControllerContext.RequirePlayer(state);
+
+        CharacterId characterId = new(characterGuid);
+        Character? character = state.Entities.Get<Character>(characterId);
+        if (character == null || character.Player != player)
+        {
+            return NotFound();
+        }
+
+        return character.ToDto();
     }
 
     /// <summary>

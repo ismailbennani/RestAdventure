@@ -46,6 +46,6 @@ export class SelectPlayerPageComponent implements OnInit {
 
   selectPlayer(player: Player) {
     this.selectedPlayerService.set(player);
-    this.router.navigateByUrl(GAME_PATH);
+    this.router.navigate([GAME_PATH]);
   }
 }

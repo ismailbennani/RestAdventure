@@ -5,6 +5,7 @@ import { Inventory } from '../../../../api/game-api-client.generated';
   selector: 'app-inventory',
   templateUrl: './inventory.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true,
 })
 export class InventoryComponent {
   @Input({ required: true }) inventory: Inventory = null!;

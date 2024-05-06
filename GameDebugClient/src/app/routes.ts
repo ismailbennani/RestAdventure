@@ -5,16 +5,16 @@ import { SelectPlayerPageComponent } from './pages/select-player/select-player-p
 export const GAME_PATH = 'game';
 export const SELECT_PLAYER_ROUTE = 'select-player';
 
-export const routeConfig: Routes = [
+export const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    redirectTo: 'game',
+    redirectTo: GAME_PATH,
   },
   {
-    path: 'game',
+    path: GAME_PATH,
     canActivate: [playerSelectedGuard],
-    loadChildren: () => import('./game-client/game-client.module').then(m => m.GameClientModule),
+    loadChildren: () => import('./game-client/game-client.routes').then(m => m.gameClientRoutes),
   },
   {
     path: SELECT_PLAYER_ROUTE,

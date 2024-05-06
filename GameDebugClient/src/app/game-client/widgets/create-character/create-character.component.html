@@ -17,6 +17,12 @@
     </div>
   </div>
   <div class="d-flex justify-content-end">
-    <button class="btn btn-sm btn-outline-dark" (click)="createCharacter(name.value, class.value)">Create</button>
+    <button type="button" class="btn btn-sm btn-outline-dark" (click)="createCharacter(name.value, class.value)" [disabled]="creating">
+      @if (creating) {
+        <app-spinner size="sm"></app-spinner>
+      } @else {
+        Create
+      }
+    </button>
   </div>
 </form>

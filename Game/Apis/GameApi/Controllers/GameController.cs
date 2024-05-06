@@ -45,7 +45,7 @@ public class GameController : GameApiController
             Tick = state.Tick,
             Paused = _gameScheduler.Paused,
             LastTickDate = _gameScheduler.LastStepDate,
-            NextTickDate = _gameScheduler.NextStepDate
+            NextTickDate = _gameScheduler.Paused ? null : _gameScheduler.NextStepDate
         };
     }
 }

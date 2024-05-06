@@ -1,6 +1,11 @@
 <div class="list-group list-group-flush">
   @for (character of team.characters; track $index) {
-    <a type="button" class="list-group-item list-group-item-action">
+    <a
+      type="button"
+      class="list-group-item list-group-item-action"
+      [class.active]="currentPageService.isCharacterOpened(character)"
+      (click)="currentPageService.openCharacter(character)"
+    >
       <div class="d-flex gap-1">
         <div>
           <i class="bi bi-person"></i>
@@ -28,7 +33,7 @@
     @if (inCreation) {
       <div class="p-2">
         <h6>Create character</h6>
-        <app-create-character></app-create-character>
+        <app-create-character (character)="onCharacterCreated($event)"></app-create-character>
       </div>
     } @else {
       <a type="button" class="list-group-item list-group-item-action" (click)="inCreation = true">

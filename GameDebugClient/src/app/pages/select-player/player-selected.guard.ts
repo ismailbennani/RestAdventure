@@ -11,7 +11,7 @@ export const playerSelectedGuard: CanActivateFn = (route, state) => {
   return selectPreferredPlayer().pipe(
     tap(result => {
       if (!result) {
-        router.navigateByUrl(SELECT_PLAYER_ROUTE).then();
+        router.navigate([SELECT_PLAYER_ROUTE]).then();
       }
     }),
   );
