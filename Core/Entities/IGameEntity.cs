@@ -23,4 +23,9 @@ public interface IGameEntity : IDisposable
     ///     Event fired each time this entity moves
     /// </summary>
     event EventHandler<EntityMovedEvent>? Moved;
+
+    /// <summary>
+    ///     Kill the entity
+    /// </summary>
+    Task KillAsync(GameState state);
 }

@@ -50,9 +50,11 @@ public class CombatInstance : IDisposable
 
     public event EventHandler<CombatEntityAttackedEvent>? Attacked;
 
+    IEnumerable<EntityState> Alive => _states.Values.Where(s => s.Entity.Combat.Health > 0);
+
     public async Task PlayTurnAsync()
     {
-        foreach (EntityState entityState in _states.Values)
+        foreach (EntityState entityState in Alive)
         {
             entityState.Lead += entityState.Entity.Combat.Speed;
         }
@@ -60,13 +62,13 @@ public class CombatInstance : IDisposable
         int subTurn = 1;
         while (true)
         {
-            EntityState? next = _states.Values.Where(s => s.Lead > 0).MaxBy(s => s.Lead);
+            EntityState? next = Alive.Where(s => s.Lead > 0).MaxBy(s => s.Lead);
             if (next == null)
             {
                 break;
             }
 
-            CombatFormation otherFormation = GetFormation(next.Team.OtherSide());
+            CombatFormation otherFormation = GetTeam(next.Team.OtherSide());
             IGameEntityWithCombatStatistics target = otherFormation.Entities[0];
 
             await ResolveAttackAsync(subTurn, next.Entity, target);
@@ -83,6 +85,14 @@ public class CombatInstance : IDisposable
 
         Turn++;
     }
+
+    public CombatFormation GetTeam(CombatSide team) =>
+        team switch
+        {
+            CombatSide.Team1 => Team1,
+            CombatSide.Team2 => Team2,
+            _ => throw new ArgumentOutOfRangeException(nameof(team), team, null)
+        };
 
     Task ResolveAttackAsync(int subTurn, IGameEntityWithCombatStatistics attacker, IGameEntityWithCombatStatistics target)
     {
@@ -117,14 +127,6 @@ public class CombatInstance : IDisposable
     }
 
     static bool HasLost(CombatFormation team) => team.Entities.All(c => c.Combat.Health <= 0);
-
-    CombatFormation GetFormation(CombatSide team) =>
-        team switch
-        {
-            CombatSide.Team1 => Team1,
-            CombatSide.Team2 => Team2,
-            _ => throw new ArgumentOutOfRangeException(nameof(team), team, null)
-        };
 
     class EntityState
     {

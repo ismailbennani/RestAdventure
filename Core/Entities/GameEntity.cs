@@ -42,6 +42,8 @@ public abstract class GameEntity : IEquatable<GameEntity>, IGameEntity, IDisposa
         Moved?.Invoke(this, new EntityMovedEvent { OldLocation = oldLocation, NewLocation = Location });
     }
 
+    public async Task KillAsync(GameState state) => await state.Entities.DestroyAsync(this);
+
     public override string ToString() => Name;
 
     public virtual void Dispose()

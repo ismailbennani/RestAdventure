@@ -28,6 +28,6 @@ public class HarvestInteractionInstance : InteractionInstance
     {
         Character.Inventory.Add(HarvestInteraction.Harvest.Items);
         Character.Jobs.Get(HarvestInteraction.Job)?.Progression.Progress(HarvestInteraction.Harvest.Experience);
-        await state.Entities.DestroyAsync(Target);
+        await Target.KillAsync(state);
     }
 }
