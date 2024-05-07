@@ -1,6 +1,6 @@
 ﻿using RestAdventure.Core.Entities;
 
-namespace RestAdventure.Core.Gameplay.Interactions;
+namespace RestAdventure.Core.Interactions;
 
 public interface IGameEntityWithInteractions : IGameEntity
 {

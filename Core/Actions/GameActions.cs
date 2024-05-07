@@ -1,11 +1,12 @@
 ﻿using Microsoft.Extensions.Logging;
+using RestAdventure.Core.Actions.Notifications;
 using RestAdventure.Core.Characters;
-using RestAdventure.Core.Gameplay.Actions.Notifications;
-using RestAdventure.Core.Gameplay.Interactions;
+using RestAdventure.Core.Interactions;
+using RestAdventure.Core.Maps;
 using RestAdventure.Core.Maps.Locations;
 using RestAdventure.Kernel.Errors;
 
-namespace RestAdventure.Core.Gameplay.Actions;
+namespace RestAdventure.Core.Actions;
 
 /// <summary>
 ///     Set the action that a character will perform on next tick.

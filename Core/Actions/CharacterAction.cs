@@ -1,7 +1,7 @@
 ﻿using RestAdventure.Core.Characters;
 using RestAdventure.Kernel.Errors;
 
-namespace RestAdventure.Core.Gameplay.Actions;
+namespace RestAdventure.Core.Actions;
 
 public abstract class CharacterAction
 {

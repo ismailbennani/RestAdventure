@@ -1,10 +1,10 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
+using RestAdventure.Core.Actions;
 using RestAdventure.Core.Combat;
 using RestAdventure.Core.Entities;
-using RestAdventure.Core.Gameplay.Actions;
-using RestAdventure.Core.Gameplay.Interactions;
 using RestAdventure.Core.History;
+using RestAdventure.Core.Interactions;
 using RestAdventure.Core.Players;
 using RestAdventure.Core.Settings;
 

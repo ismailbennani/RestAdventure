@@ -3,7 +3,7 @@ using NSwag.Annotations;
 using RestAdventure.Core;
 using RestAdventure.Core.Characters;
 using RestAdventure.Core.Entities;
-using RestAdventure.Core.Gameplay.Interactions;
+using RestAdventure.Core.Interactions;
 using RestAdventure.Core.Maps.Locations;
 using RestAdventure.Core.Players;
 using RestAdventure.Game.Apis.Common.Dtos.Entities;

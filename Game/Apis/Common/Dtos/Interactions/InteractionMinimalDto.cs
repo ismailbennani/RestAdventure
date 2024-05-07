@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using RestAdventure.Core.Gameplay.Interactions;
+using RestAdventure.Core.Interactions;
 
 namespace RestAdventure.Game.Apis.Common.Dtos.Interactions;
 

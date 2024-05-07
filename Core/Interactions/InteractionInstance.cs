@@ -1,6 +1,6 @@
 ﻿using RestAdventure.Core.Characters;
 
-namespace RestAdventure.Core.Gameplay.Interactions;
+namespace RestAdventure.Core.Interactions;
 
 public record InteractionInstanceId(Guid Guid);
 

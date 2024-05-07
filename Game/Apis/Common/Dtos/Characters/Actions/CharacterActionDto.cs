@@ -1,5 +1,7 @@
 ﻿using System.Text.Json.Serialization;
-using RestAdventure.Core.Gameplay.Actions;
+using RestAdventure.Core.Actions;
+using RestAdventure.Core.Interactions;
+using RestAdventure.Core.Maps;
 
 namespace RestAdventure.Game.Apis.Common.Dtos.Characters.Actions;
 

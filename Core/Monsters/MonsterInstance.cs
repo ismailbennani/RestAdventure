@@ -1,6 +1,6 @@
 ﻿using RestAdventure.Core.Combat;
 using RestAdventure.Core.Entities;
-using RestAdventure.Core.Gameplay.Interactions;
+using RestAdventure.Core.Interactions;
 using RestAdventure.Core.Maps.Locations;
 
 namespace RestAdventure.Core.Monsters;

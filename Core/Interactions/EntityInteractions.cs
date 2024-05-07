@@ -1,4 +1,4 @@
-﻿namespace RestAdventure.Core.Gameplay.Interactions;
+﻿namespace RestAdventure.Core.Interactions;
 
 public class EntityInteractions
 {

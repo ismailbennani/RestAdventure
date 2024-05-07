@@ -4,23 +4,23 @@ namespace RestAdventure.Core.Resources;
 
 public class GameResourcesStore<TResourceId, TResource> : IReadOnlyCollection<TResource> where TResourceId: ResourceId where TResource: GameResource<TResourceId>
 {
-    readonly Dictionary<TResourceId, TResource> _resources = [];
+    protected Dictionary<TResourceId, TResource> Resources { get; } = [];
 
-    public int Count => _resources.Count;
-    public IEnumerator<TResource> GetEnumerator() => _resources.Values.GetEnumerator();
-    IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_resources).GetEnumerator();
+    public int Count => Resources.Count;
+    public IEnumerator<TResource> GetEnumerator() => Resources.Values.GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)Resources).GetEnumerator();
 
-    public void Register(TResource resource) => _resources[resource.Id] = resource;
+    public void Register(TResource resource) => Resources[resource.Id] = resource;
 
     public void Register(IEnumerable<TResource> resources)
     {
         foreach (TResource resource in resources)
         {
-            _resources[resource.Id] = resource;
+            Resources[resource.Id] = resource;
         }
     }
 
-    public TResource? Get(TResourceId resourceId) => _resources.GetValueOrDefault(resourceId);
+    public TResource? Get(TResourceId resourceId) => Resources.GetValueOrDefault(resourceId);
 }
 
 public static class GameResourcesStoreExtensions

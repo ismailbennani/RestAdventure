@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using RestAdventure.Core.Characters;
 
-namespace RestAdventure.Core.Gameplay.Actions.Notifications;
+namespace RestAdventure.Core.Actions.Notifications;
 
 public class ActionPerformed : INotification
 {

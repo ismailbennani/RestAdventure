@@ -1,5 +1,5 @@
 ﻿using RestAdventure.Core.Characters;
-using RestAdventure.Core.Gameplay.Interactions;
+using RestAdventure.Core.Interactions;
 using RestAdventure.Kernel.Errors;
 
 namespace RestAdventure.Core.Maps.Harvestables;

@@ -1,8 +1,8 @@
 ﻿using RestAdventure.Core.Characters;
-using RestAdventure.Core.Gameplay.Interactions.Notifications;
+using RestAdventure.Core.Interactions.Notifications;
 using RestAdventure.Kernel.Errors;
 
-namespace RestAdventure.Core.Gameplay.Interactions;
+namespace RestAdventure.Core.Interactions;
 
 public class GameInteractions
 {

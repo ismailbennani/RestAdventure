@@ -1,8 +1,9 @@
-﻿using RestAdventure.Core.Characters;
+﻿using RestAdventure.Core.Actions;
+using RestAdventure.Core.Characters;
 using RestAdventure.Core.Maps.Locations;
 using RestAdventure.Kernel.Errors;
 
-namespace RestAdventure.Core.Gameplay.Actions;
+namespace RestAdventure.Core.Maps;
 
 public class CharacterMoveToLocationAction : CharacterAction
 {

@@ -1,7 +1,7 @@
 ﻿using MediatR;
+using RestAdventure.Core.Actions;
+using RestAdventure.Core.Actions.Notifications;
 using RestAdventure.Core.Characters;
-using RestAdventure.Core.Gameplay.Actions;
-using RestAdventure.Core.Gameplay.Actions.Notifications;
 
 namespace RestAdventure.Core.History.Characters;
 

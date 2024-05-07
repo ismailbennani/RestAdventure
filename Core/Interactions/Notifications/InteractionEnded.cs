@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace RestAdventure.Core.Gameplay.Interactions.Notifications;
+namespace RestAdventure.Core.Interactions.Notifications;
 
 public class InteractionEnded: INotification
 {

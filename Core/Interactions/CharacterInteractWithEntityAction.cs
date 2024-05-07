@@ -1,8 +1,8 @@
-﻿using RestAdventure.Core.Characters;
-using RestAdventure.Core.Gameplay.Interactions;
+﻿using RestAdventure.Core.Actions;
+using RestAdventure.Core.Characters;
 using RestAdventure.Kernel.Errors;
 
-namespace RestAdventure.Core.Gameplay.Actions;
+namespace RestAdventure.Core.Interactions;
 
 public class CharacterInteractWithEntityAction : CharacterAction
 {

@@ -1,6 +1,8 @@
 ﻿using System.Reflection;
 using RestAdventure.Core.Items;
 
+namespace BaseGame;
+
 public class Items
 {
     public Items()

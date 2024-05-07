@@ -1,7 +1,7 @@
 ﻿using RestAdventure.Core.Characters;
 using RestAdventure.Kernel.Errors;
 
-namespace RestAdventure.Core.Gameplay.Interactions;
+namespace RestAdventure.Core.Interactions;
 
 public record InteractionId(Guid Guid);
 

@@ -32,33 +32,33 @@ public class AdminGameContentController : AdminApiController
     /// </summary>
     [HttpGet("characters/classes")]
     public SearchResultDto<CharacterClassDto> SearchCharacterClasses([FromQuery] SearchRequestDto request) =>
-        SearchResources(request, content => content.Characters.Classes.All, (_, i) => i.ToDto());
+        SearchResources(request, content => content.Characters.Classes, (_, i) => i.ToDto());
 
     /// <summary>
     ///     Search items
     /// </summary>
     [HttpGet("items")]
-    public SearchResultDto<ItemDto> SearchItems([FromQuery] SearchRequestDto request) => SearchResources(request, content => content.Items.All, (_, i) => i.ToDto());
+    public SearchResultDto<ItemDto> SearchItems([FromQuery] SearchRequestDto request) => SearchResources(request, content => content.Items, (_, i) => i.ToDto());
 
     /// <summary>
     ///     Search locations
     /// </summary>
     [HttpGet("locations")]
     public SearchResultDto<LocationDto> SearchLocations([FromQuery] SearchRequestDto request) =>
-        SearchResources(request, content => content.Maps.Locations.All, (content, l) => l.ToDiscoveredLocationDto(content));
+        SearchResources(request, content => content.Maps.Locations, (content, l) => l.ToDiscoveredLocationDto(content));
 
     /// <summary>
     ///     Search jobs
     /// </summary>
     [HttpGet("jobs")]
-    public SearchResultDto<JobDto> SearchJobs([FromQuery] SearchRequestDto request) => SearchResources(request, content => content.Jobs.All, (_, j) => j.ToDto());
+    public SearchResultDto<JobDto> SearchJobs([FromQuery] SearchRequestDto request) => SearchResources(request, content => content.Jobs, (_, j) => j.ToDto());
 
     /// <summary>
     ///     Search harvestables
     /// </summary>
     [HttpGet("harvestables")]
     public SearchResultDto<HarvestableDto> SearchHarvestables([FromQuery] SearchRequestDto request) =>
-        SearchResources(request, content => content.Harvestables.All, (_, h) => h.ToDto());
+        SearchResources(request, content => content.Harvestables, (_, h) => h.ToDto());
 
     SearchResultDto<TDto> SearchResources<TResource, TDto>(
         [FromQuery] SearchRequestDto request,

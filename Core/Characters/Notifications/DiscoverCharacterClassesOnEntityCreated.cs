@@ -21,7 +21,7 @@ public class DiscoverCharacterClassesOnEntityCreated : INotificationHandler<Game
 
         GameContent content = _gameService.RequireGameContent();
 
-        foreach (CharacterClass cls in content.Characters.Classes.All)
+        foreach (CharacterClass cls in content.Characters.Classes)
         {
             character.Player.Knowledge.Discover(cls);
         }

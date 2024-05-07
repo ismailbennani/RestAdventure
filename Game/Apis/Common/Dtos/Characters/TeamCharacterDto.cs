@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using RestAdventure.Core.Actions;
 using RestAdventure.Core.Characters;
-using RestAdventure.Core.Gameplay.Actions;
-using RestAdventure.Core.Gameplay.Interactions;
+using RestAdventure.Core.Interactions;
 using RestAdventure.Game.Apis.Common.Dtos.Characters.Actions;
 using RestAdventure.Game.Apis.Common.Dtos.Interactions;
 using RestAdventure.Game.Apis.Common.Dtos.Items;
