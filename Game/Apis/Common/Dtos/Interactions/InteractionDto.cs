@@ -26,7 +26,6 @@ static class InteractionMappingExtensions
     public static InteractionDto ToDto(this Interaction interaction, Maybe canInteract) =>
         new()
         {
-            Id = interaction.Id.Guid,
             Name = interaction.Name,
             CanInteract = canInteract.Success,
             WhyNot = canInteract.WhyNot

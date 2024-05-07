@@ -10,6 +10,8 @@ public class JobInstance
         Progression = new ProgressionBar(job.LevelCaps);
     }
 
+    public IEnumerable<JobHarvest> Harvests => Job.Harvests.Where(h => h.Level <= Progression.Level);
+
     /// <summary>
     ///     The job that is instantiated.
     /// </summary>

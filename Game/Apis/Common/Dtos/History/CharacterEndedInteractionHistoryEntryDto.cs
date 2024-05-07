@@ -9,12 +9,6 @@ namespace RestAdventure.Game.Apis.Common.Dtos.History;
 public class CharacterEndedInteractionHistoryEntryDto : CharacterHistoryEntryDto
 {
     /// <summary>
-    ///     The unique ID of the interaction that has been started
-    /// </summary>
-    [Required]
-    public required Guid InteractionId { get; init; }
-
-    /// <summary>
     ///     The name of the interaction that has been started
     /// </summary>
     [Required]
@@ -39,7 +33,6 @@ static class CharacterEndedInteractionHistoryEntryMappingExtensions
         new()
         {
             Tick = entry.Tick,
-            InteractionId = entry.InteractionId.Guid,
             InteractionName = entry.InteractionName,
             SubjectId = entry.SubjectId.Guid,
             SubjectName = entry.SubjectName

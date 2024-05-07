@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using RestAdventure.Core.Actions.Notifications;
 using RestAdventure.Core.Characters;
+using RestAdventure.Core.Entities;
 using RestAdventure.Core.Interactions;
 using RestAdventure.Core.Maps;
 using RestAdventure.Core.Maps.Locations;
@@ -37,7 +38,7 @@ public class GameActions
     /// <summary>
     ///     Perform an interaction.
     /// </summary>
-    public void Interact(Character character, Interaction interaction, IGameEntityWithInteractions entity)
+    public void Interact(Character character, Interaction interaction, IGameEntity entity)
     {
         AssertCharacterCanPerformAction(character);
         _actions[character.Id] = new CharacterInteractWithEntityAction(interaction, entity);

@@ -115,7 +115,7 @@ export class CharacterPageComponent implements OnInit {
     }
 
     this.charactersActionsApiClient
-      .interact(this.character.id, entity.id, interaction.id)
+      .interact(this.character.id, entity.id, interaction.name)
       .pipe(switchMap(_ => this.gameService.refreshNow(true)))
       .subscribe();
   }
@@ -157,7 +157,7 @@ export class CharacterPageComponent implements OnInit {
       return false;
     }
 
-    return this.character.plannedAction.entity.id == entity.id && this.character.plannedAction.interaction.id == interaction.id;
+    return this.character.plannedAction.entity.id == entity.id && this.character.plannedAction.interaction.name == interaction.name;
   }
 
   isPerformingInteraction(entity: EntityWithInteractions, interaction: InteractionMinimal) {
@@ -165,7 +165,7 @@ export class CharacterPageComponent implements OnInit {
       return false;
     }
 
-    return this.character.currentInteraction.subject.id == entity.id && this.character.currentInteraction.interaction.id == interaction.id;
+    return this.character.currentInteraction.subject.id == entity.id && this.character.currentInteraction.interaction.name == interaction.name;
   }
 
   deleteCharacter() {

@@ -2,8 +2,8 @@
 using RestAdventure.Core.Items;
 using RestAdventure.Core.Jobs;
 using RestAdventure.Core.Maps;
-using RestAdventure.Core.Maps.Harvestables;
 using RestAdventure.Core.Monsters;
+using RestAdventure.Core.StaticObjects;
 
 namespace RestAdventure.Core;
 
@@ -15,6 +15,11 @@ public class GameContent
     public GameMaps Maps { get; } = new();
 
     /// <summary>
+    ///     The static objects of the game
+    /// </summary>
+    public GameStaticObjects StaticObjects { get; } = new();
+
+    /// <summary>
     ///     The items of the game
     /// </summary>
     public GameItems Items { get; } = new();
@@ -23,11 +28,6 @@ public class GameContent
     ///     The jobs of the game
     /// </summary>
     public GameJobs Jobs { get; } = new();
-
-    /// <summary>
-    ///     The harvestables of the game
-    /// </summary>
-    public GameHarvestables Harvestables { get; } = new();
 
     /// <summary>
     ///     The characters of the game

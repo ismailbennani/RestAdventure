@@ -330,13 +330,13 @@ export class GameContentApiClient {
     }
 
     /**
-     * Get harvestable
+     * Get static object
      */
-    getHarvestable(harvestableId: string): Observable<Harvestable> {
-        let url_ = this.baseUrl + "/game/content/harvestables/{harvestableId}";
-        if (harvestableId === undefined || harvestableId === null)
-            throw new Error("The parameter 'harvestableId' must be defined.");
-        url_ = url_.replace("{harvestableId}", encodeURIComponent("" + harvestableId));
+    getHarvestable(staticObjectId: string): Observable<StaticObject> {
+        let url_ = this.baseUrl + "/game/content/static-objects/{staticObjectId}";
+        if (staticObjectId === undefined || staticObjectId === null)
+            throw new Error("The parameter 'staticObjectId' must be defined.");
+        url_ = url_.replace("{staticObjectId}", encodeURIComponent("" + staticObjectId));
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -354,14 +354,14 @@ export class GameContentApiClient {
                 try {
                     return this.processGetHarvestable(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<Harvestable>;
+                    return _observableThrow(e) as any as Observable<StaticObject>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<Harvestable>;
+                return _observableThrow(response_) as any as Observable<StaticObject>;
         }));
     }
 
-    protected processGetHarvestable(response: HttpResponseBase): Observable<Harvestable> {
+    protected processGetHarvestable(response: HttpResponseBase): Observable<StaticObject> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -372,7 +372,7 @@ export class GameContentApiClient {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = Harvestable.fromJS(resultData200);
+            result200 = StaticObject.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status === 404) {
@@ -707,9 +707,10 @@ export class TeamCharactersActionsApiClient {
 
     /**
      * Interact
+     * @param interactionName (optional) 
      */
-    interact(characterGuid: string, entityGuid: string, interactionGuid: string): Observable<void> {
-        let url_ = this.baseUrl + "/game/team/characters/{characterGuid}/interactions/entity/{entityGuid}/{interactionGuid}";
+    interact(characterGuid: string, entityGuid: string, interactionGuid: string, interactionName?: string | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/game/team/characters/{characterGuid}/interactions/entity/{entityGuid}/{interactionGuid}?";
         if (characterGuid === undefined || characterGuid === null)
             throw new Error("The parameter 'characterGuid' must be defined.");
         url_ = url_.replace("{characterGuid}", encodeURIComponent("" + characterGuid));
@@ -719,6 +720,10 @@ export class TeamCharactersActionsApiClient {
         if (interactionGuid === undefined || interactionGuid === null)
             throw new Error("The parameter 'interactionGuid' must be defined.");
         url_ = url_.replace("{interactionGuid}", encodeURIComponent("" + interactionGuid));
+        if (interactionName === null)
+            throw new Error("The parameter 'interactionName' cannot be null.");
+        else if (interactionName !== undefined)
+            url_ += "interactionName=" + encodeURIComponent("" + interactionName) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -1666,19 +1671,19 @@ export interface IJob extends IJobMinimal {
     levelCaps: number[];
 }
 
-/** Harvestable */
-export class Harvestable implements IHarvestable {
-    /** The unique ID of the harvestable
+/** Static object */
+export class StaticObject implements IStaticObject {
+    /** The unique ID of the static object
              */
     id!: string;
-    /** The name of the harvestable
+    /** The name of the static object
              */
     name!: string;
-    /** The description of the harvestable
+    /** The description of the static object
              */
     description?: string | undefined;
 
-    constructor(data?: IHarvestable) {
+    constructor(data?: IStaticObject) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -1695,9 +1700,9 @@ export class Harvestable implements IHarvestable {
         }
     }
 
-    static fromJS(data: any): Harvestable {
+    static fromJS(data: any): StaticObject {
         data = typeof data === 'object' ? data : {};
-        let result = new Harvestable();
+        let result = new StaticObject();
         result.init(data);
         return result;
     }
@@ -1711,15 +1716,15 @@ export class Harvestable implements IHarvestable {
     }
 }
 
-/** Harvestable */
-export interface IHarvestable {
-    /** The unique ID of the harvestable
+/** Static object */
+export interface IStaticObject {
+    /** The unique ID of the static object
              */
     id: string;
-    /** The name of the harvestable
+    /** The name of the static object
              */
     name: string;
-    /** The description of the harvestable
+    /** The description of the static object
              */
     description?: string | undefined;
 }
@@ -1934,9 +1939,6 @@ export interface IEntityWithInteractions extends IEntityMinimal {
 
 /** Interaction (minimal) */
 export class InteractionMinimal implements IInteractionMinimal {
-    /** The unique ID of the interaction
-             */
-    id!: string;
     /** The name of the interaction
              */
     name!: string;
@@ -1952,7 +1954,6 @@ export class InteractionMinimal implements IInteractionMinimal {
 
     init(_data?: any) {
         if (_data) {
-            this.id = _data["id"];
             this.name = _data["name"];
         }
     }
@@ -1966,7 +1967,6 @@ export class InteractionMinimal implements IInteractionMinimal {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
         data["name"] = this.name;
         return data;
     }
@@ -1974,9 +1974,6 @@ export class InteractionMinimal implements IInteractionMinimal {
 
 /** Interaction (minimal) */
 export interface IInteractionMinimal {
-    /** The unique ID of the interaction
-             */
-    id: string;
     /** The name of the interaction
              */
     name: string;
@@ -1987,6 +1984,9 @@ export class Interaction extends InteractionMinimal implements IInteraction {
     /** Can this interaction be performed
              */
     canInteract!: boolean;
+    /** Why cannot this interaction be performed
+             */
+    whyNot?: string | undefined;
 
     constructor(data?: IInteraction) {
         super(data);
@@ -1996,6 +1996,7 @@ export class Interaction extends InteractionMinimal implements IInteraction {
         super.init(_data);
         if (_data) {
             this.canInteract = _data["canInteract"];
+            this.whyNot = _data["whyNot"];
         }
     }
 
@@ -2009,6 +2010,7 @@ export class Interaction extends InteractionMinimal implements IInteraction {
     override toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["canInteract"] = this.canInteract;
+        data["whyNot"] = this.whyNot;
         super.toJSON(data);
         return data;
     }
@@ -2019,6 +2021,9 @@ export interface IInteraction extends IInteractionMinimal {
     /** Can this interaction be performed
              */
     canInteract: boolean;
+    /** Why cannot this interaction be performed
+             */
+    whyNot?: string | undefined;
 }
 
 /** Character */
@@ -3229,9 +3234,6 @@ export interface ICharacterPerformedActionHistoryEntry extends ICharacterHistory
 
 /** Character started interaction history entry */
 export class CharacterStartedInteractionHistoryEntry extends CharacterHistoryEntry implements ICharacterStartedInteractionHistoryEntry {
-    /** The unique ID of the interaction that has been started
-             */
-    interactionId!: string;
     /** The name of the interaction that has been started
              */
     interactionName!: string;
@@ -3250,7 +3252,6 @@ export class CharacterStartedInteractionHistoryEntry extends CharacterHistoryEnt
     override init(_data?: any) {
         super.init(_data);
         if (_data) {
-            this.interactionId = _data["interactionId"];
             this.interactionName = _data["interactionName"];
             this.subjectId = _data["subjectId"];
             this.subjectName = _data["subjectName"];
@@ -3266,7 +3267,6 @@ export class CharacterStartedInteractionHistoryEntry extends CharacterHistoryEnt
 
     override toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["interactionId"] = this.interactionId;
         data["interactionName"] = this.interactionName;
         data["subjectId"] = this.subjectId;
         data["subjectName"] = this.subjectName;
@@ -3277,9 +3277,6 @@ export class CharacterStartedInteractionHistoryEntry extends CharacterHistoryEnt
 
 /** Character started interaction history entry */
 export interface ICharacterStartedInteractionHistoryEntry extends ICharacterHistoryEntry {
-    /** The unique ID of the interaction that has been started
-             */
-    interactionId: string;
     /** The name of the interaction that has been started
              */
     interactionName: string;
@@ -3293,9 +3290,6 @@ export interface ICharacterStartedInteractionHistoryEntry extends ICharacterHist
 
 /** Character ended interaction history entry */
 export class CharacterEndedInteractionHistoryEntry extends CharacterHistoryEntry implements ICharacterEndedInteractionHistoryEntry {
-    /** The unique ID of the interaction that has been started
-             */
-    interactionId!: string;
     /** The name of the interaction that has been started
              */
     interactionName!: string;
@@ -3314,7 +3308,6 @@ export class CharacterEndedInteractionHistoryEntry extends CharacterHistoryEntry
     override init(_data?: any) {
         super.init(_data);
         if (_data) {
-            this.interactionId = _data["interactionId"];
             this.interactionName = _data["interactionName"];
             this.subjectId = _data["subjectId"];
             this.subjectName = _data["subjectName"];
@@ -3330,7 +3323,6 @@ export class CharacterEndedInteractionHistoryEntry extends CharacterHistoryEntry
 
     override toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["interactionId"] = this.interactionId;
         data["interactionName"] = this.interactionName;
         data["subjectId"] = this.subjectId;
         data["subjectName"] = this.subjectName;
@@ -3341,9 +3333,6 @@ export class CharacterEndedInteractionHistoryEntry extends CharacterHistoryEntry
 
 /** Character ended interaction history entry */
 export interface ICharacterEndedInteractionHistoryEntry extends ICharacterHistoryEntry {
-    /** The unique ID of the interaction that has been started
-             */
-    interactionId: string;
     /** The name of the interaction that has been started
              */
     interactionName: string;

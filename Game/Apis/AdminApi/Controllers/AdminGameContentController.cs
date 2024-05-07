@@ -2,11 +2,11 @@
 using NSwag.Annotations;
 using RestAdventure.Core;
 using RestAdventure.Game.Apis.Common.Dtos.Characters;
-using RestAdventure.Game.Apis.Common.Dtos.Harvestables;
 using RestAdventure.Game.Apis.Common.Dtos.Items;
 using RestAdventure.Game.Apis.Common.Dtos.Jobs;
 using RestAdventure.Game.Apis.Common.Dtos.Maps;
 using RestAdventure.Game.Apis.Common.Dtos.Queries;
+using RestAdventure.Game.Apis.Common.Dtos.StaticObjects;
 using RestAdventure.Kernel.Queries;
 
 namespace RestAdventure.Game.Apis.AdminApi.Controllers;
@@ -54,11 +54,11 @@ public class AdminGameContentController : AdminApiController
     public SearchResultDto<JobDto> SearchJobs([FromQuery] SearchRequestDto request) => SearchResources(request, content => content.Jobs, (_, j) => j.ToDto());
 
     /// <summary>
-    ///     Search harvestables
+    ///     Search static objects
     /// </summary>
-    [HttpGet("harvestables")]
-    public SearchResultDto<HarvestableDto> SearchHarvestables([FromQuery] SearchRequestDto request) =>
-        SearchResources(request, content => content.Harvestables, (_, h) => h.ToDto());
+    [HttpGet("static-objects")]
+    public SearchResultDto<StaticObjectDto> SearchHarvestables([FromQuery] SearchRequestDto request) =>
+        SearchResources(request, content => content.StaticObjects, (_, h) => h.ToDto());
 
     SearchResultDto<TDto> SearchResources<TResource, TDto>(
         [FromQuery] SearchRequestDto request,

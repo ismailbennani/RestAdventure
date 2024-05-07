@@ -68,7 +68,7 @@
                             {{ entity.name }}
                           </div>
                           <div class="d-flex flex-wrap">
-                            @for (interaction of entity.interactions; track interaction.id) {
+                            @for (interaction of entity.interactions; track interaction.name) {
                               <button
                                 class="btn btn-sm"
                                 [ngClass]="

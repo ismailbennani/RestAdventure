@@ -43,5 +43,10 @@ public class Job : GameResource<JobId>
     /// </example>
     public IReadOnlyList<int> LevelCaps { get; init; } = Array.Empty<int>();
 
+    /// <summary>
+    ///     The harvests enabled by the job
+    /// </summary>
+    public IReadOnlyCollection<JobHarvest> Harvests = Array.Empty<JobHarvest>();
+
     public override string ToString() => $"Job {Name} ({Id})";
 }

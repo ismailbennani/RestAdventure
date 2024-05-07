@@ -9,13 +9,6 @@ namespace RestAdventure.Game.Apis.Common.Dtos.Interactions;
 public class InteractionMinimalDto
 {
     /// <summary>
-    ///     The unique ID of the interaction
-    /// </summary>
-    /// <returns></returns>
-    [Required]
-    public required Guid Id { get; init; }
-
-    /// <summary>
     ///     The name of the interaction
     /// </summary>
     [Required]
@@ -24,5 +17,5 @@ public class InteractionMinimalDto
 
 static class InteractionMinimalMappingExtensions
 {
-    public static InteractionMinimalDto ToMinimalDto(this Interaction interaction) => new() { Id = interaction.Id.Guid, Name = interaction.Name };
+    public static InteractionMinimalDto ToMinimalDto(this Interaction interaction) => new() { Name = interaction.Name };
 }

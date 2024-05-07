@@ -85,7 +85,7 @@ static class TeamCharacterMappingExtensions
             Progression = character.Progression.ToMinimalDto(),
             Location = character.Location.ToMinimalDto(),
             Inventory = character.Inventory.ToDto(),
-            Jobs = character.Jobs.All.Select(j => j.ToDto()).ToArray(),
+            Jobs = character.Jobs.Select(j => j.ToDto()).ToArray(),
             LastActionResult = options?.LastActionResult?.ToDto(),
             CurrentInteraction = options?.InteractionInstance?.ToDto(),
             PlannedAction = options?.NextAction?.ToDto()

@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Admin API",
-    "version": "0.0.0-alpha.0.83+629bc97dc9f6a0c80c177b5b046ff3ebb207daca"
+    "version": "0.0.0-alpha.0.97+a0444847239dce25d5501ea8edcf9fbba795d7e7"
   },
   "servers": [
     {
@@ -197,12 +197,12 @@
         }
       }
     },
-    "/admin/game/content/harvestables": {
+    "/admin/game/content/static-objects": {
       "get": {
         "tags": [
           "Game"
         ],
-        "summary": "Search harvestables",
+        "summary": "Search static objects",
         "operationId": "AdminGameContent_SearchHarvestables",
         "parameters": [
           {
@@ -232,7 +232,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SearchResultOfHarvestable"
+                  "$ref": "#/components/schemas/SearchResultOfStaticObject"
                 }
               }
             }
@@ -865,7 +865,7 @@
           }
         }
       },
-      "SearchResultOfHarvestable": {
+      "SearchResultOfStaticObject": {
         "type": "object",
         "description": "Search result\n            ",
         "additionalProperties": false,
@@ -881,7 +881,7 @@
             "type": "array",
             "description": "The items found by the query\n            ",
             "items": {
-              "$ref": "#/components/schemas/Harvestable"
+              "$ref": "#/components/schemas/StaticObject"
             }
           },
           "pageNumber": {
@@ -906,9 +906,9 @@
           }
         }
       },
-      "Harvestable": {
+      "StaticObject": {
         "type": "object",
-        "description": "Harvestable\n            ",
+        "description": "Static object\n            ",
         "additionalProperties": false,
         "required": [
           "id",
@@ -917,18 +917,18 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "The unique ID of the harvestable\n            ",
+            "description": "The unique ID of the static object\n            ",
             "format": "guid",
             "minLength": 1
           },
           "name": {
             "type": "string",
-            "description": "The name of the harvestable\n            ",
+            "description": "The name of the static object\n            ",
             "minLength": 1
           },
           "description": {
             "type": "string",
-            "description": "The description of the harvestable\n            ",
+            "description": "The description of the static object\n            ",
             "nullable": true
           }
         }

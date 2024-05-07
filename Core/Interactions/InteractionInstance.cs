@@ -1,4 +1,5 @@
 ﻿using RestAdventure.Core.Characters;
+using RestAdventure.Core.Entities;
 
 namespace RestAdventure.Core.Interactions;
 
@@ -6,7 +7,7 @@ public record InteractionInstanceId(Guid Guid);
 
 public abstract class InteractionInstance
 {
-    protected InteractionInstance(Character character, Interaction interaction, IGameEntityWithInteractions subject)
+    protected InteractionInstance(Character character, Interaction interaction, IGameEntity subject)
     {
         Character = character;
         Interaction = interaction;
@@ -28,7 +29,7 @@ public abstract class InteractionInstance
     /// <summary>
     ///     The subject of the interaction
     /// </summary>
-    public IGameEntityWithInteractions Subject { get; }
+    public IGameEntity Subject { get; }
 
     public abstract bool IsOver(GameState state);
 

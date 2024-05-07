@@ -1,5 +1,4 @@
 ﻿using RestAdventure.Core.Maps.Areas;
-using RestAdventure.Core.Maps.Harvestables;
 using RestAdventure.Core.Maps.Locations;
 
 namespace BaseGame.Maps;
@@ -18,12 +17,5 @@ public class MapGenerator
             Locations = [location1, location2],
             Connections = [(location1, location2)]
         };
-    }
-
-    public IEnumerable<HarvestableInstance> GenerateHarvestables(GeneratedMaps maps, Harvestables harvestables)
-    {
-        HarvestableInstance appleTreeInstance = new(harvestables.AppleTree, maps.Locations.First());
-        HarvestableInstance pearTreeInstance = new(harvestables.PearTree, maps.Locations.First());
-        return [appleTreeInstance, pearTreeInstance];
     }
 }

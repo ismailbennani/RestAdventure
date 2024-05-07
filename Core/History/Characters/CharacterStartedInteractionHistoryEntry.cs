@@ -9,13 +9,11 @@ public class CharacterStartedInteractionHistoryEntry : CharacterHistoryEntry
 {
     public CharacterStartedInteractionHistoryEntry(InteractionInstance interactionInstance, long tick) : base(interactionInstance.Character, tick)
     {
-        InteractionId = interactionInstance.Interaction.Id;
         InteractionName = interactionInstance.Interaction.Name;
         SubjectId = interactionInstance.Subject.Id;
         SubjectName = interactionInstance.Subject.Name;
     }
 
-    public InteractionId InteractionId { get; }
     public string InteractionName { get; }
     public GameEntityId SubjectId { get; }
     public string SubjectName { get; }

@@ -1,10 +1,15 @@
-﻿namespace RestAdventure.Core.Jobs;
+﻿using System.Collections;
 
-public class EntityJobs : IDisposable
+namespace RestAdventure.Core.Jobs;
+
+public class EntityJobs : IReadOnlyCollection<JobInstance>, IDisposable
 {
     readonly Dictionary<JobId, JobInstance> _jobs = new();
 
-    public IEnumerable<JobInstance> All => _jobs.Values.Where(j => j.Progression.Level > 0);
+    public int Count => _jobs.Count;
+    public IEnumerator<JobInstance> GetEnumerator() => _jobs.Values.GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_jobs).GetEnumerator();
+
     public event EventHandler<Job>? JobLearned;
     public event EventHandler<EntityJobGainedExperienceEvent>? JobGainedExperience;
     public event EventHandler<EntityJobLeveledUpEvent>? JobLeveledUp;

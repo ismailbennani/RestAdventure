@@ -22,12 +22,14 @@ namespace RestAdventure.Game.Apis.GameApi.Controllers.Characters;
 public class TeamCharactersActionsController : GameApiController
 {
     readonly GameService _gameService;
+    readonly AvailableInteractionsService _availableInteractionsService;
 
     /// <summary>
     /// </summary>
-    public TeamCharactersActionsController(GameService gameService)
+    public TeamCharactersActionsController(GameService gameService, AvailableInteractionsService availableInteractionsService)
     {
         _gameService = gameService;
+        _availableInteractionsService = availableInteractionsService;
     }
 
     /// <summary>
@@ -102,13 +104,13 @@ public class TeamCharactersActionsController : GameApiController
             return BadRequest();
         }
 
-        IEnumerable<IGameEntityWithInteractions> entities = state.Entities.AtLocation<IGameEntityWithInteractions>(character.Location);
+        IEnumerable<GameEntity> entities = state.Entities.AtLocation(character.Location);
 
         List<EntityWithInteractionsDto> result = [];
-        foreach (IGameEntityWithInteractions entity in entities)
+        foreach (GameEntity entity in entities)
         {
             List<InteractionDto> interactions = [];
-            foreach (Interaction interaction in entity.Interactions.All)
+            foreach (Interaction interaction in _availableInteractionsService.GetAvailableInteractions(character, entity))
             {
                 Maybe canInteract = await interaction.CanInteractAsync(state, character, entity);
                 interactions.Add(interaction.ToDto(canInteract));
@@ -135,7 +137,7 @@ public class TeamCharactersActionsController : GameApiController
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public ActionResult Interact(Guid characterGuid, Guid entityGuid, Guid interactionGuid)
+    public ActionResult Interact(Guid characterGuid, Guid entityGuid, string interactionName)
     {
         GameState state = _gameService.RequireGameState();
         Player player = ControllerContext.RequirePlayer(state);
@@ -149,14 +151,13 @@ public class TeamCharactersActionsController : GameApiController
         }
 
         GameEntityId entityId = new(entityGuid);
-        IGameEntityWithInteractions? entity = state.Entities.Get<IGameEntityWithInteractions>(entityId);
+        GameEntity? entity = state.Entities.Get(entityId);
         if (entity == null)
         {
             return NotFound();
         }
 
-        InteractionId interactionId = new(interactionGuid);
-        Interaction? interaction = entity.Interactions.Get(interactionId);
+        Interaction? interaction = _availableInteractionsService.GetAvailableInteractions(character, entity).SingleOrDefault(i => i.Name == interactionName);
         if (interaction == null)
         {
             return NotFound();

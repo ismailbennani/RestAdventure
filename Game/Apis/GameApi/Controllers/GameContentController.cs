@@ -4,15 +4,15 @@ using RestAdventure.Core;
 using RestAdventure.Core.Characters;
 using RestAdventure.Core.Items;
 using RestAdventure.Core.Jobs;
-using RestAdventure.Core.Maps.Harvestables;
 using RestAdventure.Core.Maps.Locations;
 using RestAdventure.Core.Players;
 using RestAdventure.Core.Resources;
+using RestAdventure.Core.StaticObjects;
 using RestAdventure.Game.Apis.Common.Dtos.Characters;
-using RestAdventure.Game.Apis.Common.Dtos.Harvestables;
 using RestAdventure.Game.Apis.Common.Dtos.Items;
 using RestAdventure.Game.Apis.Common.Dtos.Jobs;
 using RestAdventure.Game.Apis.Common.Dtos.Maps;
+using RestAdventure.Game.Apis.Common.Dtos.StaticObjects;
 using RestAdventure.Game.Authentication;
 using RestAdventure.Kernel.Security;
 
@@ -69,13 +69,13 @@ public class GameContentController : GameApiController
     public ActionResult<JobDto> GetJob(Guid jobId) => GetResource(content => content.Jobs.Get(new JobId(jobId)), (_, j) => j.ToDto());
 
     /// <summary>
-    ///     Get harvestable
+    ///     Get static object
     /// </summary>
-    [HttpGet("harvestables/{harvestableId:guid}")]
-    [ProducesResponseType<HarvestableDto>(StatusCodes.Status200OK)]
+    [HttpGet("static-objects/{staticObjectId:guid}")]
+    [ProducesResponseType<StaticObjectDto>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
-    public ActionResult<HarvestableDto> GetHarvestable(Guid harvestableId) =>
-        GetResource(content => content.Harvestables.Get(new HarvestableId(harvestableId)), (_, h) => h.ToDto());
+    public ActionResult<StaticObjectDto> GetHarvestable(Guid staticObjectId) =>
+        GetResource(content => content.StaticObjects.Get(new StaticObjectId(staticObjectId)), (_, h) => h.ToDto());
 
     ActionResult<TDto> GetResource<TResource, TDto>(Func<GameContent, TResource?> findResource, Func<GameContent, TResource, TDto> map) where TResource: GameResource
     {

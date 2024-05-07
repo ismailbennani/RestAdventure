@@ -1,14 +1,14 @@
 ﻿using MediatR;
 using RestAdventure.Core.Entities.Notifications;
-using RestAdventure.Core.Maps.Harvestables;
+using RestAdventure.Core.StaticObjects;
 
 namespace RestAdventure.Core.Characters.Notifications;
 
-public class DiscoverHarvestablesOnCharacterMovedToLocation : INotificationHandler<GameEntityMovedToLocation>
+public class DiscoverStaticObjectsOnCharacterMovedToLocation : INotificationHandler<GameEntityMovedToLocation>
 {
     readonly GameService _gameService;
 
-    public DiscoverHarvestablesOnCharacterMovedToLocation(GameService gameService)
+    public DiscoverStaticObjectsOnCharacterMovedToLocation(GameService gameService)
     {
         _gameService = gameService;
     }
@@ -22,10 +22,10 @@ public class DiscoverHarvestablesOnCharacterMovedToLocation : INotificationHandl
 
         GameState state = _gameService.RequireGameState();
 
-        IEnumerable<HarvestableInstance> harvestables = state.Entities.AtLocation<HarvestableInstance>(notification.NewLocation);
-        foreach (HarvestableInstance harvestableInstance in harvestables)
+        IEnumerable<StaticObjectInstance> staticObjects = state.Entities.AtLocation<StaticObjectInstance>(notification.NewLocation);
+        foreach (StaticObjectInstance staticObject in staticObjects)
         {
-            character.Player.Knowledge.Discover(harvestableInstance.Harvestable);
+            character.Player.Knowledge.Discover(staticObject.Object);
         }
 
         return Task.CompletedTask;

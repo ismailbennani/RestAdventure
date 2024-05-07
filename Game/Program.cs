@@ -6,7 +6,6 @@ using BaseGame;
 using NSwag;
 using NSwag.Generation.Processors.Security;
 using RestAdventure.Core;
-using RestAdventure.Core.Maps.Harvestables;
 using RestAdventure.Core.Settings;
 using RestAdventure.Game.Apis.AdminApi;
 using RestAdventure.Game.Apis.GameApi;
@@ -151,11 +150,6 @@ async Task<GameState> LoadGameAsync(WebApplication app)
 
     GameService gameService = app.Services.GetRequiredService<GameService>();
     GameState state = gameService.NewGame(content, new GameSettings());
-
-    foreach (HarvestableInstance harvestableInstance in content.Maps.Harvestables.All)
-    {
-        await state.Entities.RegisterAsync(harvestableInstance);
-    }
 
     return state;
 }

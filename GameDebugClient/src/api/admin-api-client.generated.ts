@@ -330,12 +330,12 @@ export class AdminGameContentApiClient {
     }
 
     /**
-     * Search harvestables
+     * Search static objects
      * @param pageNumber (optional) The page number
      * @param pageSize (optional) The page size
      */
-    searchHarvestables(pageNumber?: number | undefined, pageSize?: number | undefined): Observable<SearchResultOfHarvestable> {
-        let url_ = this.baseUrl + "/admin/game/content/harvestables?";
+    searchHarvestables(pageNumber?: number | undefined, pageSize?: number | undefined): Observable<SearchResultOfStaticObject> {
+        let url_ = this.baseUrl + "/admin/game/content/static-objects?";
         if (pageNumber === null)
             throw new Error("The parameter 'pageNumber' cannot be null.");
         else if (pageNumber !== undefined)
@@ -361,14 +361,14 @@ export class AdminGameContentApiClient {
                 try {
                     return this.processSearchHarvestables(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<SearchResultOfHarvestable>;
+                    return _observableThrow(e) as any as Observable<SearchResultOfStaticObject>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<SearchResultOfHarvestable>;
+                return _observableThrow(response_) as any as Observable<SearchResultOfStaticObject>;
         }));
     }
 
-    protected processSearchHarvestables(response: HttpResponseBase): Observable<SearchResultOfHarvestable> {
+    protected processSearchHarvestables(response: HttpResponseBase): Observable<SearchResultOfStaticObject> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -379,7 +379,7 @@ export class AdminGameContentApiClient {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = SearchResultOfHarvestable.fromJS(resultData200);
+            result200 = SearchResultOfStaticObject.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -1724,10 +1724,10 @@ export interface IJob extends IJobMinimal {
 }
 
 /** Search result */
-export class SearchResultOfHarvestable implements ISearchResultOfHarvestable {
+export class SearchResultOfStaticObject implements ISearchResultOfStaticObject {
     /** The items found by the query
              */
-    items!: Harvestable[];
+    items!: StaticObject[];
     /** The page number corresponding to the results that have been selected
              */
     pageNumber!: number;
@@ -1741,7 +1741,7 @@ export class SearchResultOfHarvestable implements ISearchResultOfHarvestable {
              */
     totalPagesCount!: number;
 
-    constructor(data?: ISearchResultOfHarvestable) {
+    constructor(data?: ISearchResultOfStaticObject) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -1758,7 +1758,7 @@ export class SearchResultOfHarvestable implements ISearchResultOfHarvestable {
             if (Array.isArray(_data["items"])) {
                 this.items = [] as any;
                 for (let item of _data["items"])
-                    this.items!.push(Harvestable.fromJS(item));
+                    this.items!.push(StaticObject.fromJS(item));
             }
             this.pageNumber = _data["pageNumber"];
             this.pageSize = _data["pageSize"];
@@ -1767,9 +1767,9 @@ export class SearchResultOfHarvestable implements ISearchResultOfHarvestable {
         }
     }
 
-    static fromJS(data: any): SearchResultOfHarvestable {
+    static fromJS(data: any): SearchResultOfStaticObject {
         data = typeof data === 'object' ? data : {};
-        let result = new SearchResultOfHarvestable();
+        let result = new SearchResultOfStaticObject();
         result.init(data);
         return result;
     }
@@ -1790,10 +1790,10 @@ export class SearchResultOfHarvestable implements ISearchResultOfHarvestable {
 }
 
 /** Search result */
-export interface ISearchResultOfHarvestable {
+export interface ISearchResultOfStaticObject {
     /** The items found by the query
              */
-    items: Harvestable[];
+    items: StaticObject[];
     /** The page number corresponding to the results that have been selected
              */
     pageNumber: number;
@@ -1808,19 +1808,19 @@ export interface ISearchResultOfHarvestable {
     totalPagesCount: number;
 }
 
-/** Harvestable */
-export class Harvestable implements IHarvestable {
-    /** The unique ID of the harvestable
+/** Static object */
+export class StaticObject implements IStaticObject {
+    /** The unique ID of the static object
              */
     id!: string;
-    /** The name of the harvestable
+    /** The name of the static object
              */
     name!: string;
-    /** The description of the harvestable
+    /** The description of the static object
              */
     description?: string | undefined;
 
-    constructor(data?: IHarvestable) {
+    constructor(data?: IStaticObject) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -1837,9 +1837,9 @@ export class Harvestable implements IHarvestable {
         }
     }
 
-    static fromJS(data: any): Harvestable {
+    static fromJS(data: any): StaticObject {
         data = typeof data === 'object' ? data : {};
-        let result = new Harvestable();
+        let result = new StaticObject();
         result.init(data);
         return result;
     }
@@ -1853,15 +1853,15 @@ export class Harvestable implements IHarvestable {
     }
 }
 
-/** Harvestable */
-export interface IHarvestable {
-    /** The unique ID of the harvestable
+/** Static object */
+export interface IStaticObject {
+    /** The unique ID of the static object
              */
     id: string;
-    /** The name of the harvestable
+    /** The name of the static object
              */
     name: string;
-    /** The description of the harvestable
+    /** The description of the static object
              */
     description?: string | undefined;
 }

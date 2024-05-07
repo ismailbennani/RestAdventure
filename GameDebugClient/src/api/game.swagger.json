@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0-alpha.0.83+629bc97dc9f6a0c80c177b5b046ff3ebb207daca"
+    "version": "0.0.0-alpha.0.97+a0444847239dce25d5501ea8edcf9fbba795d7e7"
   },
   "servers": [
     {
@@ -222,16 +222,16 @@
         ]
       }
     },
-    "/game/content/harvestables/{harvestableId}": {
+    "/game/content/static-objects/{staticObjectId}": {
       "get": {
         "tags": [
           "Game"
         ],
-        "summary": "Get harvestable",
+        "summary": "Get static object",
         "operationId": "GameContent_GetHarvestable",
         "parameters": [
           {
-            "name": "harvestableId",
+            "name": "staticObjectId",
             "in": "path",
             "required": true,
             "schema": {
@@ -247,7 +247,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Harvestable"
+                  "$ref": "#/components/schemas/StaticObject"
                 }
               }
             }
@@ -494,14 +494,21 @@
             "x-position": 2
           },
           {
+            "name": "interactionName",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 3
+          },
+          {
             "name": "interactionGuid",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string",
-              "format": "guid"
+              "type": "string"
             },
-            "x-position": 3
+            "x-position": 4
           }
         ],
         "responses": {
@@ -1042,9 +1049,9 @@
           }
         }
       },
-      "Harvestable": {
+      "StaticObject": {
         "type": "object",
-        "description": "Harvestable\n            ",
+        "description": "Static object\n            ",
         "additionalProperties": false,
         "required": [
           "id",
@@ -1053,18 +1060,18 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "The unique ID of the harvestable\n            ",
+            "description": "The unique ID of the static object\n            ",
             "format": "guid",
             "minLength": 1
           },
           "name": {
             "type": "string",
-            "description": "The name of the harvestable\n            ",
+            "description": "The name of the static object\n            ",
             "minLength": 1
           },
           "description": {
             "type": "string",
-            "description": "The description of the harvestable\n            ",
+            "description": "The description of the static object\n            ",
             "nullable": true
           }
         }
@@ -1156,6 +1163,11 @@
               "canInteract": {
                 "type": "boolean",
                 "description": "Can this interaction be performed\n            "
+              },
+              "whyNot": {
+                "type": "string",
+                "description": "Why cannot this interaction be performed\n            ",
+                "nullable": true
               }
             }
           }
@@ -1166,16 +1178,9 @@
         "description": "Interaction (minimal)\n            ",
         "additionalProperties": false,
         "required": [
-          "id",
           "name"
         ],
         "properties": {
-          "id": {
-            "type": "string",
-            "description": "The unique ID of the interaction\n            ",
-            "format": "guid",
-            "minLength": 1
-          },
           "name": {
             "type": "string",
             "description": "The name of the interaction\n            ",
@@ -1859,18 +1864,11 @@
             "description": "Character started interaction history entry\n            ",
             "additionalProperties": false,
             "required": [
-              "interactionId",
               "interactionName",
               "subjectId",
               "subjectName"
             ],
             "properties": {
-              "interactionId": {
-                "type": "string",
-                "description": "The unique ID of the interaction that has been started\n            ",
-                "format": "guid",
-                "minLength": 1
-              },
               "interactionName": {
                 "type": "string",
                 "description": "The name of the interaction that has been started\n            ",
@@ -1901,18 +1899,11 @@
             "description": "Character ended interaction history entry\n            ",
             "additionalProperties": false,
             "required": [
-              "interactionId",
               "interactionName",
               "subjectId",
               "subjectName"
             ],
             "properties": {
-              "interactionId": {
-                "type": "string",
-                "description": "The unique ID of the interaction that has been started\n            ",
-                "format": "guid",
-                "minLength": 1
-              },
               "interactionName": {
                 "type": "string",
                 "description": "The name of the interaction that has been started\n            ",
