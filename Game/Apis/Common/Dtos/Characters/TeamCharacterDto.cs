@@ -3,6 +3,7 @@ using RestAdventure.Core.Actions;
 using RestAdventure.Core.Characters;
 using RestAdventure.Core.Interactions;
 using RestAdventure.Game.Apis.Common.Dtos.Characters.Actions;
+using RestAdventure.Game.Apis.Common.Dtos.Entities;
 using RestAdventure.Game.Apis.Common.Dtos.Interactions;
 using RestAdventure.Game.Apis.Common.Dtos.Items;
 using RestAdventure.Game.Apis.Common.Dtos.Jobs;

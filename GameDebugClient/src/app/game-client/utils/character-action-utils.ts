@@ -7,7 +7,7 @@ export class CharacterActionUtils {
     }
 
     if (action instanceof CharacterInteractWithEntityAction) {
-      return `interact with ${action.entity.name}: ${action.interaction.name}`;
+      return `interact with ${action.target.name}: ${action.interaction.name}`;
     }
 
     return '???';

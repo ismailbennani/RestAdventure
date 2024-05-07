@@ -4,12 +4,13 @@
       <h2>
         <span class="text-uppercase">{{ character.class.name }}</span>
         {{ character.name }}
-        lv.{{ character.progression.level }}
       </h2>
       <div class="flex-grow-1"></div>
+      <div>lv.{{ character.progression.level }}</div>
     </div>
+    <app-progression-bar color="danger" label="HP" [value]="character.combat.health" [maxValue]="character.combat.maxHealth" displayValue="absolute"></app-progression-bar>
+    <app-progression-bar color="info" label="Exp" [value]="character.progression.experience" [maxValue]="1" displayValue="absolute"></app-progression-bar>
     <ul>
-      <li>Experience: {{ character.progression.experience }}</li>
       <li>Location: {{ character.location.positionX }}, {{ character.location.positionY }} ({{ character.location.area.name }})</li>
       <li>
         Planned action:
@@ -35,7 +36,7 @@
       <li>
         Current interaction:
         @if (character.currentInteraction) {
-          {{ character.currentInteraction.interaction.name }}, {{ character.currentInteraction.subject.name }}
+          {{ character.currentInteraction.interaction.name }}, {{ character.currentInteraction.target.name }}
         } @else {
           none
         }

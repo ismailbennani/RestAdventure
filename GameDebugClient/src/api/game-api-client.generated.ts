@@ -707,23 +707,18 @@ export class TeamCharactersActionsApiClient {
 
     /**
      * Interact
-     * @param interactionName (optional) 
      */
-    interact(characterGuid: string, entityGuid: string, interactionGuid: string, interactionName?: string | undefined): Observable<void> {
-        let url_ = this.baseUrl + "/game/team/characters/{characterGuid}/interactions/entity/{entityGuid}/{interactionGuid}?";
+    interact(characterGuid: string, entityGuid: string, interactionName: string): Observable<void> {
+        let url_ = this.baseUrl + "/game/team/characters/{characterGuid}/interactions/entity/{entityGuid}/{interactionName}";
         if (characterGuid === undefined || characterGuid === null)
             throw new Error("The parameter 'characterGuid' must be defined.");
         url_ = url_.replace("{characterGuid}", encodeURIComponent("" + characterGuid));
         if (entityGuid === undefined || entityGuid === null)
             throw new Error("The parameter 'entityGuid' must be defined.");
         url_ = url_.replace("{entityGuid}", encodeURIComponent("" + entityGuid));
-        if (interactionGuid === undefined || interactionGuid === null)
-            throw new Error("The parameter 'interactionGuid' must be defined.");
-        url_ = url_.replace("{interactionGuid}", encodeURIComponent("" + interactionGuid));
-        if (interactionName === null)
-            throw new Error("The parameter 'interactionName' cannot be null.");
-        else if (interactionName !== undefined)
-            url_ += "interactionName=" + encodeURIComponent("" + interactionName) + "&";
+        if (interactionName === undefined || interactionName === null)
+            throw new Error("The parameter 'interactionName' must be defined.");
+        url_ = url_.replace("{interactionName}", encodeURIComponent("" + interactionName));
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -2049,6 +2044,9 @@ export class TeamCharacter implements ITeamCharacter {
     /** The jobs of the character
              */
     jobs!: JobInstance[];
+    /** The combat statistics of the entity
+             */
+    combat!: EntityCombatStatistics;
     /** The result of the action that has been performed on last tick
              */
     lastActionResult?: CharacterActionResult | undefined;
@@ -2072,6 +2070,7 @@ export class TeamCharacter implements ITeamCharacter {
             this.location = new LocationMinimal();
             this.inventory = new Inventory();
             this.jobs = [];
+            this.combat = new EntityCombatStatistics();
         }
     }
 
@@ -2088,6 +2087,7 @@ export class TeamCharacter implements ITeamCharacter {
                 for (let item of _data["jobs"])
                     this.jobs!.push(JobInstance.fromJS(item));
             }
+            this.combat = _data["combat"] ? EntityCombatStatistics.fromJS(_data["combat"]) : new EntityCombatStatistics();
             this.lastActionResult = _data["lastActionResult"] ? CharacterActionResult.fromJS(_data["lastActionResult"]) : <any>undefined;
             this.currentInteraction = _data["currentInteraction"] ? InteractionInstance.fromJS(_data["currentInteraction"]) : <any>undefined;
             this.plannedAction = _data["plannedAction"] ? CharacterAction.fromJS(_data["plannedAction"]) : <any>undefined;
@@ -2114,6 +2114,7 @@ export class TeamCharacter implements ITeamCharacter {
             for (let item of this.jobs)
                 data["jobs"].push(item.toJSON());
         }
+        data["combat"] = this.combat ? this.combat.toJSON() : <any>undefined;
         data["lastActionResult"] = this.lastActionResult ? this.lastActionResult.toJSON() : <any>undefined;
         data["currentInteraction"] = this.currentInteraction ? this.currentInteraction.toJSON() : <any>undefined;
         data["plannedAction"] = this.plannedAction ? this.plannedAction.toJSON() : <any>undefined;
@@ -2144,6 +2145,9 @@ export interface ITeamCharacter {
     /** The jobs of the character
              */
     jobs: JobInstance[];
+    /** The combat statistics of the entity
+             */
+    combat: EntityCombatStatistics;
     /** The result of the action that has been performed on last tick
              */
     lastActionResult?: CharacterActionResult | undefined;
@@ -2426,6 +2430,72 @@ export interface IJobInstance {
     progression: ProgressionBarMinimal;
 }
 
+/** Entity combat statistics */
+export class EntityCombatStatistics implements IEntityCombatStatistics {
+    /** The health of the entity
+             */
+    health!: number;
+    /** The max health of the entity
+             */
+    maxHealth!: number;
+    /** The speed of the entity
+             */
+    speed!: number;
+    /** The attack of the entity
+             */
+    attack!: number;
+
+    constructor(data?: IEntityCombatStatistics) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.health = _data["health"];
+            this.maxHealth = _data["maxHealth"];
+            this.speed = _data["speed"];
+            this.attack = _data["attack"];
+        }
+    }
+
+    static fromJS(data: any): EntityCombatStatistics {
+        data = typeof data === 'object' ? data : {};
+        let result = new EntityCombatStatistics();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["health"] = this.health;
+        data["maxHealth"] = this.maxHealth;
+        data["speed"] = this.speed;
+        data["attack"] = this.attack;
+        return data;
+    }
+}
+
+/** Entity combat statistics */
+export interface IEntityCombatStatistics {
+    /** The health of the entity
+             */
+    health: number;
+    /** The max health of the entity
+             */
+    maxHealth: number;
+    /** The speed of the entity
+             */
+    speed: number;
+    /** The attack of the entity
+             */
+    attack: number;
+}
+
 /** The result of an action performed by a character */
 export class CharacterActionResult implements ICharacterActionResult {
     /** The tick at which the action has been performed
@@ -2589,15 +2659,15 @@ export class CharacterInteractWithEntityAction extends CharacterAction implement
     /** The interaction
              */
     interaction!: InteractionMinimal;
-    /** The subject of the interaction
+    /** The target of the interaction
              */
-    entity!: EntityMinimal;
+    target!: EntityMinimal;
 
     constructor(data?: ICharacterInteractWithEntityAction) {
         super(data);
         if (!data) {
             this.interaction = new InteractionMinimal();
-            this.entity = new EntityMinimal();
+            this.target = new EntityMinimal();
         }
         this._discriminator = "interact";
     }
@@ -2606,7 +2676,7 @@ export class CharacterInteractWithEntityAction extends CharacterAction implement
         super.init(_data);
         if (_data) {
             this.interaction = _data["interaction"] ? InteractionMinimal.fromJS(_data["interaction"]) : new InteractionMinimal();
-            this.entity = _data["entity"] ? EntityMinimal.fromJS(_data["entity"]) : new EntityMinimal();
+            this.target = _data["target"] ? EntityMinimal.fromJS(_data["target"]) : new EntityMinimal();
         }
     }
 
@@ -2620,7 +2690,7 @@ export class CharacterInteractWithEntityAction extends CharacterAction implement
     override toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["interaction"] = this.interaction ? this.interaction.toJSON() : <any>undefined;
-        data["entity"] = this.entity ? this.entity.toJSON() : <any>undefined;
+        data["target"] = this.target ? this.target.toJSON() : <any>undefined;
         super.toJSON(data);
         return data;
     }
@@ -2631,9 +2701,9 @@ export interface ICharacterInteractWithEntityAction extends ICharacterAction {
     /** The interaction
              */
     interaction: InteractionMinimal;
-    /** The subject of the interaction
+    /** The target of the interaction
              */
-    entity: EntityMinimal;
+    target: EntityMinimal;
 }
 
 /** Interaction instance */
@@ -2644,9 +2714,9 @@ export class InteractionInstance implements IInteractionInstance {
     /** The interaction associated with the instance
              */
     interaction!: InteractionMinimal;
-    /** The subject of the interaction
+    /** The target of the interaction
              */
-    subject!: EntityMinimal;
+    target!: EntityMinimal;
 
     constructor(data?: IInteractionInstance) {
         if (data) {
@@ -2657,7 +2727,7 @@ export class InteractionInstance implements IInteractionInstance {
         }
         if (!data) {
             this.interaction = new InteractionMinimal();
-            this.subject = new EntityMinimal();
+            this.target = new EntityMinimal();
         }
     }
 
@@ -2665,7 +2735,7 @@ export class InteractionInstance implements IInteractionInstance {
         if (_data) {
             this.id = _data["id"];
             this.interaction = _data["interaction"] ? InteractionMinimal.fromJS(_data["interaction"]) : new InteractionMinimal();
-            this.subject = _data["subject"] ? EntityMinimal.fromJS(_data["subject"]) : new EntityMinimal();
+            this.target = _data["target"] ? EntityMinimal.fromJS(_data["target"]) : new EntityMinimal();
         }
     }
 
@@ -2680,7 +2750,7 @@ export class InteractionInstance implements IInteractionInstance {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
         data["interaction"] = this.interaction ? this.interaction.toJSON() : <any>undefined;
-        data["subject"] = this.subject ? this.subject.toJSON() : <any>undefined;
+        data["target"] = this.target ? this.target.toJSON() : <any>undefined;
         return data;
     }
 }
@@ -2693,9 +2763,9 @@ export interface IInteractionInstance {
     /** The interaction associated with the instance
              */
     interaction: InteractionMinimal;
-    /** The subject of the interaction
+    /** The target of the interaction
              */
-    subject: EntityMinimal;
+    target: EntityMinimal;
 }
 
 /** Character creation options */
@@ -3237,12 +3307,12 @@ export class CharacterStartedInteractionHistoryEntry extends CharacterHistoryEnt
     /** The name of the interaction that has been started
              */
     interactionName!: string;
-    /** The entity that was the subject of the interaction
+    /** The entity that was the target of the interaction
              */
-    subjectId!: string;
-    /** The name of the entity that was the subject of the interaction
+    targetId!: string;
+    /** The name of the entity that was the target of the interaction
              */
-    subjectName!: string;
+    targetName!: string;
 
     constructor(data?: ICharacterStartedInteractionHistoryEntry) {
         super(data);
@@ -3253,8 +3323,8 @@ export class CharacterStartedInteractionHistoryEntry extends CharacterHistoryEnt
         super.init(_data);
         if (_data) {
             this.interactionName = _data["interactionName"];
-            this.subjectId = _data["subjectId"];
-            this.subjectName = _data["subjectName"];
+            this.targetId = _data["targetId"];
+            this.targetName = _data["targetName"];
         }
     }
 
@@ -3268,8 +3338,8 @@ export class CharacterStartedInteractionHistoryEntry extends CharacterHistoryEnt
     override toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["interactionName"] = this.interactionName;
-        data["subjectId"] = this.subjectId;
-        data["subjectName"] = this.subjectName;
+        data["targetId"] = this.targetId;
+        data["targetName"] = this.targetName;
         super.toJSON(data);
         return data;
     }
@@ -3280,12 +3350,12 @@ export interface ICharacterStartedInteractionHistoryEntry extends ICharacterHist
     /** The name of the interaction that has been started
              */
     interactionName: string;
-    /** The entity that was the subject of the interaction
+    /** The entity that was the target of the interaction
              */
-    subjectId: string;
-    /** The name of the entity that was the subject of the interaction
+    targetId: string;
+    /** The name of the entity that was the target of the interaction
              */
-    subjectName: string;
+    targetName: string;
 }
 
 /** Character ended interaction history entry */
@@ -3293,12 +3363,12 @@ export class CharacterEndedInteractionHistoryEntry extends CharacterHistoryEntry
     /** The name of the interaction that has been started
              */
     interactionName!: string;
-    /** The entity that was the subject of the interaction
+    /** The entity that was the target of the interaction
              */
-    subjectId!: string;
-    /** The name of the entity that was the subject of the interaction
+    targetId!: string;
+    /** The name of the entity that was the target of the interaction
              */
-    subjectName!: string;
+    targetName!: string;
 
     constructor(data?: ICharacterEndedInteractionHistoryEntry) {
         super(data);
@@ -3309,8 +3379,8 @@ export class CharacterEndedInteractionHistoryEntry extends CharacterHistoryEntry
         super.init(_data);
         if (_data) {
             this.interactionName = _data["interactionName"];
-            this.subjectId = _data["subjectId"];
-            this.subjectName = _data["subjectName"];
+            this.targetId = _data["targetId"];
+            this.targetName = _data["targetName"];
         }
     }
 
@@ -3324,8 +3394,8 @@ export class CharacterEndedInteractionHistoryEntry extends CharacterHistoryEntry
     override toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["interactionName"] = this.interactionName;
-        data["subjectId"] = this.subjectId;
-        data["subjectName"] = this.subjectName;
+        data["targetId"] = this.targetId;
+        data["targetName"] = this.targetName;
         super.toJSON(data);
         return data;
     }
@@ -3336,12 +3406,12 @@ export interface ICharacterEndedInteractionHistoryEntry extends ICharacterHistor
     /** The name of the interaction that has been started
              */
     interactionName: string;
-    /** The entity that was the subject of the interaction
+    /** The entity that was the target of the interaction
              */
-    subjectId: string;
-    /** The name of the entity that was the subject of the interaction
+    targetId: string;
+    /** The name of the entity that was the target of the interaction
              */
-    subjectName: string;
+    targetName: string;
 }
 
 /** Character learned job history entry */

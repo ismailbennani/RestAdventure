@@ -1,6 +1,7 @@
-﻿using RestAdventure.Core.Combat;
+﻿using System.ComponentModel.DataAnnotations;
+using RestAdventure.Core.Combat;
 
-namespace RestAdventure.Game.Apis.Common.Dtos.Characters;
+namespace RestAdventure.Game.Apis.Common.Dtos.Entities;
 
 /// <summary>
 ///     Entity combat statistics
@@ -10,21 +11,25 @@ public class EntityCombatStatisticsDto
     /// <summary>
     ///     The health of the entity
     /// </summary>
+    [Required]
     public required int Health { get; init; }
 
     /// <summary>
     ///     The max health of the entity
     /// </summary>
+    [Required]
     public required int MaxHealth { get; init; }
 
     /// <summary>
     ///     The speed of the entity
     /// </summary>
+    [Required]
     public required int Speed { get; init; }
 
     /// <summary>
     ///     The attack of the entity
     /// </summary>
+    [Required]
     public required int Attack { get; init; }
 }
 

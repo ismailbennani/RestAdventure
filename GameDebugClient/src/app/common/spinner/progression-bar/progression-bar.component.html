@@ -1,0 +1,24 @@
+<div class="row">
+  @if (label) {
+    <div class="col-sm-{{ labelSize }} text-end text-truncate">
+      {{ label }}
+    </div>
+  }
+  <div class="col m-auto">
+    <div class="progress position-relative" role="progressbar" [attr.aria-valuenow]="percent" aria-valuemin="0" aria-valuemax="100">
+      <div class="progress-bar bg-{{ color }}" [ngStyle]="{ 'width.%': percent }"></div>
+      @if (displayValue) {
+        <div class="position-absolute top-0 bottom-0 start-0 end-0 text-center text-{{ textColor }}">
+          @switch (displayValue) {
+            @case ('percent') {
+              {{ percent }}%
+            }
+            @case ('absolute') {
+              {{ value }}/{{ maxValue }}
+            }
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>

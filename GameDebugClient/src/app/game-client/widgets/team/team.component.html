@@ -1,6 +1,6 @@
-@if (teamService.team) {
+@if (team) {
   <div class="list-group list-group-flush">
-    @for (character of teamService.team.characters; track $index) {
+    @for (character of team.characters; track $index) {
       <a
         type="button"
         class="list-group-item list-group-item-action"
@@ -11,26 +11,29 @@
           <div>
             <i class="bi bi-person"></i>
           </div>
-          <div>
-            <div>
+          <div class="flex-grow-1">
+            <div class="d-flex gap-1">
               <span class="text-uppercase">{{ character.class.name }}</span>
               {{ character.name }}
+              <div class="flex-grow-1"></div>
+              lv.{{ character.progression.level }}
             </div>
+            <app-progression-bar
+              color="danger"
+              label="HP"
+              labelSize="3"
+              [value]="character.combat.health"
+              [maxValue]="character.combat.maxHealth"
+              displayValue="absolute"
+            ></app-progression-bar>
+            <app-progression-bar color="info" label="Exp" labelSize="3" [value]="character.progression.experience" [maxValue]="1" displayValue="absolute"></app-progression-bar>
             <div>{{ character.location.area.name }}: [{{ character.location.positionX }}, {{ character.location.positionY }}]</div>
-          </div>
-          <div class="flex-grow-1"></div>
-          <div class="d-flex align-items-center justify-content-center">
-            @if (character.currentInteraction) {
-              <i class="fs-1 lh-1 bi bi-three-dots"></i>
-            } @else if (character.plannedAction) {
-              <i class="fs-1 lh-1 bi bi-dot"></i>
-            }
           </div>
         </div>
       </a>
     }
 
-    @if (!loadingClasses && gameService.settings.maxTeamSize && teamService.team.characters.length < gameService.settings.maxTeamSize) {
+    @if (!loadingClasses && gameService.settings.maxTeamSize && team.characters.length < gameService.settings.maxTeamSize) {
       @if (inCreation) {
         <div class="p-2">
           <h6>Create character</h6>
@@ -66,7 +69,7 @@
       } @else {
         <a type="button" class="list-group-item list-group-item-action" (click)="inCreation = true">
           <i class="bi bi-plus"></i>
-          Create new character ({{ teamService.team.characters.length }}/{{ gameService.settings.maxTeamSize }})
+          Create new character ({{ team.characters.length }}/{{ gameService.settings.maxTeamSize }})
         </a>
       }
     }

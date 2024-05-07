@@ -149,7 +149,7 @@ export class CharacterPageComponent implements OnInit {
       return false;
     }
 
-    return this.character.plannedAction.entity.id == entity.id;
+    return this.character.plannedAction.target.id == entity.id;
   }
 
   plansToPerformInteraction(entity: EntityWithInteractions, interaction: InteractionMinimal) {
@@ -157,7 +157,7 @@ export class CharacterPageComponent implements OnInit {
       return false;
     }
 
-    return this.character.plannedAction.entity.id == entity.id && this.character.plannedAction.interaction.name == interaction.name;
+    return this.character.plannedAction.target.id == entity.id && this.character.plannedAction.interaction.name == interaction.name;
   }
 
   isPerformingInteraction(entity: EntityWithInteractions, interaction: InteractionMinimal) {
@@ -165,7 +165,7 @@ export class CharacterPageComponent implements OnInit {
       return false;
     }
 
-    return this.character.currentInteraction.subject.id == entity.id && this.character.currentInteraction.interaction.name == interaction.name;
+    return this.character.currentInteraction.target.id == entity.id && this.character.currentInteraction.interaction.name == interaction.name;
   }
 
   deleteCharacter() {

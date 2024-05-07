@@ -112,11 +112,11 @@ export class CharacterHistoryComponent implements OnInit {
     }
 
     if (entry instanceof CharacterStartedInteractionHistoryEntry) {
-      return `Started interaction ${entry.interactionName} with ${entry.subjectName}`;
+      return `Started interaction ${entry.interactionName} with ${entry.targetName}`;
     }
 
     if (entry instanceof CharacterEndedInteractionHistoryEntry) {
-      return `Ended interaction ${entry.interactionName} with ${entry.subjectName}`;
+      return `Ended interaction ${entry.interactionName} with ${entry.targetName}`;
     }
 
     if (entry instanceof CharacterLearnedJobHistoryEntry) {

@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0-alpha.0.97+a0444847239dce25d5501ea8edcf9fbba795d7e7"
+    "version": "0.0.0-alpha.0.103+fe38dfd13be647cf4a155467eae401b2516045c3"
   },
   "servers": [
     {
@@ -465,7 +465,7 @@
         ]
       }
     },
-    "/game/team/characters/{characterGuid}/interactions/entity/{entityGuid}/{interactionGuid}": {
+    "/game/team/characters/{characterGuid}/interactions/entity/{entityGuid}/{interactionName}": {
       "post": {
         "tags": [
           "Team"
@@ -495,20 +495,12 @@
           },
           {
             "name": "interactionName",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 3
-          },
-          {
-            "name": "interactionGuid",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "x-position": 4
+            "x-position": 3
           }
         ],
         "responses": {
@@ -1221,7 +1213,8 @@
           "progression",
           "location",
           "inventory",
-          "jobs"
+          "jobs",
+          "combat"
         ],
         "properties": {
           "id": {
@@ -1273,6 +1266,14 @@
             "items": {
               "$ref": "#/components/schemas/JobInstance"
             }
+          },
+          "combat": {
+            "description": "The combat statistics of the entity\n            ",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/EntityCombatStatistics"
+              }
+            ]
           },
           "lastActionResult": {
             "description": "The result of the action that has been performed on last tick\n            ",
@@ -1423,6 +1424,39 @@
           }
         }
       },
+      "EntityCombatStatistics": {
+        "type": "object",
+        "description": "Entity combat statistics\n            ",
+        "additionalProperties": false,
+        "required": [
+          "health",
+          "maxHealth",
+          "speed",
+          "attack"
+        ],
+        "properties": {
+          "health": {
+            "type": "integer",
+            "description": "The health of the entity\n            ",
+            "format": "int32"
+          },
+          "maxHealth": {
+            "type": "integer",
+            "description": "The max health of the entity\n            ",
+            "format": "int32"
+          },
+          "speed": {
+            "type": "integer",
+            "description": "The speed of the entity\n            ",
+            "format": "int32"
+          },
+          "attack": {
+            "type": "integer",
+            "description": "The attack of the entity\n            ",
+            "format": "int32"
+          }
+        }
+      },
       "CharacterActionResult": {
         "type": "object",
         "description": "The result of an action performed by a character\n            ",
@@ -1513,7 +1547,7 @@
             "additionalProperties": false,
             "required": [
               "interaction",
-              "entity"
+              "target"
             ],
             "properties": {
               "interaction": {
@@ -1524,8 +1558,8 @@
                   }
                 ]
               },
-              "entity": {
-                "description": "The subject of the interaction\n            ",
+              "target": {
+                "description": "The target of the interaction\n            ",
                 "oneOf": [
                   {
                     "$ref": "#/components/schemas/EntityMinimal"
@@ -1543,7 +1577,7 @@
         "required": [
           "id",
           "interaction",
-          "subject"
+          "target"
         ],
         "properties": {
           "id": {
@@ -1560,8 +1594,8 @@
               }
             ]
           },
-          "subject": {
-            "description": "The subject of the interaction\n            ",
+          "target": {
+            "description": "The target of the interaction\n            ",
             "oneOf": [
               {
                 "$ref": "#/components/schemas/EntityMinimal"
@@ -1865,8 +1899,8 @@
             "additionalProperties": false,
             "required": [
               "interactionName",
-              "subjectId",
-              "subjectName"
+              "targetId",
+              "targetName"
             ],
             "properties": {
               "interactionName": {
@@ -1874,15 +1908,15 @@
                 "description": "The name of the interaction that has been started\n            ",
                 "minLength": 1
               },
-              "subjectId": {
+              "targetId": {
                 "type": "string",
-                "description": "The entity that was the subject of the interaction\n            ",
+                "description": "The entity that was the target of the interaction\n            ",
                 "format": "guid",
                 "minLength": 1
               },
-              "subjectName": {
+              "targetName": {
                 "type": "string",
-                "description": "The name of the entity that was the subject of the interaction\n            ",
+                "description": "The name of the entity that was the target of the interaction\n            ",
                 "minLength": 1
               }
             }
@@ -1900,8 +1934,8 @@
             "additionalProperties": false,
             "required": [
               "interactionName",
-              "subjectId",
-              "subjectName"
+              "targetId",
+              "targetName"
             ],
             "properties": {
               "interactionName": {
@@ -1909,15 +1943,15 @@
                 "description": "The name of the interaction that has been started\n            ",
                 "minLength": 1
               },
-              "subjectId": {
+              "targetId": {
                 "type": "string",
-                "description": "The entity that was the subject of the interaction\n            ",
+                "description": "The entity that was the target of the interaction\n            ",
                 "format": "guid",
                 "minLength": 1
               },
-              "subjectName": {
+              "targetName": {
                 "type": "string",
-                "description": "The name of the entity that was the subject of the interaction\n            ",
+                "description": "The name of the entity that was the target of the interaction\n            ",
                 "minLength": 1
               }
             }
