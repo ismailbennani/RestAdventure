@@ -29,7 +29,7 @@ public class Gatherer
             Experience = 5
         };
 
-        Job = new Job { Name = "Gatherer", Description = "Pick stuff here and there", Innate = true, LevelCaps = [2, 5, 10], Harvests = [PickApples, PickPears] };
+        Job = new Job { Name = "gatherer", Description = "Pick stuff here and there", Innate = true, LevelCaps = [2, 5, 10], Harvests = [PickApples, PickPears] };
     }
 
     public Job Job { get; }
