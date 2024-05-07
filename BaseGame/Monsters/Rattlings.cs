@@ -19,7 +19,8 @@ public class Rattlings
         {
             Family = Family,
             Name = "Petit Paw",
-            Description = "",
+            Description = "These tiny speedsters may lack in size, but they make up for it with their lightning-fast reflexes. "
+                          + "Quick, nimble, and always one step ahead, Petit Paws are the epitome of agility, darting through the shadows with grace and precision.",
             Health = 2,
             Speed = 180,
             Attack = 1
@@ -29,7 +30,8 @@ public class Rattlings
         {
             Family = Family,
             Name = "Rapierat",
-            Description = "",
+            Description = "Masters of finesse and precision, Rapierats are skilled duelists who excel in the art of swordplay. "
+                          + "With their trusty rapier in hand, they move with elegance and grace, striking swiftly and decisively in battle.",
             Health = 5,
             Speed = 100,
             Attack = 6
@@ -39,7 +41,8 @@ public class Rattlings
         {
             Family = Family,
             Name = "Biggaud",
-            Description = "",
+            Description = "Towering over their counterparts, Biggaud are the brutes of the rattlings. "
+                          + "With their immense strength and sturdy build, they serve as formidable defenders, capable of enduring even the fiercest of attacks.",
             Health = 10,
             Speed = 100,
             Attack = 2
@@ -49,7 +52,8 @@ public class Rattlings
         {
             Family = Family,
             Name = "Sorcerat",
-            Description = "",
+            Description = " Gifted with the ability to harness magic, Sorcerats are esteemed members of the rattling community. "
+                          + "Though physically frail, their mastery of spells and enchantments makes them invaluable allies in times of need, wielding arcane forces to protect their kin.",
             Health = 10,
             Speed = 100,
             Attack = 2
