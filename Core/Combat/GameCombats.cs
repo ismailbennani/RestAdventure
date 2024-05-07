@@ -24,6 +24,20 @@ public class GameCombats
         CombatInstance combat = new(team1, team2, _settings);
         _combats[combat.Id] = combat;
         await _publisher.Publish(new CombatStarted { Combat = combat });
+
+        combat.Attacked += (_, args) => _publisher.Publish(
+                new CombatEntityAttacked
+                {
+                    Combat = combat,
+                    SubTurn = args.SubTurn,
+                    Attacker = args.Attacker,
+                    Target = args.Target,
+                    DamageDealt = args.DamageDealt,
+                    DamageReceived = args.DamageReceived
+                }
+            )
+            .Wait();
+
         return combat;
     }
 

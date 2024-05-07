@@ -5,7 +5,7 @@ namespace RestAdventure.Core.Players;
 /// <summary>
 ///     A user in a game
 /// </summary>
-public class Player
+public class Player : IDisposable
 {
     public Player(User user)
     {
@@ -16,4 +16,10 @@ public class Player
     public PlayerKnowledge Knowledge { get; } = new();
 
     public override string ToString() => $"{User}";
+
+    public void Dispose()
+    {
+        Knowledge.Dispose();
+        GC.SuppressFinalize(this);
+    }
 }

@@ -5,19 +5,19 @@ namespace RestAdventure.Core.Combat;
 
 public record CombatInstanceId(Guid Guid);
 
-public class CombatInstance
+public class CombatInstance : IDisposable
 {
     readonly GameSettings _settings;
     readonly Dictionary<GameEntityId, EntityState> _states;
 
     internal CombatInstance(CombatFormation team1, CombatFormation team2, GameSettings settings)
     {
-        if (team1.Entities.Count(e => e.Combat.Health > 0) == 0)
+        if (!team1.Entities.Any(e => e.Combat.Health > 0))
         {
             throw new ArgumentException("Team 1 cannot be empty", nameof(team1));
         }
 
-        if (team2.Entities.Count(e => e.Combat.Health > 0) == 0)
+        if (!team2.Entities.Any(e => e.Combat.Health > 0))
         {
             throw new ArgumentException("Team 2 cannot be empty", nameof(team2));
         }
@@ -31,12 +31,12 @@ public class CombatInstance
 
         foreach (IGameEntityWithCombatStatistics entity in team1.Entities)
         {
-            _states[entity.Id] = new EntityState(entity, Team.Team1);
+            _states[entity.Id] = new EntityState(entity, CombatSide.Team1);
         }
 
         foreach (IGameEntityWithCombatStatistics entity in team2.Entities)
         {
-            _states[entity.Id] = new EntityState(entity, Team.Team2);
+            _states[entity.Id] = new EntityState(entity, CombatSide.Team2);
         }
     }
 
@@ -46,7 +46,9 @@ public class CombatInstance
 
     public int Turn { get; private set; }
     public bool IsOver { get; private set; }
-    public Team? Winner { get; private set; }
+    public CombatSide? Winner { get; private set; }
+
+    public event EventHandler<CombatEntityAttackedEvent>? Attacked;
 
     public async Task PlayTurnAsync()
     {
@@ -64,7 +66,7 @@ public class CombatInstance
                 break;
             }
 
-            CombatFormation otherFormation = GetFormation(OtherTeam(next.Team));
+            CombatFormation otherFormation = GetFormation(next.Team.OtherSide());
             IGameEntityWithCombatStatistics target = otherFormation.Entities[0];
 
             await ResolveAttackAsync(subTurn, next.Entity, target);
@@ -82,20 +84,29 @@ public class CombatInstance
         Turn++;
     }
 
-    async Task ResolveAttackAsync(int subTurn, IGameEntityWithCombatStatistics attacker, IGameEntityWithCombatStatistics target) => throw new NotImplementedException();
+    async Task ResolveAttackAsync(int subTurn, IGameEntityWithCombatStatistics attacker, IGameEntityWithCombatStatistics target)
+    {
+        int damageToDeal = attacker.Combat.Attack();
+        int damageReceived = target.Combat.ReceiveAttack(damageToDeal);
+
+        Attacked?.Invoke(
+            this,
+            new CombatEntityAttackedEvent { SubTurn = subTurn, Attacker = attacker, Target = target, DamageDealt = damageToDeal, DamageReceived = damageReceived }
+        );
+    }
 
     bool EvaluateWinCondition()
     {
         if (HasLost(Team1))
         {
-            Winner = Team.Team2;
+            Winner = CombatSide.Team2;
             IsOver = true;
             return true;
         }
 
         if (HasLost(Team2))
         {
-            Winner = Team.Team1;
+            Winner = CombatSide.Team1;
             IsOver = true;
             return true;
         }
@@ -105,56 +116,39 @@ public class CombatInstance
 
     static bool HasLost(CombatFormation team) => team.Entities.All(c => c.Combat.Health <= 0);
 
-    CombatFormation GetFormation(Team team) =>
+    CombatFormation GetFormation(CombatSide team) =>
         team switch
         {
-            Team.Team1 => Team1,
-            Team.Team2 => Team2,
+            CombatSide.Team1 => Team1,
+            CombatSide.Team2 => Team2,
             _ => throw new ArgumentOutOfRangeException(nameof(team), team, null)
         };
 
-    Team OtherTeam(Team team) =>
-        team switch
-        {
-            Team.Team1 => Team.Team2,
-            Team.Team2 => Team.Team1
-        };
-
-    public enum Team
-    {
-        Team1,
-        Team2
-    }
-
     class EntityState
     {
-        public EntityState(IGameEntityWithCombatStatistics entity, Team team)
+        public EntityState(IGameEntityWithCombatStatistics entity, CombatSide team)
         {
             Entity = entity;
             Team = team;
         }
 
         public IGameEntityWithCombatStatistics Entity { get; }
-        public Team Team { get; }
+        public CombatSide Team { get; }
         public int Lead { get; set; }
+    }
+
+    public void Dispose()
+    {
+        Attacked = null;
+        GC.SuppressFinalize(this);
     }
 }
 
-public class CombatFormation
+public class CombatEntityAttackedEvent
 {
-    /// <summary>
-    ///     The characters in order
-    /// </summary>
-    public required IReadOnlyList<IGameEntityWithCombatStatistics> Entities { get; init; }
-}
-
-public interface IGameEntityWithCombatStatistics : IGameEntity
-{
-    EntityCombatStatistics Combat { get; }
-}
-
-public class EntityCombatStatistics
-{
-    public int Health { get; private set; }
-    public int Speed { get; private set; }
+    public required int SubTurn { get; init; }
+    public required IGameEntityWithCombatStatistics Attacker { get; init; }
+    public required IGameEntityWithCombatStatistics Target { get; init; }
+    public required int DamageDealt { get; init; }
+    public required int DamageReceived { get; init; }
 }

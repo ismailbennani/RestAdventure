@@ -2,7 +2,7 @@
 
 namespace RestAdventure.Core.Players;
 
-public class PlayerKnowledge
+public class PlayerKnowledge : IDisposable
 {
     readonly HashSet<ResourceId> _discoveredResources = [];
 
@@ -19,4 +19,10 @@ public class PlayerKnowledge
     }
 
     public bool Knows(GameResource resource) => _discoveredResources.Contains(resource.Id);
+
+    public void Dispose()
+    {
+        Discovered = null;
+        GC.SuppressFinalize(this);
+    }
 }

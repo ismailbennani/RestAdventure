@@ -3,7 +3,7 @@ using RestAdventure.Kernel.Security;
 
 namespace RestAdventure.Core.Players;
 
-public class GamePlayers
+public class GamePlayers : IDisposable
 {
     readonly Dictionary<UserId, Player> _players = [];
 
@@ -33,6 +33,17 @@ public class GamePlayers
 
     public Player? GetPlayer(UserId userId) => _players.GetValueOrDefault(userId);
     public Player? GetPlayerByApiKey(ApiKey apiKey) => _players.Values.SingleOrDefault(p => p.User.ApiKey == apiKey);
+
+    public void Dispose()
+    {
+        foreach (Player player in _players.Values)
+        {
+            player.Dispose();
+        }
+        _players.Clear();
+
+        GC.SuppressFinalize(this);
+    }
 }
 
 public static class GamePlayersStateExtensions
