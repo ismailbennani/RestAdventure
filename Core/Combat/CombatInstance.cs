@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using RestAdventure.Core.Entities;
+using RestAdventure.Core.Maps.Locations;
 using RestAdventure.Core.Settings;
 
 namespace RestAdventure.Core.Combat;
@@ -24,6 +25,7 @@ public class CombatInstance : IDisposable
         }
         _settings = settings;
 
+        Location = team1.Entities[0].Location;
         Team1 = team1;
         Team2 = team2;
 
@@ -42,6 +44,7 @@ public class CombatInstance : IDisposable
     }
 
     public CombatInstanceId Id { get; } = new(Guid.NewGuid());
+    public Location Location { get; }
     public CombatFormation Team1 { get; }
     public CombatFormation Team2 { get; }
 

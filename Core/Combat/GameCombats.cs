@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
 using RestAdventure.Core.Combat.Notifications;
+using RestAdventure.Core.Maps.Locations;
 using RestAdventure.Core.Settings;
 
 namespace RestAdventure.Core.Combat;
@@ -41,13 +42,11 @@ public class GameCombats : IDisposable
         return combat;
     }
 
-    public async Task ResolveCombatsAsync(GameState state)
+    public async Task RemoveCombatsIfOverAsync(GameState state)
     {
         List<CombatInstanceId> toRemove = [];
         foreach (CombatInstance combat in _combats.Values)
         {
-            await combat.PlayTurnAsync();
-
             if (combat.IsOver)
             {
                 toRemove.Add(combat.Id);
@@ -67,6 +66,8 @@ public class GameCombats : IDisposable
             combat.Dispose();
         }
     }
+
+    public IEnumerable<CombatInstance> AtLocation(Location location) => _combats.Values.Where(c => c.Location == location);
 
     public void Dispose()
     {

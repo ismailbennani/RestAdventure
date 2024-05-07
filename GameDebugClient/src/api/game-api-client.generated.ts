@@ -506,6 +506,79 @@ export class GameApiClient {
 }
 
 @Injectable()
+export class CombatsApiClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "https://localhost:7056";
+    }
+
+    /**
+     * Get combats
+     */
+    getCombats(locationGuid: string): Observable<CombatInstance[]> {
+        let url_ = this.baseUrl + "/game/location/{locationGuid}/combats";
+        if (locationGuid === undefined || locationGuid === null)
+            throw new Error("The parameter 'locationGuid' must be defined.");
+        url_ = url_.replace("{locationGuid}", encodeURIComponent("" + locationGuid));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetCombats(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetCombats(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<CombatInstance[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<CombatInstance[]>;
+        }));
+    }
+
+    protected processGetCombats(response: HttpResponseBase): Observable<CombatInstance[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(CombatInstance.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
 export class TeamCharactersActionsApiClient {
     private http: HttpClient;
     private baseUrl: string;
@@ -1832,6 +1905,92 @@ export interface IGameState {
     nextTickDate?: Date | undefined;
 }
 
+/** Combat instance */
+export class CombatInstance implements ICombatInstance {
+    /** The unique ID of the combat instance
+             */
+    id!: string;
+    /** The first team in the combat instance
+             */
+    team1!: EntityInCombat[];
+    /** The second team in the combat instance
+             */
+    team2!: EntityInCombat[];
+    /** The current turn of the combat instance
+             */
+    turn!: number;
+
+    constructor(data?: ICombatInstance) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.team1 = [];
+            this.team2 = [];
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            if (Array.isArray(_data["team1"])) {
+                this.team1 = [] as any;
+                for (let item of _data["team1"])
+                    this.team1!.push(EntityInCombat.fromJS(item));
+            }
+            if (Array.isArray(_data["team2"])) {
+                this.team2 = [] as any;
+                for (let item of _data["team2"])
+                    this.team2!.push(EntityInCombat.fromJS(item));
+            }
+            this.turn = _data["turn"];
+        }
+    }
+
+    static fromJS(data: any): CombatInstance {
+        data = typeof data === 'object' ? data : {};
+        let result = new CombatInstance();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        if (Array.isArray(this.team1)) {
+            data["team1"] = [];
+            for (let item of this.team1)
+                data["team1"].push(item.toJSON());
+        }
+        if (Array.isArray(this.team2)) {
+            data["team2"] = [];
+            for (let item of this.team2)
+                data["team2"].push(item.toJSON());
+        }
+        data["turn"] = this.turn;
+        return data;
+    }
+}
+
+/** Combat instance */
+export interface ICombatInstance {
+    /** The unique ID of the combat instance
+             */
+    id: string;
+    /** The first team in the combat instance
+             */
+    team1: EntityInCombat[];
+    /** The second team in the combat instance
+             */
+    team2: EntityInCombat[];
+    /** The current turn of the combat instance
+             */
+    turn: number;
+}
+
 /** Entity (minimal) */
 export class EntityMinimal implements IEntityMinimal {
     /** The unique ID of the entity
@@ -1880,6 +2039,122 @@ export interface IEntityMinimal {
     /** The name of the entity
              */
     name: string;
+}
+
+/** Entity in combat */
+export class EntityInCombat extends EntityMinimal implements IEntityInCombat {
+    /** The level of the character
+             */
+    level!: number;
+    /** The combat statistics of the character
+             */
+    combat!: EntityCombatStatistics;
+
+    constructor(data?: IEntityInCombat) {
+        super(data);
+        if (!data) {
+            this.combat = new EntityCombatStatistics();
+        }
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.level = _data["level"];
+            this.combat = _data["combat"] ? EntityCombatStatistics.fromJS(_data["combat"]) : new EntityCombatStatistics();
+        }
+    }
+
+    static override fromJS(data: any): EntityInCombat {
+        data = typeof data === 'object' ? data : {};
+        let result = new EntityInCombat();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["level"] = this.level;
+        data["combat"] = this.combat ? this.combat.toJSON() : <any>undefined;
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Entity in combat */
+export interface IEntityInCombat extends IEntityMinimal {
+    /** The level of the character
+             */
+    level: number;
+    /** The combat statistics of the character
+             */
+    combat: EntityCombatStatistics;
+}
+
+/** Entity combat statistics */
+export class EntityCombatStatistics implements IEntityCombatStatistics {
+    /** The health of the entity
+             */
+    health!: number;
+    /** The max health of the entity
+             */
+    maxHealth!: number;
+    /** The speed of the entity
+             */
+    speed!: number;
+    /** The attack of the entity
+             */
+    attack!: number;
+
+    constructor(data?: IEntityCombatStatistics) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.health = _data["health"];
+            this.maxHealth = _data["maxHealth"];
+            this.speed = _data["speed"];
+            this.attack = _data["attack"];
+        }
+    }
+
+    static fromJS(data: any): EntityCombatStatistics {
+        data = typeof data === 'object' ? data : {};
+        let result = new EntityCombatStatistics();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["health"] = this.health;
+        data["maxHealth"] = this.maxHealth;
+        data["speed"] = this.speed;
+        data["attack"] = this.attack;
+        return data;
+    }
+}
+
+/** Entity combat statistics */
+export interface IEntityCombatStatistics {
+    /** The health of the entity
+             */
+    health: number;
+    /** The max health of the entity
+             */
+    maxHealth: number;
+    /** The speed of the entity
+             */
+    speed: number;
+    /** The attack of the entity
+             */
+    attack: number;
 }
 
 /** Entity with interactions */
@@ -2436,72 +2711,6 @@ export interface IJobInstance {
     /** The progression of the job
              */
     progression: ProgressionBarMinimal;
-}
-
-/** Entity combat statistics */
-export class EntityCombatStatistics implements IEntityCombatStatistics {
-    /** The health of the entity
-             */
-    health!: number;
-    /** The max health of the entity
-             */
-    maxHealth!: number;
-    /** The speed of the entity
-             */
-    speed!: number;
-    /** The attack of the entity
-             */
-    attack!: number;
-
-    constructor(data?: IEntityCombatStatistics) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.health = _data["health"];
-            this.maxHealth = _data["maxHealth"];
-            this.speed = _data["speed"];
-            this.attack = _data["attack"];
-        }
-    }
-
-    static fromJS(data: any): EntityCombatStatistics {
-        data = typeof data === 'object' ? data : {};
-        let result = new EntityCombatStatistics();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["health"] = this.health;
-        data["maxHealth"] = this.maxHealth;
-        data["speed"] = this.speed;
-        data["attack"] = this.attack;
-        return data;
-    }
-}
-
-/** Entity combat statistics */
-export interface IEntityCombatStatistics {
-    /** The health of the entity
-             */
-    health: number;
-    /** The max health of the entity
-             */
-    maxHealth: number;
-    /** The speed of the entity
-             */
-    speed: number;
-    /** The attack of the entity
-             */
-    attack: number;
 }
 
 /** The result of an action performed by a character */

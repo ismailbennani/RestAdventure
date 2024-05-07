@@ -9,16 +9,18 @@ public record MonsterInstanceId(Guid Guid) : GameEntityId(Guid);
 
 public class MonsterInstance : GameEntity<MonsterInstanceId>, IGameEntityWithCombatStatistics, IInteractibleEntity
 {
-    public MonsterInstance(MonsterSpecies species, Location location) : base(new MonsterInstanceId(Guid.NewGuid()), species.Name, location)
+    public MonsterInstance(MonsterSpecies species, int level, Location location) : base(new MonsterInstanceId(Guid.NewGuid()), species.Name, location)
     {
         Species = species;
+        Level = level;
         Combat = new EntityCombatStatistics(Species.Health, Species.Speed, Species.Attack);
     }
 
     public MonsterSpecies Species { get; }
+    public int Level { get; }
     public EntityCombatStatistics Combat { get; }
+
     public bool Disabled { get; private set; }
     public void Enable() => Disabled = false;
-
     public void Disable() => Disabled = true;
 }

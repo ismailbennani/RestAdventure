@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0-alpha.0.106+ebb65e3fafaa6dfca48a63562db9b246fe49a50f"
+    "version": "0.0.0-alpha.0.107+f33fc56db12e32dfa44ec0e21af8e4e34d448974"
   },
   "servers": [
     {
@@ -310,6 +310,47 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/GameState"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ]
+      }
+    },
+    "/game/location/{locationGuid}/combats": {
+      "get": {
+        "tags": [
+          "Combats"
+        ],
+        "summary": "Get combats",
+        "operationId": "Combats_GetCombats",
+        "parameters": [
+          {
+            "name": "locationGuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CombatInstance"
+                  }
                 }
               }
             }
@@ -1115,6 +1156,130 @@
           }
         }
       },
+      "CombatInstance": {
+        "type": "object",
+        "description": "Combat instance\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "team1",
+          "team2",
+          "turn"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the combat instance\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "team1": {
+            "type": "array",
+            "description": "The first team in the combat instance\n            ",
+            "items": {
+              "$ref": "#/components/schemas/EntityInCombat"
+            }
+          },
+          "team2": {
+            "type": "array",
+            "description": "The second team in the combat instance\n            ",
+            "items": {
+              "$ref": "#/components/schemas/EntityInCombat"
+            }
+          },
+          "turn": {
+            "type": "integer",
+            "description": "The current turn of the combat instance\n            ",
+            "format": "int32"
+          }
+        }
+      },
+      "EntityInCombat": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/EntityMinimal"
+          },
+          {
+            "type": "object",
+            "description": "Entity in combat\n            ",
+            "additionalProperties": false,
+            "required": [
+              "level",
+              "combat"
+            ],
+            "properties": {
+              "level": {
+                "type": "integer",
+                "description": "The level of the character\n            ",
+                "format": "int32"
+              },
+              "combat": {
+                "description": "The combat statistics of the character\n            ",
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/EntityCombatStatistics"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "EntityCombatStatistics": {
+        "type": "object",
+        "description": "Entity combat statistics\n            ",
+        "additionalProperties": false,
+        "required": [
+          "health",
+          "maxHealth",
+          "speed",
+          "attack"
+        ],
+        "properties": {
+          "health": {
+            "type": "integer",
+            "description": "The health of the entity\n            ",
+            "format": "int32"
+          },
+          "maxHealth": {
+            "type": "integer",
+            "description": "The max health of the entity\n            ",
+            "format": "int32"
+          },
+          "speed": {
+            "type": "integer",
+            "description": "The speed of the entity\n            ",
+            "format": "int32"
+          },
+          "attack": {
+            "type": "integer",
+            "description": "The attack of the entity\n            ",
+            "format": "int32"
+          }
+        }
+      },
+      "EntityMinimal": {
+        "type": "object",
+        "description": "Entity (minimal)\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the entity\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the entity\n            ",
+            "minLength": 1
+          }
+        }
+      },
       "EntityWithInteractions": {
         "allOf": [
           {
@@ -1176,28 +1341,6 @@
           "name": {
             "type": "string",
             "description": "The name of the interaction\n            ",
-            "minLength": 1
-          }
-        }
-      },
-      "EntityMinimal": {
-        "type": "object",
-        "description": "Entity (minimal)\n            ",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "name"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "The unique ID of the entity\n            ",
-            "format": "guid",
-            "minLength": 1
-          },
-          "name": {
-            "type": "string",
-            "description": "The name of the entity\n            ",
             "minLength": 1
           }
         }
@@ -1427,39 +1570,6 @@
                 "$ref": "#/components/schemas/ProgressionBarMinimal"
               }
             ]
-          }
-        }
-      },
-      "EntityCombatStatistics": {
-        "type": "object",
-        "description": "Entity combat statistics\n            ",
-        "additionalProperties": false,
-        "required": [
-          "health",
-          "maxHealth",
-          "speed",
-          "attack"
-        ],
-        "properties": {
-          "health": {
-            "type": "integer",
-            "description": "The health of the entity\n            ",
-            "format": "int32"
-          },
-          "maxHealth": {
-            "type": "integer",
-            "description": "The max health of the entity\n            ",
-            "format": "int32"
-          },
-          "speed": {
-            "type": "integer",
-            "description": "The speed of the entity\n            ",
-            "format": "int32"
-          },
-          "attack": {
-            "type": "integer",
-            "description": "The attack of the entity\n            ",
-            "format": "int32"
           }
         }
       },
@@ -2218,6 +2328,9 @@
     },
     {
       "name": "Game"
+    },
+    {
+      "name": "Combats"
     },
     {
       "name": "Team"

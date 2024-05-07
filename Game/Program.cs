@@ -165,7 +165,7 @@ async Task<GameState> LoadGameAsync(WebApplication app)
     StaticObjectInstance pearTree = new(baseGameContent.Trees.PearTree, baseGameContent.GeneratedMaps.Locations.First());
     await state.Entities.AddAsync(pearTree);
 
-    MonsterInstance petitPaw = new(baseGameContent.Rattlings.PetitPaw, baseGameContent.GeneratedMaps.Locations.First());
+    MonsterInstance petitPaw = new(baseGameContent.Rattlings.PetitPaw, 1, baseGameContent.GeneratedMaps.Locations.First());
     await state.Entities.AddAsync(petitPaw);
 
     Player player = await state.Players.RegisterPlayerAsync(new User(new UserId(Guid.NewGuid()), "PLAYER"));

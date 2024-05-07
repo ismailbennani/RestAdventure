@@ -63,6 +63,8 @@ public class GameService
         await state.Actions.ResolveActionsAsync(state);
         await state.Interactions.ResolveInteractionsAsync(state);
 
+        await state.Combats.RemoveCombatsIfOverAsync(state);
+
         await _publisher.Publish(new GameTick { GameState = state });
 
         return state.Tick;

@@ -1,11 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ReplaySubject, combineLatest, forkJoin, map, of, switchMap } from 'rxjs';
-import { ILocationMinimal, LocationMinimal, Player } from '../../../../api/admin-api-client.generated';
+import { ReplaySubject, combineLatest, forkJoin, map, of, switchMap, tap } from 'rxjs';
+import { ILocationMinimal, LocationMinimal } from '../../../../api/admin-api-client.generated';
 import {
   CharacterInteractWithEntityAction,
   CharacterMoveToLocationAction,
+  CombatInstance,
+  CombatsApiClient,
   EntityWithInteractions,
   InteractionMinimal,
   Team,
@@ -20,6 +22,7 @@ import { PlayersService } from '../../services/players/players.service';
 import { TeamService } from '../../services/team/team.service';
 import { CharacterHistoryComponent } from '../../widgets/character-history/character-history.component';
 import { CharacterComponent } from '../../widgets/character/character.component';
+import { CombatComponent } from '../../widgets/combat/combat.component';
 import { InventoryComponent } from '../../widgets/inventory/inventory.component';
 import { JobsComponent } from '../../widgets/jobs/jobs.component';
 
@@ -27,7 +30,7 @@ import { JobsComponent } from '../../widgets/jobs/jobs.component';
   selector: 'app-character-page',
   templateUrl: './character-page.component.html',
   standalone: true,
-  imports: [CommonModule, SpinnerComponent, InventoryComponent, CharacterComponent, CharacterHistoryComponent, JobsComponent],
+  imports: [CommonModule, SpinnerComponent, InventoryComponent, CharacterComponent, CharacterHistoryComponent, JobsComponent, CombatComponent],
 })
 export class CharacterPageComponent implements OnInit {
   protected loading: boolean = false;
@@ -35,8 +38,9 @@ export class CharacterPageComponent implements OnInit {
   protected character: TeamCharacter | undefined;
   protected accessibleLocations: LocationMinimal[] = [];
   protected entitiesWithInteractions: EntityWithInteractions[] = [];
+  protected combats: CombatInstance[] = [];
+  protected selectedCombat: CombatInstance | undefined;
 
-  private player: Player | undefined;
   private team: Team | undefined;
   private refreshSubject: ReplaySubject<void> = new ReplaySubject<void>(1);
 
@@ -48,6 +52,7 @@ export class CharacterPageComponent implements OnInit {
     private teamService: TeamService,
     private charactersApiClient: TeamCharactersApiClient,
     private charactersActionsApiClient: TeamCharactersActionsApiClient,
+    private combatsApiClient: CombatsApiClient,
   ) {}
 
   ngOnInit(): void {
@@ -57,7 +62,6 @@ export class CharacterPageComponent implements OnInit {
       team: this.teamService.team$,
     }).subscribe(({ characterId, player, team }) => {
       this.characterId = characterId;
-      this.player = player;
       this.team = team;
       this.refreshSubject.next();
     });
@@ -90,9 +94,25 @@ export class CharacterPageComponent implements OnInit {
             interactions: this.charactersActionsApiClient.getAvailableInteractions(this.character.id),
           });
         }),
-        map(result => {
+        tap(result => {
           this.accessibleLocations = result?.locations ?? [];
           this.entitiesWithInteractions = result?.interactions ?? [];
+        }),
+        switchMap(_ => {
+          if (!this.character) {
+            return of(undefined);
+          }
+
+          return this.combatsApiClient.getCombats(this.character.location.id);
+        }),
+        map(combats => {
+          this.combats = combats ?? [];
+
+          if (this.combats.length > 0) {
+            this.selectCombat(this.combats[0]);
+          } else {
+            this.unselectCombat();
+          }
         }),
       )
       .subscribe();
@@ -177,5 +197,13 @@ export class CharacterPageComponent implements OnInit {
       .deleteCharacter(this.characterId)
       .pipe(switchMap(() => this.gameService.refreshNow(true)))
       .subscribe();
+  }
+
+  selectCombat(combat: CombatInstance) {
+    this.selectedCombat = combat;
+  }
+
+  unselectCombat() {
+    this.selectedCombat = undefined;
   }
 }
