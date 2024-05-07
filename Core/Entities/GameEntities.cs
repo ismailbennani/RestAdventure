@@ -7,7 +7,7 @@ using RestAdventure.Core.Maps.Locations;
 
 namespace RestAdventure.Core.Entities;
 
-public class GameEntities
+public class GameEntities : IDisposable
 {
     readonly Dictionary<GameEntityId, GameEntity> _entities = [];
 
@@ -50,6 +50,8 @@ public class GameEntities
         _entities.Remove(entity.Id);
 
         await GameState.Publisher.Publish(new GameEntityDeleted { Entity = entity });
+
+        entity.Dispose();
     }
 
     public GameEntity? Get(GameEntityId id) => _entities.SingleOrDefault(kv => kv.Key.Guid == id.Guid).Value;
@@ -77,4 +79,13 @@ public class GameEntities
     }
 
     void PublishSync(INotification notification) => GameState.Publisher.Publish(notification).Wait();
+
+    public void Dispose()
+    {
+        foreach (GameEntity entity in _entities.Values)
+        {
+            entity.Dispose();
+        }
+        _entities.Clear();
+    }
 }

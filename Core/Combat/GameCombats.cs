@@ -5,7 +5,7 @@ using RestAdventure.Core.Settings;
 
 namespace RestAdventure.Core.Combat;
 
-public class GameCombats
+public class GameCombats : IDisposable
 {
     readonly GameSettings _settings;
     readonly IPublisher _publisher;
@@ -63,6 +63,19 @@ public class GameCombats
             }
 
             await _publisher.Publish(new CombatEnded { Combat = combat });
+
+            combat.Dispose();
         }
+    }
+
+    public void Dispose()
+    {
+        foreach (CombatInstance combat in _combats.Values)
+        {
+            combat.Dispose();
+        }
+        _combats.Clear();
+
+        GC.SuppressFinalize(this);
     }
 }

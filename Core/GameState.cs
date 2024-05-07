@@ -10,7 +10,7 @@ using RestAdventure.Core.Settings;
 
 namespace RestAdventure.Core;
 
-public class GameState
+public class GameState : IDisposable
 {
     public GameState(GameSettings settings, GameContent content, IPublisher publisher, ILoggerFactory loggerFactory)
     {
@@ -38,4 +38,12 @@ public class GameState
     public GameActions Actions { get; }
     public GameInteractions Interactions { get; }
     public GameCombats Combats { get; }
+
+    public void Dispose()
+    {
+        Players.Dispose();
+        Entities.Dispose();
+        Combats.Dispose();
+        GC.SuppressFinalize(this);
+    }
 }

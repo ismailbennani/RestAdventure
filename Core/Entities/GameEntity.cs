@@ -8,7 +8,7 @@ public record GameEntityId(Guid Guid);
 /// <remarks>
 ///     Common representation of all <see cref="GameEntity{TId}" /> instances
 /// </remarks>
-public abstract class GameEntity : IEquatable<GameEntity>, IGameEntity
+public abstract class GameEntity : IEquatable<GameEntity>, IGameEntity, IDisposable
 {
     public GameEntity(GameEntityId id, string name, Location location)
     {
@@ -43,6 +43,12 @@ public abstract class GameEntity : IEquatable<GameEntity>, IGameEntity
     }
 
     public override string ToString() => Name;
+
+    public virtual void Dispose()
+    {
+        Moved = null;
+        GC.SuppressFinalize(this);
+    }
 
     public bool Equals(GameEntity? other)
     {

@@ -3,7 +3,7 @@
 /// <summary>
 ///     A collection of items
 /// </summary>
-public class Inventory : IReadOnlyInventory
+public class Inventory : IReadOnlyInventory, IDisposable
 {
     readonly List<ItemInstanceStack> _stacks = [];
 
@@ -110,6 +110,12 @@ public class Inventory : IReadOnlyInventory
 
     /// <inheritdoc />
     public ItemInstanceStack? Find(ItemInstance itemInstance) => _stacks.FirstOrDefault(e => e.ItemInstance == itemInstance);
+
+    public void Dispose()
+    {
+        Changed = null;
+        GC.SuppressFinalize(this);
+    }
 }
 
 public class InventoryItemStackChangedEvent

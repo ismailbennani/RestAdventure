@@ -18,6 +18,7 @@ public class Character : GameEntity<CharacterId>, IGameEntityWithInventory, IGam
         Progression = new ProgressionBar(characterClass.LevelCaps);
         Inventory = new Inventory();
         Jobs = new EntityJobs();
+        Combat = new EntityCombatStatistics();
     }
 
     public Player Player { get; }
@@ -48,4 +49,11 @@ public class Character : GameEntity<CharacterId>, IGameEntityWithInventory, IGam
     public EntityCombatStatistics Combat { get; private set; }
 
     public override string ToString() => $"{Class} {Name} ({Player})";
+
+    public override void Dispose()
+    {
+        Inventory.Dispose();
+        Jobs.Dispose();
+        GC.SuppressFinalize(this);
+    }
 }

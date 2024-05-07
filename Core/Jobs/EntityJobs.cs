@@ -1,6 +1,6 @@
 ﻿namespace RestAdventure.Core.Jobs;
 
-public class EntityJobs
+public class EntityJobs : IDisposable
 {
     readonly Dictionary<JobId, JobInstance> _jobs = new();
 
@@ -40,6 +40,13 @@ public class EntityJobs
     }
 
     public JobInstance? Get(Job job) => _jobs.GetValueOrDefault(job.Id);
+
+    public void Dispose()
+    {
+        JobGainedExperience = null;
+        JobLeveledUp = null;
+        GC.SuppressFinalize(this);
+    }
 }
 
 public class EntityJobGainedExperienceEvent
