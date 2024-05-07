@@ -67,15 +67,3 @@ public class EntityJobLeveledUpEvent
     public required int OldLevel { get; init; }
     public required int NewLevel { get; init; }
 }
-
-public static class EntityJobsExtensions
-{
-    public static void GainExperience(this EntityJobs jobs, IEnumerable<JobExperienceStack> stacks)
-    {
-        foreach (JobExperienceStack stack in stacks)
-        {
-            JobInstance? instance = jobs.Get(stack.Job);
-            instance?.Progression.Progress(stack.Amount);
-        }
-    }
-}

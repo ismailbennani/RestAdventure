@@ -27,7 +27,7 @@ public class HarvestInteractionInstance : InteractionInstance
     public override Task OnEndAsync(GameState state)
     {
         Character.Inventory.Add(HarvestInteraction.Harvest.Items);
-        Character.Jobs.GainExperience(HarvestInteraction.Harvest.Experience);
+        Character.Jobs.Get(HarvestInteraction.Job)?.Progression.Progress(HarvestInteraction.Harvest.Experience);
         return Task.CompletedTask;
     }
 }

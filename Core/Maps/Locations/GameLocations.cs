@@ -21,6 +21,14 @@ public class GameLocations : GameResourcesStore<LocationId, Location>
         _connections.Add((location1.Id, location2.Id));
     }
 
+    public void Connect(IEnumerable<(Location, Location)> connections)
+    {
+        foreach ((Location location1, Location location2) in connections)
+        {
+            Connect(location1, location2);
+        }
+    }
+
     public IEnumerable<Location> ConnectedTo(Location location) =>
         _connections.Where(l => l.Item1 == location.Id || l.Item2 == location.Id)
             .Select(connection => connection.Item1 == location.Id ? Resources[connection.Item2] : Resources[connection.Item1]);

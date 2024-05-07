@@ -7,6 +7,7 @@ using NSwag;
 using NSwag.Generation.Processors.Security;
 using RestAdventure.Core;
 using RestAdventure.Core.Settings;
+using RestAdventure.Core.StaticObjects;
 using RestAdventure.Game.Apis.AdminApi;
 using RestAdventure.Game.Apis.GameApi;
 using RestAdventure.Game.Apis.GameApi.Services.Game;
@@ -150,6 +151,15 @@ async Task<GameState> LoadGameAsync(WebApplication app)
 
     GameService gameService = app.Services.GetRequiredService<GameService>();
     GameState state = gameService.NewGame(content, new GameSettings());
+
+    StaticObjectInstance appleTree1 = new(baseGameContent.Trees.AppleTree, baseGameContent.GeneratedMaps.Locations.First());
+    await state.Entities.RegisterAsync(appleTree1);
+
+    StaticObjectInstance appleTree2 = new(baseGameContent.Trees.AppleTree, baseGameContent.GeneratedMaps.Locations.First());
+    await state.Entities.RegisterAsync(appleTree2);
+
+    StaticObjectInstance pearTree = new(baseGameContent.Trees.PearTree, baseGameContent.GeneratedMaps.Locations.First());
+    await state.Entities.RegisterAsync(pearTree);
 
     return state;
 }

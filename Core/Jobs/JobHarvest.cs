@@ -10,7 +10,7 @@ public class JobHarvest
     /// <summary>
     ///     The unique name of this harvest
     /// </summary>
-    public required int Name { get; init; }
+    public required string Name { get; init; }
 
     /// <summary>
     ///     The min level required for the harvest
@@ -35,5 +35,5 @@ public class JobHarvest
     /// <summary>
     ///     The experience that should be given to the player when they are done harvesting
     /// </summary>
-    public required IReadOnlyCollection<JobExperienceStack> Experience { get; init; }
+    public required int Experience { get; init; }
 }

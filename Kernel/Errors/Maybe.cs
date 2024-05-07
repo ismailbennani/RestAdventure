@@ -22,7 +22,7 @@ public class Maybe<T>
     public T? Value { get; init; }
 
     public static implicit operator Maybe<T>(T value) => new() { Success = true, Value = value };
-    public static implicit operator Maybe<T>(string reason) => new() { Success = true, WhyNot = reason };
+    public static implicit operator Maybe<T>(string reason) => new() { Success = false, WhyNot = reason };
 
     public static implicit operator Maybe(Maybe<T> maybe) => new() { Success = maybe.Success, WhyNot = maybe.WhyNot };
 
@@ -43,7 +43,7 @@ public class Maybe
     public string? WhyNot { get; init; }
 
     public static implicit operator Maybe(bool success) => new() { Success = success, WhyNot = success ? null : "Could not perform the operation" };
-    public static implicit operator Maybe(string reason) => new() { Success = true, WhyNot = reason };
+    public static implicit operator Maybe(string reason) => new() { Success = false, WhyNot = reason };
 
     public static implicit operator bool(Maybe maybe) => maybe.Success;
 }

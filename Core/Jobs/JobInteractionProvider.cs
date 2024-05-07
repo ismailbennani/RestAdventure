@@ -19,7 +19,7 @@ public class JobInteractionProvider : IInteractionProvider
 
         foreach (JobInstance job in character.Jobs)
         {
-            foreach (JobHarvest harvest in job.Harvests)
+            foreach (JobHarvest harvest in job.Job.Harvests)
             {
                 if (harvest.Targets.Contains(staticObjectInstance.Object))
                 {

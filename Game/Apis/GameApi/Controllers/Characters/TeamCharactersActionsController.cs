@@ -109,8 +109,14 @@ public class TeamCharactersActionsController : GameApiController
         List<EntityWithInteractionsDto> result = [];
         foreach (GameEntity entity in entities)
         {
+            Interaction[] availableInteractions = _availableInteractionsService.GetAvailableInteractions(character, entity).ToArray();
+            if (availableInteractions.Length == 0)
+            {
+                continue;
+            }
+
             List<InteractionDto> interactions = [];
-            foreach (Interaction interaction in _availableInteractionsService.GetAvailableInteractions(character, entity))
+            foreach (Interaction interaction in availableInteractions)
             {
                 Maybe canInteract = await interaction.CanInteractAsync(state, character, entity);
                 interactions.Add(interaction.ToDto(canInteract));
@@ -133,7 +139,7 @@ public class TeamCharactersActionsController : GameApiController
     /// <summary>
     ///     Interact
     /// </summary>
-    [HttpPost("interactions/entity/{entityGuid:guid}/{interactionGuid:guid}")]
+    [HttpPost("interactions/entity/{entityGuid:guid}/{interactionName}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using RestAdventure.Core.Characters.Services;
+using RestAdventure.Core.Interactions;
 using RestAdventure.Core.Interactions.Providers;
 using RestAdventure.Core.Jobs;
 using RestAdventure.Core.Monsters;
@@ -13,7 +14,8 @@ public static class CoreHostingExtensions
         services.AddSingleton<GameService>();
         services.AddSingleton<CharactersService>();
 
-        // IInteractionProvider
+        // Interactions
+        services.AddSingleton<AvailableInteractionsService>();
         services.AddSingleton<IInteractionProvider, JobInteractionProvider>();
         services.AddSingleton<IInteractionProvider, MonsterCombatInteractionProvider>();
     }
