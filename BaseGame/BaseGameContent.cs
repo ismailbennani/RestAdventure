@@ -1,4 +1,5 @@
 ﻿using BaseGame.Maps;
+using BaseGame.Monsters;
 using RestAdventure.Core;
 using RestAdventure.Core.Characters;
 using RestAdventure.Core.Items;
@@ -20,6 +21,10 @@ public class BaseGameContent : ContentPlugin
         Items items = new();
         Jobs jobs = new();
         Harvestables harvestables = new(items, jobs);
+
+        Rattlings rattlings = new();
+        content.Monsters.Families.Register(rattlings.Family);
+        content.Monsters.Species.Register(rattlings.Species);
 
         RegisterMaps(content, generatedMaps);
         RegisterCharacterClasses(content, characterClasses.All);

@@ -4,7 +4,7 @@ using RestAdventure.Kernel.Errors;
 
 namespace RestAdventure.Core.Combat;
 
-public class CharacterCombatInteraction : Interaction
+public class CombatInteraction : Interaction
 {
     public override string Name => "Combat";
 

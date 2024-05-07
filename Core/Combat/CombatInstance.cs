@@ -86,14 +86,14 @@ public class CombatInstance : IDisposable
 
     Task ResolveAttackAsync(int subTurn, IGameEntityWithCombatStatistics attacker, IGameEntityWithCombatStatistics target)
     {
-        int damageToDeal = attacker.Combat.Attack();
-        int damageReceived = target.Combat.ReceiveAttack(damageToDeal);
+        EntityAttack damageToDeal = attacker.Combat.DealAttack();
+        EntityAttack damageReceived = target.Combat.ReceiveAttack(damageToDeal);
 
         Attacked?.Invoke(
             this,
-            new CombatEntityAttackedEvent { SubTurn = subTurn, Attacker = attacker, Target = target, DamageDealt = damageToDeal, DamageReceived = damageReceived }
+            new CombatEntityAttackedEvent { SubTurn = subTurn, Attacker = attacker, Target = target, AttackDealt = damageToDeal, AttackReceived = damageReceived }
         );
-        
+
         return Task.CompletedTask;
     }
 
@@ -151,6 +151,6 @@ public class CombatEntityAttackedEvent
     public required int SubTurn { get; init; }
     public required IGameEntityWithCombatStatistics Attacker { get; init; }
     public required IGameEntityWithCombatStatistics Target { get; init; }
-    public required int DamageDealt { get; init; }
-    public required int DamageReceived { get; init; }
+    public required EntityAttack AttackDealt { get; init; }
+    public required EntityAttack AttackReceived { get; init; }
 }

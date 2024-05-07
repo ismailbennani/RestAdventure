@@ -32,8 +32,8 @@ public class GameCombats : IDisposable
                     SubTurn = args.SubTurn,
                     Attacker = args.Attacker,
                     Target = args.Target,
-                    DamageDealt = args.DamageDealt,
-                    DamageReceived = args.DamageReceived
+                    AttackDealt = args.AttackDealt,
+                    AttackReceived = args.AttackReceived
                 }
             )
             .Wait();

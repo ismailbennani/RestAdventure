@@ -8,6 +8,6 @@ public class CombatEntityAttacked : INotification
     public required int SubTurn { get; init; }
     public required IGameEntityWithCombatStatistics Attacker { get; init; }
     public required IGameEntityWithCombatStatistics Target { get; init; }
-    public required int DamageDealt { get; init; }
-    public required int DamageReceived { get; init; }
+    public required EntityAttack AttackDealt { get; init; }
+    public required EntityAttack AttackReceived { get; init; }
 }

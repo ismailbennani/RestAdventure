@@ -18,7 +18,7 @@ public class Character : GameEntity<CharacterId>, IGameEntityWithInventory, IGam
         Progression = new ProgressionBar(characterClass.LevelCaps);
         Inventory = new Inventory();
         Jobs = new EntityJobs();
-        Combat = new EntityCombatStatistics();
+        Combat = new EntityCombatStatistics(10, 100, 10);
     }
 
     public Player Player { get; }

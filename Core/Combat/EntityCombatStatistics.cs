@@ -2,28 +2,36 @@
 
 public class EntityCombatStatistics
 {
+    public EntityCombatStatistics(int health, int speed, int attack)
+    {
+        Health = health;
+        Speed = speed;
+        Attack = attack;
+    }
+
     public int Health { get; private set; }
     public int Speed { get; private set; }
+    public int Attack { get; private set; }
 
     public event EventHandler<EntityDamagedEvent>? Damaged;
 
-    public int Attack() => 1;
+    public EntityAttack DealAttack() => new() { Damage = Attack };
 
-    public int ReceiveAttack(int value)
+    public EntityAttack ReceiveAttack(EntityAttack attack)
     {
         int oldHealth = Health;
-        Health -= value;
+        Health -= attack.Damage;
 
-        Damaged?.Invoke(this, new EntityDamagedEvent { OriginalDamage = value, DamageReceived = value, OldHealth = oldHealth, NewHealth = Health });
+        Damaged?.Invoke(this, new EntityDamagedEvent { AttackDealt = attack, AttackReceived = attack, OldHealth = oldHealth, NewHealth = Health });
 
-        return value;
+        return attack;
     }
 }
 
 public class EntityDamagedEvent
 {
-    public required int OriginalDamage { get; init; }
-    public required int DamageReceived { get; init; }
+    public required EntityAttack AttackDealt { get; init; }
+    public required EntityAttack AttackReceived { get; init; }
     public required int OldHealth { get; init; }
     public required int NewHealth { get; init; }
 }

@@ -3,16 +3,12 @@ using RestAdventure.Core.Items;
 using RestAdventure.Core.Jobs;
 using RestAdventure.Core.Maps;
 using RestAdventure.Core.Maps.Harvestables;
+using RestAdventure.Core.Monsters;
 
 namespace RestAdventure.Core;
 
 public class GameContent
 {
-    /// <summary>
-    ///     The characters of the game
-    /// </summary>
-    public GameCharacters Characters { get; } = new();
-
     /// <summary>
     ///     The maps of the game
     /// </summary>
@@ -32,4 +28,14 @@ public class GameContent
     ///     The harvestables of the game
     /// </summary>
     public GameHarvestables Harvestables { get; } = new();
+
+    /// <summary>
+    ///     The characters of the game
+    /// </summary>
+    public GameCharacters Characters { get; } = new();
+
+    /// <summary>
+    ///     The mosnters of the game
+    /// </summary>
+    public GameMonsters Monsters { get; } = new();
 }

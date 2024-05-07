@@ -11,11 +11,10 @@ public record HarvestableInstanceId(Guid Guid) : GameEntityId(Guid);
 /// </summary>
 public class HarvestableInstance : GameEntity<HarvestableInstanceId>, IGameEntityWithInteractions
 {
-    static readonly HarvestInteraction Interaction = new();
-
     public HarvestableInstance(Harvestable harvestable, Location location) : base(new HarvestableInstanceId(Guid.NewGuid()), harvestable.Name, location)
     {
         Harvestable = harvestable;
+        Interactions = new EntityInteractions(new HarvestInteraction());
     }
 
     /// <summary>
@@ -26,5 +25,5 @@ public class HarvestableInstance : GameEntity<HarvestableInstanceId>, IGameEntit
     /// <summary>
     ///     The interactions
     /// </summary>
-    public EntityInteractions Interactions => new(Interaction);
+    public EntityInteractions Interactions { get; }
 }
