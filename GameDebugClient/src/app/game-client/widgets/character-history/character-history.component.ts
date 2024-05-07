@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { ReplaySubject, combineLatest, map, switchMap, tap } from 'rxjs';
 import {
+  CharacterAttackedHistoryEntry,
   CharacterCreatedHistoryEntry,
   CharacterDeletedHistoryEntry,
   CharacterEndedInteractionHistoryEntry,
@@ -12,6 +13,7 @@ import {
   CharacterLearnedJobHistoryEntry,
   CharacterMoveLocationHistoryEntry,
   CharacterPerformedActionHistoryEntry,
+  CharacterReceivedAttackHistoryEntry,
   CharacterStartedInteractionHistoryEntry,
   TeamCharacter,
   TeamCharactersApiClient,
@@ -129,6 +131,24 @@ export class CharacterHistoryComponent implements OnInit {
 
     if (entry instanceof CharacterJobLeveledUpHistoryEntry) {
       return `${entry.jobName}: +${entry.newLevel - entry.oldLevel} lv. (${entry.newLevel})`;
+    }
+
+    if (entry instanceof CharacterAttackedHistoryEntry) {
+      const reduction = entry.attackReceived.damage - entry.attackDealt.damage;
+      if (reduction === 0) {
+        return `Attacked ${entry.targetName}: -${entry.attackReceived.damage} HP`;
+      } else {
+        return `Attacked ${entry.targetName}: -${entry.attackReceived.damage} HP (${entry.attackDealt.damage}-${reduction})`;
+      }
+    }
+
+    if (entry instanceof CharacterReceivedAttackHistoryEntry) {
+      const reduction = entry.attackReceived.damage - entry.attackDealt.damage;
+      if (reduction === 0) {
+        return `Attacked by ${entry.attackerName}: -${entry.attackReceived.damage} HP`;
+      } else {
+        return `Attacked by ${entry.attackerName}: -${entry.attackReceived.damage} HP (${entry.attackDealt.damage}-${reduction})`;
+      }
     }
 
     return '???';

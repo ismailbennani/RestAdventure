@@ -5,11 +5,11 @@ using RestAdventure.Core.Maps.Locations;
 
 namespace RestAdventure.Core.Monsters;
 
-public record MonterInstanceId(Guid Guid) : GameEntityId(Guid);
+public record MonsterInstanceId(Guid Guid) : GameEntityId(Guid);
 
-public class MonsterInstance : GameEntity<MonterInstanceId>, IGameEntityWithCombatStatistics, IInteractibleEntity
+public class MonsterInstance : GameEntity<MonsterInstanceId>, IGameEntityWithCombatStatistics, IInteractibleEntity
 {
-    public MonsterInstance(MonsterSpecies species, Location location) : base(new MonterInstanceId(Guid.NewGuid()), species.Name, location)
+    public MonsterInstance(MonsterSpecies species, Location location) : base(new MonsterInstanceId(Guid.NewGuid()), species.Name, location)
     {
         Species = species;
         Combat = new EntityCombatStatistics(Species.Health, Species.Speed, Species.Attack);

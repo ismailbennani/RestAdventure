@@ -19,6 +19,8 @@ namespace RestAdventure.Game.Apis.Common.Dtos.History;
 [JsonDerivedType(typeof(CharacterLearnedJobHistoryEntryDto), "job-learned")]
 [JsonDerivedType(typeof(CharacterJobGainedExperienceHistoryEntryDto), "job-gained-experience")]
 [JsonDerivedType(typeof(CharacterJobLeveledUpHistoryEntryDto), "job-leveled-up")]
+[JsonDerivedType(typeof(CharacterAttackedHistoryEntryDto), "attacked")]
+[JsonDerivedType(typeof(CharacterReceivedAttackHistoryEntryDto), "received-attack")]
 public class CharacterHistoryEntryDto
 {
     /// <summary>
@@ -43,6 +45,8 @@ static class CharacterHistoryEntryMappingExtensions
             EntityLearnedJobHistoryEntry entityLearnedJobHistoryEntry => entityLearnedJobHistoryEntry.ToDto(),
             EntityJobGainedExperienceHistoryEntry entityJobGainedExperienceHistoryEntry => entityJobGainedExperienceHistoryEntry.ToDto(),
             EntityJobLeveledUpHistoryEntry entityJobLeveledUpHistoryEntry => entityJobLeveledUpHistoryEntry.ToDto(),
+            CharacterAttackedHistoryEntry characterAttackedHistoryEntry => characterAttackedHistoryEntry.ToDto(),
+            CharacterReceivedAttackHistoryEntry characterReceivedAttackHistoryEntry => characterReceivedAttackHistoryEntry.ToDto(),
             _ => throw new ArgumentOutOfRangeException(nameof(entry))
         };
 }

@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0-alpha.0.103+fe38dfd13be647cf4a155467eae401b2516045c3"
+    "version": "0.0.0-alpha.0.105+3c9f3ec9356f0b579937ee4a3a2d023011514765"
   },
   "servers": [
     {
@@ -1681,7 +1681,9 @@
             "interaction-ended": "#/components/schemas/CharacterEndedInteractionHistoryEntry",
             "job-learned": "#/components/schemas/CharacterLearnedJobHistoryEntry",
             "job-gained-experience": "#/components/schemas/CharacterJobGainedExperienceHistoryEntry",
-            "job-leveled-up": "#/components/schemas/CharacterJobLeveledUpHistoryEntry"
+            "job-leveled-up": "#/components/schemas/CharacterJobLeveledUpHistoryEntry",
+            "attacked": "#/components/schemas/CharacterAttackedHistoryEntry",
+            "received-attack": "#/components/schemas/CharacterReceivedAttackHistoryEntry"
           }
         },
         "description": "Character history entry\n            ",
@@ -2064,6 +2066,115 @@
                 "type": "integer",
                 "description": "The new level of the job\n            ",
                 "format": "int32"
+              }
+            }
+          }
+        ]
+      },
+      "CharacterAttackedHistoryEntry": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CharacterHistoryEntry"
+          },
+          {
+            "type": "object",
+            "description": "Character attacked history entry\n            ",
+            "additionalProperties": false,
+            "required": [
+              "attackDealt",
+              "attackReceived",
+              "targetId",
+              "targetName"
+            ],
+            "properties": {
+              "attackDealt": {
+                "description": "The attack dealt by the character\n            ",
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/EntityAttack"
+                  }
+                ]
+              },
+              "attackReceived": {
+                "description": "The attack received by the target\n            ",
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/EntityAttack"
+                  }
+                ]
+              },
+              "targetId": {
+                "type": "string",
+                "description": "The unique ID of the target receiving the attack\n            ",
+                "format": "guid",
+                "minLength": 1
+              },
+              "targetName": {
+                "type": "string",
+                "description": "The name of the target receiving the attack\n            ",
+                "minLength": 1
+              }
+            }
+          }
+        ]
+      },
+      "EntityAttack": {
+        "type": "object",
+        "description": "Entity attack\n            ",
+        "additionalProperties": false,
+        "required": [
+          "damage"
+        ],
+        "properties": {
+          "damage": {
+            "type": "integer",
+            "description": "The damage of the attack\n            ",
+            "format": "int32"
+          }
+        }
+      },
+      "CharacterReceivedAttackHistoryEntry": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CharacterHistoryEntry"
+          },
+          {
+            "type": "object",
+            "description": "Character attacked history entry\n            ",
+            "additionalProperties": false,
+            "required": [
+              "attackDealt",
+              "attackReceived",
+              "attackerId",
+              "attackerName"
+            ],
+            "properties": {
+              "attackDealt": {
+                "description": "The attack dealt by the character\n            ",
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/EntityAttack"
+                  }
+                ]
+              },
+              "attackReceived": {
+                "description": "The attack received by the target\n            ",
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/EntityAttack"
+                  }
+                ]
+              },
+              "attackerId": {
+                "type": "string",
+                "description": "The unique ID of the target receiving the attack\n            ",
+                "format": "guid",
+                "minLength": 1
+              },
+              "attackerName": {
+                "type": "string",
+                "description": "The name of the target receiving the attack\n            ",
+                "minLength": 1
               }
             }
           }

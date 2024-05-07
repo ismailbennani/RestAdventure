@@ -1,4 +1,5 @@
-﻿using RestAdventure.Core.Entities;
+﻿using System.Diagnostics.CodeAnalysis;
+using RestAdventure.Core.Entities;
 using RestAdventure.Core.Settings;
 
 namespace RestAdventure.Core.Combat;
@@ -45,7 +46,10 @@ public class CombatInstance : IDisposable
     public CombatFormation Team2 { get; }
 
     public int Turn { get; private set; }
+
+    [MemberNotNullWhen(true, nameof(Winner))]
     public bool IsOver { get; private set; }
+
     public CombatSide? Winner { get; private set; }
 
     public event EventHandler<CombatEntityAttackedEvent>? Attacked;

@@ -2979,6 +2979,16 @@ export class CharacterHistoryEntry implements ICharacterHistoryEntry {
             result.init(data);
             return result;
         }
+        if (data["$type"] === "attacked") {
+            let result = new CharacterAttackedHistoryEntry();
+            result.init(data);
+            return result;
+        }
+        if (data["$type"] === "received-attack") {
+            let result = new CharacterReceivedAttackHistoryEntry();
+            result.init(data);
+            return result;
+        }
         let result = new CharacterHistoryEntry();
         result.init(data);
         return result;
@@ -3588,6 +3598,184 @@ export interface ICharacterJobLeveledUpHistoryEntry extends ICharacterHistoryEnt
     /** The new level of the job
              */
     newLevel: number;
+}
+
+/** Character attacked history entry */
+export class CharacterAttackedHistoryEntry extends CharacterHistoryEntry implements ICharacterAttackedHistoryEntry {
+    /** The attack dealt by the character
+             */
+    attackDealt!: EntityAttack;
+    /** The attack received by the target
+             */
+    attackReceived!: EntityAttack;
+    /** The unique ID of the target receiving the attack
+             */
+    targetId!: string;
+    /** The name of the target receiving the attack
+             */
+    targetName!: string;
+
+    constructor(data?: ICharacterAttackedHistoryEntry) {
+        super(data);
+        if (!data) {
+            this.attackDealt = new EntityAttack();
+            this.attackReceived = new EntityAttack();
+        }
+        this._discriminator = "attacked";
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.attackDealt = _data["attackDealt"] ? EntityAttack.fromJS(_data["attackDealt"]) : new EntityAttack();
+            this.attackReceived = _data["attackReceived"] ? EntityAttack.fromJS(_data["attackReceived"]) : new EntityAttack();
+            this.targetId = _data["targetId"];
+            this.targetName = _data["targetName"];
+        }
+    }
+
+    static override fromJS(data: any): CharacterAttackedHistoryEntry {
+        data = typeof data === 'object' ? data : {};
+        let result = new CharacterAttackedHistoryEntry();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["attackDealt"] = this.attackDealt ? this.attackDealt.toJSON() : <any>undefined;
+        data["attackReceived"] = this.attackReceived ? this.attackReceived.toJSON() : <any>undefined;
+        data["targetId"] = this.targetId;
+        data["targetName"] = this.targetName;
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Character attacked history entry */
+export interface ICharacterAttackedHistoryEntry extends ICharacterHistoryEntry {
+    /** The attack dealt by the character
+             */
+    attackDealt: EntityAttack;
+    /** The attack received by the target
+             */
+    attackReceived: EntityAttack;
+    /** The unique ID of the target receiving the attack
+             */
+    targetId: string;
+    /** The name of the target receiving the attack
+             */
+    targetName: string;
+}
+
+/** Entity attack */
+export class EntityAttack implements IEntityAttack {
+    /** The damage of the attack
+             */
+    damage!: number;
+
+    constructor(data?: IEntityAttack) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.damage = _data["damage"];
+        }
+    }
+
+    static fromJS(data: any): EntityAttack {
+        data = typeof data === 'object' ? data : {};
+        let result = new EntityAttack();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["damage"] = this.damage;
+        return data;
+    }
+}
+
+/** Entity attack */
+export interface IEntityAttack {
+    /** The damage of the attack
+             */
+    damage: number;
+}
+
+/** Character attacked history entry */
+export class CharacterReceivedAttackHistoryEntry extends CharacterHistoryEntry implements ICharacterReceivedAttackHistoryEntry {
+    /** The attack dealt by the character
+             */
+    attackDealt!: EntityAttack;
+    /** The attack received by the target
+             */
+    attackReceived!: EntityAttack;
+    /** The unique ID of the target receiving the attack
+             */
+    attackerId!: string;
+    /** The name of the target receiving the attack
+             */
+    attackerName!: string;
+
+    constructor(data?: ICharacterReceivedAttackHistoryEntry) {
+        super(data);
+        if (!data) {
+            this.attackDealt = new EntityAttack();
+            this.attackReceived = new EntityAttack();
+        }
+        this._discriminator = "received-attack";
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.attackDealt = _data["attackDealt"] ? EntityAttack.fromJS(_data["attackDealt"]) : new EntityAttack();
+            this.attackReceived = _data["attackReceived"] ? EntityAttack.fromJS(_data["attackReceived"]) : new EntityAttack();
+            this.attackerId = _data["attackerId"];
+            this.attackerName = _data["attackerName"];
+        }
+    }
+
+    static override fromJS(data: any): CharacterReceivedAttackHistoryEntry {
+        data = typeof data === 'object' ? data : {};
+        let result = new CharacterReceivedAttackHistoryEntry();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["attackDealt"] = this.attackDealt ? this.attackDealt.toJSON() : <any>undefined;
+        data["attackReceived"] = this.attackReceived ? this.attackReceived.toJSON() : <any>undefined;
+        data["attackerId"] = this.attackerId;
+        data["attackerName"] = this.attackerName;
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Character attacked history entry */
+export interface ICharacterReceivedAttackHistoryEntry extends ICharacterHistoryEntry {
+    /** The attack dealt by the character
+             */
+    attackDealt: EntityAttack;
+    /** The attack received by the target
+             */
+    attackReceived: EntityAttack;
+    /** The unique ID of the target receiving the attack
+             */
+    attackerId: string;
+    /** The name of the target receiving the attack
+             */
+    attackerName: string;
 }
 
 /** Team of characters */
