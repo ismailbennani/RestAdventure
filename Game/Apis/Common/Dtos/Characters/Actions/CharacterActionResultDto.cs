@@ -37,6 +37,6 @@ static class CharacterActionResultMappingExtensions
     public static CharacterActionResultDto ToDto(this CharacterActionResult result) =>
         new()
         {
-            Tick = result.Tick, Action = result.Action.ToDto(), Success = result.Success, FailureReason = result.FailureReason
+            Tick = result.Tick, Action = result.Action.ToDto(), Success = result.Success, FailureReason = result.WhyNot
         };
 }

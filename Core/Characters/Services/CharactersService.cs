@@ -1,4 +1,5 @@
 ﻿using RestAdventure.Core.Players;
+using RestAdventure.Kernel.Errors;
 
 namespace RestAdventure.Core.Characters.Services;
 
@@ -11,7 +12,7 @@ public class CharactersService
         _gameService = gameService;
     }
 
-    public async Task<CharacterCreationResult> CreateCharacterAsync(Player player, string name, CharacterClass cls)
+    public async Task<Maybe<Character>> CreateCharacterAsync(Player player, string name, CharacterClass cls)
     {
         GameState state = _gameService.RequireGameState();
 
@@ -19,12 +20,12 @@ public class CharactersService
         IEnumerable<Character> characters = state.Entities.GetCharactersOfPlayer(player);
         if (characters.Count() >= maxTeamSize)
         {
-            return new CharacterCreationResult { IsSuccess = false, ErrorMessage = $"reached max team size (max:{maxTeamSize})" };
+            return $"reached max team size (max:{maxTeamSize})";
         }
 
         Character character = new(player, cls, name);
         await state.Entities.RegisterAsync(character);
 
-        return new CharacterCreationResult { IsSuccess = true, Character = character };
+        return character;
     }
 }

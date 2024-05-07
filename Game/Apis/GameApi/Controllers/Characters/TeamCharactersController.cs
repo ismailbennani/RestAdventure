@@ -10,6 +10,7 @@ using RestAdventure.Game.Apis.Common.Dtos.History;
 using RestAdventure.Game.Apis.Common.Dtos.Queries;
 using RestAdventure.Game.Apis.GameApi.Controllers.Characters.Requests;
 using RestAdventure.Game.Authentication;
+using RestAdventure.Kernel.Errors;
 using RestAdventure.Kernel.Queries;
 
 namespace RestAdventure.Game.Apis.GameApi.Controllers.Characters;
@@ -45,21 +46,21 @@ public class TeamCharactersController : GameApiController
 
         Player player = ControllerContext.RequirePlayer(state);
 
-        CharacterClassId clsId = new CharacterClassId(request.ClassId);
+        CharacterClassId clsId = new(request.ClassId);
         CharacterClass? cls = content.Characters.Classes.Get(clsId);
         if (cls == null)
         {
             return NotFound();
         }
 
-        CharacterCreationResult result = await _charactersService.CreateCharacterAsync(player, request.Name, cls);
+        Maybe<Character> character = await _charactersService.CreateCharacterAsync(player, request.Name, cls);
 
-        if (!result.IsSuccess)
+        if (!character.Success)
         {
-            return Problem($"Could not create character: {result.ErrorMessage}", statusCode: StatusCodes.Status400BadRequest);
+            return Problem($"Could not create character: {character.WhyNot}", statusCode: StatusCodes.Status400BadRequest);
         }
 
-        return result.Character.ToDto();
+        return character.Value.ToDto();
     }
 
     /// <summary>

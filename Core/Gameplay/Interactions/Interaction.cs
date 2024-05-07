@@ -22,9 +22,3 @@ public abstract class Interaction
 
     public override string ToString() => Name;
 }
-
-public class CanInteractResult
-{
-    public required bool CanInteract { get; init; }
-    public string? WhyNot { get; init; }
-}
