@@ -84,7 +84,7 @@ public class CombatInstance : IDisposable
         Turn++;
     }
 
-    async Task ResolveAttackAsync(int subTurn, IGameEntityWithCombatStatistics attacker, IGameEntityWithCombatStatistics target)
+    Task ResolveAttackAsync(int subTurn, IGameEntityWithCombatStatistics attacker, IGameEntityWithCombatStatistics target)
     {
         int damageToDeal = attacker.Combat.Attack();
         int damageReceived = target.Combat.ReceiveAttack(damageToDeal);
@@ -93,6 +93,8 @@ public class CombatInstance : IDisposable
             this,
             new CombatEntityAttackedEvent { SubTurn = subTurn, Attacker = attacker, Target = target, DamageDealt = damageToDeal, DamageReceived = damageReceived }
         );
+        
+        return Task.CompletedTask;
     }
 
     bool EvaluateWinCondition()
