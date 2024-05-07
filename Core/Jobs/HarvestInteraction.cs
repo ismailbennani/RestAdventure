@@ -1,5 +1,4 @@
 ﻿using RestAdventure.Core.Characters;
-using RestAdventure.Core.Entities;
 using RestAdventure.Core.Interactions;
 using RestAdventure.Core.StaticObjects;
 using RestAdventure.Kernel.Errors;
@@ -18,7 +17,7 @@ public class HarvestInteraction : Interaction
     public Job Job { get; }
     public JobHarvest Harvest { get; }
 
-    public override Task<Maybe> CanInteractAsync(GameState state, Character character, IGameEntity entity)
+    protected override Task<Maybe> CanInteractInternalAsync(GameState state, Character character, IInteractibleEntity target)
     {
         JobInstance? job = character.Jobs.Get(Job);
         if (job == null || Harvest.Level > job.Progression.Level)
@@ -26,12 +25,12 @@ public class HarvestInteraction : Interaction
             return Task.FromResult<Maybe>("Character doesn't fulfill the conditions");
         }
 
-        if (entity is not StaticObjectInstance staticObjectInstance || !Harvest.Targets.Contains(staticObjectInstance.Object))
+        if (target is not StaticObjectInstance staticObjectInstance || !Harvest.Targets.Contains(staticObjectInstance.Object))
         {
             return Task.FromResult<Maybe>("Entity cannot be harvested");
         }
 
-        if (character.Location != entity.Location)
+        if (character.Location != target.Location)
         {
             return Task.FromResult<Maybe>("Entity is inaccessible");
         }
@@ -39,6 +38,6 @@ public class HarvestInteraction : Interaction
         return Task.FromResult<Maybe>(true);
     }
 
-    public override Task<Maybe<InteractionInstance>> InstantiateInteractionAsync(GameState state, Character character, IGameEntity entity) =>
-        Task.FromResult<Maybe<InteractionInstance>>(new HarvestInteractionInstance(character, this, entity));
+    public override Task<Maybe<InteractionInstance>> InstantiateInteractionAsync(GameState state, Character character, IInteractibleEntity target) =>
+        Task.FromResult<Maybe<InteractionInstance>>(new HarvestInteractionInstance(character, this, target));
 }

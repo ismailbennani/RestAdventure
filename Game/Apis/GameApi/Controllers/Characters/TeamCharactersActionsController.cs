@@ -104,10 +104,10 @@ public class TeamCharactersActionsController : GameApiController
             return BadRequest();
         }
 
-        IEnumerable<GameEntity> entities = state.Entities.AtLocation(character.Location);
+        IEnumerable<IInteractibleEntity> entities = state.Entities.AtLocation<IInteractibleEntity>(character.Location);
 
         List<EntityWithInteractionsDto> result = [];
-        foreach (GameEntity entity in entities)
+        foreach (IInteractibleEntity entity in entities)
         {
             Interaction[] availableInteractions = _availableInteractionsService.GetAvailableInteractions(character, entity).ToArray();
             if (availableInteractions.Length == 0)
@@ -157,7 +157,7 @@ public class TeamCharactersActionsController : GameApiController
         }
 
         GameEntityId entityId = new(entityGuid);
-        GameEntity? entity = state.Entities.Get(entityId);
+        IInteractibleEntity? entity = state.Entities.Get<IInteractibleEntity>(entityId);
         if (entity == null)
         {
             return NotFound();

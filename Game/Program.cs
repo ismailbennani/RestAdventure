@@ -153,13 +153,13 @@ async Task<GameState> LoadGameAsync(WebApplication app)
     GameState state = gameService.NewGame(content, new GameSettings());
 
     StaticObjectInstance appleTree1 = new(baseGameContent.Trees.AppleTree, baseGameContent.GeneratedMaps.Locations.First());
-    await state.Entities.RegisterAsync(appleTree1);
+    await state.Entities.AddAsync(appleTree1);
 
     StaticObjectInstance appleTree2 = new(baseGameContent.Trees.AppleTree, baseGameContent.GeneratedMaps.Locations.First());
-    await state.Entities.RegisterAsync(appleTree2);
+    await state.Entities.AddAsync(appleTree2);
 
     StaticObjectInstance pearTree = new(baseGameContent.Trees.PearTree, baseGameContent.GeneratedMaps.Locations.First());
-    await state.Entities.RegisterAsync(pearTree);
+    await state.Entities.AddAsync(pearTree);
 
     return state;
 }

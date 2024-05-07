@@ -10,13 +10,13 @@ public class CharacterEndedInteractionHistoryEntry : CharacterHistoryEntry
     public CharacterEndedInteractionHistoryEntry(InteractionInstance interactionInstance, long tick) : base(interactionInstance.Character, tick)
     {
         InteractionName = interactionInstance.Interaction.Name;
-        SubjectId = interactionInstance.Subject.Id;
-        SubjectName = interactionInstance.Subject.Name;
+        TargetId = interactionInstance.Target.Id;
+        TargetName = interactionInstance.Target.Name;
     }
 
     public string InteractionName { get; }
-    public GameEntityId SubjectId { get; }
-    public string SubjectName { get; }
+    public GameEntityId TargetId { get; }
+    public string TargetName { get; }
 }
 
 public class CreateCharacterEndedInteractionHistoryEntry : INotificationHandler<InteractionEnded>

@@ -9,7 +9,7 @@ namespace RestAdventure.Core.Entities;
 
 public class GameEntities : IDisposable
 {
-    readonly Dictionary<GameEntityId, GameEntity> _entities = [];
+    readonly Dictionary<GameEntityId, IGameEntity> _entities = [];
 
     public GameEntities(GameState gameState)
     {
@@ -18,9 +18,9 @@ public class GameEntities : IDisposable
 
     internal GameState GameState { get; }
 
-    public IEnumerable<GameEntity> All => _entities.Values;
+    public IEnumerable<IGameEntity> All => _entities.Values;
 
-    public async Task RegisterAsync(GameEntity entity)
+    public async Task AddAsync(IGameEntity entity)
     {
         _entities[entity.Id] = entity;
 
@@ -40,7 +40,7 @@ public class GameEntities : IDisposable
         await GameState.Publisher.Publish(new GameEntityMovedToLocation { Entity = entity, OldLocation = null, NewLocation = entity.Location });
     }
 
-    public async Task UnregisterAsync(GameEntity entity)
+    public async Task DestroyAsync(IGameEntity entity)
     {
         if (!_entities.ContainsKey(entity.Id))
         {
@@ -54,9 +54,9 @@ public class GameEntities : IDisposable
         entity.Dispose();
     }
 
-    public GameEntity? Get(GameEntityId id) => _entities.SingleOrDefault(kv => kv.Key.Guid == id.Guid).Value;
+    public IGameEntity? Get(GameEntityId id) => _entities.SingleOrDefault(kv => kv.Key.Guid == id.Guid).Value;
     public TEntity? Get<TEntity>(GameEntityId id) where TEntity: class, IGameEntity => Get(id) as TEntity;
-    public IEnumerable<GameEntity> AtLocation(Location location) => All.Where(e => e.Location == location);
+    public IEnumerable<IGameEntity> AtLocation(Location location) => All.Where(e => e.Location == location);
     public IEnumerable<TEntity> AtLocation<TEntity>(Location location) where TEntity: IGameEntity => All.OfType<TEntity>().Where(e => e.Location == location);
 
     void RegisterInventoryEvents(IGameEntityWithInventory entity) =>
@@ -82,7 +82,7 @@ public class GameEntities : IDisposable
 
     public void Dispose()
     {
-        foreach (GameEntity entity in _entities.Values)
+        foreach (IGameEntity entity in _entities.Values)
         {
             entity.Dispose();
         }

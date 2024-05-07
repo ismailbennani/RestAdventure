@@ -127,7 +127,7 @@ public class TeamCharactersController : GameApiController
             return NotFound();
         }
 
-        await state.Entities.UnregisterAsync(character);
+        await state.Entities.DestroyAsync(character);
 
         return NoContent();
     }

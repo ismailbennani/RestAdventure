@@ -1,15 +1,15 @@
 ﻿using RestAdventure.Core.Characters;
 using RestAdventure.Core.Combat;
-using RestAdventure.Core.Entities;
+using RestAdventure.Core.Interactions;
 using RestAdventure.Kernel.Errors;
 
 namespace RestAdventure.Core.Monsters;
 
 public class MonsterCombatInteraction : CombatInteraction
 {
-    public override Task<Maybe> CanInteractAsync(GameState state, Character character, IGameEntity entity)
+    protected override Task<Maybe> CanInteractInternalAsync(GameState state, Character character, IInteractibleEntity target)
     {
-        if (entity is not MonsterInstance monster)
+        if (target is not MonsterInstance monster)
         {
             return Task.FromResult<Maybe>("Target is not a monster");
         }

@@ -1,5 +1,4 @@
 ﻿using RestAdventure.Core.Characters;
-using RestAdventure.Core.Entities;
 using RestAdventure.Core.Interactions.Notifications;
 using RestAdventure.Kernel.Errors;
 
@@ -17,14 +16,8 @@ public class GameInteractions
 
     internal GameState GameState { get; }
 
-    public async Task<Maybe<InteractionInstance>> StartInteractionAsync(Character character, Interaction interaction, IGameEntity entity)
+    public async Task<Maybe<InteractionInstance>> StartInteractionAsync(Character character, Interaction interaction, IInteractibleEntity entity)
     {
-        InteractionInstance? currentInteraction = GetCharacterInteraction(character);
-        if (currentInteraction != null)
-        {
-            return $"Character {character} is already performing an interaction";
-        }
-
         Maybe canInteract = await interaction.CanInteractAsync(GameState, character, entity);
         if (!canInteract.Success)
         {

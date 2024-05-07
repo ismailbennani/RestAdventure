@@ -1,5 +1,4 @@
 ﻿using RestAdventure.Core.Characters;
-using RestAdventure.Core.Entities;
 using RestAdventure.Core.Interactions;
 using RestAdventure.Kernel.Errors;
 
@@ -9,13 +8,13 @@ public abstract class CombatInteraction : Interaction
 {
     public override string Name => "combat";
 
-    public override async Task<Maybe<InteractionInstance>> InstantiateInteractionAsync(GameState state, Character character, IGameEntity entity)
+    public override async Task<Maybe<InteractionInstance>> InstantiateInteractionAsync(GameState state, Character character, IInteractibleEntity target)
     {
-        IGameEntityWithCombatStatistics target = (IGameEntityWithCombatStatistics)entity;
+        IGameEntityWithCombatStatistics entityWithCombat = (IGameEntityWithCombatStatistics)target;
 
-        CombatInstance combat = await state.Combats.StartCombatAsync(new CombatFormation { Entities = [character] }, new CombatFormation { Entities = [target] });
+        CombatInstance combat = await state.Combats.StartCombatAsync(new CombatFormation { Entities = [character] }, new CombatFormation { Entities = [entityWithCombat] });
 
-        return new CharacterCombatInteractionInstance(combat, character, this, entity);
+        return new CharacterCombatInteractionInstance(combat, character, this, target);
     }
 }
 
@@ -23,7 +22,11 @@ public class CharacterCombatInteractionInstance : InteractionInstance
 {
     public CombatInstance Combat { get; }
 
-    public CharacterCombatInteractionInstance(CombatInstance combat, Character character, Interaction interaction, IGameEntity subject) : base(character, interaction, subject)
+    public CharacterCombatInteractionInstance(CombatInstance combat, Character character, Interaction interaction, IInteractibleEntity target) : base(
+        character,
+        interaction,
+        target
+    )
     {
         Combat = combat;
     }

@@ -2,7 +2,7 @@
 
 namespace RestAdventure.Core.Entities;
 
-public interface IGameEntity
+public interface IGameEntity : IDisposable
 {
     /// <summary>
     ///     The unique ID of the entity

@@ -22,10 +22,10 @@ public class InteractionInstanceDto
     public required InteractionMinimalDto Interaction { get; init; }
 
     /// <summary>
-    ///     The subject of the interaction
+    ///     The target of the interaction
     /// </summary>
     [Required]
-    public required EntityMinimalDto Subject { get; init; }
+    public required EntityMinimalDto Target { get; init; }
 }
 
 static class InteractionInstanceMappingExtensions
@@ -35,6 +35,6 @@ static class InteractionInstanceMappingExtensions
         {
             Id = instance.Id.Guid,
             Interaction = instance.Interaction.ToMinimalDto(),
-            Subject = instance.Subject.ToMinimalDto()
+            Target = instance.Target.ToMinimalDto()
         };
 }

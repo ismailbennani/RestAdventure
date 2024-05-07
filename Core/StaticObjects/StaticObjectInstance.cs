@@ -1,11 +1,12 @@
 ﻿using RestAdventure.Core.Entities;
+using RestAdventure.Core.Interactions;
 using RestAdventure.Core.Maps.Locations;
 
 namespace RestAdventure.Core.StaticObjects;
 
 public record StaticObjectInstanceId(Guid Guid) : GameEntityId(Guid);
 
-public class StaticObjectInstance : GameEntity<StaticObjectInstanceId>
+public class StaticObjectInstance : GameEntity<StaticObjectInstanceId>, IInteractibleEntity
 {
     public StaticObjectInstance(StaticObject staticObject, Location location) : base(new StaticObjectInstanceId(Guid.NewGuid()), staticObject.Name, location)
     {
@@ -13,4 +14,8 @@ public class StaticObjectInstance : GameEntity<StaticObjectInstanceId>
     }
 
     public StaticObject Object { get; }
+    public bool Disabled { get; private set; }
+    public void Enable() => Disabled = false;
+
+    public void Disable() => Disabled = true;
 }

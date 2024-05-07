@@ -15,16 +15,16 @@ public class CharacterStartedInteractionHistoryEntryDto : CharacterHistoryEntryD
     public required string InteractionName { get; init; }
 
     /// <summary>
-    ///     The entity that was the subject of the interaction
+    ///     The entity that was the target of the interaction
     /// </summary>
     [Required]
-    public required Guid SubjectId { get; init; }
+    public required Guid TargetId { get; init; }
 
     /// <summary>
-    ///     The name of the entity that was the subject of the interaction
+    ///     The name of the entity that was the target of the interaction
     /// </summary>
     [Required]
-    public required string SubjectName { get; init; }
+    public required string TargetName { get; init; }
 }
 
 static class CharacterStartedInteractionHistoryEntryMappingExtensions
@@ -34,7 +34,7 @@ static class CharacterStartedInteractionHistoryEntryMappingExtensions
         {
             Tick = entry.Tick,
             InteractionName = entry.InteractionName,
-            SubjectId = entry.SubjectId.Guid,
-            SubjectName = entry.SubjectName
+            TargetId = entry.TargetId.Guid,
+            TargetName = entry.TargetName
         };
 }

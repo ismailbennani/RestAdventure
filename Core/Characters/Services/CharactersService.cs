@@ -24,7 +24,7 @@ public class CharactersService
         }
 
         Character character = new(player, cls, name);
-        await state.Entities.RegisterAsync(character);
+        await state.Entities.AddAsync(character);
 
         return character;
     }
