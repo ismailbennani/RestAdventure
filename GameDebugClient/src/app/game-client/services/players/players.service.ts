@@ -44,36 +44,57 @@ export class PlayersService {
   }
 
   select(playerId: string) {
-    const playerInternal = this.playersInternal.find(p => p.id === playerId);
-    if (!playerInternal) {
-      console.error('Unknown player.', playerId);
-      this.selectedPlayerInternal = undefined;
-      this.selectedPlayerSubject.next(undefined);
-      localStorage.removeItem(PlayersService.LOCAL_STORAGE_KEY);
-    } else {
+    let playerInternal = this.playersInternal.find(p => p.id === playerId);
+    if (!playerInternal && this.playersInternal.length > 0) {
+      playerInternal = this.playersInternal[0];
+    }
+
+    if (playerInternal) {
       this.selectedPlayerInternal = playerInternal;
       this.selectedPlayerSubject.next(playerInternal);
       localStorage.setItem(PlayersService.LOCAL_STORAGE_KEY, playerId);
+    } else {
+      console.error('Unknown player.', playerId);
+      this.unselect();
     }
   }
 
-  refreshAndSelect(playerId: string): void {
-    this.refreshInternal().subscribe(() => this.select(playerId));
+  unselect() {
+    this.selectedPlayerInternal = undefined;
+    this.selectedPlayerSubject.next(undefined);
+    localStorage.removeItem(PlayersService.LOCAL_STORAGE_KEY);
   }
 
-  private refreshInternal(): Observable<void> {
+  refreshAndSelect(playerId: string): void {
+    this.refreshInternal(playerId).subscribe();
+  }
+
+  private refreshInternal(playerId?: string): Observable<void> {
     return this.adminPlayersApiClient.getPlayers().pipe(
       map(players => {
         this.playersInternal = players;
         this.playersSubject.next(players);
+
+        if (playerId && this.playersInternal.find(p => p.id == playerId)) {
+          this.select(playerId);
+          return;
+        }
 
         const preferredPlayerId = localStorage.getItem(PlayersService.LOCAL_STORAGE_KEY);
         if (preferredPlayerId) {
           const preferredPlayer = this.playersInternal.find(p => p.id === preferredPlayerId);
           if (preferredPlayer) {
             this.select(preferredPlayer.id);
+            return;
           }
         }
+
+        if (this.playersInternal.length > 0) {
+          this.select(this.playersInternal[0].id);
+          return;
+        }
+
+        this.unselect();
       }),
     );
   }
