@@ -67,7 +67,7 @@ public class GameActions
                 Tick = state.Tick,
                 Action = action,
                 Success = resolution.Success,
-                FailureReason = resolution.WhyNot
+                WhyNot = resolution.WhyNot
             };
             _results[characterId] = result;
 

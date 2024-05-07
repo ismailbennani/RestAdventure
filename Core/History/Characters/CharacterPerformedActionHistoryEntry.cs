@@ -11,7 +11,7 @@ public class CharacterPerformedActionHistoryEntry : CharacterHistoryEntry
     {
         Action = result.Action;
         Success = result.Success;
-        FailureReason = result.FailureReason;
+        FailureReason = result.WhyNot;
     }
 
     public CharacterAction Action { get; }
