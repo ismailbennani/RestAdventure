@@ -2167,6 +2167,9 @@ export class ProgressionBarMinimal implements IProgressionBarMinimal {
     /** The experience acquired
              */
     experience!: number;
+    /** The experience required to reach next level. The value is null when Level is the max level.
+             */
+    nextLevelExperience!: number;
 
     constructor(data?: IProgressionBarMinimal) {
         if (data) {
@@ -2181,6 +2184,7 @@ export class ProgressionBarMinimal implements IProgressionBarMinimal {
         if (_data) {
             this.level = _data["level"];
             this.experience = _data["experience"];
+            this.nextLevelExperience = _data["nextLevelExperience"];
         }
     }
 
@@ -2195,6 +2199,7 @@ export class ProgressionBarMinimal implements IProgressionBarMinimal {
         data = typeof data === 'object' ? data : {};
         data["level"] = this.level;
         data["experience"] = this.experience;
+        data["nextLevelExperience"] = this.nextLevelExperience;
         return data;
     }
 }
@@ -2207,6 +2212,9 @@ export interface IProgressionBarMinimal {
     /** The experience acquired
              */
     experience: number;
+    /** The experience required to reach next level. The value is null when Level is the max level.
+             */
+    nextLevelExperience: number;
 }
 
 /** Inventory */

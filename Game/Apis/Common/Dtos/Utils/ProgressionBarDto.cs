@@ -22,6 +22,7 @@ static class ProgressionBarMappingExtensions
         {
             Level = bar.Level,
             Experience = bar.Experience,
+            NextLevelExperience = bar.NextLevelExperience,
             LevelCaps = bar.LevelCaps
         };
 }

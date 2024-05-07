@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { catchError, finalize, map, of, switchMap, tap } from 'rxjs';
 import { AdminGameContentApiClient } from '../../../../api/admin-api-client.generated';
-import { CreateCharacterRequest, Team, TeamCharactersApiClient } from '../../../../api/game-api-client.generated';
+import { CreateCharacterRequest, TeamCharactersApiClient } from '../../../../api/game-api-client.generated';
 import { ProgressionBarComponent } from '../../../common/spinner/progression-bar/progression-bar.component';
 import { SpinnerComponent } from '../../../common/spinner/spinner.component';
 import { CurrentPageService } from '../../services/current-page.service';
@@ -21,9 +21,7 @@ export class TeamComponent implements OnInit {
   protected inCreation: boolean = false;
   protected creating: boolean = false;
 
-  protected team: Team | undefined;
   protected characterClasses: { value: string; display: string }[] = [];
-  protected computedValues: { [characterId: string]: { healthPercent: number } } = {};
 
   constructor(
     protected currentPageService: CurrentPageService,
@@ -40,19 +38,6 @@ export class TeamComponent implements OnInit {
       .searchCharacterClasses(1, 100)
       .pipe(finalize(() => (this.loadingClasses = false)))
       .subscribe(result => (this.characterClasses = result.items.map(c => ({ value: c.id, display: c.name }))));
-
-    this.teamService.team$.subscribe(team => {
-      this.team = team;
-
-      this.computedValues = {};
-      if (team) {
-        for (const character of team.characters) {
-          this.computedValues[character.id] = {
-            healthPercent: this.getPercent(character.combat.health, character.combat.maxHealth),
-          };
-        }
-      }
-    });
   }
 
   createCharacter(name: string, cls: string) {
@@ -72,9 +57,5 @@ export class TeamComponent implements OnInit {
         }),
       )
       .subscribe();
-  }
-
-  protected getPercent(value: number, maxValue: number) {
-    return maxValue == 0 ? 0 : Math.floor((value * 100) / maxValue);
   }
 }

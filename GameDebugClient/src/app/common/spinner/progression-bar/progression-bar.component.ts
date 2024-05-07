@@ -20,14 +20,14 @@ export class ProgressionBarComponent {
   private _value: number = 0;
 
   @Input()
-  public get maxValue(): number {
+  public get maxValue(): number | undefined {
     return this._maxNumber;
   }
-  public set maxValue(value: number) {
+  public set maxValue(value: number | undefined) {
     this._maxNumber = value;
     this.refreshCachedValues();
   }
-  private _maxNumber: number = 0;
+  private _maxNumber: number | undefined = 0;
 
   @Input() color: 'success' | 'warning' | 'info' | 'danger' = 'danger';
   @Input() label: string | undefined;
@@ -38,7 +38,7 @@ export class ProgressionBarComponent {
   public textColor = 'light';
 
   private refreshCachedValues() {
-    this.percent = this.maxValue === 0 ? 0 : Math.floor((this.value * 100) / this.maxValue);
+    this.percent = !this.maxValue || this.maxValue === 0 ? 100 : Math.floor((this.value * 100) / this.maxValue);
 
     if (this.percent > 45) {
       switch (this.color) {

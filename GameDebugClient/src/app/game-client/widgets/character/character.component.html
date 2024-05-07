@@ -9,7 +9,13 @@
       <div>lv.{{ character.progression.level }}</div>
     </div>
     <app-progression-bar color="danger" label="HP" [value]="character.combat.health" [maxValue]="character.combat.maxHealth" displayValue="absolute"></app-progression-bar>
-    <app-progression-bar color="info" label="Exp" [value]="character.progression.experience" [maxValue]="1" displayValue="absolute"></app-progression-bar>
+    <app-progression-bar
+      color="info"
+      label="Exp"
+      [value]="character.progression.experience"
+      [maxValue]="character.progression.nextLevelExperience"
+      displayValue="absolute"
+    ></app-progression-bar>
     <ul>
       <li>Location: {{ character.location.positionX }}, {{ character.location.positionY }} ({{ character.location.area.name }})</li>
       <li>

@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0-alpha.0.105+3c9f3ec9356f0b579937ee4a3a2d023011514765"
+    "version": "0.0.0-alpha.0.106+ebb65e3fafaa6dfca48a63562db9b246fe49a50f"
   },
   "servers": [
     {
@@ -1310,7 +1310,8 @@
         "additionalProperties": false,
         "required": [
           "level",
-          "experience"
+          "experience",
+          "nextLevelExperience"
         ],
         "properties": {
           "level": {
@@ -1321,6 +1322,11 @@
           "experience": {
             "type": "integer",
             "description": "The experience acquired\n            ",
+            "format": "int32"
+          },
+          "nextLevelExperience": {
+            "type": "integer",
+            "description": "The experience required to reach next level. The value is null when Level is the max level.\n            ",
             "format": "int32"
           }
         }

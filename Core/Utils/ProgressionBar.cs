@@ -33,6 +33,8 @@ public class ProgressionBar
     /// </example>
     public IReadOnlyList<int> LevelCaps { get; private set; }
 
+    public int? NextLevelExperience => LevelCaps.Count > Level - 1 ? LevelCaps[Level - 1] : null;
+
     public event EventHandler<ProgressedEvent>? Progressed;
     public event EventHandler<LeveledUpEvent>? LeveledUp;
 

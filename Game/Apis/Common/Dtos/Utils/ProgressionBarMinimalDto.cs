@@ -19,6 +19,12 @@ public class ProgressionBarMinimalDto
     /// </summary>
     [Required]
     public required int Experience { get; init; }
+
+    /// <summary>
+    ///     The experience required to reach next level. The value is null when Level is the max level.
+    /// </summary>
+    [Required]
+    public required int? NextLevelExperience { get; init; }
 }
 
 static class ProgressionBarMinimalMappingExtensions
@@ -27,6 +33,7 @@ static class ProgressionBarMinimalMappingExtensions
         new()
         {
             Level = bar.Level,
-            Experience = bar.Experience
+            Experience = bar.Experience,
+            NextLevelExperience = bar.NextLevelExperience
         };
 }
