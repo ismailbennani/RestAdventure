@@ -6,6 +6,9 @@ using BaseGame;
 using NSwag;
 using NSwag.Generation.Processors.Security;
 using RestAdventure.Core;
+using RestAdventure.Core.Characters;
+using RestAdventure.Core.Monsters;
+using RestAdventure.Core.Players;
 using RestAdventure.Core.Settings;
 using RestAdventure.Core.StaticObjects;
 using RestAdventure.Game.Apis.AdminApi;
@@ -14,6 +17,7 @@ using RestAdventure.Game.Apis.GameApi.Services.Game;
 using RestAdventure.Game.Authentication;
 using RestAdventure.Game.Settings;
 using RestAdventure.Kernel.OpenApi;
+using RestAdventure.Kernel.Security;
 using Serilog;
 using Serilog.Events;
 using Serilog.Extensions.Logging;
@@ -160,6 +164,13 @@ async Task<GameState> LoadGameAsync(WebApplication app)
 
     StaticObjectInstance pearTree = new(baseGameContent.Trees.PearTree, baseGameContent.GeneratedMaps.Locations.First());
     await state.Entities.AddAsync(pearTree);
+
+    MonsterInstance petitPaw = new(baseGameContent.Rattlings.PetitPaw, baseGameContent.GeneratedMaps.Locations.First());
+    await state.Entities.AddAsync(petitPaw);
+
+    Player player = await state.Players.RegisterPlayerAsync(new User(new UserId(Guid.NewGuid()), "PLAYER"));
+    await state.Entities.AddAsync(new Character(player, baseGameContent.CharacterClasses.Dealer, "DEALER"));
+
 
     return state;
 }

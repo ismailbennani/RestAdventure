@@ -5,11 +5,13 @@ public class EntityCombatStatistics
     public EntityCombatStatistics(int health, int speed, int attack)
     {
         Health = health;
+        MaxHealth = health;
         Speed = speed;
         Attack = attack;
     }
 
     public int Health { get; private set; }
+    public int MaxHealth { get; private set; }
     public int Speed { get; private set; }
     public int Attack { get; private set; }
 

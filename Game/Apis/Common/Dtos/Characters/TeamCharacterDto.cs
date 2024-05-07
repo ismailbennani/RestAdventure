@@ -59,6 +59,12 @@ public class TeamCharacterDto
     public required IReadOnlyCollection<JobInstanceDto> Jobs { get; init; }
 
     /// <summary>
+    ///     The combat statistics of the entity
+    /// </summary>
+    [Required]
+    public required EntityCombatStatisticsDto Combat { get; init; }
+
+    /// <summary>
     ///     The result of the action that has been performed on last tick
     /// </summary>
     public CharacterActionResultDto? LastActionResult { get; init; }
@@ -86,6 +92,7 @@ static class TeamCharacterMappingExtensions
             Location = character.Location.ToMinimalDto(),
             Inventory = character.Inventory.ToDto(),
             Jobs = character.Jobs.Select(j => j.ToDto()).ToArray(),
+            Combat = character.Combat.ToDto(),
             LastActionResult = options?.LastActionResult?.ToDto(),
             CurrentInteraction = options?.InteractionInstance?.ToDto(),
             PlannedAction = options?.NextAction?.ToDto()
