@@ -43,10 +43,10 @@ export class ProgressionBarComponent {
     if (this.percent > 45) {
       switch (this.color) {
         case 'success':
-        case 'warning':
         case 'danger':
           this.textColor = 'light';
           break;
+        case 'warning':
         case 'info':
           this.textColor = 'dark';
           break;
