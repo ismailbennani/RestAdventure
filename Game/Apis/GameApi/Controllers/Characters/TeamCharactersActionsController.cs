@@ -7,8 +7,10 @@ using RestAdventure.Core.Gameplay.Interactions;
 using RestAdventure.Core.Maps.Locations;
 using RestAdventure.Core.Players;
 using RestAdventure.Game.Apis.Common.Dtos.Entities;
+using RestAdventure.Game.Apis.Common.Dtos.Interactions;
 using RestAdventure.Game.Apis.Common.Dtos.Maps;
 using RestAdventure.Game.Authentication;
+using RestAdventure.Kernel.Errors;
 
 namespace RestAdventure.Game.Apis.GameApi.Controllers.Characters;
 
@@ -87,7 +89,7 @@ public class TeamCharactersActionsController : GameApiController
     ///     Get available interactions
     /// </summary>
     [HttpGet("interactions")]
-    public ActionResult<IReadOnlyCollection<EntityWithInteractionsDto>> GetAvailableInteractions(Guid characterGuid)
+    public async Task<ActionResult<IReadOnlyCollection<EntityWithInteractionsDto>>> GetAvailableInteractionsAsync(Guid characterGuid)
     {
         GameState state = _gameService.RequireGameState();
         Player player = ControllerContext.RequirePlayer(state);
@@ -102,7 +104,28 @@ public class TeamCharactersActionsController : GameApiController
 
         IEnumerable<IGameEntityWithInteractions> entities = state.Entities.AtLocation<IGameEntityWithInteractions>(character.Location);
 
-        return entities.Select(e => e.ToEntityWithInteractionsDto(character)).ToArray();
+        List<EntityWithInteractionsDto> result = [];
+        foreach (IGameEntityWithInteractions entity in entities)
+        {
+            List<InteractionDto> interactions = [];
+            foreach (Interaction interaction in entity.Interactions.All)
+            {
+                Maybe canInteract = await interaction.CanInteractAsync(state, character, entity);
+                interactions.Add(interaction.ToDto(canInteract));
+            }
+
+            result.Add(
+                new EntityWithInteractionsDto
+                {
+                    Id = entity.Id.Guid,
+                    Name = entity.Name,
+                    Interactions = interactions
+                }
+            );
+        }
+
+
+        return result;
     }
 
     /// <summary>

@@ -1,4 +1,5 @@
 ﻿using RestAdventure.Core.Characters;
+using RestAdventure.Kernel.Errors;
 
 namespace RestAdventure.Core.Gameplay.Interactions;
 
@@ -16,8 +17,14 @@ public abstract class Interaction
     /// </summary>
     public abstract string Name { get; }
 
-    public abstract bool CanInteract(Character character, IGameEntityWithInteractions entity);
-    public abstract InteractionInstance Instantiate(Character character, IGameEntityWithInteractions entity);
+    public abstract Task<Maybe> CanInteractAsync(GameState state, Character character, IGameEntityWithInteractions entity);
+    public abstract Task<Maybe<InteractionInstance>> InstantiateInteractionAsync(GameState state, Character character, IGameEntityWithInteractions entity);
 
     public override string ToString() => Name;
+}
+
+public class CanInteractResult
+{
+    public required bool CanInteract { get; init; }
+    public string? WhyNot { get; init; }
 }

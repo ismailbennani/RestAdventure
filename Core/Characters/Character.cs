@@ -1,4 +1,5 @@
-﻿using RestAdventure.Core.Entities;
+﻿using RestAdventure.Core.Combat;
+using RestAdventure.Core.Entities;
 using RestAdventure.Core.Items;
 using RestAdventure.Core.Jobs;
 using RestAdventure.Core.Players;
@@ -8,7 +9,7 @@ namespace RestAdventure.Core.Characters;
 
 public record CharacterId(Guid Guid) : GameEntityId(Guid);
 
-public class Character : GameEntity<CharacterId>, IGameEntityWithInventory, IGameEntityWithJobs
+public class Character : GameEntity<CharacterId>, IGameEntityWithInventory, IGameEntityWithJobs, IGameEntityWithCombatStatistics
 {
     public Character(Player player, CharacterClass characterClass, string name) : base(new CharacterId(Guid.NewGuid()), name, characterClass.StartLocation)
     {
@@ -40,6 +41,11 @@ public class Character : GameEntity<CharacterId>, IGameEntityWithInventory, IGam
     ///     The jobs of the character
     /// </summary>
     public EntityJobs Jobs { get; private set; }
+
+    /// <summary>
+    ///     The combat statistics of the character
+    /// </summary>
+    public EntityCombatStatistics Combat { get; private set; }
 
     public override string ToString() => $"{Class} {Name} ({Player})";
 }

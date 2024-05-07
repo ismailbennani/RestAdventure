@@ -1,5 +1,6 @@
 ﻿using RestAdventure.Core.Characters;
 using RestAdventure.Core.Gameplay.Interactions;
+using RestAdventure.Kernel.Errors;
 
 namespace RestAdventure.Core.Maps.Harvestables;
 
@@ -7,23 +8,29 @@ public class HarvestInteraction : Interaction
 {
     public override string Name => "Harvest";
 
-    public override bool CanInteract(Character character, IGameEntityWithInteractions entity)
+    public override Task<Maybe> CanInteractAsync(GameState state, Character character, IGameEntityWithInteractions entity)
     {
         if (entity is not HarvestableInstance harvestableInstance)
         {
-            throw new InvalidOperationException($"Expected {entity} to be a {nameof(HarvestableInstance)}, but got {entity.GetType()}");
+            return Task.FromResult<Maybe>($"Expected {entity} to be a {nameof(HarvestableInstance)}, but got {entity.GetType()}");
         }
 
-        return character.Location == entity.Location && (harvestableInstance.Harvestable.HarvestCondition?.Evaluate(character) ?? true);
+        if (character.Location != entity.Location)
+        {
+            return Task.FromResult<Maybe>("Entity is inaccessible");
+        }
+
+        if (harvestableInstance.Harvestable.HarvestCondition != null && !harvestableInstance.Harvestable.HarvestCondition.Evaluate(character))
+        {
+            return Task.FromResult<Maybe>("Character does not fulfill conditions");
+        }
+
+        return Task.FromResult<Maybe>(true);
     }
 
-    public override InteractionInstance Instantiate(Character character, IGameEntityWithInteractions entity)
+    public override Task<Maybe<InteractionInstance>> InstantiateInteractionAsync(GameState state, Character character, IGameEntityWithInteractions entity)
     {
-        if (entity is not HarvestableInstance harvestableInstance)
-        {
-            throw new InvalidOperationException($"Expected {entity} to be a {nameof(HarvestableInstance)}, but got {entity.GetType()}");
-        }
-
-        return new HarvestInteractionInstance(character, this, harvestableInstance);
+        HarvestableInstance harvestableInstance = (HarvestableInstance)entity;
+        return Task.FromResult<Maybe<InteractionInstance>>(new HarvestInteractionInstance(character, this, harvestableInstance));
     }
 }

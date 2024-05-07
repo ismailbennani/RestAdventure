@@ -3,6 +3,7 @@ using RestAdventure.Core.Characters;
 using RestAdventure.Core.Gameplay.Actions.Notifications;
 using RestAdventure.Core.Gameplay.Interactions;
 using RestAdventure.Core.Maps.Locations;
+using RestAdventure.Kernel.Errors;
 
 namespace RestAdventure.Core.Gameplay.Actions;
 
@@ -47,7 +48,7 @@ public class GameActions
 
     public CharacterAction? GetNextAction(Character character) => _actions.GetValueOrDefault(character.Id);
 
-    public async Task ResolveActionsAsync(GameContent content, GameState state)
+    public async Task ResolveActionsAsync(GameState state)
     {
         _results.Clear();
 
@@ -60,13 +61,13 @@ public class GameActions
                 continue;
             }
 
-            CharacterActionResolution resolution = action.Perform(content, state, character);
+            Maybe resolution = await action.PerformAsync(state, character);
             CharacterActionResult result = new()
             {
                 Tick = state.Tick,
                 Action = action,
                 Success = resolution.Success,
-                FailureReason = resolution.ErrorMessage
+                FailureReason = resolution.WhyNot
             };
             _results[characterId] = result;
 

@@ -1,5 +1,4 @@
-﻿using RestAdventure.Core.Characters;
-using RestAdventure.Core.Entities;
+﻿using RestAdventure.Core.Entities;
 using RestAdventure.Core.Gameplay.Interactions;
 using RestAdventure.Core.Maps.Locations;
 
@@ -28,6 +27,4 @@ public class HarvestableInstance : GameEntity<HarvestableInstanceId>, IGameEntit
     ///     The interactions
     /// </summary>
     public EntityInteractions Interactions => new(Interaction);
-
-    public bool CanBeHarvestedBy(Character character) => Interaction.CanInteract(character, this);
 }

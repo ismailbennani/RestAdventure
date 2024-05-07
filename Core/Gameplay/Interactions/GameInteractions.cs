@@ -1,6 +1,6 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using RestAdventure.Core.Characters;
+﻿using RestAdventure.Core.Characters;
 using RestAdventure.Core.Gameplay.Interactions.Notifications;
+using RestAdventure.Kernel.Errors;
 
 namespace RestAdventure.Core.Gameplay.Interactions;
 
@@ -16,39 +16,39 @@ public class GameInteractions
 
     internal GameState GameState { get; }
 
-    public bool TryStartInteraction(Character character, Interaction interaction, IGameEntityWithInteractions entity, [NotNullWhen(false)] out string? whyNot)
+    public async Task<Maybe<InteractionInstance>> StartInteractionAsync(Character character, Interaction interaction, IGameEntityWithInteractions entity)
     {
         if (entity.Interactions.Get(interaction.Id) == null)
         {
-            whyNot = $"Interaction {interaction} cannot be performed on entity {entity}";
-            return false;
+            return $"Interaction {interaction} cannot be performed on entity {entity}";
         }
 
         InteractionInstance? currentInteraction = GetCharacterInteraction(character);
         if (currentInteraction != null)
         {
-            whyNot = $"Character {character} is already performing an interaction";
-            return false;
+            return $"Character {character} is already performing an interaction";
         }
 
-        if (!interaction.CanInteract(character, entity))
+        Maybe canInteract = await interaction.CanInteractAsync(GameState, character, entity);
+        if (!canInteract.Success)
         {
-            whyNot = $"Character {character} cannot perform interaction {interaction} on entity {entity}";
-            return false;
+            return $"Character {character} cannot perform interaction {interaction} on entity {entity}: {canInteract.WhyNot}";
         }
 
-        InteractionInstance instance = interaction.Instantiate(character, entity);
-        _newInteractions.Add(instance);
+        Maybe<InteractionInstance> instance = await interaction.InstantiateInteractionAsync(GameState, character, entity);
+        if (instance.Success)
+        {
+            _newInteractions.Add(instance.Value);
+        }
 
-        whyNot = null;
-        return true;
+        return instance;
     }
 
-    public async Task ResolveInteractionsAsync(GameContent content, GameState state)
+    public async Task ResolveInteractionsAsync(GameState state)
     {
         foreach (InteractionInstance newInteraction in _newInteractions)
         {
-            await newInteraction.OnStartAsync(content, state);
+            await newInteraction.OnStartAsync(state);
             _interactions[newInteraction.Character.Id] = newInteraction;
 
             await GameState.Publisher.Publish(new InteractionStarted { InteractionInstance = newInteraction });
@@ -57,15 +57,15 @@ public class GameInteractions
 
         foreach (InteractionInstance instance in _interactions.Values)
         {
-            await instance.OnTickAsync(content, state);
+            await instance.OnTickAsync(state);
         }
 
         List<CharacterId> toRemove = [];
         foreach ((CharacterId? characterId, InteractionInstance? instance) in _interactions)
         {
-            if (instance.IsOver(content, state))
+            if (instance.IsOver(state))
             {
-                await instance.OnEndAsync(content, state);
+                await instance.OnEndAsync(state);
                 toRemove.Add(characterId);
             }
         }

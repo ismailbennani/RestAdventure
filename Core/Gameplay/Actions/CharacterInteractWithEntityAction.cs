@@ -1,5 +1,6 @@
 ﻿using RestAdventure.Core.Characters;
 using RestAdventure.Core.Gameplay.Interactions;
+using RestAdventure.Kernel.Errors;
 
 namespace RestAdventure.Core.Gameplay.Actions;
 
@@ -14,13 +15,5 @@ public class CharacterInteractWithEntityAction : CharacterAction
     public Interaction Interaction { get; }
     public IGameEntityWithInteractions Entity { get; }
 
-    public override CharacterActionResolution Perform(GameContent content, GameState state, Character character)
-    {
-        if (!state.Interactions.TryStartInteraction(character, Interaction, Entity, out string? whyNot))
-        {
-            return new CharacterActionResolution { Success = false, ErrorMessage = whyNot };
-        }
-
-        return new CharacterActionResolution { Success = true };
-    }
+    public override async Task<Maybe> PerformAsync(GameState state, Character character) => await state.Interactions.StartInteractionAsync(character, Interaction, Entity);
 }

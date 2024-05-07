@@ -25,7 +25,7 @@ public class GameService
     public GameState NewGame(GameContent content, GameSettings settings)
     {
         _gameContent = content;
-        _gameState = new GameState(settings, _publisher, _loggerFactory);
+        _gameState = new GameState(settings, content, _publisher, _loggerFactory);
 
         _logger.LogInformation("Game state has been initialized with settings: {settingsJson}.", JsonSerializer.Serialize(settings));
 
@@ -56,13 +56,12 @@ public class GameService
 
     public async Task<long> TickAsync()
     {
-        GameContent content = RequireGameContent();
         GameState state = RequireGameState();
 
         state.Tick++;
 
-        await state.Actions.ResolveActionsAsync(content, state);
-        await state.Interactions.ResolveInteractionsAsync(content, state);
+        await state.Actions.ResolveActionsAsync(state);
+        await state.Interactions.ResolveInteractionsAsync(state);
 
         await _publisher.Publish(new GameTick { GameState = state });
 

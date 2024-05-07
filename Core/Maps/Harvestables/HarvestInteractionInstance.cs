@@ -9,7 +9,7 @@ public class HarvestInteractionInstance : InteractionInstance
 {
     long _startTick;
 
-    public HarvestInteractionInstance(Character character, HarvestInteraction interaction, HarvestableInstance harvestableInstance) : base(
+    internal HarvestInteractionInstance(Character character, HarvestInteraction interaction, HarvestableInstance harvestableInstance) : base(
         character,
         interaction,
         harvestableInstance
@@ -20,15 +20,15 @@ public class HarvestInteractionInstance : InteractionInstance
 
     public HarvestableInstance HarvestableInstance { get; }
 
-    public override Task OnStartAsync(GameContent content, GameState state)
+    public override Task OnStartAsync(GameState state)
     {
         _startTick = state.Tick;
         return Task.CompletedTask;
     }
 
-    public override bool IsOver(GameContent content, GameState state) => state.Tick - _startTick >= HarvestableInstance.Harvestable.HarvestDuration;
+    public override bool IsOver(GameState state) => state.Tick - _startTick >= HarvestableInstance.Harvestable.HarvestDuration;
 
-    public override Task OnEndAsync(GameContent content, GameState state)
+    public override Task OnEndAsync(GameState state)
     {
         Character.Inventory.Add(HarvestableInstance.Harvestable.Items);
         Character.Jobs.GainExperience(HarvestableInstance.Harvestable.Experience);

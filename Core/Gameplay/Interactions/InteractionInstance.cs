@@ -6,7 +6,7 @@ public record InteractionInstanceId(Guid Guid);
 
 public abstract class InteractionInstance
 {
-    public InteractionInstance(Character character, Interaction interaction, IGameEntityWithInteractions subject)
+    protected InteractionInstance(Character character, Interaction interaction, IGameEntityWithInteractions subject)
     {
         Character = character;
         Interaction = interaction;
@@ -30,13 +30,13 @@ public abstract class InteractionInstance
     /// </summary>
     public IGameEntityWithInteractions Subject { get; }
 
-    public abstract bool IsOver(GameContent content, GameState state);
+    public abstract bool IsOver(GameState state);
 
     /// <summary>
     ///     This hook is called on the first tick, even if <see cref="IsOver" /> returns true. It is guaranteed to be called exactly once per interaction.
     ///     When this hook is called on the same tick as <see cref="OnStartAsync" /> or <see cref="OnTickAsync" />, it is always called first.
     /// </summary>
-    public virtual Task OnStartAsync(GameContent content, GameState state) => Task.CompletedTask;
+    public virtual Task OnStartAsync(GameState state) => Task.CompletedTask;
 
     /// <summary>
     ///     Called once per tick between the first and the last one.
@@ -44,7 +44,7 @@ public abstract class InteractionInstance
     ///     When this hook is called on the same tick as <see cref="OnStartAsync" />, it will be called AFTER it.
     ///     When this hook is called on the same tick as <see cref="OnEndAsync" />, it will be called BEFORE it.
     /// </summary>
-    public virtual Task OnTickAsync(GameContent content, GameState state) => Task.CompletedTask;
+    public virtual Task OnTickAsync(GameState state) => Task.CompletedTask;
 
     /// <summary>
     ///     This hook is called on the last tick, even if it is the first one. It is guaranteed to be called exactly once per interaction.
@@ -52,5 +52,5 @@ public abstract class InteractionInstance
     ///     This means that this hook MIGHT be called on the same tick as <see cref="OnStartAsync" />, if <see cref="IsOver" /> returns true on the first tick.
     ///     When this hook is called on the same tick as <see cref="OnStartAsync" /> or <see cref="OnTickAsync" />, it is always called last.
     /// </summary>
-    public virtual Task OnEndAsync(GameContent content, GameState state) => Task.CompletedTask;
+    public virtual Task OnEndAsync(GameState state) => Task.CompletedTask;
 }
