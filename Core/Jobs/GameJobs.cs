@@ -1,17 +1,8 @@
-﻿namespace RestAdventure.Core.Jobs;
+﻿using RestAdventure.Core.Resources;
 
-public class GameJobs
+namespace RestAdventure.Core.Jobs;
+
+public class GameJobs : GameResourcesStore<JobId, Job>
 {
-    readonly Dictionary<JobId, Job> _jobs = [];
-
-    public IEnumerable<Job> All => _jobs.Values;
-    public IEnumerable<Job> Innate => All.Where(j => j.Innate);
-
-    public void Register(Job job) => _jobs[job.Id] = job;
-    public Job? Get(JobId jobId) => _jobs.GetValueOrDefault(jobId);
-}
-
-public static class GameJobsExtensions
-{
-    public static Job RequireJob(this GameJobs jobs, JobId jobId) => jobs.Get(jobId) ?? throw new InvalidOperationException($"Could not find job {jobId}");
+    public IEnumerable<Job> Innate => this.Where(j => j.Innate);
 }
