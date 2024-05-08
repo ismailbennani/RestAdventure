@@ -20,11 +20,12 @@
 <ng-template #monsterGroupListItem let-monsterGroup="monsterGroup" let-plansToAttack="plansToAttack" let-isAttacking="isAttacking">
   <li class="list-group-item" [class.text-danger]="!monsterGroup.canAttack && !isAttacking" (click)="attack(monsterGroup)">
     <div class="d-flex align-items-center">
-      <ul class="flex-grow-1 list-group list-group-flush">
+      <div class="flex-grow-1">
         @for (monster of monsterGroup.monsters; track monster.id) {
-          <li class="list-group-item bg-transparent p-0" [class.text-danger]="!monsterGroup.canAttack && !isAttacking">{{ monster.name }} lv. {{ monster.level }}</li>
+          <div class="text-truncate" [class.text-danger]="!monsterGroup.canAttack && !isAttacking">{{ monster.name }} lv. {{ monster.level }}</div>
         }
-      </ul>
+        <div class="text-truncate small">{{ monsterGroup.expectedExperience }} exp</div>
+      </div>
       <div class="d-flex align-items-center justify-content-center">
         @if (isAttacking) {
           <button class="btn btn-primary">In combat</button>

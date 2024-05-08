@@ -62,7 +62,13 @@ public class PveController : GameApiController
             }
 
             Maybe canAttack = await combatInteraction.CanInteractAsync(character, monster);
-            result.Add(new MonsterGroupDto { Id = monster.Id.Guid, Monsters = [monster.ToDto()], CanAttack = canAttack.Success, WhyCannotAttack = canAttack.WhyNot });
+            result.Add(
+                new MonsterGroupDto
+                {
+                    Id = monster.Id.Guid, Monsters = [monster.ToDto()], CanAttack = canAttack.Success, WhyCannotAttack = canAttack.WhyNot,
+                    ExpectedExperience = monster.Species.Experience
+                }
+            );
         }
 
         return result;

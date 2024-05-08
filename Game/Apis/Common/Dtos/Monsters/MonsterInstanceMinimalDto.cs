@@ -7,7 +7,7 @@ namespace RestAdventure.Game.Apis.Common.Dtos.Monsters;
 /// <summary>
 ///     Monster minimal
 /// </summary>
-public class MonsterMinimalDto : EntityMinimalDto
+public class MonsterInstanceMinimalDto : EntityMinimalDto
 {
     /// <summary>
     ///     The level of the monster
@@ -18,7 +18,7 @@ public class MonsterMinimalDto : EntityMinimalDto
 
 static class MonsterMinimalMappingExtensions
 {
-    public static MonsterMinimalDto ToDto(this MonsterInstance monster) =>
+    public static MonsterInstanceMinimalDto ToDto(this MonsterInstance monster) =>
         new()
         {
             Id = monster.Id.Guid,

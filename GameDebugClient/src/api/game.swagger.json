@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0-alpha.0.128+a58f79753823b16507865c15e27c5b4a892692ed"
+    "version": "0.0.0-alpha.0.129+03f10f9e1dfdb442f3f8b1cbb820e4a610fb3937"
   },
   "servers": [
     {
@@ -1623,7 +1623,8 @@
         "required": [
           "id",
           "monsters",
-          "canAttack"
+          "canAttack",
+          "expectedExperience"
         ],
         "properties": {
           "id": {
@@ -1636,7 +1637,7 @@
             "type": "array",
             "description": "The monsters in the group\n            ",
             "items": {
-              "$ref": "#/components/schemas/MonsterMinimal"
+              "$ref": "#/components/schemas/MonsterInstanceMinimal"
             }
           },
           "canAttack": {
@@ -1647,10 +1648,15 @@
             "type": "string",
             "description": "Why cannot the character attack the monsters\n            ",
             "nullable": true
+          },
+          "expectedExperience": {
+            "type": "integer",
+            "description": "The expected experience gain if the character defeats the monster group\n            ",
+            "format": "int32"
           }
         }
       },
-      "MonsterMinimal": {
+      "MonsterInstanceMinimal": {
         "allOf": [
           {
             "$ref": "#/components/schemas/EntityMinimal"

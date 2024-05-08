@@ -2704,13 +2704,16 @@ export class MonsterGroup implements IMonsterGroup {
     id!: string;
     /** The monsters in the group
              */
-    monsters!: MonsterMinimal[];
+    monsters!: MonsterInstanceMinimal[];
     /** Can the character attack the monsters
              */
     canAttack!: boolean;
     /** Why cannot the character attack the monsters
              */
     whyCannotAttack?: string | undefined;
+    /** The expected experience gain if the character defeats the monster group
+             */
+    expectedExperience!: number;
 
     constructor(data?: IMonsterGroup) {
         if (data) {
@@ -2730,10 +2733,11 @@ export class MonsterGroup implements IMonsterGroup {
             if (Array.isArray(_data["monsters"])) {
                 this.monsters = [] as any;
                 for (let item of _data["monsters"])
-                    this.monsters!.push(MonsterMinimal.fromJS(item));
+                    this.monsters!.push(MonsterInstanceMinimal.fromJS(item));
             }
             this.canAttack = _data["canAttack"];
             this.whyCannotAttack = _data["whyCannotAttack"];
+            this.expectedExperience = _data["expectedExperience"];
         }
     }
 
@@ -2754,6 +2758,7 @@ export class MonsterGroup implements IMonsterGroup {
         }
         data["canAttack"] = this.canAttack;
         data["whyCannotAttack"] = this.whyCannotAttack;
+        data["expectedExperience"] = this.expectedExperience;
         return data;
     }
 }
@@ -2765,22 +2770,25 @@ export interface IMonsterGroup {
     id: string;
     /** The monsters in the group
              */
-    monsters: MonsterMinimal[];
+    monsters: MonsterInstanceMinimal[];
     /** Can the character attack the monsters
              */
     canAttack: boolean;
     /** Why cannot the character attack the monsters
              */
     whyCannotAttack?: string | undefined;
+    /** The expected experience gain if the character defeats the monster group
+             */
+    expectedExperience: number;
 }
 
 /** Monster minimal */
-export class MonsterMinimal extends EntityMinimal implements IMonsterMinimal {
+export class MonsterInstanceMinimal extends EntityMinimal implements IMonsterInstanceMinimal {
     /** The level of the monster
              */
     level!: number;
 
-    constructor(data?: IMonsterMinimal) {
+    constructor(data?: IMonsterInstanceMinimal) {
         super(data);
     }
 
@@ -2791,9 +2799,9 @@ export class MonsterMinimal extends EntityMinimal implements IMonsterMinimal {
         }
     }
 
-    static override fromJS(data: any): MonsterMinimal {
+    static override fromJS(data: any): MonsterInstanceMinimal {
         data = typeof data === 'object' ? data : {};
-        let result = new MonsterMinimal();
+        let result = new MonsterInstanceMinimal();
         result.init(data);
         return result;
     }
@@ -2807,7 +2815,7 @@ export class MonsterMinimal extends EntityMinimal implements IMonsterMinimal {
 }
 
 /** Monster minimal */
-export interface IMonsterMinimal extends IEntityMinimal {
+export interface IMonsterInstanceMinimal extends IEntityMinimal {
     /** The level of the monster
              */
     level: number;

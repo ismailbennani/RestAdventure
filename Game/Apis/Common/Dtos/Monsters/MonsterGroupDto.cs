@@ -17,7 +17,7 @@ public class MonsterGroupDto
     ///     The monsters in the group
     /// </summary>
     [Required]
-    public required IReadOnlyCollection<MonsterMinimalDto> Monsters { get; init; }
+    public required IReadOnlyCollection<MonsterInstanceMinimalDto> Monsters { get; init; }
 
     /// <summary>
     ///     Can the character attack the monsters
@@ -29,4 +29,10 @@ public class MonsterGroupDto
     ///     Why cannot the character attack the monsters
     /// </summary>
     public string? WhyCannotAttack { get; init; }
+
+    /// <summary>
+    ///     The expected experience gain if the character defeats the monster group
+    /// </summary>
+    [Required]
+    public required int ExpectedExperience { get; init; }
 }
