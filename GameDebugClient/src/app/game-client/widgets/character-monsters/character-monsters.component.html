@@ -6,7 +6,7 @@
   <ul class="list-group list-group-flush">
     @if (monsterGroups.length > 0) {
       @for (monsterGroup of monsterGroups; track monsterGroup.id) {
-        <li class="list-group-item" [class.active]="plansToAttack(monsterGroup)" (click)="attack(monsterGroup)">
+        <li class="list-group-item" (click)="attack(monsterGroup)">
           <div class="d-flex">
             <ul class="flex-grow-1 list-group list-group-flush">
               @for (monster of monsterGroup.monsters; track monster.id) {
@@ -16,6 +16,8 @@
             <div class="d-flex align-items-center justify-content-center">
               @if (isAttacking(monsterGroup)) {
                 <button class="btn btn-primary">In combat</button>
+              } @else if (plansToAttack(monsterGroup)) {
+                <button class="btn btn-primary">Attack</button>
               } @else if (monsterGroup.canAttack) {
                 <button class="btn btn-outline-secondary">Attack</button>
               } @else {

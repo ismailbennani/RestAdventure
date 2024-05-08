@@ -40,7 +40,11 @@ export class CharacterMonstersComponent implements OnInit {
   }
 
   plansToAttack(monsterGroup?: MonsterGroup) {
-    if (!this.character?.plannedAction || !(this.character.plannedAction instanceof CharacterInteractWithEntityAction)) {
+    if (
+      !this.character?.plannedAction ||
+      !(this.character.plannedAction instanceof CharacterInteractWithEntityAction) ||
+      this.character.plannedAction.interaction.name != 'combat'
+    ) {
       return false;
     }
 

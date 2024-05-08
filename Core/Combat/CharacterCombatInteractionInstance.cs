@@ -20,7 +20,7 @@ public class CharacterCombatInteractionInstance : InteractionInstance
 
     public override Task OnTickAsync(GameState state)
     {
-        Combat = state.Combats.Get(CombatInPreparation.Id);
+        Combat ??= state.Combats.Get(CombatInPreparation.Id);
         return Task.CompletedTask;
     }
 

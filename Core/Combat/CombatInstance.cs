@@ -34,7 +34,6 @@ public class CombatInstance : IDisposable
         Team1 = team1;
         Team2 = team2;
 
-        Turn = 1;
         _states = new Dictionary<GameEntityId, EntityState>();
 
         foreach (IGameEntityWithCombatStatistics entity in team1.Entities)
@@ -66,6 +65,8 @@ public class CombatInstance : IDisposable
 
     public async Task PlayTurnAsync()
     {
+        Turn++;
+
         foreach (EntityState entityState in Alive)
         {
             entityState.Lead += entityState.Entity.Combat.Speed;
@@ -95,7 +96,6 @@ public class CombatInstance : IDisposable
             subTurn++;
         }
 
-        Turn++;
     }
 
     public CombatFormation GetTeam(CombatSide team) =>
