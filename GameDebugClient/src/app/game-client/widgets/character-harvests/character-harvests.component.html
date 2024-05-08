@@ -21,7 +21,7 @@
                 (click)="harvest(harvestable, jobHarvest)"
                 [attr.aria-disabled]="!jobHarvest.canHarvest"
               >
-                <span>{{ jobHarvest.name }}</span>
+                <span>{{ jobHarvest.name }}: {{ formatExpectedHarvest(jobHarvest.expectedHarvest) }}, {{ jobHarvest.expectedExperience }} exp</span>
                 <span class="text-danger small" [title]="jobHarvest.whyCannotHarvest">{{ jobHarvest.whyCannotHarvest }}</span>
               </a>
             }

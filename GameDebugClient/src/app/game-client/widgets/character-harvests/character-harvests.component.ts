@@ -1,7 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { ReplaySubject, switchMap, tap } from 'rxjs';
-import { CharacterInteractWithEntityAction, HarvestableEntity, HarvestableEntityHarvest, JobsHarvestApiClient, TeamCharacter } from '../../../../api/game-api-client.generated';
+import {
+  CharacterInteractWithEntityAction,
+  HarvestableEntity,
+  HarvestableEntityHarvest,
+  ItemStack,
+  JobsHarvestApiClient,
+  TeamCharacter,
+} from '../../../../api/game-api-client.generated';
 import { GameService } from '../../services/game.service';
 
 @Component({
@@ -76,5 +83,9 @@ export class CharacterHarvestsComponent implements OnInit {
     }
 
     return this.character.currentInteraction.target.id == harvestable.id && this.character.currentInteraction.interaction.name == harvest.job.name + '-' + harvest.name;
+  }
+
+  protected formatExpectedHarvest(items: ItemStack[]) {
+    return items.map(s => `${s.count}x ${s.item.name}`).join(', ');
   }
 }
