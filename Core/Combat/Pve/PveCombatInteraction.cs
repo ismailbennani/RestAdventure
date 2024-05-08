@@ -14,24 +14,24 @@ public class PveCombatInteraction : Interaction
     public override string Name => "combat";
     protected GameCombats Combats { get; }
 
-    protected override Task<Maybe> CanInteractInternalAsync(IInteractingEntity source, IInteractibleEntity target)
+    protected override Maybe CanInteractInternal(IInteractingEntity source, IInteractibleEntity target)
     {
         if (source is not IGameEntityWithCombatStatistics)
         {
-            return Task.FromResult<Maybe>("Source cannot enter combat");
+            return "Source cannot enter combat";
         }
 
         if (target is not IGameEntityWithCombatStatistics)
         {
-            return Task.FromResult<Maybe>("Target cannot enter combat");
+            return "Target cannot enter combat";
         }
 
         if (target is not MonsterInstance)
         {
-            return Task.FromResult<Maybe>("Target is not a monster");
+            return "Target is not a monster";
         }
 
-        return Task.FromResult<Maybe>(true);
+        return true;
     }
 
     protected override async Task<Maybe<InteractionInstance>> InstantiateInteractionInternalAsync(IInteractingEntity source, IInteractibleEntity target)

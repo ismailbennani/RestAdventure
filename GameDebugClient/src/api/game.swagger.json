@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0-alpha.0.129+03f10f9e1dfdb442f3f8b1cbb820e4a610fb3937"
+    "version": "0.0.0-alpha.0.130+10098a3876629fa639c72e18959ac759acd3593c"
   },
   "servers": [
     {
@@ -562,7 +562,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/LocationMinimal"
+                    "$ref": "#/components/schemas/LocationWithAccess"
                   }
                 }
               }
@@ -1613,6 +1613,34 @@
             "type": "integer",
             "description": "The number of instances in this stack\n            ",
             "format": "int32"
+          }
+        }
+      },
+      "LocationWithAccess": {
+        "type": "object",
+        "description": "Location with access\n            ",
+        "additionalProperties": false,
+        "required": [
+          "location",
+          "isAccessible"
+        ],
+        "properties": {
+          "location": {
+            "description": "The location\n            ",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/LocationMinimal"
+              }
+            ]
+          },
+          "isAccessible": {
+            "type": "boolean",
+            "description": "Is the location accessible\n            "
+          },
+          "whyIsNotAccessible": {
+            "type": "string",
+            "description": "Why is the location not accessible\n            ",
+            "nullable": true
           }
         }
       },

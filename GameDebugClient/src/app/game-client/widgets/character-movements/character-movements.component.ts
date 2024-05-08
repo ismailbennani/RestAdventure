@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { ReplaySubject, switchMap, tap } from 'rxjs';
 import { LocationMinimal } from '../../../../api/admin-api-client.generated';
-import { CharacterMoveToLocationAction, LocationsApiClient, TeamCharacter } from '../../../../api/game-api-client.generated';
+import { CharacterMoveToLocationAction, LocationWithAccess, LocationsApiClient, TeamCharacter } from '../../../../api/game-api-client.generated';
 import { GameService } from '../../services/game.service';
 
 @Component({
@@ -21,7 +21,7 @@ export class CharacterMovementsComponent implements OnInit {
     this.characterSubject.next(value);
   }
 
-  protected locations: LocationMinimal[] = [];
+  protected locations: LocationWithAccess[] = [];
 
   private _character: TeamCharacter = null!;
   private characterSubject: ReplaySubject<TeamCharacter> = new ReplaySubject<TeamCharacter>(1);
@@ -40,13 +40,13 @@ export class CharacterMovementsComponent implements OnInit {
       .subscribe();
   }
 
-  moveToLocation(location: LocationMinimal) {
-    if (!this.character) {
+  moveToLocation(location: LocationWithAccess) {
+    if (!this.character || !location.isAccessible) {
       return;
     }
 
     this.locationsApiClient
-      .moveToLocation(this.character.id, location.id)
+      .moveToLocation(this.character.id, location.location.id)
       .pipe(switchMap(_ => this.gameService.refreshNow(true)))
       .subscribe();
   }

@@ -66,7 +66,7 @@ public class JobsHarvestController : GameApiController
             List<HarvestableEntityHarvestDto> harvests = [];
             foreach (HarvestInteraction interaction in availableInteractions)
             {
-                Maybe canHarvest = await interaction.CanInteractAsync(character, entity);
+                Maybe canHarvest = state.CharacterActions.CanInteract(character, interaction, entity);
                 harvests.Add(
                     new HarvestableEntityHarvestDto
                     {
@@ -128,7 +128,7 @@ public class JobsHarvestController : GameApiController
             return NotFound();
         }
 
-        state.Actions.Interact(character, interaction, entity);
+        state.CharacterActions.PlanInteraction(character, interaction, entity);
 
         return NoContent();
     }

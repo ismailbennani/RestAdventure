@@ -47,7 +47,7 @@ export class CharacterHarvestsComponent implements OnInit {
   }
 
   harvest(entity: HarvestableEntity, harvest: HarvestableEntityHarvest) {
-    if (!this.character) {
+    if (!this.character || !harvest.canHarvest) {
       return;
     }
 

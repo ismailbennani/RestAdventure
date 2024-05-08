@@ -14,16 +14,5 @@ public class CharacterMoveToLocationAction : CharacterAction
 
     public Location Location { get; }
 
-    public override Task<Maybe> PerformAsync(GameState state, Character character)
-    {
-        bool isAccessible = state.Content.Maps.Locations.AreConnected(character.Location, Location);
-        if (!isAccessible)
-        {
-            return Task.FromResult<Maybe>($"Map {Location.Id} is inaccessible");
-        }
-
-        character.MoveTo(Location);
-
-        return Task.FromResult<Maybe>(true);
-    }
+    public override Task<Maybe> PerformAsync(GameState state, Character character) => Task.FromResult(character.Movement.MoveTo(state, Location));
 }

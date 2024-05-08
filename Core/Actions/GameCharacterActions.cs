@@ -12,42 +12,89 @@ namespace RestAdventure.Core.Actions;
 /// <summary>
 ///     Set the action that a character will perform on next tick.
 /// </summary>
-public class GameActions
+public class GameCharacterActions
 {
+    readonly GameState _state;
     readonly IPublisher _publisher;
-    readonly ILogger<GameActions> _logger;
+    readonly ILogger<GameCharacterActions> _logger;
     readonly Dictionary<CharacterId, CharacterAction> _actions = new();
     readonly Dictionary<CharacterId, CharacterActionResult> _results = new();
 
-    public GameActions(IPublisher publisher, ILogger<GameActions> logger)
+    public GameCharacterActions(GameState state, ILogger<GameCharacterActions> logger)
     {
-        _publisher = publisher;
+        _state = state;
+        _publisher = state.Publisher;
         _logger = logger;
     }
 
     /// <summary>
     ///     Make the character move to the given location.
     /// </summary>
-    public void MoveToLocation(Character character, Location location)
+    public Maybe CanMoveTo(Character character, Location location)
     {
-        AssertCharacterCanPerformAction(character);
+        Maybe canPerformAction = CanCharacterPerformAction(character);
+        if (!canPerformAction)
+        {
+            return canPerformAction;
+        }
+
+        Maybe canMoveTo = character.Movement.CanMoveTo(_state, location);
+        if (!canMoveTo)
+        {
+            return canMoveTo;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    ///     Make the character move to the given location.
+    /// </summary>
+    public void PlanMovement(Character character, Location location)
+    {
+        if (!CanMoveTo(character, location))
+        {
+            throw new InvalidOperationException("Location is not accessible");
+        }
+
         _actions[character.Id] = new CharacterMoveToLocationAction(location);
+    }
+
+    public Maybe CanInteract(Character character, Interaction interaction, IInteractibleEntity entity)
+    {
+        Maybe canPerformAction = CanCharacterPerformAction(character);
+        if (!canPerformAction)
+        {
+            return canPerformAction;
+        }
+
+        Maybe canInteract = interaction.CanInteract(character, entity);
+        if (!canInteract)
+        {
+            return canInteract;
+        }
+
+        return true;
     }
 
     /// <summary>
     ///     Perform an interaction.
     /// </summary>
-    public void Interact(Character character, Interaction interaction, IInteractibleEntity entity)
+    public void PlanInteraction(Character character, Interaction interaction, IInteractibleEntity entity)
     {
-        AssertCharacterCanPerformAction(character);
+        if (!CanInteract(character, interaction, entity))
+        {
+            throw new InvalidOperationException("Interaction is not available");
+        }
+
         _actions[character.Id] = new CharacterInteractWithEntityAction(interaction, entity);
     }
 
-    public void Cancel(Character character) => _actions.Remove(character.Id);
+    public void CancelCurrentPlan(Character character) => _actions.Remove(character.Id);
 
     public CharacterActionResult? GetLastActionResult(Character character) => _results.GetValueOrDefault(character.Id);
 
-    public CharacterAction? GetNextAction(Character character) => _actions.GetValueOrDefault(character.Id);
+    public CharacterAction? GetPlannedAction(Character character) => _actions.GetValueOrDefault(character.Id);
 
     public async Task ResolveActionsAsync(GameState state)
     {
@@ -78,11 +125,13 @@ public class GameActions
         _actions.Clear();
     }
 
-    static void AssertCharacterCanPerformAction(Character character)
+    static Maybe CanCharacterPerformAction(Character character)
     {
         if (character.CurrentInteraction != null)
         {
-            throw new InvalidOperationException($"Character {character} cannot perform action because they are currently locked in an interaction.");
+            return "Character is busy";
         }
+
+        return true;
     }
 }

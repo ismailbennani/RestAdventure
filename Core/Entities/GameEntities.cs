@@ -24,7 +24,8 @@ public class GameEntities : IDisposable
     {
         _entities[entity.Id] = entity;
 
-        entity.Moved += (_, args) => _publisher.PublishSync(new GameEntityMovedToLocation { Entity = entity, OldLocation = args.OldLocation, NewLocation = args.NewLocation });
+        entity.LocationChanged += (_, args) =>
+            _publisher.PublishSync(new GameEntityMovedToLocation { Entity = entity, OldLocation = args.OldLocation, NewLocation = args.NewLocation });
 
         if (entity is IGameEntityWithInventory withInventory)
         {

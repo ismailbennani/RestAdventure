@@ -9,7 +9,7 @@ public abstract class Interaction
     /// </summary>
     public abstract string Name { get; }
 
-    public async Task<Maybe> CanInteractAsync(IInteractingEntity source, IInteractibleEntity target)
+    public Maybe CanInteract(IInteractingEntity source, IInteractibleEntity target)
     {
         if (source.CurrentInteraction != null)
         {
@@ -26,14 +26,14 @@ public abstract class Interaction
             return "Target is inaccessible";
         }
 
-        return await CanInteractInternalAsync(source, target);
+        return CanInteractInternal(source, target);
     }
 
-    protected abstract Task<Maybe> CanInteractInternalAsync(IInteractingEntity source, IInteractibleEntity target);
+    protected abstract Maybe CanInteractInternal(IInteractingEntity source, IInteractibleEntity target);
 
     public async Task<Maybe<InteractionInstance>> InstantiateInteractionAsync(IInteractingEntity source, IInteractibleEntity target)
     {
-        Maybe canInteract = await CanInteractAsync(source, target);
+        Maybe canInteract = CanInteract(source, target);
         if (!canInteract.Success)
         {
             return canInteract.WhyNot;

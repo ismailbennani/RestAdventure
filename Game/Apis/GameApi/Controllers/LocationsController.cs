@@ -6,6 +6,7 @@ using RestAdventure.Core.Maps.Locations;
 using RestAdventure.Core.Players;
 using RestAdventure.Game.Apis.Common.Dtos.Maps;
 using RestAdventure.Game.Authentication;
+using RestAdventure.Kernel.Errors;
 
 namespace RestAdventure.Game.Apis.GameApi.Controllers;
 
@@ -29,10 +30,10 @@ public class LocationsController : GameApiController
     ///     Get accessible locations
     /// </summary>
     [HttpGet]
-    [ProducesResponseType<IReadOnlyCollection<LocationMinimalDto>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<IReadOnlyCollection<LocationWithAccessDto>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
-    public ActionResult<IReadOnlyCollection<LocationMinimalDto>> GetAccessibleLocations(Guid characterGuid)
+    public ActionResult<IReadOnlyCollection<LocationWithAccessDto>> GetAccessibleLocations(Guid characterGuid)
     {
         GameContent content = _gameService.RequireGameContent();
         GameState state = _gameService.RequireGameState();
@@ -47,7 +48,22 @@ public class LocationsController : GameApiController
         }
 
         IEnumerable<Location> accessibleLocations = content.Maps.Locations.ConnectedTo(character.Location);
-        return accessibleLocations.Select(l => l.ToMinimalDto()).ToArray();
+
+        List<LocationWithAccessDto> result = [];
+        foreach (Location location in accessibleLocations)
+        {
+            Maybe canMove = state.CharacterActions.CanMoveTo(character, location);
+            result.Add(
+                new LocationWithAccessDto
+                {
+                    Location = location.ToMinimalDto(),
+                    IsAccessible = canMove.Success,
+                    WhyIsNotAccessible = canMove.WhyNot
+                }
+            );
+        }
+
+        return result;
     }
 
     /// <summary>
@@ -78,7 +94,7 @@ public class LocationsController : GameApiController
             return NotFound();
         }
 
-        state.Actions.MoveToLocation(character, location);
+        state.CharacterActions.PlanMovement(character, location);
 
         return NoContent();
     }

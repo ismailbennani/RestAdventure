@@ -3,6 +3,7 @@ using RestAdventure.Core.Entities;
 using RestAdventure.Core.Interactions;
 using RestAdventure.Core.Items;
 using RestAdventure.Core.Jobs;
+using RestAdventure.Core.Maps;
 using RestAdventure.Core.Players;
 using RestAdventure.Core.Utils;
 
@@ -10,7 +11,7 @@ namespace RestAdventure.Core.Characters;
 
 public record CharacterId(Guid Guid) : GameEntityId(Guid);
 
-public class Character : GameEntity<CharacterId>, IGameEntityWithInventory, IGameEntityWithJobs, IGameEntityWithCombatStatistics, IInteractingEntity
+public class Character : GameEntity<CharacterId>, IGameEntityWithInventory, IGameEntityWithJobs, IGameEntityWithCombatStatistics, IInteractingEntity, IGameEntityWithMovement
 {
     InteractionInstance? _currentInteraction;
 
@@ -22,6 +23,7 @@ public class Character : GameEntity<CharacterId>, IGameEntityWithInventory, IGam
         Inventory = new Inventory();
         Jobs = new EntityJobs();
         Combat = new EntityCombatStatistics(10, 100, 1);
+        Movement = new EntityMovement(this);
     }
 
     public Player Player { get; }
@@ -61,6 +63,11 @@ public class Character : GameEntity<CharacterId>, IGameEntityWithInventory, IGam
     public InteractionInstance? CurrentInteraction => _currentInteraction;
 
     InteractionInstance? IInteractingEntity.CurrentInteraction { get => _currentInteraction; set => _currentInteraction = value; }
+
+    /// <summary>
+    ///     The movement of the character
+    /// </summary>
+    public EntityMovement Movement { get; }
 
     public override string ToString() => $"{Class} {Name} ({Player})";
 

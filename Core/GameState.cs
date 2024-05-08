@@ -21,7 +21,7 @@ public class GameState : IDisposable
         Players = new GamePlayers(publisher);
         Entities = new GameEntities(publisher);
         Interactions = new GameInteractions(publisher, loggerFactory.CreateLogger<GameInteractions>());
-        Actions = new GameActions(publisher, loggerFactory.CreateLogger<GameActions>());
+        CharacterActions = new GameCharacterActions(this, loggerFactory.CreateLogger<GameCharacterActions>());
         Combats = new GameCombats(settings, publisher, loggerFactory.CreateLogger<GameCombats>());
     }
 
@@ -34,8 +34,8 @@ public class GameState : IDisposable
 
     public GameHistory History { get; }
     public GamePlayers Players { get; }
+    public GameCharacterActions CharacterActions { get; }
     public GameEntities Entities { get; }
-    public GameActions Actions { get; }
     public GameInteractions Interactions { get; }
     public GameCombats Combats { get; }
 

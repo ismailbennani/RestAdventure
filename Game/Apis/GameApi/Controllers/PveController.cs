@@ -61,7 +61,7 @@ public class PveController : GameApiController
                 continue;
             }
 
-            Maybe canAttack = await combatInteraction.CanInteractAsync(character, monster);
+            Maybe canAttack = state.CharacterActions.CanInteract(character, combatInteraction, monster);
             result.Add(
                 new MonsterGroupDto
                 {
@@ -107,7 +107,7 @@ public class PveController : GameApiController
             return NotFound();
         }
 
-        state.Actions.Interact(character, interaction, monster);
+        state.CharacterActions.PlanInteraction(character, interaction, monster);
 
         return NoContent();
     }

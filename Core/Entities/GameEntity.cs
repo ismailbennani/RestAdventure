@@ -8,7 +8,7 @@ public record GameEntityId(Guid Guid);
 /// <remarks>
 ///     Common representation of all <see cref="GameEntity{TId}" /> instances
 /// </remarks>
-public abstract class GameEntity : IEquatable<GameEntity>, IGameEntity, IDisposable
+public abstract class GameEntity : IEquatable<GameEntity>, IGameEntity
 {
     public GameEntity(GameEntityId id, string name, Location location)
     {
@@ -27,9 +27,9 @@ public abstract class GameEntity : IEquatable<GameEntity>, IGameEntity, IDisposa
     public Location Location { get; private set; }
 
     /// <inheritdoc />
-    public event EventHandler<EntityMovedEvent>? Moved;
+    public event EventHandler<EntityMovedEvent>? LocationChanged;
 
-    public void MoveTo(Location location)
+    public void SetLocation(Location location)
     {
         if (Location == location)
         {
@@ -39,7 +39,7 @@ public abstract class GameEntity : IEquatable<GameEntity>, IGameEntity, IDisposa
         Location oldLocation = Location;
         Location = location;
 
-        Moved?.Invoke(this, new EntityMovedEvent { OldLocation = oldLocation, NewLocation = Location });
+        LocationChanged?.Invoke(this, new EntityMovedEvent { OldLocation = oldLocation, NewLocation = Location });
     }
 
     public async Task KillAsync(GameState state) => await state.Entities.DestroyAsync(this);
@@ -48,7 +48,7 @@ public abstract class GameEntity : IEquatable<GameEntity>, IGameEntity, IDisposa
 
     public virtual void Dispose()
     {
-        Moved = null;
+        LocationChanged = null;
         GC.SuppressFinalize(this);
     }
 

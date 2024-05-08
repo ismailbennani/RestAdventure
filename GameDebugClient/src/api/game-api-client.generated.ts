@@ -810,7 +810,7 @@ export class LocationsApiClient {
     /**
      * Get accessible locations
      */
-    getAccessibleLocations(characterGuid: string): Observable<LocationMinimal[]> {
+    getAccessibleLocations(characterGuid: string): Observable<LocationWithAccess[]> {
         let url_ = this.baseUrl + "/game/team/characters/{characterGuid}/locations";
         if (characterGuid === undefined || characterGuid === null)
             throw new Error("The parameter 'characterGuid' must be defined.");
@@ -832,14 +832,14 @@ export class LocationsApiClient {
                 try {
                     return this.processGetAccessibleLocations(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<LocationMinimal[]>;
+                    return _observableThrow(e) as any as Observable<LocationWithAccess[]>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<LocationMinimal[]>;
+                return _observableThrow(response_) as any as Observable<LocationWithAccess[]>;
         }));
     }
 
-    protected processGetAccessibleLocations(response: HttpResponseBase): Observable<LocationMinimal[]> {
+    protected processGetAccessibleLocations(response: HttpResponseBase): Observable<LocationWithAccess[]> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -853,7 +853,7 @@ export class LocationsApiClient {
             if (Array.isArray(resultData200)) {
                 result200 = [] as any;
                 for (let item of resultData200)
-                    result200!.push(LocationMinimal.fromJS(item));
+                    result200!.push(LocationWithAccess.fromJS(item));
             }
             else {
                 result200 = <any>null;
@@ -2695,6 +2695,67 @@ export interface IItemStack {
     /** The number of instances in this stack
              */
     count: number;
+}
+
+/** Location with access */
+export class LocationWithAccess implements ILocationWithAccess {
+    /** The location
+             */
+    location!: LocationMinimal;
+    /** Is the location accessible
+             */
+    isAccessible!: boolean;
+    /** Why is the location not accessible
+             */
+    whyIsNotAccessible?: string | undefined;
+
+    constructor(data?: ILocationWithAccess) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.location = new LocationMinimal();
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.location = _data["location"] ? LocationMinimal.fromJS(_data["location"]) : new LocationMinimal();
+            this.isAccessible = _data["isAccessible"];
+            this.whyIsNotAccessible = _data["whyIsNotAccessible"];
+        }
+    }
+
+    static fromJS(data: any): LocationWithAccess {
+        data = typeof data === 'object' ? data : {};
+        let result = new LocationWithAccess();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["location"] = this.location ? this.location.toJSON() : <any>undefined;
+        data["isAccessible"] = this.isAccessible;
+        data["whyIsNotAccessible"] = this.whyIsNotAccessible;
+        return data;
+    }
+}
+
+/** Location with access */
+export interface ILocationWithAccess {
+    /** The location
+             */
+    location: LocationMinimal;
+    /** Is the location accessible
+             */
+    isAccessible: boolean;
+    /** Why is the location not accessible
+             */
+    whyIsNotAccessible?: string | undefined;
 }
 
 /** Monster group */

@@ -71,7 +71,7 @@ export class CharacterMonstersComponent implements OnInit {
       return false;
     }
 
-    if (monsterGroup && this.character.currentInteraction.interaction.name == 'combat' && this.character.currentInteraction.target.id != monsterGroup.id) {
+    if (monsterGroup && (this.character.currentInteraction.interaction.name != 'combat' || this.character.currentInteraction.target.id != monsterGroup.id)) {
       return false;
     }
 

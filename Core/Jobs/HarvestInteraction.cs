@@ -16,30 +16,30 @@ public class HarvestInteraction : Interaction
     public Job Job { get; }
     public JobHarvest Harvest { get; }
 
-    protected override Task<Maybe> CanInteractInternalAsync(IInteractingEntity source, IInteractibleEntity target)
+    protected override Maybe CanInteractInternal(IInteractingEntity source, IInteractibleEntity target)
     {
         if (source is not IGameEntityWithJobs entityWithJobs)
         {
-            return Task.FromResult<Maybe>("Source doesn't have jobs");
+            return "Source doesn't have jobs";
         }
 
         JobInstance? job = entityWithJobs.Jobs.Get(Job);
         if (job == null || Harvest.Level > job.Progression.Level)
         {
-            return Task.FromResult<Maybe>("Source doesn't fulfill the conditions");
+            return "Source doesn't fulfill the conditions";
         }
 
         if (target is not StaticObjectInstance staticObjectInstance || !Harvest.Targets.Contains(staticObjectInstance.Object))
         {
-            return Task.FromResult<Maybe>("Entity cannot be harvested");
+            return "Entity cannot be harvested";
         }
 
         if (source.Location != target.Location)
         {
-            return Task.FromResult<Maybe>("Entity is inaccessible");
+            return "Entity is inaccessible";
         }
 
-        return Task.FromResult<Maybe>(true);
+        return true;
     }
 
     protected override Task<Maybe<InteractionInstance>> InstantiateInteractionInternalAsync(IInteractingEntity source, IInteractibleEntity target) =>

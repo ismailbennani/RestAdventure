@@ -5,9 +5,19 @@
   <hr class="m-0" />
   <div class="list-group list-group-flush">
     @if (locations.length > 0) {
-      @for (location of locations; track location.id) {
-        <a role="button" class="list-group-item list-group-item-action" [class.active]="plansToMove(location)" (click)="moveToLocation(location)">
-          {{ location.area.name }} [{{ location.positionX }}, {{ location.positionY }}]
+      @for (locationWithAccess of locations; track locationWithAccess.location.id) {
+        <a
+          role="button"
+          class="list-group-item list-group-item-action"
+          [class.active]="plansToMove(locationWithAccess.location)"
+          [class.disabled]="!locationWithAccess.isAccessible"
+          [class.text-danger]="!locationWithAccess.isAccessible"
+          (click)="moveToLocation(locationWithAccess)"
+        >
+          <div>{{ locationWithAccess.location.area.name }} [{{ locationWithAccess.location.positionX }}, {{ locationWithAccess.location.positionY }}]</div>
+          @if (!locationWithAccess.isAccessible) {
+            <div class="small">{{ locationWithAccess.whyIsNotAccessible }}</div>
+          }
         </a>
       }
     } @else {

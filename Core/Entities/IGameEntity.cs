@@ -22,7 +22,7 @@ public interface IGameEntity : IDisposable
     /// <summary>
     ///     Event fired each time this entity moves
     /// </summary>
-    event EventHandler<EntityMovedEvent>? Moved;
+    event EventHandler<EntityMovedEvent>? LocationChanged;
 
     /// <summary>
     ///     Kill the entity

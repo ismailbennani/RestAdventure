@@ -89,10 +89,10 @@ export class CharacterPageComponent implements OnInit {
     this.loading = true;
     this.refreshSubject
       .pipe(
-        switchMap(() => {
+        tap(() => {
           if (!this.characterId || !this.team) {
             this.loading = true;
-            return of(undefined);
+            return;
           }
 
           if (this.character?.id !== this.characterId) {
@@ -103,26 +103,17 @@ export class CharacterPageComponent implements OnInit {
 
           if (!this.character && this.team && this.team.characters.length > 0) {
             this.currentPageService.openCharacter(this.team.characters[0]);
-            return of(undefined);
+            return;
           }
 
           if (!this.character) {
             this.currentPageService.openHome();
-            return of(undefined);
+            return;
           }
 
           this.loading = false;
-
-          return forkJoin({
-            locations: this.locationsApiClient.getAccessibleLocations(this.character.id),
-            harvestables: this.jobsHarvestApiClient.getHarvestables(this.character.id),
-          });
         }),
-        tap(result => {
-          this.accessibleLocations = result?.locations ?? [];
-          this.harvestableEntities = result?.harvestables ?? [];
-        }),
-        switchMap(_ => {
+        switchMap(() => {
           if (!this.character) {
             return of(undefined);
           }

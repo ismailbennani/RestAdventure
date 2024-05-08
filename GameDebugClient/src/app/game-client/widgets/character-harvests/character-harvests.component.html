@@ -6,33 +6,59 @@
   <div class="list-group list-group-flush">
     @if (harvestables.length > 0) {
       @for (harvestable of harvestables; track harvestable.id) {
-        <div class="list-group-item">
-          <div [class.fw-bold]="plansToHarvest(harvestable)">
-            {{ harvestable.name }}
-          </div>
-          <div class="list-group list-group-flush">
-            @for (jobHarvest of harvestable.harvests; track jobHarvest.name) {
-              <a
-                role="button"
-                class="list-group-item list-group-item-action"
-                [class.active]="plansToHarvest(harvestable, jobHarvest)"
-                [class.disabled]="!jobHarvest.canHarvest"
-                [class.text-danger]="!jobHarvest.canHarvest"
-                (click)="harvest(harvestable, jobHarvest)"
-                [attr.aria-disabled]="!jobHarvest.canHarvest"
-              >
-                <div class="d-flex gap-4 justify-content-between">
-                  <div class="flex-grow-1 text-truncate">{{ jobHarvest.name }}</div>
-                  <div>{{ formatExpectedHarvest(jobHarvest.expectedHarvest) }}, {{ jobHarvest.expectedExperience }} exp</div>
-                </div>
-                <div class="text-danger small text-truncate" [title]="jobHarvest.whyCannotHarvest">{{ jobHarvest.whyCannotHarvest }}</div>
-              </a>
-            }
-          </div>
-        </div>
+        <ng-container [ngTemplateOutlet]="harvestableListItem" [ngTemplateOutletContext]="{ harvestable, plansToHarvest: plansToHarvest(harvestable) }"></ng-container>
       }
     } @else {
       <div class="list-group-item text-center text-secondary">None</div>
     }
   </div>
 </div>
+
+<ng-template #harvestableListItem let-harvestable="harvestable" let-plansToHarvestHarvestable="plansToHarvest">
+  <div class="list-group-item">
+    <div [class.fw-bold]="plansToHarvestHarvestable">
+      {{ harvestable.name }}
+    </div>
+    <div class="list-group list-group-flush">
+      @for (harvestableHarvest of harvestable.harvests; track harvestableHarvest.name) {
+        <ng-container
+          [ngTemplateOutlet]="harvestableHarvestListItem"
+          [ngTemplateOutletContext]="{
+            harvestable,
+            harvestableHarvest,
+            plansToHarvest: plansToHarvest(harvestable, harvestableHarvest),
+            isHarvesting: isHarvesting(harvestable, harvestableHarvest),
+            expectedHarvest: formatExpectedHarvest(harvestableHarvest.expectedHarvest)
+          }"
+        ></ng-container>
+      }
+    </div>
+  </div>
+</ng-template>
+
+<ng-template
+  #harvestableHarvestListItem
+  let-harvestable="harvestable"
+  let-harvestableHarvest="harvestableHarvest"
+  let-plansToHarvest="plansToHarvest"
+  let-isHarvesting="isHarvesting"
+  let-expectedHarvest="expectedHarvest"
+>
+  <a
+    role="button"
+    class="list-group-item list-group-item-action"
+    [class.active]="isHarvesting || plansToHarvest"
+    [class.disabled]="!isHarvesting && !harvestableHarvest.canHarvest"
+    [class.text-danger]="!isHarvesting && !harvestableHarvest.canHarvest"
+    (click)="harvest(harvestable, harvestableHarvest)"
+    [attr.aria-disabled]="!isHarvesting && !harvestableHarvest.canHarvest"
+  >
+    <div class="d-flex gap-4 justify-content-between">
+      <div class="flex-grow-1 text-truncate">{{ harvestableHarvest.name }}</div>
+      <div>{{ expectedHarvest }}, {{ harvestableHarvest.expectedExperience }} exp</div>
+    </div>
+    @if (!isHarvesting && !harvestableHarvest.canHarvest) {
+      <div class="text-danger small text-truncate" [title]="harvestableHarvest.whyCannotHarvest">{{ harvestableHarvest.whyCannotHarvest }}</div>
+    }
+  </a>
+</ng-template>

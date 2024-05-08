@@ -60,7 +60,7 @@ public class GameService
 
         state.Tick++;
 
-        await state.Actions.ResolveActionsAsync(state);
+        await state.CharacterActions.ResolveActionsAsync(state);
         await state.Combats.ResolveCombatsAsync(state);
         await state.Interactions.ResolveInteractionsAsync(state);
 

@@ -43,7 +43,7 @@ public class TeamController : GameApiController
                         new CharacterMappingOptions
                         {
                             InteractionInstance = state.Interactions.GetCharacterInteraction(c),
-                            NextAction = state.Actions.GetNextAction(c)
+                            NextAction = state.CharacterActions.GetPlannedAction(c)
                         }
                     )
                 )

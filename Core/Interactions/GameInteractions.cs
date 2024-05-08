@@ -21,7 +21,7 @@ public class GameInteractions
 
     public async Task<Maybe<InteractionInstance>> StartInteractionAsync(IInteractingEntity source, Interaction interaction, IInteractibleEntity entity)
     {
-        Maybe canInteract = await interaction.CanInteractAsync(source, entity);
+        Maybe canInteract = interaction.CanInteract(source, entity);
         if (!canInteract.Success)
         {
             return $"Character {source} cannot perform interaction {interaction} on entity {entity}: {canInteract.WhyNot}";
