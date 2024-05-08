@@ -140,7 +140,7 @@ export class CharacterHistoryComponent implements OnInit {
     }
 
     if (entry instanceof CharacterStartedCombatPreparationHistoryEntry) {
-      return `Started combat preparation: ${entry.team1.map(e => e.name).join(',')} v. ${entry.team2.map(e => e.name).join(',')} at ${entry.locationAreaName} [${entry.locationPositionX}, ${entry.locationPositionY}]`;
+      return `Started combat preparation: ${entry.attackers.map(e => e.name).join(',')} v. ${entry.defenders.map(e => e.name).join(',')} at ${entry.locationAreaName} [${entry.locationPositionX}, ${entry.locationPositionY}]`;
     }
 
     if (entry instanceof CharacterCombatInPreparationCanceledHistoryEntry) {
@@ -148,7 +148,7 @@ export class CharacterHistoryComponent implements OnInit {
     }
 
     if (entry instanceof CharacterCombatStartedHistoryEntry) {
-      return `Started combat: ${entry.team1.map(e => e.name).join(',')} v. ${entry.team2.map(e => e.name).join(',')} at ${entry.locationAreaName} [${entry.locationPositionX}, ${entry.locationPositionY}]`;
+      return `Started combat: ${entry.attackers.map(e => e.name).join(',')} v. ${entry.defenders.map(e => e.name).join(',')} at ${entry.locationAreaName} [${entry.locationPositionX}, ${entry.locationPositionY}]`;
     }
 
     if (entry instanceof CharacterAttackedHistoryEntry) {
@@ -172,11 +172,11 @@ export class CharacterHistoryComponent implements OnInit {
     if (entry instanceof CharacterCombatEndedHistoryEntry) {
       let winners: CombatEntityInHistoryEntry[] = [];
       switch (entry.winner) {
-        case CombatSide.Team1:
-          winners = entry.team1;
+        case CombatSide.Attackers:
+          winners = entry.attackers;
           break;
-        case CombatSide.Team2:
-          winners = entry.team2;
+        case CombatSide.Defenders:
+          winners = entry.defenders;
           break;
       }
 

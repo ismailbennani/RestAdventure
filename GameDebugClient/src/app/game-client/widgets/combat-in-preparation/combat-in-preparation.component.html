@@ -4,13 +4,13 @@
   </div>
   <div class="row">
     <div class="col-lg-5 d-flex gap-2">
-      @for (entity of combat.team1; track entity.id) {
+      @for (entity of combat.attackers; track entity.id) {
         <ng-container [ngTemplateOutlet]="entityTpl" [ngTemplateOutletContext]="{ entity }"></ng-container>
       }
     </div>
     <div class="col"></div>
     <div class="col-lg-5 d-flex gap-2">
-      @for (entity of combat.team2; track entity.id) {
+      @for (entity of combat.defenders; track entity.id) {
         <ng-container [ngTemplateOutlet]="entityTpl" [ngTemplateOutletContext]="{ entity }"></ng-container>
       }
     </div>

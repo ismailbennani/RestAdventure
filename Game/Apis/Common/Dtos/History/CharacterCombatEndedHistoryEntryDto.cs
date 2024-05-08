@@ -46,16 +46,16 @@ public class CharacterCombatEndedHistoryEntryDto : CharacterHistoryEntryDto
     public required int LocationPositionY { get; init; }
 
     /// <summary>
-    ///     The first team of the combat
+    ///     The attackers of the combat
     /// </summary>
     [Required]
-    public required IReadOnlyList<CombatEntityInHistoryEntryDto> Team1 { get; init; }
+    public required IReadOnlyList<CombatEntityInHistoryEntryDto> Attackers { get; init; }
 
     /// <summary>
-    ///     The second team of the combat
+    ///     The defenders of the combat
     /// </summary>
     [Required]
-    public required IReadOnlyList<CombatEntityInHistoryEntryDto> Team2 { get; init; }
+    public required IReadOnlyList<CombatEntityInHistoryEntryDto> Defenders { get; init; }
 
     /// <summary>
     ///     The winner of the combat
@@ -82,8 +82,8 @@ static class CharacterCombatEndedHistoryEntryMappingExtensions
             LocationAreaName = entry.LocationAreaName,
             LocationPositionX = entry.LocationPositionX,
             LocationPositionY = entry.LocationPositionY,
-            Team1 = entry.Team1.Select(e => e.ToDto()).ToArray(),
-            Team2 = entry.Team2.Select(e => e.ToDto()).ToArray(),
+            Attackers = entry.Attackers.Select(e => e.ToDto()).ToArray(),
+            Defenders = entry.Defenders.Select(e => e.ToDto()).ToArray(),
             Winner = entry.Winner,
             Duration = entry.Duration
         };

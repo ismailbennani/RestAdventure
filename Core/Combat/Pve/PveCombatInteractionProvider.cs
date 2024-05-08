@@ -2,15 +2,16 @@
 using RestAdventure.Core.Entities;
 using RestAdventure.Core.Interactions;
 using RestAdventure.Core.Interactions.Providers;
+using RestAdventure.Core.Monsters;
 
-namespace RestAdventure.Core.Monsters;
+namespace RestAdventure.Core.Combat.Pve;
 
-public class MonsterCombatInteractionProvider : IInteractionProvider
+public class PveCombatInteractionProvider : IInteractionProvider
 {
     readonly GameService _gameService;
-    MonsterCombatInteraction? _cachedMonsterCombatInteraction;
+    PveCombatInteraction? _cachedMonsterCombatInteraction;
 
-    public MonsterCombatInteractionProvider(GameService gameService)
+    public PveCombatInteractionProvider(GameService gameService)
     {
         _gameService = gameService;
     }
@@ -23,6 +24,6 @@ public class MonsterCombatInteractionProvider : IInteractionProvider
         }
 
         GameState state = _gameService.RequireGameState();
-        yield return _cachedMonsterCombatInteraction ??= new MonsterCombatInteraction(state.Combats);
+        yield return _cachedMonsterCombatInteraction ??= new PveCombatInteraction(state.Combats);
     }
 }

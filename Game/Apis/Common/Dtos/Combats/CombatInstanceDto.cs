@@ -15,16 +15,16 @@ public class CombatInstanceDto
     public required Guid Id { get; init; }
 
     /// <summary>
-    ///     The first team in the combat instance
+    ///     The attackers in the combat instance
     /// </summary>
     [Required]
-    public required IReadOnlyList<EntityInCombatDto> Team1 { get; init; }
+    public required IReadOnlyList<EntityInCombatDto> Attackers { get; init; }
 
     /// <summary>
-    ///     The second team in the combat instance
+    ///     The defenders in the combat instance
     /// </summary>
     [Required]
-    public required IReadOnlyList<EntityInCombatDto> Team2 { get; init; }
+    public required IReadOnlyList<EntityInCombatDto> Defenders { get; init; }
 
     /// <summary>
     ///     The current turn of the combat instance
@@ -40,7 +40,7 @@ static class CombatInstanceMappingExtensions
         {
             Id = combat.Id.Guid,
             Turn = combat.Turn,
-            Team1 = combat.Team1.Entities.Select(e => e.ToEntityInCombatDto()).ToArray(),
-            Team2 = combat.Team2.Entities.Select(e => e.ToEntityInCombatDto()).ToArray()
+            Attackers = combat.Attackers.Entities.Select(e => e.ToEntityInCombatDto()).ToArray(),
+            Defenders = combat.Defenders.Entities.Select(e => e.ToEntityInCombatDto()).ToArray()
         };
 }

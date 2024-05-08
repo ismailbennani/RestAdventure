@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using BaseGame.Maps;
+﻿using BaseGame.Maps;
 using RestAdventure.Core.Characters;
 
 namespace BaseGame;
@@ -51,10 +50,4 @@ public class CharacterClasses
     public CharacterClass Mage { get; }
     public CharacterClass Scout { get; }
     public CharacterClass Dealer { get; }
-
-    public IEnumerable<CharacterClass> All =>
-        typeof(CharacterClasses).GetProperties(BindingFlags.Instance | BindingFlags.Public)
-            .Where(p => p.PropertyType == typeof(CharacterClass))
-            .Select(p => p.GetValue(this))
-            .OfType<CharacterClass>();
 }

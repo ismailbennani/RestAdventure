@@ -1435,12 +1435,12 @@ export class CombatInPreparation implements ICombatInPreparation {
     /** The unique ID of the combat instance
              */
     id!: string;
-    /** The first team in the combat instance
+    /** The attackers in the combat instance
              */
-    team1!: EntityMinimal[];
-    /** The second team in the combat instance
+    attackers!: EntityMinimal[];
+    /** The defenders in the combat instance
              */
-    team2!: EntityMinimal[];
+    defenders!: EntityMinimal[];
 
     constructor(data?: ICombatInPreparation) {
         if (data) {
@@ -1450,23 +1450,23 @@ export class CombatInPreparation implements ICombatInPreparation {
             }
         }
         if (!data) {
-            this.team1 = [];
-            this.team2 = [];
+            this.attackers = [];
+            this.defenders = [];
         }
     }
 
     init(_data?: any) {
         if (_data) {
             this.id = _data["id"];
-            if (Array.isArray(_data["team1"])) {
-                this.team1 = [] as any;
-                for (let item of _data["team1"])
-                    this.team1!.push(EntityMinimal.fromJS(item));
+            if (Array.isArray(_data["attackers"])) {
+                this.attackers = [] as any;
+                for (let item of _data["attackers"])
+                    this.attackers!.push(EntityMinimal.fromJS(item));
             }
-            if (Array.isArray(_data["team2"])) {
-                this.team2 = [] as any;
-                for (let item of _data["team2"])
-                    this.team2!.push(EntityMinimal.fromJS(item));
+            if (Array.isArray(_data["defenders"])) {
+                this.defenders = [] as any;
+                for (let item of _data["defenders"])
+                    this.defenders!.push(EntityMinimal.fromJS(item));
             }
         }
     }
@@ -1481,15 +1481,15 @@ export class CombatInPreparation implements ICombatInPreparation {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
-        if (Array.isArray(this.team1)) {
-            data["team1"] = [];
-            for (let item of this.team1)
-                data["team1"].push(item.toJSON());
+        if (Array.isArray(this.attackers)) {
+            data["attackers"] = [];
+            for (let item of this.attackers)
+                data["attackers"].push(item.toJSON());
         }
-        if (Array.isArray(this.team2)) {
-            data["team2"] = [];
-            for (let item of this.team2)
-                data["team2"].push(item.toJSON());
+        if (Array.isArray(this.defenders)) {
+            data["defenders"] = [];
+            for (let item of this.defenders)
+                data["defenders"].push(item.toJSON());
         }
         return data;
     }
@@ -1500,12 +1500,12 @@ export interface ICombatInPreparation {
     /** The unique ID of the combat instance
              */
     id: string;
-    /** The first team in the combat instance
+    /** The attackers in the combat instance
              */
-    team1: EntityMinimal[];
-    /** The second team in the combat instance
+    attackers: EntityMinimal[];
+    /** The defenders in the combat instance
              */
-    team2: EntityMinimal[];
+    defenders: EntityMinimal[];
 }
 
 /** Entity (minimal) */
@@ -1563,12 +1563,12 @@ export class CombatInstance implements ICombatInstance {
     /** The unique ID of the combat instance
              */
     id!: string;
-    /** The first team in the combat instance
+    /** The attackers in the combat instance
              */
-    team1!: EntityInCombat[];
-    /** The second team in the combat instance
+    attackers!: EntityInCombat[];
+    /** The defenders in the combat instance
              */
-    team2!: EntityInCombat[];
+    defenders!: EntityInCombat[];
     /** The current turn of the combat instance
              */
     turn!: number;
@@ -1581,23 +1581,23 @@ export class CombatInstance implements ICombatInstance {
             }
         }
         if (!data) {
-            this.team1 = [];
-            this.team2 = [];
+            this.attackers = [];
+            this.defenders = [];
         }
     }
 
     init(_data?: any) {
         if (_data) {
             this.id = _data["id"];
-            if (Array.isArray(_data["team1"])) {
-                this.team1 = [] as any;
-                for (let item of _data["team1"])
-                    this.team1!.push(EntityInCombat.fromJS(item));
+            if (Array.isArray(_data["attackers"])) {
+                this.attackers = [] as any;
+                for (let item of _data["attackers"])
+                    this.attackers!.push(EntityInCombat.fromJS(item));
             }
-            if (Array.isArray(_data["team2"])) {
-                this.team2 = [] as any;
-                for (let item of _data["team2"])
-                    this.team2!.push(EntityInCombat.fromJS(item));
+            if (Array.isArray(_data["defenders"])) {
+                this.defenders = [] as any;
+                for (let item of _data["defenders"])
+                    this.defenders!.push(EntityInCombat.fromJS(item));
             }
             this.turn = _data["turn"];
         }
@@ -1613,15 +1613,15 @@ export class CombatInstance implements ICombatInstance {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
-        if (Array.isArray(this.team1)) {
-            data["team1"] = [];
-            for (let item of this.team1)
-                data["team1"].push(item.toJSON());
+        if (Array.isArray(this.attackers)) {
+            data["attackers"] = [];
+            for (let item of this.attackers)
+                data["attackers"].push(item.toJSON());
         }
-        if (Array.isArray(this.team2)) {
-            data["team2"] = [];
-            for (let item of this.team2)
-                data["team2"].push(item.toJSON());
+        if (Array.isArray(this.defenders)) {
+            data["defenders"] = [];
+            for (let item of this.defenders)
+                data["defenders"].push(item.toJSON());
         }
         data["turn"] = this.turn;
         return data;
@@ -1633,12 +1633,12 @@ export interface ICombatInstance {
     /** The unique ID of the combat instance
              */
     id: string;
-    /** The first team in the combat instance
+    /** The attackers in the combat instance
              */
-    team1: EntityInCombat[];
-    /** The second team in the combat instance
+    attackers: EntityInCombat[];
+    /** The defenders in the combat instance
              */
-    team2: EntityInCombat[];
+    defenders: EntityInCombat[];
     /** The current turn of the combat instance
              */
     turn: number;
@@ -4339,18 +4339,18 @@ export class CharacterStartedCombatPreparationHistoryEntry extends CharacterHist
     /** The Y position of the location of the combat
              */
     locationPositionY!: number;
-    /** The first team of the combat
+    /** The attackers of the combat
              */
-    team1!: CombatEntityInHistoryEntry[];
-    /** The second team of the combat
+    attackers!: CombatEntityInHistoryEntry[];
+    /** The defenders of the combat
              */
-    team2!: CombatEntityInHistoryEntry[];
+    defenders!: CombatEntityInHistoryEntry[];
 
     constructor(data?: ICharacterStartedCombatPreparationHistoryEntry) {
         super(data);
         if (!data) {
-            this.team1 = [];
-            this.team2 = [];
+            this.attackers = [];
+            this.defenders = [];
         }
         this._discriminator = "combat-preparation-started";
     }
@@ -4364,15 +4364,15 @@ export class CharacterStartedCombatPreparationHistoryEntry extends CharacterHist
             this.locationAreaName = _data["locationAreaName"];
             this.locationPositionX = _data["locationPositionX"];
             this.locationPositionY = _data["locationPositionY"];
-            if (Array.isArray(_data["team1"])) {
-                this.team1 = [] as any;
-                for (let item of _data["team1"])
-                    this.team1!.push(CombatEntityInHistoryEntry.fromJS(item));
+            if (Array.isArray(_data["attackers"])) {
+                this.attackers = [] as any;
+                for (let item of _data["attackers"])
+                    this.attackers!.push(CombatEntityInHistoryEntry.fromJS(item));
             }
-            if (Array.isArray(_data["team2"])) {
-                this.team2 = [] as any;
-                for (let item of _data["team2"])
-                    this.team2!.push(CombatEntityInHistoryEntry.fromJS(item));
+            if (Array.isArray(_data["defenders"])) {
+                this.defenders = [] as any;
+                for (let item of _data["defenders"])
+                    this.defenders!.push(CombatEntityInHistoryEntry.fromJS(item));
             }
         }
     }
@@ -4392,15 +4392,15 @@ export class CharacterStartedCombatPreparationHistoryEntry extends CharacterHist
         data["locationAreaName"] = this.locationAreaName;
         data["locationPositionX"] = this.locationPositionX;
         data["locationPositionY"] = this.locationPositionY;
-        if (Array.isArray(this.team1)) {
-            data["team1"] = [];
-            for (let item of this.team1)
-                data["team1"].push(item.toJSON());
+        if (Array.isArray(this.attackers)) {
+            data["attackers"] = [];
+            for (let item of this.attackers)
+                data["attackers"].push(item.toJSON());
         }
-        if (Array.isArray(this.team2)) {
-            data["team2"] = [];
-            for (let item of this.team2)
-                data["team2"].push(item.toJSON());
+        if (Array.isArray(this.defenders)) {
+            data["defenders"] = [];
+            for (let item of this.defenders)
+                data["defenders"].push(item.toJSON());
         }
         super.toJSON(data);
         return data;
@@ -4427,12 +4427,12 @@ export interface ICharacterStartedCombatPreparationHistoryEntry extends ICharact
     /** The Y position of the location of the combat
              */
     locationPositionY: number;
-    /** The first team of the combat
+    /** The attackers of the combat
              */
-    team1: CombatEntityInHistoryEntry[];
-    /** The second team of the combat
+    attackers: CombatEntityInHistoryEntry[];
+    /** The defenders of the combat
              */
-    team2: CombatEntityInHistoryEntry[];
+    defenders: CombatEntityInHistoryEntry[];
 }
 
 /** Combat entity in history entry */
@@ -4505,18 +4505,18 @@ export class CharacterCombatInPreparationCanceledHistoryEntry extends CharacterH
     /** The Y position of the location of the combat
              */
     locationPositionY!: number;
-    /** The first team of the combat
+    /** The attackers of the combat
              */
-    team1!: CombatEntityInHistoryEntry[];
-    /** The second team of the combat
+    attackers!: CombatEntityInHistoryEntry[];
+    /** The defenders of the combat
              */
-    team2!: CombatEntityInHistoryEntry[];
+    defenders!: CombatEntityInHistoryEntry[];
 
     constructor(data?: ICharacterCombatInPreparationCanceledHistoryEntry) {
         super(data);
         if (!data) {
-            this.team1 = [];
-            this.team2 = [];
+            this.attackers = [];
+            this.defenders = [];
         }
         this._discriminator = "combat-preparation-canceled";
     }
@@ -4530,15 +4530,15 @@ export class CharacterCombatInPreparationCanceledHistoryEntry extends CharacterH
             this.locationAreaName = _data["locationAreaName"];
             this.locationPositionX = _data["locationPositionX"];
             this.locationPositionY = _data["locationPositionY"];
-            if (Array.isArray(_data["team1"])) {
-                this.team1 = [] as any;
-                for (let item of _data["team1"])
-                    this.team1!.push(CombatEntityInHistoryEntry.fromJS(item));
+            if (Array.isArray(_data["attackers"])) {
+                this.attackers = [] as any;
+                for (let item of _data["attackers"])
+                    this.attackers!.push(CombatEntityInHistoryEntry.fromJS(item));
             }
-            if (Array.isArray(_data["team2"])) {
-                this.team2 = [] as any;
-                for (let item of _data["team2"])
-                    this.team2!.push(CombatEntityInHistoryEntry.fromJS(item));
+            if (Array.isArray(_data["defenders"])) {
+                this.defenders = [] as any;
+                for (let item of _data["defenders"])
+                    this.defenders!.push(CombatEntityInHistoryEntry.fromJS(item));
             }
         }
     }
@@ -4558,15 +4558,15 @@ export class CharacterCombatInPreparationCanceledHistoryEntry extends CharacterH
         data["locationAreaName"] = this.locationAreaName;
         data["locationPositionX"] = this.locationPositionX;
         data["locationPositionY"] = this.locationPositionY;
-        if (Array.isArray(this.team1)) {
-            data["team1"] = [];
-            for (let item of this.team1)
-                data["team1"].push(item.toJSON());
+        if (Array.isArray(this.attackers)) {
+            data["attackers"] = [];
+            for (let item of this.attackers)
+                data["attackers"].push(item.toJSON());
         }
-        if (Array.isArray(this.team2)) {
-            data["team2"] = [];
-            for (let item of this.team2)
-                data["team2"].push(item.toJSON());
+        if (Array.isArray(this.defenders)) {
+            data["defenders"] = [];
+            for (let item of this.defenders)
+                data["defenders"].push(item.toJSON());
         }
         super.toJSON(data);
         return data;
@@ -4593,12 +4593,12 @@ export interface ICharacterCombatInPreparationCanceledHistoryEntry extends IChar
     /** The Y position of the location of the combat
              */
     locationPositionY: number;
-    /** The first team of the combat
+    /** The attackers of the combat
              */
-    team1: CombatEntityInHistoryEntry[];
-    /** The second team of the combat
+    attackers: CombatEntityInHistoryEntry[];
+    /** The defenders of the combat
              */
-    team2: CombatEntityInHistoryEntry[];
+    defenders: CombatEntityInHistoryEntry[];
 }
 
 /** Character combat in preparation canceled */
@@ -4621,18 +4621,18 @@ export class CharacterCombatStartedHistoryEntry extends CharacterHistoryEntry im
     /** The Y position of the location of the combat
              */
     locationPositionY!: number;
-    /** The first team of the combat
+    /** The attackers of the combat
              */
-    team1!: CombatEntityInHistoryEntry[];
-    /** The second team of the combat
+    attackers!: CombatEntityInHistoryEntry[];
+    /** The defenders of the combat
              */
-    team2!: CombatEntityInHistoryEntry[];
+    defenders!: CombatEntityInHistoryEntry[];
 
     constructor(data?: ICharacterCombatStartedHistoryEntry) {
         super(data);
         if (!data) {
-            this.team1 = [];
-            this.team2 = [];
+            this.attackers = [];
+            this.defenders = [];
         }
         this._discriminator = "combat-started";
     }
@@ -4646,15 +4646,15 @@ export class CharacterCombatStartedHistoryEntry extends CharacterHistoryEntry im
             this.locationAreaName = _data["locationAreaName"];
             this.locationPositionX = _data["locationPositionX"];
             this.locationPositionY = _data["locationPositionY"];
-            if (Array.isArray(_data["team1"])) {
-                this.team1 = [] as any;
-                for (let item of _data["team1"])
-                    this.team1!.push(CombatEntityInHistoryEntry.fromJS(item));
+            if (Array.isArray(_data["attackers"])) {
+                this.attackers = [] as any;
+                for (let item of _data["attackers"])
+                    this.attackers!.push(CombatEntityInHistoryEntry.fromJS(item));
             }
-            if (Array.isArray(_data["team2"])) {
-                this.team2 = [] as any;
-                for (let item of _data["team2"])
-                    this.team2!.push(CombatEntityInHistoryEntry.fromJS(item));
+            if (Array.isArray(_data["defenders"])) {
+                this.defenders = [] as any;
+                for (let item of _data["defenders"])
+                    this.defenders!.push(CombatEntityInHistoryEntry.fromJS(item));
             }
         }
     }
@@ -4674,15 +4674,15 @@ export class CharacterCombatStartedHistoryEntry extends CharacterHistoryEntry im
         data["locationAreaName"] = this.locationAreaName;
         data["locationPositionX"] = this.locationPositionX;
         data["locationPositionY"] = this.locationPositionY;
-        if (Array.isArray(this.team1)) {
-            data["team1"] = [];
-            for (let item of this.team1)
-                data["team1"].push(item.toJSON());
+        if (Array.isArray(this.attackers)) {
+            data["attackers"] = [];
+            for (let item of this.attackers)
+                data["attackers"].push(item.toJSON());
         }
-        if (Array.isArray(this.team2)) {
-            data["team2"] = [];
-            for (let item of this.team2)
-                data["team2"].push(item.toJSON());
+        if (Array.isArray(this.defenders)) {
+            data["defenders"] = [];
+            for (let item of this.defenders)
+                data["defenders"].push(item.toJSON());
         }
         super.toJSON(data);
         return data;
@@ -4709,12 +4709,12 @@ export interface ICharacterCombatStartedHistoryEntry extends ICharacterHistoryEn
     /** The Y position of the location of the combat
              */
     locationPositionY: number;
-    /** The first team of the combat
+    /** The attackers of the combat
              */
-    team1: CombatEntityInHistoryEntry[];
-    /** The second team of the combat
+    attackers: CombatEntityInHistoryEntry[];
+    /** The defenders of the combat
              */
-    team2: CombatEntityInHistoryEntry[];
+    defenders: CombatEntityInHistoryEntry[];
 }
 
 /** Character attacked history entry */
@@ -4915,12 +4915,12 @@ export class CharacterCombatEndedHistoryEntry extends CharacterHistoryEntry impl
     /** The Y position of the location of the combat
              */
     locationPositionY!: number;
-    /** The first team of the combat
+    /** The attackers of the combat
              */
-    team1!: CombatEntityInHistoryEntry[];
-    /** The second team of the combat
+    attackers!: CombatEntityInHistoryEntry[];
+    /** The defenders of the combat
              */
-    team2!: CombatEntityInHistoryEntry[];
+    defenders!: CombatEntityInHistoryEntry[];
     /** The winner of the combat
              */
     winner!: CombatSide;
@@ -4931,8 +4931,8 @@ export class CharacterCombatEndedHistoryEntry extends CharacterHistoryEntry impl
     constructor(data?: ICharacterCombatEndedHistoryEntry) {
         super(data);
         if (!data) {
-            this.team1 = [];
-            this.team2 = [];
+            this.attackers = [];
+            this.defenders = [];
         }
         this._discriminator = "combat-ended";
     }
@@ -4946,15 +4946,15 @@ export class CharacterCombatEndedHistoryEntry extends CharacterHistoryEntry impl
             this.locationAreaName = _data["locationAreaName"];
             this.locationPositionX = _data["locationPositionX"];
             this.locationPositionY = _data["locationPositionY"];
-            if (Array.isArray(_data["team1"])) {
-                this.team1 = [] as any;
-                for (let item of _data["team1"])
-                    this.team1!.push(CombatEntityInHistoryEntry.fromJS(item));
+            if (Array.isArray(_data["attackers"])) {
+                this.attackers = [] as any;
+                for (let item of _data["attackers"])
+                    this.attackers!.push(CombatEntityInHistoryEntry.fromJS(item));
             }
-            if (Array.isArray(_data["team2"])) {
-                this.team2 = [] as any;
-                for (let item of _data["team2"])
-                    this.team2!.push(CombatEntityInHistoryEntry.fromJS(item));
+            if (Array.isArray(_data["defenders"])) {
+                this.defenders = [] as any;
+                for (let item of _data["defenders"])
+                    this.defenders!.push(CombatEntityInHistoryEntry.fromJS(item));
             }
             this.winner = _data["winner"];
             this.duration = _data["duration"];
@@ -4976,15 +4976,15 @@ export class CharacterCombatEndedHistoryEntry extends CharacterHistoryEntry impl
         data["locationAreaName"] = this.locationAreaName;
         data["locationPositionX"] = this.locationPositionX;
         data["locationPositionY"] = this.locationPositionY;
-        if (Array.isArray(this.team1)) {
-            data["team1"] = [];
-            for (let item of this.team1)
-                data["team1"].push(item.toJSON());
+        if (Array.isArray(this.attackers)) {
+            data["attackers"] = [];
+            for (let item of this.attackers)
+                data["attackers"].push(item.toJSON());
         }
-        if (Array.isArray(this.team2)) {
-            data["team2"] = [];
-            for (let item of this.team2)
-                data["team2"].push(item.toJSON());
+        if (Array.isArray(this.defenders)) {
+            data["defenders"] = [];
+            for (let item of this.defenders)
+                data["defenders"].push(item.toJSON());
         }
         data["winner"] = this.winner;
         data["duration"] = this.duration;
@@ -5013,12 +5013,12 @@ export interface ICharacterCombatEndedHistoryEntry extends ICharacterHistoryEntr
     /** The Y position of the location of the combat
              */
     locationPositionY: number;
-    /** The first team of the combat
+    /** The attackers of the combat
              */
-    team1: CombatEntityInHistoryEntry[];
-    /** The second team of the combat
+    attackers: CombatEntityInHistoryEntry[];
+    /** The defenders of the combat
              */
-    team2: CombatEntityInHistoryEntry[];
+    defenders: CombatEntityInHistoryEntry[];
     /** The winner of the combat
              */
     winner: CombatSide;
@@ -5028,8 +5028,8 @@ export interface ICharacterCombatEndedHistoryEntry extends ICharacterHistoryEntr
 }
 
 export enum CombatSide {
-    Team1 = "team1",
-    Team2 = "team2",
+    Attackers = "attackers",
+    Defenders = "defenders",
 }
 
 /** Team of characters */

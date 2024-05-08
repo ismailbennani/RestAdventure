@@ -1,4 +1,5 @@
-﻿using RestAdventure.Core.Resources;
+﻿using RestAdventure.Core.Items;
+using RestAdventure.Core.Resources;
 
 namespace RestAdventure.Core.Monsters;
 
@@ -12,4 +13,9 @@ public class MonsterFamily : GameResource<MonsterFamilyId>
 
     public required string Name { get; init; }
     public string? Description { get; init; }
+
+    /// <summary>
+    ///     The items that all the species of this family can drop when they die
+    /// </summary>
+    public IReadOnlyCollection<ItemStack> Items { get; init; } = Array.Empty<ItemStack>();
 }

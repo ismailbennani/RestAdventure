@@ -2,6 +2,7 @@
 using NSwag.Annotations;
 using RestAdventure.Core;
 using RestAdventure.Core.Characters;
+using RestAdventure.Core.Combat.Pve;
 using RestAdventure.Core.Interactions;
 using RestAdventure.Core.Monsters;
 using RestAdventure.Core.Players;
@@ -54,8 +55,7 @@ public class PveController : GameApiController
         List<MonsterGroupDto> result = new();
         foreach (MonsterInstance monster in monsters)
         {
-            MonsterCombatInteraction? combatInteraction =
-                _availableInteractionsService.GetAvailableInteractions(character, monster).OfType<MonsterCombatInteraction>().FirstOrDefault();
+            PveCombatInteraction? combatInteraction = _availableInteractionsService.GetAvailableInteractions(character, monster).OfType<PveCombatInteraction>().FirstOrDefault();
             if (combatInteraction == null)
             {
                 continue;
@@ -95,7 +95,7 @@ public class PveController : GameApiController
             return NotFound();
         }
 
-        MonsterCombatInteraction? interaction = _availableInteractionsService.GetAvailableInteractions(character, monster).OfType<MonsterCombatInteraction>().FirstOrDefault();
+        PveCombatInteraction? interaction = _availableInteractionsService.GetAvailableInteractions(character, monster).OfType<PveCombatInteraction>().FirstOrDefault();
         if (interaction == null)
         {
             return NotFound();

@@ -16,16 +16,16 @@ public class CombatInPreparationDto
     public required Guid Id { get; init; }
 
     /// <summary>
-    ///     The first team in the combat instance
+    ///     The attackers in the combat instance
     /// </summary>
     [Required]
-    public required IReadOnlyList<EntityMinimalDto> Team1 { get; init; }
+    public required IReadOnlyList<EntityMinimalDto> Attackers { get; init; }
 
     /// <summary>
-    ///     The second team in the combat instance
+    ///     The defenders in the combat instance
     /// </summary>
     [Required]
-    public required IReadOnlyList<EntityMinimalDto> Team2 { get; init; }
+    public required IReadOnlyList<EntityMinimalDto> Defenders { get; init; }
 }
 
 static class CombatInPreparationMappingExtensions
@@ -34,7 +34,7 @@ static class CombatInPreparationMappingExtensions
         new()
         {
             Id = combat.Id.Guid,
-            Team1 = combat.Team1.Entities.Select(e => e.ToMinimalDto()).ToArray(),
-            Team2 = combat.Team2.Entities.Select(e => e.ToMinimalDto()).ToArray()
+            Attackers = combat.Attackers.Entities.Select(e => e.ToMinimalDto()).ToArray(),
+            Defenders = combat.Defenders.Entities.Select(e => e.ToMinimalDto()).ToArray()
         };
 }

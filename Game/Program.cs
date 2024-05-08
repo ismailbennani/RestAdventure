@@ -156,13 +156,13 @@ async Task<GameState> LoadGameAsync(WebApplication app)
     GameService gameService = app.Services.GetRequiredService<GameService>();
     GameState state = gameService.NewGame(content, new GameSettings());
 
-    StaticObjectInstance appleTree1 = new(baseGameContent.Trees.AppleTree, baseGameContent.GeneratedMaps.Locations.First());
+    StaticObjectInstance appleTree1 = new(baseGameContent.Gatherer.AppleTree, baseGameContent.GeneratedMaps.Locations.First());
     await state.Entities.AddAsync(appleTree1);
 
-    StaticObjectInstance appleTree2 = new(baseGameContent.Trees.AppleTree, baseGameContent.GeneratedMaps.Locations.First());
+    StaticObjectInstance appleTree2 = new(baseGameContent.Gatherer.AppleTree, baseGameContent.GeneratedMaps.Locations.First());
     await state.Entities.AddAsync(appleTree2);
 
-    StaticObjectInstance pearTree = new(baseGameContent.Trees.PearTree, baseGameContent.GeneratedMaps.Locations.First());
+    StaticObjectInstance pearTree = new(baseGameContent.Gatherer.PearTree, baseGameContent.GeneratedMaps.Locations.First());
     await state.Entities.AddAsync(pearTree);
 
     MonsterInstance petitPaw = new(baseGameContent.Rattlings.PetitPaw, 1, baseGameContent.GeneratedMaps.Locations.First());

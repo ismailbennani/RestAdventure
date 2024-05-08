@@ -16,41 +16,41 @@ public class CombatInstance : IDisposable
     {
         Id = combatInPreparation.Id;
         Location = combatInPreparation.Location;
-        CombatFormation team1 = combatInPreparation.Team1.Lock();
-        CombatFormation team2 = combatInPreparation.Team2.Lock();
+        CombatFormation attackers = combatInPreparation.Attackers.Lock();
+        CombatFormation defenders = combatInPreparation.Defenders.Lock();
 
-        if (!team1.Entities.Any(e => e.Combat.Health > 0))
+        if (!attackers.Entities.Any(e => e.Combat.Health > 0))
         {
             throw new ArgumentException("Team 1 cannot be empty", nameof(combatInPreparation));
         }
 
-        if (!team2.Entities.Any(e => e.Combat.Health > 0))
+        if (!defenders.Entities.Any(e => e.Combat.Health > 0))
         {
             throw new ArgumentException("Team 2 cannot be empty", nameof(combatInPreparation));
         }
 
         _settings = combatInPreparation.Settings;
 
-        Team1 = team1;
-        Team2 = team2;
+        Attackers = attackers;
+        Defenders = defenders;
 
         _states = new Dictionary<GameEntityId, EntityState>();
 
-        foreach (IGameEntityWithCombatStatistics entity in team1.Entities)
+        foreach (IGameEntityWithCombatStatistics entity in attackers.Entities)
         {
-            _states[entity.Id] = new EntityState(entity, CombatSide.Team1);
+            _states[entity.Id] = new EntityState(entity, CombatSide.Attackers);
         }
 
-        foreach (IGameEntityWithCombatStatistics entity in team2.Entities)
+        foreach (IGameEntityWithCombatStatistics entity in defenders.Entities)
         {
-            _states[entity.Id] = new EntityState(entity, CombatSide.Team2);
+            _states[entity.Id] = new EntityState(entity, CombatSide.Defenders);
         }
     }
 
     public CombatInstanceId Id { get; }
     public Location Location { get; }
-    public CombatFormation Team1 { get; }
-    public CombatFormation Team2 { get; }
+    public CombatFormation Attackers { get; }
+    public CombatFormation Defenders { get; }
 
     public int Turn { get; private set; }
 
@@ -101,8 +101,8 @@ public class CombatInstance : IDisposable
     public CombatFormation GetTeam(CombatSide team) =>
         team switch
         {
-            CombatSide.Team1 => Team1,
-            CombatSide.Team2 => Team2,
+            CombatSide.Attackers => Attackers,
+            CombatSide.Defenders => Defenders,
             _ => throw new ArgumentOutOfRangeException(nameof(team), team, null)
         };
 
@@ -121,16 +121,16 @@ public class CombatInstance : IDisposable
 
     bool EvaluateWinCondition()
     {
-        if (HasLost(Team1))
+        if (HasLost(Attackers))
         {
-            Winner = CombatSide.Team2;
+            Winner = CombatSide.Defenders;
             IsOver = true;
             return true;
         }
 
-        if (HasLost(Team2))
+        if (HasLost(Defenders))
         {
-            Winner = CombatSide.Team1;
+            Winner = CombatSide.Attackers;
             IsOver = true;
             return true;
         }

@@ -18,8 +18,8 @@ public class CharacterCombatEndedHistoryEntry : CharacterHistoryEntry
         LocationAreaName = combat.Location.Area.Name;
         LocationPositionX = combat.Location.PositionX;
         LocationPositionY = combat.Location.PositionY;
-        Team1 = combat.Team1.Entities.Select(e => (e.Id, e.Name)).ToArray();
-        Team2 = combat.Team2.Entities.Select(e => (e.Id, e.Name)).ToArray();
+        Attackers = combat.Attackers.Entities.Select(e => (e.Id, e.Name)).ToArray();
+        Defenders = combat.Defenders.Entities.Select(e => (e.Id, e.Name)).ToArray();
         Winner = combat.Winner ?? throw new ArgumentNullException(nameof(combat.Winner));
         Duration = combat.Turn;
     }
@@ -30,8 +30,8 @@ public class CharacterCombatEndedHistoryEntry : CharacterHistoryEntry
     public string LocationAreaName { get; }
     public int LocationPositionX { get; }
     public int LocationPositionY { get; }
-    public IReadOnlyList<(GameEntityId Id, string Name)> Team1 { get; }
-    public IReadOnlyList<(GameEntityId Id, string Name)> Team2 { get; }
+    public IReadOnlyList<(GameEntityId Id, string Name)> Attackers { get; }
+    public IReadOnlyList<(GameEntityId Id, string Name)> Defenders { get; }
     public CombatSide Winner { get; }
     public int Duration { get; }
 }
@@ -49,7 +49,7 @@ public class CreateCharacterEndedCombatHistoryEntry : INotificationHandler<Comba
     {
         GameState state = _gameService.RequireGameState();
 
-        foreach (IGameEntityWithCombatStatistics entity in notification.Combat.Team1.Entities.Concat(notification.Combat.Team2.Entities))
+        foreach (IGameEntityWithCombatStatistics entity in notification.Combat.Attackers.Entities.Concat(notification.Combat.Defenders.Entities))
         {
             if (entity is not Character character)
             {

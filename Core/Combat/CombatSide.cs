@@ -2,8 +2,8 @@
 
 public enum CombatSide
 {
-    Team1,
-    Team2
+    Attackers,
+    Defenders
 }
 
 public static class CombatSideExtensions
@@ -11,8 +11,8 @@ public static class CombatSideExtensions
     public static CombatSide OtherSide(this CombatSide side) =>
         side switch
         {
-            CombatSide.Team1 => CombatSide.Team2,
-            CombatSide.Team2 => CombatSide.Team1,
+            CombatSide.Attackers => CombatSide.Defenders,
+            CombatSide.Defenders => CombatSide.Attackers,
             _ => throw new ArgumentOutOfRangeException(nameof(side), side, null)
         };
 }

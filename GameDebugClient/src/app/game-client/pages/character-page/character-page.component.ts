@@ -188,13 +188,15 @@ export class CharacterPageComponent implements OnInit {
       }
     }
 
-    const combatInvolvingCharacter = this.combats.find(c => c.team1.some(e => e.id === this.characterId) || c.team2.some(e => e.id === this.characterId));
+    const combatInvolvingCharacter = this.combats.find(c => c.attackers.some(e => e.id === this.characterId) || c.defenders.some(e => e.id === this.characterId));
     if (combatInvolvingCharacter) {
       this.selectCombat(combatInvolvingCharacter);
       return;
     }
 
-    const combatInPreparationInvolvingCharacter = this.combatsInPreparation.find(c => c.team1.some(e => e.id === this.characterId) || c.team2.some(e => e.id === this.characterId));
+    const combatInPreparationInvolvingCharacter = this.combatsInPreparation.find(
+      c => c.attackers.some(e => e.id === this.characterId) || c.defenders.some(e => e.id === this.characterId),
+    );
     if (combatInPreparationInvolvingCharacter) {
       this.selectCombatInPreparation(combatInPreparationInvolvingCharacter);
       return;

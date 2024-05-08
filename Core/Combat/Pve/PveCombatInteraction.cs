@@ -1,11 +1,12 @@
 ﻿using RestAdventure.Core.Interactions;
+using RestAdventure.Core.Monsters;
 using RestAdventure.Kernel.Errors;
 
-namespace RestAdventure.Core.Combat;
+namespace RestAdventure.Core.Combat.Pve;
 
-public abstract class CombatInteraction : Interaction
+public class PveCombatInteraction : Interaction
 {
-    protected CombatInteraction(GameCombats combats)
+    public PveCombatInteraction(GameCombats combats)
     {
         Combats = combats;
     }
@@ -25,12 +26,17 @@ public abstract class CombatInteraction : Interaction
             return Task.FromResult<Maybe>("Target cannot enter combat");
         }
 
+        if (target is not MonsterInstance)
+        {
+            return Task.FromResult<Maybe>("Target is not a monster");
+        }
+
         return Task.FromResult<Maybe>(true);
     }
 
     protected override async Task<Maybe<InteractionInstance>> InstantiateInteractionInternalAsync(IInteractingEntity source, IInteractibleEntity target)
     {
         CombatInPreparation combatInPreparation = await Combats.StartCombatAsync((IGameEntityWithCombatStatistics)source, (IGameEntityWithCombatStatistics)target);
-        return new CharacterCombatInteractionInstance(combatInPreparation, source, this, target);
+        return new PveCombatInteractionInstance(combatInPreparation, source, this, target);
     }
 }

@@ -30,20 +30,20 @@ public class GameCombats : IDisposable
 
         await _publisher.Publish(new CombatPreparationStarted { Combat = combatInPreparation });
 
-        combatInPreparation.Team1.Added += (_, entity) =>
-            _publisher.PublishSync(new CombatInPreparationEntityAdded { CombatInPreparation = combatInPreparation, Side = CombatSide.Team1, Entity = entity });
-        combatInPreparation.Team1.Removed += (_, entity) =>
-            _publisher.PublishSync(new CombatInPreparationEntityRemoved { CombatInPreparation = combatInPreparation, Side = CombatSide.Team1, Entity = entity });
-        combatInPreparation.Team1.Reordered += (_, args) => _publisher.PublishSync(
-            new CombatInPreparationEntitiesReordered { CombatInPreparation = combatInPreparation, Side = CombatSide.Team1, OldOrder = args.OldOrder, NewOrder = args.NewOrder }
+        combatInPreparation.Attackers.Added += (_, entity) =>
+            _publisher.PublishSync(new CombatInPreparationEntityAdded { CombatInPreparation = combatInPreparation, Side = CombatSide.Attackers, Entity = entity });
+        combatInPreparation.Attackers.Removed += (_, entity) =>
+            _publisher.PublishSync(new CombatInPreparationEntityRemoved { CombatInPreparation = combatInPreparation, Side = CombatSide.Attackers, Entity = entity });
+        combatInPreparation.Attackers.Reordered += (_, args) => _publisher.PublishSync(
+            new CombatInPreparationEntitiesReordered { CombatInPreparation = combatInPreparation, Side = CombatSide.Attackers, OldOrder = args.OldOrder, NewOrder = args.NewOrder }
         );
 
-        combatInPreparation.Team2.Added += (_, entity) =>
-            _publisher.PublishSync(new CombatInPreparationEntityAdded { CombatInPreparation = combatInPreparation, Side = CombatSide.Team2, Entity = entity });
-        combatInPreparation.Team2.Removed += (_, entity) =>
-            _publisher.PublishSync(new CombatInPreparationEntityRemoved { CombatInPreparation = combatInPreparation, Side = CombatSide.Team2, Entity = entity });
-        combatInPreparation.Team2.Reordered += (_, args) => _publisher.PublishSync(
-            new CombatInPreparationEntitiesReordered { CombatInPreparation = combatInPreparation, Side = CombatSide.Team2, OldOrder = args.OldOrder, NewOrder = args.NewOrder }
+        combatInPreparation.Defenders.Added += (_, entity) =>
+            _publisher.PublishSync(new CombatInPreparationEntityAdded { CombatInPreparation = combatInPreparation, Side = CombatSide.Defenders, Entity = entity });
+        combatInPreparation.Defenders.Removed += (_, entity) =>
+            _publisher.PublishSync(new CombatInPreparationEntityRemoved { CombatInPreparation = combatInPreparation, Side = CombatSide.Defenders, Entity = entity });
+        combatInPreparation.Defenders.Reordered += (_, args) => _publisher.PublishSync(
+            new CombatInPreparationEntitiesReordered { CombatInPreparation = combatInPreparation, Side = CombatSide.Defenders, OldOrder = args.OldOrder, NewOrder = args.NewOrder }
         );
 
         return combatInPreparation;
