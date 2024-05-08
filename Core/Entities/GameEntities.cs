@@ -1,4 +1,5 @@
-﻿using RestAdventure.Core.Entities.Notifications;
+﻿using MediatR;
+using RestAdventure.Core.Entities.Notifications;
 using RestAdventure.Core.Extensions;
 using RestAdventure.Core.Items;
 using RestAdventure.Core.Jobs;
@@ -9,14 +10,13 @@ namespace RestAdventure.Core.Entities;
 
 public class GameEntities : IDisposable
 {
+    readonly IPublisher _publisher;
     readonly Dictionary<GameEntityId, IGameEntity> _entities = [];
 
-    public GameEntities(GameState gameState)
+    public GameEntities(IPublisher publisher)
     {
-        GameState = gameState;
+        _publisher = publisher;
     }
-
-    internal GameState GameState { get; }
 
     public IEnumerable<IGameEntity> All => _entities.Values;
 
@@ -24,8 +24,7 @@ public class GameEntities : IDisposable
     {
         _entities[entity.Id] = entity;
 
-        entity.Moved += (_, args) =>
-            GameState.Publisher.PublishSync(new GameEntityMovedToLocation { Entity = entity, OldLocation = args.OldLocation, NewLocation = args.NewLocation });
+        entity.Moved += (_, args) => _publisher.PublishSync(new GameEntityMovedToLocation { Entity = entity, OldLocation = args.OldLocation, NewLocation = args.NewLocation });
 
         if (entity is IGameEntityWithInventory withInventory)
         {
@@ -37,8 +36,8 @@ public class GameEntities : IDisposable
             RegisterJobsEvents(withJobs);
         }
 
-        await GameState.Publisher.Publish(new GameEntityCreated { Entity = entity });
-        await GameState.Publisher.Publish(new GameEntityMovedToLocation { Entity = entity, OldLocation = null, NewLocation = entity.Location });
+        await _publisher.Publish(new GameEntityCreated { Entity = entity });
+        await _publisher.Publish(new GameEntityMovedToLocation { Entity = entity, OldLocation = null, NewLocation = entity.Location });
     }
 
     public async Task DestroyAsync(IGameEntity entity)
@@ -50,7 +49,7 @@ public class GameEntities : IDisposable
 
         _entities.Remove(entity.Id);
 
-        await GameState.Publisher.Publish(new GameEntityDeleted { Entity = entity });
+        await _publisher.Publish(new GameEntityDeleted { Entity = entity });
 
         entity.Dispose();
     }
@@ -61,7 +60,7 @@ public class GameEntities : IDisposable
     public IEnumerable<TEntity> AtLocation<TEntity>(Location location) where TEntity: IGameEntity => All.OfType<TEntity>().Where(e => e.Location == location);
 
     void RegisterInventoryEvents(IGameEntityWithInventory entity) =>
-        entity.Inventory.Changed += (_, args) => GameState.Publisher.PublishSync(
+        entity.Inventory.Changed += (_, args) => _publisher.PublishSync(
             new GameEntityInventoryChanged
             {
                 Entity = entity,
@@ -73,12 +72,12 @@ public class GameEntities : IDisposable
 
     void RegisterJobsEvents(IGameEntityWithJobs entity)
     {
-        entity.Jobs.JobLearned += (_, job) => GameState.Publisher.PublishSync(new GameEntityLearnedJob { Entity = entity, Job = job });
-        entity.Jobs.JobGainedExperience += (_, args) => GameState.Publisher.PublishSync(
+        entity.Jobs.JobLearned += (_, job) => _publisher.PublishSync(new GameEntityLearnedJob { Entity = entity, Job = job });
+        entity.Jobs.JobGainedExperience += (_, args) => _publisher.PublishSync(
             new GameEntityJobGainedExperience { Entity = entity, Job = args.Job, OldExperience = args.OldExperience, NewExperience = args.NewExperience }
         );
         entity.Jobs.JobLeveledUp += (_, args) =>
-            GameState.Publisher.PublishSync(new GameEntityJobLeveledUp { Entity = entity, Job = args.Job, OldLevel = args.OldLevel, NewLevel = args.NewLevel });
+            _publisher.PublishSync(new GameEntityJobLeveledUp { Entity = entity, Job = args.Job, OldLevel = args.OldLevel, NewLevel = args.NewLevel });
     }
 
 
@@ -89,5 +88,6 @@ public class GameEntities : IDisposable
             entity.Dispose();
         }
         _entities.Clear();
+        GC.SuppressFinalize(this);
     }
 }
