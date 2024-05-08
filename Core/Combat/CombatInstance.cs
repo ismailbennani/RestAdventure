@@ -12,18 +12,22 @@ public class CombatInstance : IDisposable
     readonly GameSettings _settings;
     readonly Dictionary<GameEntityId, EntityState> _states;
 
-    internal CombatInstance(CombatFormation team1, CombatFormation team2, GameSettings settings)
+    internal CombatInstance(CombatInPreparation combatInPreparation)
     {
+        CombatFormation team1 = combatInPreparation.Team1.Lock();
+        CombatFormation team2 = combatInPreparation.Team2.Lock();
+
         if (!team1.Entities.Any(e => e.Combat.Health > 0))
         {
-            throw new ArgumentException("Team 1 cannot be empty", nameof(team1));
+            throw new ArgumentException("Team 1 cannot be empty", nameof(combatInPreparation));
         }
 
         if (!team2.Entities.Any(e => e.Combat.Health > 0))
         {
-            throw new ArgumentException("Team 2 cannot be empty", nameof(team2));
+            throw new ArgumentException("Team 2 cannot be empty", nameof(combatInPreparation));
         }
-        _settings = settings;
+
+        _settings = combatInPreparation.Settings;
 
         Location = team1.Entities[0].Location;
         Team1 = team1;

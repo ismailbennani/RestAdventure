@@ -6,4 +6,5 @@ public interface IGameEntityWithCombatStatistics : IGameEntity
 {
     int Level { get; }
     EntityCombatStatistics Combat { get; }
+    CombatEntityKind CombatEntityKind { get; }
 }

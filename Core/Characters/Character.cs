@@ -50,6 +50,8 @@ public class Character : GameEntity<CharacterId>, IGameEntityWithInventory, IGam
     /// </summary>
     public EntityCombatStatistics Combat { get; private set; }
 
+    public CombatEntityKind CombatEntityKind => CombatEntityKind.Character;
+
     public override string ToString() => $"{Class} {Name} ({Player})";
 
     public override void Dispose()

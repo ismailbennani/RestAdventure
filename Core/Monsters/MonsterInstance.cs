@@ -19,6 +19,7 @@ public class MonsterInstance : GameEntity<MonsterInstanceId>, IGameEntityWithCom
     public MonsterSpecies Species { get; }
     public int Level { get; }
     public EntityCombatStatistics Combat { get; }
+    public CombatEntityKind CombatEntityKind => CombatEntityKind.Monster;
 
     public bool Disabled { get; private set; }
     public void Enable() => Disabled = false;

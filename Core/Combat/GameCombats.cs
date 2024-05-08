@@ -20,9 +20,10 @@ public class GameCombats : IDisposable
         _logger = logger;
     }
 
-    public async Task<CombatInstance> StartCombatAsync(CombatFormation team1, CombatFormation team2)
+    public async Task<CombatInstance> StartCombatAsync(IGameEntityWithCombatStatistics attacker, IGameEntityWithCombatStatistics target)
     {
-        CombatInstance combat = new(team1, team2, _settings);
+        CombatInPreparation combatInPreparation = new(attacker, target, _settings);
+        CombatInstance combat = new(combatInPreparation);
         _combats[combat.Id] = combat;
         await _publisher.Publish(new CombatStarted { Combat = combat });
 

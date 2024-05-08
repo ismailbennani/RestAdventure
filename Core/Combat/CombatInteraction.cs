@@ -12,7 +12,7 @@ public abstract class CombatInteraction : Interaction
     {
         IGameEntityWithCombatStatistics entityWithCombat = (IGameEntityWithCombatStatistics)target;
 
-        CombatInstance combat = await state.Combats.StartCombatAsync(new CombatFormation { Entities = [character] }, new CombatFormation { Entities = [entityWithCombat] });
+        CombatInstance combat = await state.Combats.StartCombatAsync(character, entityWithCombat);
 
         return new CharacterCombatInteractionInstance(combat, character, this, target);
     }
