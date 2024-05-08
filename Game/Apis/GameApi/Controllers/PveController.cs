@@ -19,12 +19,14 @@ namespace RestAdventure.Game.Apis.GameApi.Controllers;
 public class PveController : GameApiController
 {
     readonly GameService _gameService;
+    readonly ILoggerFactory _loggerFactory;
 
     /// <summary>
     /// </summary>
-    public PveController(GameService gameService)
+    public PveController(GameService gameService, ILoggerFactory loggerFactory)
     {
         _gameService = gameService;
+        _loggerFactory = loggerFactory;
     }
 
     /// <summary>
@@ -57,7 +59,7 @@ public class PveController : GameApiController
                 continue;
             }
 
-            Maybe canStartCombat = state.Combats.CanStartCombat(character, monster);
+            Maybe canStartCombat = state.Combats.CanStartCombat([character], [monster]);
             result.Add(
                 new MonsterGroupDto
                 {
@@ -77,7 +79,7 @@ public class PveController : GameApiController
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult> AttackMonstersAsync(Guid characterGuid, Guid groupId)
+    public ActionResult AttackMonsters(Guid characterGuid, Guid groupId)
     {
         GameState state = _gameService.RequireGameState();
         Player player = ControllerContext.RequirePlayer(state);
@@ -97,7 +99,7 @@ public class PveController : GameApiController
             return NotFound();
         }
 
-        PveCombatAction action = new([character], [monster]);
+        StartPveCombatAction action = new([character], [monster], _loggerFactory.CreateLogger<StartPveCombatAction>());
         state.Actions.QueueAction(character, action);
 
         return NoContent();

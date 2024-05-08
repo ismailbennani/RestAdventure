@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0-alpha.0.135+c7b57deca0bd2ad33504f3e5d7959bff97edaa5e"
+    "version": "0.0.0-alpha.0.136+bb26113514077666e1aac1f05a4820f5d53f1f4f"
   },
   "servers": [
     {
@@ -575,7 +575,7 @@
         ]
       }
     },
-    "/game/team/characters/{characterGuid}/jobs/harvestables/{entityGuid}/{harvestNameName}": {
+    "/game/team/characters/{characterGuid}/jobs/harvestables/{entityGuid}/{harvestName}": {
       "post": {
         "tags": [
           "Jobs"
@@ -605,20 +605,12 @@
           },
           {
             "name": "harvestName",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 3
-          },
-          {
-            "name": "harvestNameName",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "x-position": 4
+            "x-position": 3
           }
         ],
         "responses": {
@@ -2078,6 +2070,7 @@
           "mapping": {
             "move": "#/components/schemas/MoveAction",
             "harvest": "#/components/schemas/HarvestAction",
+            "start-combat-pve": "#/components/schemas/StartPveCombatAction",
             "combat-pve": "#/components/schemas/PveCombatAction"
           }
         },
@@ -2181,6 +2174,38 @@
             ]
           }
         }
+      },
+      "StartPveCombatAction": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Action"
+          },
+          {
+            "type": "object",
+            "description": "PVE combat action\n            ",
+            "additionalProperties": false,
+            "required": [
+              "attackers",
+              "defenders"
+            ],
+            "properties": {
+              "attackers": {
+                "type": "array",
+                "description": "The attackers in the combat instance\n            ",
+                "items": {
+                  "$ref": "#/components/schemas/EntityMinimal"
+                }
+              },
+              "defenders": {
+                "type": "array",
+                "description": "The defenders in the combat instance\n            ",
+                "items": {
+                  "$ref": "#/components/schemas/EntityMinimal"
+                }
+              }
+            }
+          }
+        ]
       },
       "PveCombatAction": {
         "allOf": [

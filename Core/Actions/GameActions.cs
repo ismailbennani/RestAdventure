@@ -8,7 +8,7 @@ public class GameActions
 {
     readonly GameState _state;
     readonly ILogger<GameActions> _logger;
-    readonly Dictionary<CharacterId, Action> _queuedActions = new();
+    Dictionary<CharacterId, Action> _queuedActions = new();
     readonly Dictionary<CharacterId, Action> _ongoingActions = new();
 
     public GameActions(GameState state, ILogger<GameActions> logger)
@@ -26,12 +26,17 @@ public class GameActions
         }
 
         _queuedActions[character.Id] = action;
+
+        _logger.LogInformation("Action queued for {character}: {action} ({actionType})", character, action, action.GetType().Name);
         return true;
     }
 
     public async Task ResolveActionsAsync(GameState state)
     {
-        foreach ((CharacterId characterId, Action queuedAction) in _queuedActions)
+        Dictionary<CharacterId, Action> queuedActions = _queuedActions;
+        _queuedActions = new Dictionary<CharacterId, Action>();
+
+        foreach ((CharacterId characterId, Action queuedAction) in queuedActions)
         {
             Character? character = state.Entities.Get<Character>(characterId);
             if (character == null)
@@ -42,7 +47,6 @@ public class GameActions
             await queuedAction.StartAsync(state, character);
             _ongoingActions[character.Id] = queuedAction;
         }
-        _queuedActions.Clear();
 
         foreach ((CharacterId characterId, Action action) in _ongoingActions)
         {

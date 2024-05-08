@@ -10,4 +10,6 @@ public class CombatEntityAttacked : INotification
     public required IGameEntityWithCombatStatistics Target { get; init; }
     public required EntityAttack AttackDealt { get; init; }
     public required EntityAttack AttackReceived { get; init; }
+
+    public override string ToString() => $"-{AttackReceived.Damage} HP | {Attacker} -> {Target}";
 }

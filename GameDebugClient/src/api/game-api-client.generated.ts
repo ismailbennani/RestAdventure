@@ -825,23 +825,18 @@ export class JobsHarvestApiClient {
 
     /**
      * Harvest
-     * @param harvestName (optional) 
      */
-    harvest(characterGuid: string, entityGuid: string, harvestNameName: string, harvestName?: string | undefined): Observable<void> {
-        let url_ = this.baseUrl + "/game/team/characters/{characterGuid}/jobs/harvestables/{entityGuid}/{harvestNameName}?";
+    harvest(characterGuid: string, entityGuid: string, harvestName: string): Observable<void> {
+        let url_ = this.baseUrl + "/game/team/characters/{characterGuid}/jobs/harvestables/{entityGuid}/{harvestName}";
         if (characterGuid === undefined || characterGuid === null)
             throw new Error("The parameter 'characterGuid' must be defined.");
         url_ = url_.replace("{characterGuid}", encodeURIComponent("" + characterGuid));
         if (entityGuid === undefined || entityGuid === null)
             throw new Error("The parameter 'entityGuid' must be defined.");
         url_ = url_.replace("{entityGuid}", encodeURIComponent("" + entityGuid));
-        if (harvestNameName === undefined || harvestNameName === null)
-            throw new Error("The parameter 'harvestNameName' must be defined.");
-        url_ = url_.replace("{harvestNameName}", encodeURIComponent("" + harvestNameName));
-        if (harvestName === null)
-            throw new Error("The parameter 'harvestName' cannot be null.");
-        else if (harvestName !== undefined)
-            url_ += "harvestName=" + encodeURIComponent("" + harvestName) + "&";
+        if (harvestName === undefined || harvestName === null)
+            throw new Error("The parameter 'harvestName' must be defined.");
+        url_ = url_.replace("{harvestName}", encodeURIComponent("" + harvestName));
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -3466,6 +3461,11 @@ export class Action implements IAction {
             result.init(data);
             return result;
         }
+        if (data["$type"] === "start-combat-pve") {
+            let result = new StartPveCombatAction();
+            result.init(data);
+            return result;
+        }
         if (data["$type"] === "combat-pve") {
             let result = new PveCombatAction();
             result.init(data);
@@ -3637,6 +3637,74 @@ export interface IStaticObjectInstance {
     /** The name of the entity
              */
     staticObject: StaticObject;
+}
+
+/** PVE combat action */
+export class StartPveCombatAction extends Action implements IStartPveCombatAction {
+    /** The attackers in the combat instance
+             */
+    attackers!: EntityMinimal[];
+    /** The defenders in the combat instance
+             */
+    defenders!: EntityMinimal[];
+
+    constructor(data?: IStartPveCombatAction) {
+        super(data);
+        if (!data) {
+            this.attackers = [];
+            this.defenders = [];
+        }
+        this._discriminator = "start-combat-pve";
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            if (Array.isArray(_data["attackers"])) {
+                this.attackers = [] as any;
+                for (let item of _data["attackers"])
+                    this.attackers!.push(EntityMinimal.fromJS(item));
+            }
+            if (Array.isArray(_data["defenders"])) {
+                this.defenders = [] as any;
+                for (let item of _data["defenders"])
+                    this.defenders!.push(EntityMinimal.fromJS(item));
+            }
+        }
+    }
+
+    static override fromJS(data: any): StartPveCombatAction {
+        data = typeof data === 'object' ? data : {};
+        let result = new StartPveCombatAction();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.attackers)) {
+            data["attackers"] = [];
+            for (let item of this.attackers)
+                data["attackers"].push(item.toJSON());
+        }
+        if (Array.isArray(this.defenders)) {
+            data["defenders"] = [];
+            for (let item of this.defenders)
+                data["defenders"].push(item.toJSON());
+        }
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** PVE combat action */
+export interface IStartPveCombatAction extends IAction {
+    /** The attackers in the combat instance
+             */
+    attackers: EntityMinimal[];
+    /** The defenders in the combat instance
+             */
+    defenders: EntityMinimal[];
 }
 
 /** PVE combat action */

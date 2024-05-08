@@ -29,14 +29,14 @@ public class GameCombats : IDisposable
         _logger = logger;
     }
 
-    public Maybe CanStartCombat(IGameEntityWithCombatStatistics attacker, IGameEntityWithCombatStatistics target)
+    public Maybe CanStartCombat(IReadOnlyList<IGameEntityWithCombatStatistics> attackers, IReadOnlyList<IGameEntityWithCombatStatistics> defenders)
     {
-        if (attacker is IGameEntityWithDisabled { Disabled: true })
+        if (attackers.Any(attacker => attacker is IGameEntityWithDisabled { Disabled: true }))
         {
             return "Attacker is busy";
         }
 
-        if (target is IGameEntityWithDisabled { Disabled: true })
+        if (defenders.Any(target => target is IGameEntityWithDisabled { Disabled: true }))
         {
             return "Target is busy";
         }
@@ -44,8 +44,17 @@ public class GameCombats : IDisposable
         return true;
     }
 
-    public async Task<CombatInPreparation> StartCombatAsync(IReadOnlyList<IGameEntityWithCombatStatistics> attackers, IReadOnlyList<IGameEntityWithCombatStatistics> defenders)
+    public async Task<Maybe<CombatInPreparation>> StartCombatAsync(
+        IReadOnlyList<IGameEntityWithCombatStatistics> attackers,
+        IReadOnlyList<IGameEntityWithCombatStatistics> defenders
+    )
     {
+        Maybe canStartCombat = CanStartCombat(attackers, defenders);
+        if (!canStartCombat.Success)
+        {
+            return canStartCombat.WhyNot;
+        }
+
         CombatInPreparation combatInPreparation = new(attackers, defenders, _settings);
         _combatsInPreparation[combatInPreparation.Id] = combatInPreparation;
 

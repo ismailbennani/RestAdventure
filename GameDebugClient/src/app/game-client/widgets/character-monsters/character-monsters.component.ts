@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { ReplaySubject, switchMap, tap } from 'rxjs';
-import { Action, MonsterGroup, PveApiClient, PveCombatAction, TeamCharacter } from '../../../../api/game-api-client.generated';
+import { Action, MonsterGroup, PveApiClient, PveCombatAction, StartPveCombatAction, TeamCharacter } from '../../../../api/game-api-client.generated';
 import { GameService } from '../../services/game.service';
 
 @Component({
@@ -59,7 +59,7 @@ export class CharacterMonstersComponent implements OnInit {
   }
 
   private isCombatAction(action: Action, monsterGroup?: MonsterGroup) {
-    if (!(action instanceof PveCombatAction)) {
+    if (!(action instanceof PveCombatAction) && !(action instanceof StartPveCombatAction)) {
       return false;
     }
 
