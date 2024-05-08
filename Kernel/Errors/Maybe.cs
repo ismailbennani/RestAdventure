@@ -27,6 +27,8 @@ public class Maybe<T>
     public static implicit operator Maybe(Maybe<T> maybe) => new() { Success = maybe.Success, WhyNot = maybe.WhyNot };
 
     public static implicit operator bool(Maybe<T> maybe) => maybe.Success;
+
+    public override string ToString() => Success ? $"Success[{Value}]" : WhyNot;
 }
 
 public class Maybe
@@ -46,4 +48,6 @@ public class Maybe
     public static implicit operator Maybe(string reason) => new() { Success = false, WhyNot = reason };
 
     public static implicit operator bool(Maybe maybe) => maybe.Success;
+
+    public override string ToString() => Success ? "Success" : WhyNot;
 }

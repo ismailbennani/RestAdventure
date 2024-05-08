@@ -31,7 +31,14 @@ public class GameInteractions
         if (instance.Success)
         {
             _newInteractions.Add(instance.Value);
+
+            entity.Disable();
+
             source.CurrentInteraction = instance.Value;
+            if (source is IInteractibleEntity interactibleEntity)
+            {
+                interactibleEntity.Disable();
+            }
         }
 
         return instance;
@@ -71,7 +78,14 @@ public class GameInteractions
                 continue;
             }
 
+            instance.Target.Enable();
+
             instance.Source.CurrentInteraction = null;
+
+            if (instance.Source is IInteractibleEntity interactibleEntity)
+            {
+                interactibleEntity.Enable();
+            }
 
             await _publisher.Publish(new InteractionEnded { InteractionInstance = instance });
         }

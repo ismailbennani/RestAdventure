@@ -11,11 +11,6 @@ public abstract class Interaction
 
     public Maybe CanInteract(IInteractingEntity source, IInteractibleEntity target)
     {
-        if (source.CurrentInteraction != null)
-        {
-            return "Character is busy";
-        }
-
         if (target.Disabled)
         {
             return "Target is busy";

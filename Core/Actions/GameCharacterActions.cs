@@ -103,13 +103,25 @@ public class GameCharacterActions
         foreach ((CharacterId characterId, CharacterAction action) in _actions)
         {
             Character? character = state.Entities.Get<Character>(characterId);
+            Maybe resolution;
+
             if (character == null)
             {
-                _logger.LogWarning("Cannot find character {id}", characterId);
-                continue;
+                resolution = "Character has been killed";
+            }
+            else
+            {
+                Maybe canPerform = action.CanPerform(state, character);
+                if (!canPerform)
+                {
+                    resolution = canPerform;
+                }
+                else
+                {
+                    resolution = await action.PerformAsync(state, character);
+                }
             }
 
-            Maybe resolution = await action.PerformAsync(state, character);
             CharacterActionResult result = new()
             {
                 Tick = state.Tick,
@@ -117,9 +129,13 @@ public class GameCharacterActions
                 Success = resolution.Success,
                 WhyNot = resolution.WhyNot
             };
+
             _results[characterId] = result;
 
-            await _publisher.Publish(new ActionPerformed { Character = character, Result = result });
+            if (character != null)
+            {
+                await _publisher.Publish(new ActionPerformed { Character = character, Result = result });
+            }
         }
 
         _actions.Clear();

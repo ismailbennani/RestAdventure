@@ -23,7 +23,6 @@ public class HarvestInteractionInstance : InteractionInstance
     public override Task OnStartAsync(GameState state)
     {
         _startTick = state.Tick;
-        Target.Disable();
         return Task.CompletedTask;
     }
 

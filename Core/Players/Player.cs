@@ -15,7 +15,7 @@ public class Player : IDisposable
     public User User { get; }
     public PlayerKnowledge Knowledge { get; } = new();
 
-    public override string ToString() => $"{User}";
+    public override string ToString() => User.Name;
 
     public void Dispose()
     {

@@ -14,5 +14,7 @@ public class CharacterMoveToLocationAction : CharacterAction
 
     public Location Location { get; }
 
+    protected override Maybe CanPerformInternal(GameState state, Character character) => character.Movement.CanMoveTo(state, Location);
+
     public override Task<Maybe> PerformAsync(GameState state, Character character) => Task.FromResult(character.Movement.MoveTo(state, Location));
 }

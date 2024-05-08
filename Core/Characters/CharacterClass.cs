@@ -15,4 +15,6 @@ public class CharacterClass : GameResource<CharacterClassId>
     public string? Description { get; init; }
     public required Location StartLocation { get; init; }
     public required IReadOnlyList<int> LevelCaps { get; init; }
+
+    public override string ToString() => Name;
 }
