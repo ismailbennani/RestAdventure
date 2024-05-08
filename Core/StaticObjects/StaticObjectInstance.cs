@@ -14,8 +14,5 @@ public class StaticObjectInstance : GameEntity<StaticObjectInstanceId>, IGameEnt
     }
 
     public StaticObject Object { get; }
-    public bool Disabled { get; private set; }
-    public void Enable() => Disabled = false;
-
-    public void Disable() => Disabled = true;
+    public bool Disabled { get; set; }
 }

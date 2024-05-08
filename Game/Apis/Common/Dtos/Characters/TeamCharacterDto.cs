@@ -86,7 +86,7 @@ static class TeamCharacterMappingExtensions
             Location = character.Location.ToMinimalDto(),
             Inventory = character.Inventory.ToDto(),
             Jobs = character.Jobs.Select(j => j.ToDto()).ToArray(),
-            Combat = character.Combat.ToDto(),
+            Combat = character.CombatStatistics.ToDto(),
             OngoingAction = options?.OngoingAction?.ToDto(),
             PlannedAction = options?.PlannedAction?.ToDto()
         };

@@ -22,7 +22,7 @@ public class Character : GameEntity<CharacterId>, IGameEntityWithInventory, IGam
         Progression = new ProgressionBar(characterClass.LevelCaps);
         Inventory = new Inventory();
         Jobs = new EntityJobs();
-        Combat = new EntityCombatStatistics(10, 100, 1);
+        CombatStatistics = new EntityCombatStatistics(10, 100, 1);
         Movement = new EntityMovement(this);
     }
 
@@ -53,7 +53,7 @@ public class Character : GameEntity<CharacterId>, IGameEntityWithInventory, IGam
     /// <summary>
     ///     The combat statistics of the character
     /// </summary>
-    public EntityCombatStatistics Combat { get; private set; }
+    public EntityCombatStatistics CombatStatistics { get; private set; }
 
     public CombatEntityKind CombatEntityKind => CombatEntityKind.Character;
 

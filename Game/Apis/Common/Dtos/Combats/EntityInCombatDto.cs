@@ -30,6 +30,6 @@ static class EntityInCombatMappingExtensions
             Id = entity.Id.Guid,
             Name = entity.Name,
             Level = entity.Level,
-            Combat = entity.Combat.ToDto()
+            Combat = entity.CombatStatistics.ToDto()
         };
 }

@@ -13,15 +13,16 @@ public class MonsterInstance : GameEntity<MonsterInstanceId>, IGameEntityWithCom
     {
         Species = species;
         Level = level;
-        Combat = new EntityCombatStatistics(Species.Health, Species.Speed, Species.Attack);
+        CombatStatistics = new EntityCombatStatistics(Species.Health, Species.Speed, Species.Attack);
     }
 
     public MonsterSpecies Species { get; }
     public int Level { get; }
-    public EntityCombatStatistics Combat { get; }
+    public EntityCombatStatistics CombatStatistics { get; }
     public CombatEntityKind CombatEntityKind => CombatEntityKind.Monster;
 
-    public bool Disabled { get; private set; }
-    public void Enable() => Disabled = false;
-    public void Disable() => Disabled = true;
+    public CombatInPreparation? CombatInPreparation { get; set; }
+    public CombatInstance? Combat { get; set; }
+
+    public bool Disabled => CombatInPreparation != null || Combat != null;
 }

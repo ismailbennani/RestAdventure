@@ -9,6 +9,7 @@ using RestAdventure.Core.StaticObjects;
 using RestAdventure.Game.Apis.Common.Dtos.Items;
 using RestAdventure.Game.Apis.Common.Dtos.Jobs;
 using RestAdventure.Game.Authentication;
+using RestAdventure.Kernel.Errors;
 
 namespace RestAdventure.Game.Apis.GameApi.Controllers;
 
@@ -64,7 +65,7 @@ public class JobsHarvestController : GameApiController
                     continue;
                 }
 
-                bool canHarvest = job.Progression.Level >= harvest.Level;
+                Maybe canHarvest = HarvestAction.CanPerform(state, job.Job, harvest, staticObject, character);
                 harvests.Add(
                     new HarvestableEntityHarvestDto
                     {
@@ -72,10 +73,15 @@ public class JobsHarvestController : GameApiController
                         Name = harvest.Name,
                         ExpectedHarvest = harvest.Items.Select(i => i.ToDto()).ToArray(),
                         ExpectedExperience = harvest.Experience,
-                        CanHarvest = canHarvest,
-                        WhyCannotHarvest = canHarvest ? null : "Job level too low"
+                        CanHarvest = canHarvest.Success,
+                        WhyCannotHarvest = canHarvest.WhyNot
                     }
                 );
+            }
+
+            if (harvests.Count == 0)
+            {
+                continue;
             }
 
             result.Add(

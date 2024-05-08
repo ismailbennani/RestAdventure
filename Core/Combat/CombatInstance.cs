@@ -19,12 +19,12 @@ public class CombatInstance : IDisposable
         CombatFormation attackers = combatInPreparation.Attackers.Lock();
         CombatFormation defenders = combatInPreparation.Defenders.Lock();
 
-        if (!attackers.Entities.Any(e => e.Combat.Health > 0))
+        if (!attackers.Entities.Any(e => e.CombatStatistics.Health > 0))
         {
             throw new ArgumentException("Team 1 cannot be empty", nameof(combatInPreparation));
         }
 
-        if (!defenders.Entities.Any(e => e.Combat.Health > 0))
+        if (!defenders.Entities.Any(e => e.CombatStatistics.Health > 0))
         {
             throw new ArgumentException("Team 2 cannot be empty", nameof(combatInPreparation));
         }
@@ -61,7 +61,7 @@ public class CombatInstance : IDisposable
 
     public event EventHandler<CombatEntityAttackedEvent>? Attacked;
 
-    IEnumerable<EntityState> Alive => _states.Values.Where(s => s.Entity.Combat.Health > 0);
+    IEnumerable<EntityState> Alive => _states.Values.Where(s => s.Entity.CombatStatistics.Health > 0);
 
     public async Task PlayTurnAsync()
     {
@@ -69,7 +69,7 @@ public class CombatInstance : IDisposable
 
         foreach (EntityState entityState in Alive)
         {
-            entityState.Lead += entityState.Entity.Combat.Speed;
+            entityState.Lead += entityState.Entity.CombatStatistics.Speed;
         }
 
         int subTurn = 1;
@@ -108,8 +108,8 @@ public class CombatInstance : IDisposable
 
     Task ResolveAttackAsync(int subTurn, IGameEntityWithCombatStatistics attacker, IGameEntityWithCombatStatistics target)
     {
-        EntityAttack damageToDeal = attacker.Combat.DealAttack();
-        EntityAttack damageReceived = target.Combat.ReceiveAttack(damageToDeal);
+        EntityAttack damageToDeal = attacker.CombatStatistics.DealAttack();
+        EntityAttack damageReceived = target.CombatStatistics.ReceiveAttack(damageToDeal);
 
         Attacked?.Invoke(
             this,
@@ -138,7 +138,7 @@ public class CombatInstance : IDisposable
         return false;
     }
 
-    static bool HasLost(CombatFormation team) => team.Entities.All(c => c.Combat.Health <= 0);
+    static bool HasLost(CombatFormation team) => team.Entities.All(c => c.CombatStatistics.Health <= 0);
 
     class EntityState
     {
