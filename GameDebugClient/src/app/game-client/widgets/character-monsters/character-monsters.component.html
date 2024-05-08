@@ -6,31 +6,39 @@
   <ul class="list-group list-group-flush">
     @if (monsterGroups.length > 0) {
       @for (monsterGroup of monsterGroups; track monsterGroup.id) {
-        <li class="list-group-item" (click)="attack(monsterGroup)">
-          <div class="d-flex">
-            <ul class="flex-grow-1 list-group list-group-flush">
-              @for (monster of monsterGroup.monsters; track monster.id) {
-                <li class="list-group-item bg-transparent">{{ monster.name }} lv. {{ monster.level }}</li>
-              }
-            </ul>
-            <div class="d-flex align-items-center justify-content-center">
-              @if (isAttacking(monsterGroup)) {
-                <button class="btn btn-primary">In combat</button>
-              } @else if (plansToAttack(monsterGroup)) {
-                <button class="btn btn-primary">Attack</button>
-              } @else if (monsterGroup.canAttack) {
-                <button class="btn btn-outline-secondary">Attack</button>
-              } @else {
-                <span class="text-danger small text-truncate" [title]="monsterGroup.whyCannotAttack">
-                  {{ monsterGroup.whyCannotAttack }}
-                </span>
-              }
-            </div>
-          </div>
-        </li>
+        <ng-container
+          [ngTemplateOutlet]="monsterGroupListItem"
+          [ngTemplateOutletContext]="{ monsterGroup, plansToAttack: plansToAttack(monsterGroup), isAttacking: isAttacking(monsterGroup) }"
+        ></ng-container>
       }
     } @else {
       <li class="list-group-item text-center text-secondary">None</li>
     }
   </ul>
 </div>
+
+<ng-template #monsterGroupListItem let-monsterGroup="monsterGroup" let-plansToAttack="plansToAttack" let-isAttacking="isAttacking">
+  <li class="list-group-item" [class.text-danger]="!monsterGroup.canAttack && !isAttacking" (click)="attack(monsterGroup)">
+    <div class="d-flex align-items-center">
+      <ul class="flex-grow-1 list-group list-group-flush">
+        @for (monster of monsterGroup.monsters; track monster.id) {
+          <li class="list-group-item bg-transparent p-0" [class.text-danger]="!monsterGroup.canAttack && !isAttacking">{{ monster.name }} lv. {{ monster.level }}</li>
+        }
+      </ul>
+      <div class="d-flex align-items-center justify-content-center">
+        @if (isAttacking) {
+          <button class="btn btn-primary">In combat</button>
+        } @else if (plansToAttack) {
+          <button class="btn btn-primary">Attack</button>
+        } @else if (monsterGroup.canAttack) {
+          <button class="btn btn-outline-secondary">Attack</button>
+        }
+      </div>
+    </div>
+    @if (!isAttacking && !monsterGroup.canAttack) {
+      <span class="small text-truncate" [title]="monsterGroup.whyCannotAttack">
+        {{ monsterGroup.whyCannotAttack }}
+      </span>
+    }
+  </li>
+</ng-template>

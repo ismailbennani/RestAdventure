@@ -14,15 +14,18 @@
             @for (jobHarvest of harvestable.harvests; track jobHarvest.name) {
               <a
                 role="button"
-                class="list-group-item list-group-item-action d-flex justify-content-between"
+                class="list-group-item list-group-item-action"
                 [class.active]="plansToHarvest(harvestable, jobHarvest)"
                 [class.disabled]="!jobHarvest.canHarvest"
                 [class.text-danger]="!jobHarvest.canHarvest"
                 (click)="harvest(harvestable, jobHarvest)"
                 [attr.aria-disabled]="!jobHarvest.canHarvest"
               >
-                <span>{{ jobHarvest.name }}: {{ formatExpectedHarvest(jobHarvest.expectedHarvest) }}, {{ jobHarvest.expectedExperience }} exp</span>
-                <span class="text-danger small" [title]="jobHarvest.whyCannotHarvest">{{ jobHarvest.whyCannotHarvest }}</span>
+                <div class="d-flex gap-4 justify-content-between">
+                  <div class="flex-grow-1 text-truncate">{{ jobHarvest.name }}</div>
+                  <div>{{ formatExpectedHarvest(jobHarvest.expectedHarvest) }}, {{ jobHarvest.expectedExperience }} exp</div>
+                </div>
+                <div class="text-danger small text-truncate" [title]="jobHarvest.whyCannotHarvest">{{ jobHarvest.whyCannotHarvest }}</div>
               </a>
             }
           </div>
