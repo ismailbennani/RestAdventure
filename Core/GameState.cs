@@ -22,7 +22,7 @@ public class GameState : IDisposable
         Entities = new GameEntities(publisher);
         Interactions = new GameInteractions(publisher, loggerFactory.CreateLogger<GameInteractions>());
         CharacterActions = new GameCharacterActions(this, loggerFactory.CreateLogger<GameCharacterActions>());
-        Combats = new GameCombats(settings, publisher, loggerFactory.CreateLogger<GameCombats>());
+        Combats = new GameCombats(this, loggerFactory.CreateLogger<GameCombats>());
     }
 
     public IPublisher Publisher { get; }
