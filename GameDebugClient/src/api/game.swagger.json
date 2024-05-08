@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0-alpha.0.136+bb26113514077666e1aac1f05a4820f5d53f1f4f"
+    "version": "0.0.0-alpha.0.139+e225f7c4dab9539a4a62a2aa507727b6be1547ca"
   },
   "servers": [
     {
@@ -2071,6 +2071,7 @@
             "move": "#/components/schemas/MoveAction",
             "harvest": "#/components/schemas/HarvestAction",
             "start-combat-pve": "#/components/schemas/StartPveCombatAction",
+            "join-combat-pve": "#/components/schemas/JoinPveCombatAction",
             "combat-pve": "#/components/schemas/PveCombatAction"
           }
         },
@@ -2189,6 +2190,45 @@
               "defenders"
             ],
             "properties": {
+              "attackers": {
+                "type": "array",
+                "description": "The attackers in the combat instance\n            ",
+                "items": {
+                  "$ref": "#/components/schemas/EntityMinimal"
+                }
+              },
+              "defenders": {
+                "type": "array",
+                "description": "The defenders in the combat instance\n            ",
+                "items": {
+                  "$ref": "#/components/schemas/EntityMinimal"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "JoinPveCombatAction": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Action"
+          },
+          {
+            "type": "object",
+            "description": "PVE combat action\n            ",
+            "additionalProperties": false,
+            "required": [
+              "combatId",
+              "attackers",
+              "defenders"
+            ],
+            "properties": {
+              "combatId": {
+                "type": "string",
+                "description": "The unique ID of the combat\n            ",
+                "format": "guid",
+                "minLength": 1
+              },
               "attackers": {
                 "type": "array",
                 "description": "The attackers in the combat instance\n            ",

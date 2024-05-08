@@ -3466,6 +3466,11 @@ export class Action implements IAction {
             result.init(data);
             return result;
         }
+        if (data["$type"] === "join-combat-pve") {
+            let result = new JoinPveCombatAction();
+            result.init(data);
+            return result;
+        }
         if (data["$type"] === "combat-pve") {
             let result = new PveCombatAction();
             result.init(data);
@@ -3699,6 +3704,82 @@ export class StartPveCombatAction extends Action implements IStartPveCombatActio
 
 /** PVE combat action */
 export interface IStartPveCombatAction extends IAction {
+    /** The attackers in the combat instance
+             */
+    attackers: EntityMinimal[];
+    /** The defenders in the combat instance
+             */
+    defenders: EntityMinimal[];
+}
+
+/** PVE combat action */
+export class JoinPveCombatAction extends Action implements IJoinPveCombatAction {
+    /** The unique ID of the combat
+             */
+    combatId!: string;
+    /** The attackers in the combat instance
+             */
+    attackers!: EntityMinimal[];
+    /** The defenders in the combat instance
+             */
+    defenders!: EntityMinimal[];
+
+    constructor(data?: IJoinPveCombatAction) {
+        super(data);
+        if (!data) {
+            this.attackers = [];
+            this.defenders = [];
+        }
+        this._discriminator = "join-combat-pve";
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.combatId = _data["combatId"];
+            if (Array.isArray(_data["attackers"])) {
+                this.attackers = [] as any;
+                for (let item of _data["attackers"])
+                    this.attackers!.push(EntityMinimal.fromJS(item));
+            }
+            if (Array.isArray(_data["defenders"])) {
+                this.defenders = [] as any;
+                for (let item of _data["defenders"])
+                    this.defenders!.push(EntityMinimal.fromJS(item));
+            }
+        }
+    }
+
+    static override fromJS(data: any): JoinPveCombatAction {
+        data = typeof data === 'object' ? data : {};
+        let result = new JoinPveCombatAction();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["combatId"] = this.combatId;
+        if (Array.isArray(this.attackers)) {
+            data["attackers"] = [];
+            for (let item of this.attackers)
+                data["attackers"].push(item.toJSON());
+        }
+        if (Array.isArray(this.defenders)) {
+            data["defenders"] = [];
+            for (let item of this.defenders)
+                data["defenders"].push(item.toJSON());
+        }
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** PVE combat action */
+export interface IJoinPveCombatAction extends IAction {
+    /** The unique ID of the combat
+             */
+    combatId: string;
     /** The attackers in the combat instance
              */
     attackers: EntityMinimal[];

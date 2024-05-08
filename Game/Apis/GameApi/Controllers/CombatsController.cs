@@ -76,10 +76,8 @@ public class CombatsController : GameApiController
         {
             return NotFound();
         }
-        
-        combatInPreparation.GetTeam(side).Add(character);
 
-        PveCombatAction action = new(combatInPreparation);
+        JoinPveCombatAction action = new(combatInPreparation);
         state.Actions.QueueAction(character, action);
 
         return NoContent();
