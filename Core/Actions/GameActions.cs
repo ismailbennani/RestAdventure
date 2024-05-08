@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using MediatR;
+using Microsoft.Extensions.Logging;
 using RestAdventure.Core.Actions.Notifications;
 using RestAdventure.Core.Characters;
 using RestAdventure.Core.Interactions;
@@ -13,17 +14,18 @@ namespace RestAdventure.Core.Actions;
 /// </summary>
 public class GameActions
 {
+    readonly GameInteractions _interactions;
+    readonly IPublisher _publisher;
     readonly ILogger<GameActions> _logger;
     readonly Dictionary<CharacterId, CharacterAction> _actions = new();
     readonly Dictionary<CharacterId, CharacterActionResult> _results = new();
 
-    public GameActions(GameState gameState, ILogger<GameActions> logger)
+    public GameActions(GameInteractions interactions, IPublisher publisher, ILogger<GameActions> logger)
     {
-        GameState = gameState;
+        _interactions = interactions;
+        _publisher = publisher;
         _logger = logger;
     }
-
-    internal GameState GameState { get; }
 
     /// <summary>
     ///     Make the character move to the given location.
@@ -72,7 +74,7 @@ public class GameActions
             };
             _results[characterId] = result;
 
-            await GameState.Publisher.Publish(new ActionPerformed { Character = character, Result = result });
+            await _publisher.Publish(new ActionPerformed { Character = character, Result = result });
         }
 
         _actions.Clear();
@@ -80,7 +82,7 @@ public class GameActions
 
     void AssertCharacterCanPerformAction(Character character)
     {
-        if (GameState.Interactions.GetCharacterInteraction(character) != null)
+        if (_interactions.GetCharacterInteraction(character) != null)
         {
             throw new InvalidOperationException($"Character {character} cannot perform action because they are currently locked in an interaction.");
         }
