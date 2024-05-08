@@ -33,20 +33,7 @@ public class GameActions
 
     public async Task ResolveActionsAsync(GameState state)
     {
-        Dictionary<CharacterId, Action> queuedActions = _queuedActions;
-        _queuedActions = new Dictionary<CharacterId, Action>();
-
-        foreach ((CharacterId characterId, Action queuedAction) in queuedActions)
-        {
-            Character? character = state.Entities.Get<Character>(characterId);
-            if (character == null)
-            {
-                continue;
-            }
-
-            await queuedAction.StartAsync(state, character);
-            _ongoingActions[character.Id] = queuedAction;
-        }
+        await StartQueuedActionsAsync(state);
 
         foreach ((CharacterId characterId, Action action) in _ongoingActions)
         {
@@ -85,6 +72,35 @@ public class GameActions
             }
 
         }
+    }
+
+    async Task StartQueuedActionsAsync(GameState state)
+    {
+        const int fuel = 1000;
+        for (int i = 0; i < fuel; i++)
+        {
+            Dictionary<CharacterId, Action> queuedActions = _queuedActions;
+            _queuedActions = new Dictionary<CharacterId, Action>();
+
+            foreach ((CharacterId characterId, Action queuedAction) in queuedActions)
+            {
+                Character? character = state.Entities.Get<Character>(characterId);
+                if (character == null)
+                {
+                    continue;
+                }
+
+                await queuedAction.StartAsync(state, character);
+                _ongoingActions[character.Id] = queuedAction;
+            }
+
+            if (_queuedActions.Count == 0)
+            {
+                return;
+            }
+        }
+
+        _logger.LogWarning("Queued actions loop aborted, is there a cycle ?");
     }
 
     public Action? GetQueuedAction(Character character) => _queuedActions.GetValueOrDefault(character.Id);

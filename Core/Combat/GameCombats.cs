@@ -98,8 +98,8 @@ public class GameCombats : IDisposable
 
     public async Task ResolveCombatsAsync(GameState state)
     {
-        await ResolveCombatsInPreparationAsync();
         await ResolveCombatsAsync();
+        await ResolveCombatsInPreparationAsync();
     }
 
     async Task ResolveCombatsInPreparationAsync()
