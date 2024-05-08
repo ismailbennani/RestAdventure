@@ -825,18 +825,23 @@ export class JobsHarvestApiClient {
 
     /**
      * Harvest
+     * @param harvestName (optional) 
      */
-    harvest(characterGuid: string, entityGuid: string, harvest: string): Observable<void> {
-        let url_ = this.baseUrl + "/game/team/characters/{characterGuid}/jobs/harvestables/{entityGuid}/{harvest}";
+    harvest(characterGuid: string, entityGuid: string, harvestNameName: string, harvestName?: string | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/game/team/characters/{characterGuid}/jobs/harvestables/{entityGuid}/{harvestNameName}?";
         if (characterGuid === undefined || characterGuid === null)
             throw new Error("The parameter 'characterGuid' must be defined.");
         url_ = url_.replace("{characterGuid}", encodeURIComponent("" + characterGuid));
         if (entityGuid === undefined || entityGuid === null)
             throw new Error("The parameter 'entityGuid' must be defined.");
         url_ = url_.replace("{entityGuid}", encodeURIComponent("" + entityGuid));
-        if (harvest === undefined || harvest === null)
-            throw new Error("The parameter 'harvest' must be defined.");
-        url_ = url_.replace("{harvest}", encodeURIComponent("" + harvest));
+        if (harvestNameName === undefined || harvestNameName === null)
+            throw new Error("The parameter 'harvestNameName' must be defined.");
+        url_ = url_.replace("{harvestNameName}", encodeURIComponent("" + harvestNameName));
+        if (harvestName === null)
+            throw new Error("The parameter 'harvestName' cannot be null.");
+        else if (harvestName !== undefined)
+            url_ += "harvestName=" + encodeURIComponent("" + harvestName) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -2653,20 +2658,14 @@ export interface IHarvestableEntity extends IEntityMinimal {
     harvests: HarvestableEntityHarvest[];
 }
 
-/** Job harvest */
-export class HarvestableEntityHarvest implements IHarvestableEntityHarvest {
+/** Harvestable entity harvest (minimal */
+export class HarvestableEntityHarvestMinimal implements IHarvestableEntityHarvestMinimal {
     /** The job providing the harvest
              */
     job!: JobMinimal;
     /** The name of the harvest
              */
     name!: string;
-    /** Can the harvest be performed
-             */
-    canHarvest!: boolean;
-    /** Why cannot the harvest be performed
-             */
-    whyCannotHarvest?: string | undefined;
     /** The expected result of the harvest
              */
     expectedHarvest!: ItemStack[];
@@ -2674,7 +2673,7 @@ export class HarvestableEntityHarvest implements IHarvestableEntityHarvest {
              */
     expectedExperience!: number;
 
-    constructor(data?: IHarvestableEntityHarvest) {
+    constructor(data?: IHarvestableEntityHarvestMinimal) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -2691,8 +2690,6 @@ export class HarvestableEntityHarvest implements IHarvestableEntityHarvest {
         if (_data) {
             this.job = _data["job"] ? JobMinimal.fromJS(_data["job"]) : new JobMinimal();
             this.name = _data["name"];
-            this.canHarvest = _data["canHarvest"];
-            this.whyCannotHarvest = _data["whyCannotHarvest"];
             if (Array.isArray(_data["expectedHarvest"])) {
                 this.expectedHarvest = [] as any;
                 for (let item of _data["expectedHarvest"])
@@ -2702,9 +2699,9 @@ export class HarvestableEntityHarvest implements IHarvestableEntityHarvest {
         }
     }
 
-    static fromJS(data: any): HarvestableEntityHarvest {
+    static fromJS(data: any): HarvestableEntityHarvestMinimal {
         data = typeof data === 'object' ? data : {};
-        let result = new HarvestableEntityHarvest();
+        let result = new HarvestableEntityHarvestMinimal();
         result.init(data);
         return result;
     }
@@ -2713,8 +2710,6 @@ export class HarvestableEntityHarvest implements IHarvestableEntityHarvest {
         data = typeof data === 'object' ? data : {};
         data["job"] = this.job ? this.job.toJSON() : <any>undefined;
         data["name"] = this.name;
-        data["canHarvest"] = this.canHarvest;
-        data["whyCannotHarvest"] = this.whyCannotHarvest;
         if (Array.isArray(this.expectedHarvest)) {
             data["expectedHarvest"] = [];
             for (let item of this.expectedHarvest)
@@ -2725,26 +2720,67 @@ export class HarvestableEntityHarvest implements IHarvestableEntityHarvest {
     }
 }
 
-/** Job harvest */
-export interface IHarvestableEntityHarvest {
+/** Harvestable entity harvest (minimal */
+export interface IHarvestableEntityHarvestMinimal {
     /** The job providing the harvest
              */
     job: JobMinimal;
     /** The name of the harvest
              */
     name: string;
-    /** Can the harvest be performed
-             */
-    canHarvest: boolean;
-    /** Why cannot the harvest be performed
-             */
-    whyCannotHarvest?: string | undefined;
     /** The expected result of the harvest
              */
     expectedHarvest: ItemStack[];
     /** The expected experience gain from the harvest
              */
     expectedExperience: number;
+}
+
+/** Harvestable entity harvest */
+export class HarvestableEntityHarvest extends HarvestableEntityHarvestMinimal implements IHarvestableEntityHarvest {
+    /** Can the harvest be performed
+             */
+    canHarvest!: boolean;
+    /** Why cannot the harvest be performed
+             */
+    whyCannotHarvest?: string | undefined;
+
+    constructor(data?: IHarvestableEntityHarvest) {
+        super(data);
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.canHarvest = _data["canHarvest"];
+            this.whyCannotHarvest = _data["whyCannotHarvest"];
+        }
+    }
+
+    static override fromJS(data: any): HarvestableEntityHarvest {
+        data = typeof data === 'object' ? data : {};
+        let result = new HarvestableEntityHarvest();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["canHarvest"] = this.canHarvest;
+        data["whyCannotHarvest"] = this.whyCannotHarvest;
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Harvestable entity harvest */
+export interface IHarvestableEntityHarvest extends IHarvestableEntityHarvestMinimal {
+    /** Can the harvest be performed
+             */
+    canHarvest: boolean;
+    /** Why cannot the harvest be performed
+             */
+    whyCannotHarvest?: string | undefined;
 }
 
 /** Item stack */
@@ -3013,10 +3049,10 @@ export class TeamCharacter implements ITeamCharacter {
     combat!: EntityCombatStatistics;
     /** The interaction being performed by the character
              */
-    currentInteraction?: InteractionInstance | undefined;
+    ongoingAction?: Action | undefined;
     /** The action that the character has planned for the next tick
              */
-    plannedAction?: CharacterAction | undefined;
+    plannedAction?: Action | undefined;
 
     constructor(data?: ITeamCharacter) {
         if (data) {
@@ -3049,8 +3085,8 @@ export class TeamCharacter implements ITeamCharacter {
                     this.jobs!.push(JobInstance.fromJS(item));
             }
             this.combat = _data["combat"] ? EntityCombatStatistics.fromJS(_data["combat"]) : new EntityCombatStatistics();
-            this.currentInteraction = _data["currentInteraction"] ? InteractionInstance.fromJS(_data["currentInteraction"]) : <any>undefined;
-            this.plannedAction = _data["plannedAction"] ? CharacterAction.fromJS(_data["plannedAction"]) : <any>undefined;
+            this.ongoingAction = _data["ongoingAction"] ? Action.fromJS(_data["ongoingAction"]) : <any>undefined;
+            this.plannedAction = _data["plannedAction"] ? Action.fromJS(_data["plannedAction"]) : <any>undefined;
         }
     }
 
@@ -3075,7 +3111,7 @@ export class TeamCharacter implements ITeamCharacter {
                 data["jobs"].push(item.toJSON());
         }
         data["combat"] = this.combat ? this.combat.toJSON() : <any>undefined;
-        data["currentInteraction"] = this.currentInteraction ? this.currentInteraction.toJSON() : <any>undefined;
+        data["ongoingAction"] = this.ongoingAction ? this.ongoingAction.toJSON() : <any>undefined;
         data["plannedAction"] = this.plannedAction ? this.plannedAction.toJSON() : <any>undefined;
         return data;
     }
@@ -3109,10 +3145,10 @@ export interface ITeamCharacter {
     combat: EntityCombatStatistics;
     /** The interaction being performed by the character
              */
-    currentInteraction?: InteractionInstance | undefined;
+    ongoingAction?: Action | undefined;
     /** The action that the character has planned for the next tick
              */
-    plannedAction?: CharacterAction | undefined;
+    plannedAction?: Action | undefined;
 }
 
 /** Progression bar (minimal) */
@@ -3394,81 +3430,22 @@ export interface IJobInstance {
     progression: ProgressionBarMinimal;
 }
 
-/** Interaction instance */
-export class InteractionInstance implements IInteractionInstance {
-    /** The unique ID of the instance
-             */
-    id!: string;
-    /** The interaction associated with the instance
-             */
-    interaction!: InteractionMinimal;
-    /** The target of the interaction
-             */
-    target!: EntityMinimal;
-
-    constructor(data?: IInteractionInstance) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-        if (!data) {
-            this.interaction = new InteractionMinimal();
-            this.target = new EntityMinimal();
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.interaction = _data["interaction"] ? InteractionMinimal.fromJS(_data["interaction"]) : new InteractionMinimal();
-            this.target = _data["target"] ? EntityMinimal.fromJS(_data["target"]) : new EntityMinimal();
-        }
-    }
-
-    static fromJS(data: any): InteractionInstance {
-        data = typeof data === 'object' ? data : {};
-        let result = new InteractionInstance();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["interaction"] = this.interaction ? this.interaction.toJSON() : <any>undefined;
-        data["target"] = this.target ? this.target.toJSON() : <any>undefined;
-        return data;
-    }
-}
-
-/** Interaction instance */
-export interface IInteractionInstance {
-    /** The unique ID of the instance
-             */
-    id: string;
-    /** The interaction associated with the instance
-             */
-    interaction: InteractionMinimal;
-    /** The target of the interaction
-             */
-    target: EntityMinimal;
-}
-
-/** Interaction (minimal) */
-export class InteractionMinimal implements IInteractionMinimal {
-    /** The name of the interaction
+/** An action performed by a character */
+export class Action implements IAction {
+    /** The name of the action
              */
     name!: string;
 
-    constructor(data?: IInteractionMinimal) {
+    protected _discriminator: string;
+
+    constructor(data?: IAction) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
                     (<any>this)[property] = (<any>data)[property];
             }
         }
+        this._discriminator = "Action";
     }
 
     init(_data?: any) {
@@ -3477,58 +3454,24 @@ export class InteractionMinimal implements IInteractionMinimal {
         }
     }
 
-    static fromJS(data: any): InteractionMinimal {
-        data = typeof data === 'object' ? data : {};
-        let result = new InteractionMinimal();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["name"] = this.name;
-        return data;
-    }
-}
-
-/** Interaction (minimal) */
-export interface IInteractionMinimal {
-    /** The name of the interaction
-             */
-    name: string;
-}
-
-/** An action performed by a character */
-export class CharacterAction implements ICharacterAction {
-
-    protected _discriminator: string;
-
-    constructor(data?: ICharacterAction) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-        this._discriminator = "CharacterAction";
-    }
-
-    init(_data?: any) {
-    }
-
-    static fromJS(data: any): CharacterAction {
+    static fromJS(data: any): Action {
         data = typeof data === 'object' ? data : {};
         if (data["$type"] === "move") {
-            let result = new CharacterMoveToLocationAction();
+            let result = new MoveAction();
             result.init(data);
             return result;
         }
-        if (data["$type"] === "interact") {
-            let result = new CharacterInteractWithEntityAction();
+        if (data["$type"] === "harvest") {
+            let result = new HarvestAction();
             result.init(data);
             return result;
         }
-        let result = new CharacterAction();
+        if (data["$type"] === "combat-pve") {
+            let result = new PveCombatAction();
+            result.init(data);
+            return result;
+        }
+        let result = new Action();
         result.init(data);
         return result;
     }
@@ -3536,21 +3479,25 @@ export class CharacterAction implements ICharacterAction {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["$type"] = this._discriminator;
+        data["name"] = this.name;
         return data;
     }
 }
 
 /** An action performed by a character */
-export interface ICharacterAction {
+export interface IAction {
+    /** The name of the action
+             */
+    name: string;
 }
 
-/** Character moves to location */
-export class CharacterMoveToLocationAction extends CharacterAction implements ICharacterMoveToLocationAction {
+/** Move action */
+export class MoveAction extends Action implements IMoveAction {
     /** The location to which the character is moving
              */
     location!: LocationMinimal;
 
-    constructor(data?: ICharacterMoveToLocationAction) {
+    constructor(data?: IMoveAction) {
         super(data);
         if (!data) {
             this.location = new LocationMinimal();
@@ -3565,9 +3512,9 @@ export class CharacterMoveToLocationAction extends CharacterAction implements IC
         }
     }
 
-    static override fromJS(data: any): CharacterMoveToLocationAction {
+    static override fromJS(data: any): MoveAction {
         data = typeof data === 'object' ? data : {};
-        let result = new CharacterMoveToLocationAction();
+        let result = new MoveAction();
         result.init(data);
         return result;
     }
@@ -3580,63 +3527,192 @@ export class CharacterMoveToLocationAction extends CharacterAction implements IC
     }
 }
 
-/** Character moves to location */
-export interface ICharacterMoveToLocationAction extends ICharacterAction {
+/** Move action */
+export interface IMoveAction extends IAction {
     /** The location to which the character is moving
              */
     location: LocationMinimal;
 }
 
-/** Character interact with entity */
-export class CharacterInteractWithEntityAction extends CharacterAction implements ICharacterInteractWithEntityAction {
-    /** The interaction
+/** Harvest action */
+export class HarvestAction extends Action implements IHarvestAction {
+    /** The harvest
              */
-    interaction!: InteractionMinimal;
-    /** The target of the interaction
+    harvest!: HarvestableEntityHarvestMinimal;
+    /** The target of the harvest
              */
-    target!: EntityMinimal;
+    target!: StaticObjectInstance;
 
-    constructor(data?: ICharacterInteractWithEntityAction) {
+    constructor(data?: IHarvestAction) {
         super(data);
         if (!data) {
-            this.interaction = new InteractionMinimal();
-            this.target = new EntityMinimal();
+            this.harvest = new HarvestableEntityHarvestMinimal();
+            this.target = new StaticObjectInstance();
         }
-        this._discriminator = "interact";
+        this._discriminator = "harvest";
     }
 
     override init(_data?: any) {
         super.init(_data);
         if (_data) {
-            this.interaction = _data["interaction"] ? InteractionMinimal.fromJS(_data["interaction"]) : new InteractionMinimal();
-            this.target = _data["target"] ? EntityMinimal.fromJS(_data["target"]) : new EntityMinimal();
+            this.harvest = _data["harvest"] ? HarvestableEntityHarvestMinimal.fromJS(_data["harvest"]) : new HarvestableEntityHarvestMinimal();
+            this.target = _data["target"] ? StaticObjectInstance.fromJS(_data["target"]) : new StaticObjectInstance();
         }
     }
 
-    static override fromJS(data: any): CharacterInteractWithEntityAction {
+    static override fromJS(data: any): HarvestAction {
         data = typeof data === 'object' ? data : {};
-        let result = new CharacterInteractWithEntityAction();
+        let result = new HarvestAction();
         result.init(data);
         return result;
     }
 
     override toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["interaction"] = this.interaction ? this.interaction.toJSON() : <any>undefined;
+        data["harvest"] = this.harvest ? this.harvest.toJSON() : <any>undefined;
         data["target"] = this.target ? this.target.toJSON() : <any>undefined;
         super.toJSON(data);
         return data;
     }
 }
 
-/** Character interact with entity */
-export interface ICharacterInteractWithEntityAction extends ICharacterAction {
-    /** The interaction
+/** Harvest action */
+export interface IHarvestAction extends IAction {
+    /** The harvest
              */
-    interaction: InteractionMinimal;
-    /** The target of the interaction
+    harvest: HarvestableEntityHarvestMinimal;
+    /** The target of the harvest
              */
-    target: EntityMinimal;
+    target: StaticObjectInstance;
+}
+
+/** Static object instance */
+export class StaticObjectInstance implements IStaticObjectInstance {
+    /** The unique ID of the entity
+             */
+    id!: string;
+    /** The name of the entity
+             */
+    staticObject!: StaticObject;
+
+    constructor(data?: IStaticObjectInstance) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.staticObject = new StaticObject();
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.staticObject = _data["staticObject"] ? StaticObject.fromJS(_data["staticObject"]) : new StaticObject();
+        }
+    }
+
+    static fromJS(data: any): StaticObjectInstance {
+        data = typeof data === 'object' ? data : {};
+        let result = new StaticObjectInstance();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["staticObject"] = this.staticObject ? this.staticObject.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+/** Static object instance */
+export interface IStaticObjectInstance {
+    /** The unique ID of the entity
+             */
+    id: string;
+    /** The name of the entity
+             */
+    staticObject: StaticObject;
+}
+
+/** PVE combat action */
+export class PveCombatAction extends Action implements IPveCombatAction {
+    /** The unique ID of the combat
+             */
+    combatId!: string;
+    /** The attackers in the combat instance
+             */
+    attackers!: EntityMinimal[];
+    /** The defenders in the combat instance
+             */
+    defenders!: EntityMinimal[];
+
+    constructor(data?: IPveCombatAction) {
+        super(data);
+        if (!data) {
+            this.attackers = [];
+            this.defenders = [];
+        }
+        this._discriminator = "combat-pve";
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.combatId = _data["combatId"];
+            if (Array.isArray(_data["attackers"])) {
+                this.attackers = [] as any;
+                for (let item of _data["attackers"])
+                    this.attackers!.push(EntityMinimal.fromJS(item));
+            }
+            if (Array.isArray(_data["defenders"])) {
+                this.defenders = [] as any;
+                for (let item of _data["defenders"])
+                    this.defenders!.push(EntityMinimal.fromJS(item));
+            }
+        }
+    }
+
+    static override fromJS(data: any): PveCombatAction {
+        data = typeof data === 'object' ? data : {};
+        let result = new PveCombatAction();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["combatId"] = this.combatId;
+        if (Array.isArray(this.attackers)) {
+            data["attackers"] = [];
+            for (let item of this.attackers)
+                data["attackers"].push(item.toJSON());
+        }
+        if (Array.isArray(this.defenders)) {
+            data["defenders"] = [];
+            for (let item of this.defenders)
+                data["defenders"].push(item.toJSON());
+        }
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** PVE combat action */
+export interface IPveCombatAction extends IAction {
+    /** The unique ID of the combat
+             */
+    combatId: string;
+    /** The attackers in the combat instance
+             */
+    attackers: EntityMinimal[];
+    /** The defenders in the combat instance
+             */
+    defenders: EntityMinimal[];
 }
 
 /** Character creation options */
@@ -3820,18 +3896,13 @@ export class CharacterHistoryEntry implements ICharacterHistoryEntry {
             result.init(data);
             return result;
         }
-        if (data["$type"] === "action-performed") {
-            let result = new CharacterPerformedActionHistoryEntry();
-            result.init(data);
-            return result;
-        }
         if (data["$type"] === "interaction-started") {
-            let result = new CharacterStartedInteractionHistoryEntry();
+            let result = new ActionStartedHistoryEntry();
             result.init(data);
             return result;
         }
         if (data["$type"] === "interaction-ended") {
-            let result = new CharacterEndedInteractionHistoryEntry();
+            let result = new ActionEndedHistoryEntry();
             result.init(data);
             return result;
         }
@@ -4144,78 +4215,13 @@ export interface ICharacterInventoryChangedHistoryEntry extends ICharacterHistor
     newCount: number;
 }
 
-/** Character performed action */
-export class CharacterPerformedActionHistoryEntry extends CharacterHistoryEntry implements ICharacterPerformedActionHistoryEntry {
-    /** The action that has been performed
+/** Action started history entry */
+export class ActionStartedHistoryEntry extends CharacterHistoryEntry implements IActionStartedHistoryEntry {
+    /** The name of the action that has started
              */
-    action!: CharacterAction;
-    /** Has the action been successful
-             */
-    success!: boolean;
-    /** The reason of the failure
-             */
-    failureReason?: string | undefined;
+    actionName!: string;
 
-    constructor(data?: ICharacterPerformedActionHistoryEntry) {
-        super(data);
-        if (!data) {
-            this.action = new CharacterAction();
-        }
-        this._discriminator = "action-performed";
-    }
-
-    override init(_data?: any) {
-        super.init(_data);
-        if (_data) {
-            this.action = _data["action"] ? CharacterAction.fromJS(_data["action"]) : new CharacterAction();
-            this.success = _data["success"];
-            this.failureReason = _data["failureReason"];
-        }
-    }
-
-    static override fromJS(data: any): CharacterPerformedActionHistoryEntry {
-        data = typeof data === 'object' ? data : {};
-        let result = new CharacterPerformedActionHistoryEntry();
-        result.init(data);
-        return result;
-    }
-
-    override toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["action"] = this.action ? this.action.toJSON() : <any>undefined;
-        data["success"] = this.success;
-        data["failureReason"] = this.failureReason;
-        super.toJSON(data);
-        return data;
-    }
-}
-
-/** Character performed action */
-export interface ICharacterPerformedActionHistoryEntry extends ICharacterHistoryEntry {
-    /** The action that has been performed
-             */
-    action: CharacterAction;
-    /** Has the action been successful
-             */
-    success: boolean;
-    /** The reason of the failure
-             */
-    failureReason?: string | undefined;
-}
-
-/** Character started interaction history entry */
-export class CharacterStartedInteractionHistoryEntry extends CharacterHistoryEntry implements ICharacterStartedInteractionHistoryEntry {
-    /** The name of the interaction that has been started
-             */
-    interactionName!: string;
-    /** The entity that was the target of the interaction
-             */
-    targetId!: string;
-    /** The name of the entity that was the target of the interaction
-             */
-    targetName!: string;
-
-    constructor(data?: ICharacterStartedInteractionHistoryEntry) {
+    constructor(data?: IActionStartedHistoryEntry) {
         super(data);
         this._discriminator = "interaction-started";
     }
@@ -4223,55 +4229,39 @@ export class CharacterStartedInteractionHistoryEntry extends CharacterHistoryEnt
     override init(_data?: any) {
         super.init(_data);
         if (_data) {
-            this.interactionName = _data["interactionName"];
-            this.targetId = _data["targetId"];
-            this.targetName = _data["targetName"];
+            this.actionName = _data["actionName"];
         }
     }
 
-    static override fromJS(data: any): CharacterStartedInteractionHistoryEntry {
+    static override fromJS(data: any): ActionStartedHistoryEntry {
         data = typeof data === 'object' ? data : {};
-        let result = new CharacterStartedInteractionHistoryEntry();
+        let result = new ActionStartedHistoryEntry();
         result.init(data);
         return result;
     }
 
     override toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["interactionName"] = this.interactionName;
-        data["targetId"] = this.targetId;
-        data["targetName"] = this.targetName;
+        data["actionName"] = this.actionName;
         super.toJSON(data);
         return data;
     }
 }
 
-/** Character started interaction history entry */
-export interface ICharacterStartedInteractionHistoryEntry extends ICharacterHistoryEntry {
-    /** The name of the interaction that has been started
+/** Action started history entry */
+export interface IActionStartedHistoryEntry extends ICharacterHistoryEntry {
+    /** The name of the action that has started
              */
-    interactionName: string;
-    /** The entity that was the target of the interaction
-             */
-    targetId: string;
-    /** The name of the entity that was the target of the interaction
-             */
-    targetName: string;
+    actionName: string;
 }
 
-/** Character ended interaction history entry */
-export class CharacterEndedInteractionHistoryEntry extends CharacterHistoryEntry implements ICharacterEndedInteractionHistoryEntry {
-    /** The name of the interaction that has been started
+/** Action ended history entry */
+export class ActionEndedHistoryEntry extends CharacterHistoryEntry implements IActionEndedHistoryEntry {
+    /** The name of the action that has ended
              */
-    interactionName!: string;
-    /** The entity that was the target of the interaction
-             */
-    targetId!: string;
-    /** The name of the entity that was the target of the interaction
-             */
-    targetName!: string;
+    actionName!: string;
 
-    constructor(data?: ICharacterEndedInteractionHistoryEntry) {
+    constructor(data?: IActionEndedHistoryEntry) {
         super(data);
         this._discriminator = "interaction-ended";
     }
@@ -4279,40 +4269,30 @@ export class CharacterEndedInteractionHistoryEntry extends CharacterHistoryEntry
     override init(_data?: any) {
         super.init(_data);
         if (_data) {
-            this.interactionName = _data["interactionName"];
-            this.targetId = _data["targetId"];
-            this.targetName = _data["targetName"];
+            this.actionName = _data["actionName"];
         }
     }
 
-    static override fromJS(data: any): CharacterEndedInteractionHistoryEntry {
+    static override fromJS(data: any): ActionEndedHistoryEntry {
         data = typeof data === 'object' ? data : {};
-        let result = new CharacterEndedInteractionHistoryEntry();
+        let result = new ActionEndedHistoryEntry();
         result.init(data);
         return result;
     }
 
     override toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["interactionName"] = this.interactionName;
-        data["targetId"] = this.targetId;
-        data["targetName"] = this.targetName;
+        data["actionName"] = this.actionName;
         super.toJSON(data);
         return data;
     }
 }
 
-/** Character ended interaction history entry */
-export interface ICharacterEndedInteractionHistoryEntry extends ICharacterHistoryEntry {
-    /** The name of the interaction that has been started
+/** Action ended history entry */
+export interface IActionEndedHistoryEntry extends ICharacterHistoryEntry {
+    /** The name of the action that has ended
              */
-    interactionName: string;
-    /** The entity that was the target of the interaction
-             */
-    targetId: string;
-    /** The name of the entity that was the target of the interaction
-             */
-    targetName: string;
+    actionName: string;
 }
 
 /** Character learned job history entry */

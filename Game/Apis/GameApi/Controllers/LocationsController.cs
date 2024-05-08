@@ -2,6 +2,7 @@
 using NSwag.Annotations;
 using RestAdventure.Core;
 using RestAdventure.Core.Characters;
+using RestAdventure.Core.Maps;
 using RestAdventure.Core.Maps.Locations;
 using RestAdventure.Core.Players;
 using RestAdventure.Game.Apis.Common.Dtos.Maps;
@@ -52,7 +53,7 @@ public class LocationsController : GameApiController
         List<LocationWithAccessDto> result = [];
         foreach (Location location in accessibleLocations)
         {
-            Maybe canMove = state.CharacterActions.CanMoveTo(character, location);
+            Maybe canMove = character.Movement.CanMoveTo(state, location);
             result.Add(
                 new LocationWithAccessDto
                 {
@@ -94,7 +95,7 @@ public class LocationsController : GameApiController
             return NotFound();
         }
 
-        state.CharacterActions.PlanMovement(character, location);
+        state.Actions.QueueAction(character, new MoveAction(location));
 
         return NoContent();
     }

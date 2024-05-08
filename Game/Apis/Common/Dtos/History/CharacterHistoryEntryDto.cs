@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
+using RestAdventure.Core.History.Actions;
 using RestAdventure.Core.History.Characters;
 using RestAdventure.Core.History.Entities;
 
@@ -13,9 +14,8 @@ namespace RestAdventure.Game.Apis.Common.Dtos.History;
 [JsonDerivedType(typeof(CharacterDeletedHistoryEntryDto), "deleted")]
 [JsonDerivedType(typeof(CharacterMovedToLocationHistoryEntryDto), "moved")]
 [JsonDerivedType(typeof(CharacterInventoryChangedHistoryEntryDto), "inventory-changed")]
-[JsonDerivedType(typeof(CharacterPerformedActionHistoryEntryDto), "action-performed")]
-[JsonDerivedType(typeof(CharacterStartedInteractionHistoryEntryDto), "interaction-started")]
-[JsonDerivedType(typeof(CharacterEndedInteractionHistoryEntryDto), "interaction-ended")]
+[JsonDerivedType(typeof(ActionStartedHistoryEntryDto), "interaction-started")]
+[JsonDerivedType(typeof(ActionEndedHistoryEntryDto), "interaction-ended")]
 [JsonDerivedType(typeof(CharacterLearnedJobHistoryEntryDto), "job-learned")]
 [JsonDerivedType(typeof(CharacterJobGainedExperienceHistoryEntryDto), "job-gained-experience")]
 [JsonDerivedType(typeof(CharacterJobLeveledUpHistoryEntryDto), "job-leveled-up")]
@@ -41,9 +41,8 @@ static class CharacterHistoryEntryMappingExtensions
         {
             EntityCreatedHistoryEntry entityCreatedHistoryEntry => entityCreatedHistoryEntry.ToDto(),
             EntityDeletedHistoryEntry entityDeletedHistoryEntry => entityDeletedHistoryEntry.ToDto(),
-            CharacterPerformedActionHistoryEntry characterPerformedActionHistoryEntry => characterPerformedActionHistoryEntry.ToDto(),
-            CharacterStartedInteractionHistoryEntry characterStartedInteractionHistoryEntry => characterStartedInteractionHistoryEntry.ToDto(),
-            CharacterEndedInteractionHistoryEntry characterEndedInteractionHistoryEntry => characterEndedInteractionHistoryEntry.ToDto(),
+            ActionStartedHistoryEntry characterStartedInteractionHistoryEntry => characterStartedInteractionHistoryEntry.ToDto(),
+            ActionEndedHistoryEntry characterEndedInteractionHistoryEntry => characterEndedInteractionHistoryEntry.ToDto(),
             EntityInventoryChangedHistoryEntry entityInventoryChangedHistoryEntry => entityInventoryChangedHistoryEntry.ToDto(),
             EntityMovedToLocationHistoryEntry entityMovedToLocationHistoryEntry => entityMovedToLocationHistoryEntry.ToDto(),
             EntityLearnedJobHistoryEntry entityLearnedJobHistoryEntry => entityLearnedJobHistoryEntry.ToDto(),

@@ -1,13 +1,13 @@
-﻿using RestAdventure.Core.Combat;
+﻿using RestAdventure.Core.Actions;
+using RestAdventure.Core.Combat;
 using RestAdventure.Core.Entities;
-using RestAdventure.Core.Interactions;
 using RestAdventure.Core.Maps.Locations;
 
 namespace RestAdventure.Core.Monsters;
 
 public record MonsterInstanceId(Guid Guid) : GameEntityId(Guid);
 
-public class MonsterInstance : GameEntity<MonsterInstanceId>, IGameEntityWithCombatStatistics, IInteractibleEntity
+public class MonsterInstance : GameEntity<MonsterInstanceId>, IGameEntityWithCombatStatistics, IGameEntityWithDisabled
 {
     public MonsterInstance(MonsterSpecies species, int level, Location location) : base(new MonsterInstanceId(Guid.NewGuid()), species.Name, location)
     {

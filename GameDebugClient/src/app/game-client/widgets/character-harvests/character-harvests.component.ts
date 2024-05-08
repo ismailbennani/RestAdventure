@@ -1,14 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { ReplaySubject, switchMap, tap } from 'rxjs';
-import {
-  CharacterInteractWithEntityAction,
-  HarvestableEntity,
-  HarvestableEntityHarvest,
-  ItemStack,
-  JobsHarvestApiClient,
-  TeamCharacter,
-} from '../../../../api/game-api-client.generated';
+import { Action, HarvestAction, HarvestableEntity, HarvestableEntityHarvest, ItemStack, JobsHarvestApiClient, TeamCharacter } from '../../../../api/game-api-client.generated';
 import { GameService } from '../../services/game.service';
 
 @Component({
@@ -58,34 +51,30 @@ export class CharacterHarvestsComponent implements OnInit {
   }
 
   plansToHarvest(harvestable?: HarvestableEntity, harvest?: HarvestableEntityHarvest) {
-    if (
-      !this.character?.plannedAction ||
-      !(this.character.plannedAction instanceof CharacterInteractWithEntityAction) ||
-      !this.harvestables.find(h => h.id === (this.character.plannedAction as CharacterInteractWithEntityAction).target.id)
-    ) {
-      return false;
-    }
-
-    if (harvestable && this.character.plannedAction.target.id != harvestable.id) {
-      return false;
-    }
-
-    if (harvest && this.character.plannedAction.interaction.name != harvest.job.name + '-' + harvest.name) {
-      return false;
-    }
-
-    return true;
+    return this.character.plannedAction && this.isHarvestingAction(this.character.plannedAction, harvestable, harvest);
   }
 
-  isHarvesting(harvestable: HarvestableEntity, harvest: HarvestableEntityHarvest) {
-    if (!this.character?.currentInteraction) {
-      return false;
-    }
-
-    return this.character.currentInteraction.target.id == harvestable.id && this.character.currentInteraction.interaction.name == harvest.job.name + '-' + harvest.name;
+  isHarvesting(harvestable?: HarvestableEntity, harvest?: HarvestableEntityHarvest) {
+    return this.character.ongoingAction && this.isHarvestingAction(this.character.ongoingAction, harvestable, harvest);
   }
 
   protected formatExpectedHarvest(items: ItemStack[]) {
     return items.map(s => `${s.count}x ${s.item.name}`).join(', ');
+  }
+
+  private isHarvestingAction(action: Action, harvestable?: HarvestableEntity, harvest?: HarvestableEntityHarvest) {
+    if (!(action instanceof HarvestAction) || !this.harvestables.find(h => h.id === (action as HarvestAction).target.id)) {
+      return false;
+    }
+
+    if (harvestable && action.target.id !== harvestable.id) {
+      return false;
+    }
+
+    if (harvest && action.harvest.name !== harvest.name) {
+      return false;
+    }
+
+    return true;
   }
 }

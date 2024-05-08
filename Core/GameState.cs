@@ -4,7 +4,6 @@ using RestAdventure.Core.Actions;
 using RestAdventure.Core.Combat;
 using RestAdventure.Core.Entities;
 using RestAdventure.Core.History;
-using RestAdventure.Core.Interactions;
 using RestAdventure.Core.Players;
 using RestAdventure.Core.Settings;
 
@@ -20,8 +19,7 @@ public class GameState : IDisposable
         History = new GameHistory();
         Players = new GamePlayers(publisher);
         Entities = new GameEntities(publisher);
-        Interactions = new GameInteractions(publisher, loggerFactory.CreateLogger<GameInteractions>());
-        CharacterActions = new GameCharacterActions(this, loggerFactory.CreateLogger<GameCharacterActions>());
+        Actions = new GameActions(this, loggerFactory.CreateLogger<GameActions>());
         Combats = new GameCombats(this, loggerFactory.CreateLogger<GameCombats>());
     }
 
@@ -34,9 +32,8 @@ public class GameState : IDisposable
 
     public GameHistory History { get; }
     public GamePlayers Players { get; }
-    public GameCharacterActions CharacterActions { get; }
     public GameEntities Entities { get; }
-    public GameInteractions Interactions { get; }
+    public GameActions Actions { get; }
     public GameCombats Combats { get; }
 
     public void Dispose()

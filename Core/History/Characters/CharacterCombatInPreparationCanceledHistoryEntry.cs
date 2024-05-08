@@ -10,7 +10,7 @@ namespace RestAdventure.Core.History.Characters;
 
 public class CharacterCombatInPreparationCanceledHistoryEntry : CharacterHistoryEntry
 {
-    public CharacterCombatInPreparationCanceledHistoryEntry(Character source, CombatInPreparation combat, long tick) : base(source, tick)
+    public CharacterCombatInPreparationCanceledHistoryEntry(Character character, CombatInPreparation combat, long tick) : base(character, tick)
     {
         CombatInstanceId = combat.Id;
         LocationId = combat.Location.Id;

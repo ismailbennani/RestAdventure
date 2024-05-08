@@ -44,9 +44,9 @@
                     }
                   </li>
                   <li>
-                    <span class="fw-semibold me-1">Current interaction</span>
-                    @if (character.currentInteraction) {
-                      {{ character.currentInteraction.interaction.name }}, {{ character.currentInteraction.target.name }}
+                    <span class="fw-semibold me-1">Ongoing action</span>
+                    @if (character.ongoingAction) {
+                      {{ actionToString(character.ongoingAction) }}
                     } @else {
                       none
                     }
@@ -118,9 +118,13 @@
                               </div>
                             </div>
                             <div>
-                              <button class="btn" [ngClass]="combat.id === selectedCombatInPreparation?.id ? 'btn-light' : 'btn-outline-secondary'" (click)="joinCombat(combat)">
-                                Join
-                              </button>
+                              @if (plansToJoinCombat(combat) || isInCombat(combat)) {
+                                <button class="btn btn-outline-light disabled">Joined</button>
+                              } @else {
+                                <button class="btn" [ngClass]="combat.id === selectedCombatInPreparation?.id ? 'btn-light' : 'btn-outline-secondary'" (click)="joinCombat(combat)">
+                                  Join
+                                </button>
+                              }
                             </div>
                           </div>
                         </a>

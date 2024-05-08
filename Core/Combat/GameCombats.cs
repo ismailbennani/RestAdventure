@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
+using RestAdventure.Core.Actions;
 using RestAdventure.Core.Characters;
 using RestAdventure.Core.Combat.Notifications;
 using RestAdventure.Core.Extensions;
@@ -28,9 +29,24 @@ public class GameCombats : IDisposable
         _logger = logger;
     }
 
-    public async Task<CombatInPreparation> StartCombatAsync(IGameEntityWithCombatStatistics attacker, IGameEntityWithCombatStatistics target)
+    public Maybe CanStartCombat(IGameEntityWithCombatStatistics attacker, IGameEntityWithCombatStatistics target)
     {
-        CombatInPreparation combatInPreparation = new(attacker, target, _settings);
+        if (attacker is IGameEntityWithDisabled { Disabled: true })
+        {
+            return "Attacker is busy";
+        }
+
+        if (target is IGameEntityWithDisabled { Disabled: true })
+        {
+            return "Target is busy";
+        }
+
+        return true;
+    }
+
+    public async Task<CombatInPreparation> StartCombatAsync(IReadOnlyList<IGameEntityWithCombatStatistics> attackers, IReadOnlyList<IGameEntityWithCombatStatistics> defenders)
+    {
+        CombatInPreparation combatInPreparation = new(attackers, defenders, _settings);
         _combatsInPreparation[combatInPreparation.Id] = combatInPreparation;
 
         await _publisher.Publish(new CombatPreparationStarted { Combat = combatInPreparation });

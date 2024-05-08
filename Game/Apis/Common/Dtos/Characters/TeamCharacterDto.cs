@@ -1,14 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using RestAdventure.Core.Actions;
 using RestAdventure.Core.Characters;
-using RestAdventure.Core.Interactions;
 using RestAdventure.Game.Apis.Common.Dtos.Characters.Actions;
 using RestAdventure.Game.Apis.Common.Dtos.Entities;
-using RestAdventure.Game.Apis.Common.Dtos.Interactions;
 using RestAdventure.Game.Apis.Common.Dtos.Items;
 using RestAdventure.Game.Apis.Common.Dtos.Jobs;
 using RestAdventure.Game.Apis.Common.Dtos.Maps;
 using RestAdventure.Game.Apis.Common.Dtos.Utils;
+using Action = RestAdventure.Core.Actions.Action;
 
 namespace RestAdventure.Game.Apis.Common.Dtos.Characters;
 
@@ -68,12 +66,12 @@ public class TeamCharacterDto
     /// <summary>
     ///     The interaction being performed by the character
     /// </summary>
-    public InteractionInstanceDto? CurrentInteraction { get; init; }
+    public ActionDto? OngoingAction { get; init; }
 
     /// <summary>
     ///     The action that the character has planned for the next tick
     /// </summary>
-    public CharacterActionDto? PlannedAction { get; init; }
+    public ActionDto? PlannedAction { get; init; }
 }
 
 static class TeamCharacterMappingExtensions
@@ -89,13 +87,13 @@ static class TeamCharacterMappingExtensions
             Inventory = character.Inventory.ToDto(),
             Jobs = character.Jobs.Select(j => j.ToDto()).ToArray(),
             Combat = character.Combat.ToDto(),
-            CurrentInteraction = options?.InteractionInstance?.ToDto(),
-            PlannedAction = options?.NextAction?.ToDto()
+            OngoingAction = options?.OngoingAction?.ToDto(),
+            PlannedAction = options?.PlannedAction?.ToDto()
         };
 }
 
 class CharacterMappingOptions
 {
-    public InteractionInstance? InteractionInstance { get; init; }
-    public CharacterAction? NextAction { get; init; }
+    public Action? OngoingAction { get; init; }
+    public Action? PlannedAction { get; init; }
 }

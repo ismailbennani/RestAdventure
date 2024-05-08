@@ -4,8 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ReplaySubject, combineLatest, forkJoin, map, of, switchMap, tap } from 'rxjs';
 import { LocationMinimal } from '../../../../api/admin-api-client.generated';
 import {
-  CharacterAction,
-  CharacterInteractWithEntityAction,
+  Action,
   CombatInPreparation,
   CombatInstance,
   CombatSide,
@@ -13,6 +12,7 @@ import {
   HarvestableEntity,
   JobsHarvestApiClient,
   LocationsApiClient,
+  PveCombatAction,
   Team,
   TeamCharacter,
   TeamCharactersApiClient,
@@ -135,7 +135,7 @@ export class CharacterPageComponent implements OnInit {
       .subscribe();
   }
 
-  actionToString(action: CharacterAction) {
+  actionToString(action: Action) {
     return CharacterActionUtils.toString(action);
   }
 
@@ -165,19 +165,6 @@ export class CharacterPageComponent implements OnInit {
     this.selectedCombatInPreparation = undefined;
   }
 
-  plansToJoinCombat(combat: CombatInPreparation) {
-    if (
-      !this.character?.plannedAction ||
-      !(this.character.plannedAction instanceof CharacterInteractWithEntityAction) ||
-      this.character.plannedAction.interaction.name !== 'combat-join' ||
-      this.character.plannedAction.target.id !== combat.defenders[0].id
-    ) {
-      return false;
-    }
-
-    return true;
-  }
-
   joinCombat(combat: CombatInPreparation) {
     if (!this.character) {
       return;
@@ -187,6 +174,18 @@ export class CharacterPageComponent implements OnInit {
       .joinCombatInPreparation(this.character.id, combat.id, CombatSide.Attackers)
       .pipe(switchMap(() => this.gameService.refreshNow(true)))
       .subscribe();
+  }
+
+  plansToJoinCombat(combat: CombatInPreparation) {
+    return this.character?.plannedAction && this.isCombatAction(this.character.plannedAction, combat);
+  }
+
+  isInCombat(combat: CombatInPreparation) {
+    return this.character?.ongoingAction && this.isCombatAction(this.character.ongoingAction, combat);
+  }
+
+  private isCombatAction(action: Action, combat: CombatInPreparation | CombatInstance) {
+    return action instanceof PveCombatAction && action.combatId === combat.id;
   }
 
   private autoSelectCombatAfterRefresh() {

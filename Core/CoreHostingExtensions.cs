@@ -1,9 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using RestAdventure.Core.Characters.Services;
-using RestAdventure.Core.Combat.Pve;
-using RestAdventure.Core.Interactions;
-using RestAdventure.Core.Interactions.Providers;
-using RestAdventure.Core.Jobs;
 
 namespace RestAdventure.Core;
 
@@ -13,10 +9,5 @@ public static class CoreHostingExtensions
     {
         services.AddSingleton<GameService>();
         services.AddSingleton<CharactersService>();
-
-        // Interactions
-        services.AddSingleton<AvailableInteractionsService>();
-        services.AddSingleton<IInteractionProvider, JobInteractionProvider>();
-        services.AddSingleton<IInteractionProvider, PveCombatInteractionProvider>();
     }
 }

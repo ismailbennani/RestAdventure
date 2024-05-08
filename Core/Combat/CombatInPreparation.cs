@@ -5,11 +5,11 @@ namespace RestAdventure.Core.Combat;
 
 public class CombatInPreparation
 {
-    public CombatInPreparation(IGameEntityWithCombatStatistics attacker, IGameEntityWithCombatStatistics target, GameSettings settings)
+    internal CombatInPreparation(IReadOnlyList<IGameEntityWithCombatStatistics> attackers, IReadOnlyList<IGameEntityWithCombatStatistics> defenders, GameSettings settings)
     {
-        Location = attacker.Location;
-        Attackers = new CombatFormationInPreparation(attacker, settings);
-        Defenders = new CombatFormationInPreparation(target, settings);
+        Location = attackers[0].Location;
+        Attackers = new CombatFormationInPreparation(attackers, settings);
+        Defenders = new CombatFormationInPreparation(defenders, settings);
         Settings = settings;
     }
 

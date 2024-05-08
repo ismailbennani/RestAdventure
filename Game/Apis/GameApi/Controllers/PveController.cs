@@ -3,7 +3,6 @@ using NSwag.Annotations;
 using RestAdventure.Core;
 using RestAdventure.Core.Characters;
 using RestAdventure.Core.Combat.Pve;
-using RestAdventure.Core.Interactions;
 using RestAdventure.Core.Monsters;
 using RestAdventure.Core.Players;
 using RestAdventure.Game.Apis.Common.Dtos.Monsters;
@@ -20,14 +19,12 @@ namespace RestAdventure.Game.Apis.GameApi.Controllers;
 public class PveController : GameApiController
 {
     readonly GameService _gameService;
-    readonly AvailableInteractionsService _availableInteractionsService;
 
     /// <summary>
     /// </summary>
-    public PveController(GameService gameService, AvailableInteractionsService availableInteractionsService)
+    public PveController(GameService gameService)
     {
         _gameService = gameService;
-        _availableInteractionsService = availableInteractionsService;
     }
 
     /// <summary>
@@ -37,7 +34,7 @@ public class PveController : GameApiController
     [ProducesResponseType<IReadOnlyCollection<MonsterGroupDto>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<IReadOnlyCollection<MonsterGroupDto>>> GetMonstersAsync(Guid characterGuid)
+    public ActionResult<IReadOnlyCollection<MonsterGroupDto>> GetMonsters(Guid characterGuid)
     {
         GameState state = _gameService.RequireGameState();
         Player player = ControllerContext.RequirePlayer(state);
@@ -55,17 +52,16 @@ public class PveController : GameApiController
         List<MonsterGroupDto> result = new();
         foreach (MonsterInstance monster in monsters)
         {
-            PveCombatInteraction? combatInteraction = _availableInteractionsService.GetAvailableInteractions(character, monster).OfType<PveCombatInteraction>().FirstOrDefault();
-            if (combatInteraction == null)
+            if (monster.Disabled)
             {
                 continue;
             }
 
-            Maybe canAttack = state.CharacterActions.CanInteract(character, combatInteraction, monster);
+            Maybe canStartCombat = state.Combats.CanStartCombat(character, monster);
             result.Add(
                 new MonsterGroupDto
                 {
-                    Id = monster.Id.Guid, Monsters = [monster.ToDto()], CanAttack = canAttack.Success, WhyCannotAttack = canAttack.WhyNot,
+                    Id = monster.Id.Guid, Monsters = [monster.ToDto()], CanAttack = canStartCombat.Success, WhyCannotAttack = canStartCombat.WhyNot,
                     ExpectedExperience = monster.Species.Experience
                 }
             );
@@ -81,7 +77,7 @@ public class PveController : GameApiController
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
-    public ActionResult AttackMonsters(Guid characterGuid, Guid groupId)
+    public async Task<ActionResult> AttackMonstersAsync(Guid characterGuid, Guid groupId)
     {
         GameState state = _gameService.RequireGameState();
         Player player = ControllerContext.RequirePlayer(state);
@@ -101,13 +97,8 @@ public class PveController : GameApiController
             return NotFound();
         }
 
-        PveCombatInteraction? interaction = _availableInteractionsService.GetAvailableInteractions(character, monster).OfType<PveCombatInteraction>().FirstOrDefault();
-        if (interaction == null)
-        {
-            return NotFound();
-        }
-
-        state.CharacterActions.PlanInteraction(character, interaction, monster);
+        PveCombatAction action = new([character], [monster]);
+        state.Actions.QueueAction(character, action);
 
         return NoContent();
     }

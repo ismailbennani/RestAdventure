@@ -6,7 +6,10 @@
   <div class="list-group list-group-flush">
     @if (harvestables.length > 0) {
       @for (harvestable of harvestables; track harvestable.id) {
-        <ng-container [ngTemplateOutlet]="harvestableListItem" [ngTemplateOutletContext]="{ harvestable, plansToHarvest: plansToHarvest(harvestable) }"></ng-container>
+        <ng-container
+          [ngTemplateOutlet]="harvestableListItem"
+          [ngTemplateOutletContext]="{ harvestable, plansToHarvest: plansToHarvest(harvestable), isHarvesting: isHarvesting(harvestable) }"
+        ></ng-container>
       }
     } @else {
       <div class="list-group-item text-center text-secondary">None</div>
@@ -14,9 +17,9 @@
   </div>
 </div>
 
-<ng-template #harvestableListItem let-harvestable="harvestable" let-plansToHarvestHarvestable="plansToHarvest">
+<ng-template #harvestableListItem let-harvestable="harvestable" let-plansToHarvestHarvestable="plansToHarvest" let-isHarvestingHarvestable="isHarvesting">
   <div class="list-group-item">
-    <div [class.fw-bold]="plansToHarvestHarvestable">
+    <div [class.fw-bold]="plansToHarvestHarvestable || isHarvestingHarvestable">
       {{ harvestable.name }}
     </div>
     <div class="list-group list-group-flush">

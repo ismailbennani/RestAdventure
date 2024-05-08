@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
-import { CharacterAction, TeamCharacter } from '../../../../api/game-api-client.generated';
+import { Action, TeamCharacter } from '../../../../api/game-api-client.generated';
 import { ProgressionBarComponent } from '../../../common/spinner/progression-bar/progression-bar.component';
 import { CharacterActionUtils } from '../../utils/character-action-utils';
 
@@ -15,7 +15,7 @@ export class CharacterComponent {
 
   protected healthPercent: number = 0;
 
-  protected actionToString(action: CharacterAction) {
+  protected actionToString(action: Action) {
     return CharacterActionUtils.toString(action);
   }
 }

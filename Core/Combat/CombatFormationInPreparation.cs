@@ -8,12 +8,12 @@ public class CombatFormationInPreparation
     readonly GameSettings _gameSettings;
     List<IGameEntityWithCombatStatistics> _entities;
 
-    public CombatFormationInPreparation(IGameEntityWithCombatStatistics entity, GameSettings gameSettings)
+    public CombatFormationInPreparation(IReadOnlyList<IGameEntityWithCombatStatistics> entities, GameSettings gameSettings)
     {
         _gameSettings = gameSettings;
-        Owner = entity;
-        _entities = [entity];
-        CombatEntityKind = entity.CombatEntityKind;
+        Owner = entities[0];
+        _entities = entities.ToList();
+        CombatEntityKind = Owner.CombatEntityKind;
     }
 
     public IGameEntityWithCombatStatistics Owner { get; }

@@ -5,9 +5,9 @@ using RestAdventure.Game.Apis.Common.Dtos.Maps;
 namespace RestAdventure.Game.Apis.Common.Dtos.Characters.Actions;
 
 /// <summary>
-///     Character moves to location
+///     Move action
 /// </summary>
-public class CharacterMoveToLocationActionDto : CharacterActionDto
+public class MoveActionDto : ActionDto
 {
     /// <summary>
     ///     The location to which the character is moving
@@ -16,7 +16,7 @@ public class CharacterMoveToLocationActionDto : CharacterActionDto
     public required LocationMinimalDto Location { get; init; }
 }
 
-static class CharacterMoveToLocationActionMappingExtensions
+static class MoveActionMappingExtensions
 {
-    public static CharacterMoveToLocationActionDto ToDto(this CharacterMoveToLocationAction action) => new() { Location = action.Location.ToMinimalDto() };
+    public static MoveActionDto ToDto(this MoveAction action) => new() { Name = action.Name, Location = action.Location.ToMinimalDto() };
 }

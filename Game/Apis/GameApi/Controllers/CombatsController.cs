@@ -4,7 +4,6 @@ using RestAdventure.Core;
 using RestAdventure.Core.Characters;
 using RestAdventure.Core.Combat;
 using RestAdventure.Core.Combat.Pve;
-using RestAdventure.Core.Interactions;
 using RestAdventure.Core.Players;
 using RestAdventure.Game.Apis.Common.Dtos.Combats;
 using RestAdventure.Game.Authentication;
@@ -77,10 +76,11 @@ public class CombatsController : GameApiController
         {
             return NotFound();
         }
+        
+        combatInPreparation.GetTeam(side).Add(character);
 
-        PveJoinCombatInteraction interaction = new(combatInPreparation, side);
-        IInteractibleEntity target = (IInteractibleEntity)combatInPreparation.GetTeam(side.OtherSide()).Entities[0];
-        state.CharacterActions.PlanInteraction(character, interaction, target);
+        PveCombatAction action = new(combatInPreparation);
+        state.Actions.QueueAction(character, action);
 
         return NoContent();
     }

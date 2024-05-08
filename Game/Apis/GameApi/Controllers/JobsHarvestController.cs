@@ -3,13 +3,12 @@ using NSwag.Annotations;
 using RestAdventure.Core;
 using RestAdventure.Core.Characters;
 using RestAdventure.Core.Entities;
-using RestAdventure.Core.Interactions;
 using RestAdventure.Core.Jobs;
 using RestAdventure.Core.Players;
+using RestAdventure.Core.StaticObjects;
 using RestAdventure.Game.Apis.Common.Dtos.Items;
 using RestAdventure.Game.Apis.Common.Dtos.Jobs;
 using RestAdventure.Game.Authentication;
-using RestAdventure.Kernel.Errors;
 
 namespace RestAdventure.Game.Apis.GameApi.Controllers;
 
@@ -21,14 +20,12 @@ namespace RestAdventure.Game.Apis.GameApi.Controllers;
 public class JobsHarvestController : GameApiController
 {
     readonly GameService _gameService;
-    readonly AvailableInteractionsService _availableInteractionsService;
 
     /// <summary>
     /// </summary>
-    public JobsHarvestController(GameService gameService, AvailableInteractionsService availableInteractionsService)
+    public JobsHarvestController(GameService gameService)
     {
         _gameService = gameService;
-        _availableInteractionsService = availableInteractionsService;
     }
 
 
@@ -39,7 +36,7 @@ public class JobsHarvestController : GameApiController
     [ProducesResponseType<IReadOnlyCollection<HarvestableEntityDto>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<IReadOnlyCollection<HarvestableEntityDto>>> GetHarvestablesAsync(Guid characterGuid)
+    public ActionResult<IReadOnlyCollection<HarvestableEntityDto>> GetHarvestables(Guid characterGuid)
     {
         GameState state = _gameService.RequireGameState();
         Player player = ControllerContext.RequirePlayer(state);
@@ -52,30 +49,31 @@ public class JobsHarvestController : GameApiController
             return BadRequest();
         }
 
-        IEnumerable<IInteractibleEntity> entities = state.Entities.AtLocation<IInteractibleEntity>(character.Location);
+        IEnumerable<StaticObjectInstance> entities = state.Entities.AtLocation<StaticObjectInstance>(character.Location);
 
         List<HarvestableEntityDto> result = [];
-        foreach (IInteractibleEntity entity in entities)
+        foreach (StaticObjectInstance staticObject in entities)
         {
-            HarvestInteraction[] availableInteractions = _availableInteractionsService.GetAvailableInteractions(character, entity).OfType<HarvestInteraction>().ToArray();
-            if (availableInteractions.Length == 0)
-            {
-                continue;
-            }
-
             List<HarvestableEntityHarvestDto> harvests = [];
-            foreach (HarvestInteraction interaction in availableInteractions)
+
+            foreach (JobInstance job in character.Jobs)
+            foreach (JobHarvest harvest in job.Harvests)
             {
-                Maybe canHarvest = state.CharacterActions.CanInteract(character, interaction, entity);
+                if (!harvest.Match(staticObject))
+                {
+                    continue;
+                }
+
+                bool canHarvest = job.Progression.Level >= harvest.Level;
                 harvests.Add(
                     new HarvestableEntityHarvestDto
                     {
-                        Job = interaction.Job.ToMinimalDto(),
-                        Name = interaction.Harvest.Name,
-                        ExpectedHarvest = interaction.Harvest.Items.Select(i => i.ToDto()).ToArray(),
-                        ExpectedExperience = interaction.Harvest.Experience,
-                        CanHarvest = canHarvest.Success,
-                        WhyCannotHarvest = canHarvest.WhyNot
+                        Job = job.Job.ToMinimalDto(),
+                        Name = harvest.Name,
+                        ExpectedHarvest = harvest.Items.Select(i => i.ToDto()).ToArray(),
+                        ExpectedExperience = harvest.Experience,
+                        CanHarvest = canHarvest,
+                        WhyCannotHarvest = canHarvest ? null : "Job level too low"
                     }
                 );
             }
@@ -83,8 +81,8 @@ public class JobsHarvestController : GameApiController
             result.Add(
                 new HarvestableEntityDto
                 {
-                    Id = entity.Id.Guid,
-                    Name = entity.Name,
+                    Id = staticObject.Id.Guid,
+                    Name = staticObject.Name,
                     Harvests = harvests
                 }
             );
@@ -96,11 +94,11 @@ public class JobsHarvestController : GameApiController
     /// <summary>
     ///     Harvest
     /// </summary>
-    [HttpPost("{entityGuid:guid}/{harvest}")]
+    [HttpPost("{entityGuid:guid}/{harvestName}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
-    public ActionResult Harvest(Guid characterGuid, Guid entityGuid, string harvest)
+    public ActionResult Harvest(Guid characterGuid, Guid entityGuid, string harvestName)
     {
         GameState state = _gameService.RequireGameState();
         Player player = ControllerContext.RequirePlayer(state);
@@ -114,21 +112,20 @@ public class JobsHarvestController : GameApiController
         }
 
         GameEntityId entityId = new(entityGuid);
-        IInteractibleEntity? entity = state.Entities.Get<IInteractibleEntity>(entityId);
+        StaticObjectInstance? entity = state.Entities.Get<StaticObjectInstance>(entityId);
         if (entity == null)
         {
             return NotFound();
         }
 
-        HarvestInteraction? interaction = _availableInteractionsService.GetAvailableInteractions(character, entity)
-            .OfType<HarvestInteraction>()
-            .SingleOrDefault(i => i.Harvest.Name == harvest);
-        if (interaction == null)
+        var jobAndHarvest = character.Jobs.SelectMany(j => j.Harvests.Select(h => new { Job = j, Harvest = h })).SingleOrDefault(x => x.Harvest.Name == harvestName);
+        if (jobAndHarvest == null)
         {
             return NotFound();
         }
 
-        state.CharacterActions.PlanInteraction(character, interaction, entity);
+        HarvestAction action = new(jobAndHarvest.Job.Job, jobAndHarvest.Harvest, entity);
+        state.Actions.QueueAction(character, action);
 
         return NoContent();
     }

@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0-alpha.0.134+4113a8e497526ad6755f0da9803d2f0bf53409fa"
+    "version": "0.0.0-alpha.0.135+c7b57deca0bd2ad33504f3e5d7959bff97edaa5e"
   },
   "servers": [
     {
@@ -575,7 +575,7 @@
         ]
       }
     },
-    "/game/team/characters/{characterGuid}/jobs/harvestables/{entityGuid}/{harvest}": {
+    "/game/team/characters/{characterGuid}/jobs/harvestables/{entityGuid}/{harvestNameName}": {
       "post": {
         "tags": [
           "Jobs"
@@ -604,13 +604,21 @@
             "x-position": 2
           },
           {
-            "name": "harvest",
+            "name": "harvestName",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 3
+          },
+          {
+            "name": "harvestNameName",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "x-position": 3
+            "x-position": 4
           }
         ],
         "responses": {
@@ -1667,13 +1675,38 @@
         ]
       },
       "HarvestableEntityHarvest": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/HarvestableEntityHarvestMinimal"
+          },
+          {
+            "type": "object",
+            "description": "Harvestable entity harvest\n            ",
+            "additionalProperties": false,
+            "required": [
+              "canHarvest"
+            ],
+            "properties": {
+              "canHarvest": {
+                "type": "boolean",
+                "description": "Can the harvest be performed\n            "
+              },
+              "whyCannotHarvest": {
+                "type": "string",
+                "description": "Why cannot the harvest be performed\n            ",
+                "nullable": true
+              }
+            }
+          }
+        ]
+      },
+      "HarvestableEntityHarvestMinimal": {
         "type": "object",
-        "description": "Job harvest\n            ",
+        "description": "Harvestable entity harvest (minimal\n            ",
         "additionalProperties": false,
         "required": [
           "job",
           "name",
-          "canHarvest",
           "expectedHarvest",
           "expectedExperience"
         ],
@@ -1690,15 +1723,6 @@
             "type": "string",
             "description": "The name of the harvest\n            ",
             "minLength": 1
-          },
-          "canHarvest": {
-            "type": "boolean",
-            "description": "Can the harvest be performed\n            "
-          },
-          "whyCannotHarvest": {
-            "type": "string",
-            "description": "Why cannot the harvest be performed\n            ",
-            "nullable": true
           },
           "expectedHarvest": {
             "type": "array",
@@ -1901,12 +1925,12 @@
               }
             ]
           },
-          "currentInteraction": {
+          "ongoingAction": {
             "description": "The interaction being performed by the character\n            ",
             "nullable": true,
             "oneOf": [
               {
-                "$ref": "#/components/schemas/InteractionInstance"
+                "$ref": "#/components/schemas/Action"
               }
             ]
           },
@@ -1915,7 +1939,7 @@
             "nullable": true,
             "oneOf": [
               {
-                "$ref": "#/components/schemas/CharacterAction"
+                "$ref": "#/components/schemas/Action"
               }
             ]
           }
@@ -2047,83 +2071,41 @@
           }
         }
       },
-      "InteractionInstance": {
-        "type": "object",
-        "description": "Interaction instance\n            ",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "interaction",
-          "target"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "The unique ID of the instance\n            ",
-            "format": "guid",
-            "minLength": 1
-          },
-          "interaction": {
-            "description": "The interaction associated with the instance\n            ",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/InteractionMinimal"
-              }
-            ]
-          },
-          "target": {
-            "description": "The target of the interaction\n            ",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/EntityMinimal"
-              }
-            ]
-          }
-        }
-      },
-      "InteractionMinimal": {
-        "type": "object",
-        "description": "Interaction (minimal)\n            ",
-        "additionalProperties": false,
-        "required": [
-          "name"
-        ],
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "The name of the interaction\n            ",
-            "minLength": 1
-          }
-        }
-      },
-      "CharacterAction": {
+      "Action": {
         "type": "object",
         "discriminator": {
           "propertyName": "$type",
           "mapping": {
-            "move": "#/components/schemas/CharacterMoveToLocationAction",
-            "interact": "#/components/schemas/CharacterInteractWithEntityAction"
+            "move": "#/components/schemas/MoveAction",
+            "harvest": "#/components/schemas/HarvestAction",
+            "combat-pve": "#/components/schemas/PveCombatAction"
           }
         },
         "description": "An action performed by a character\n            ",
         "additionalProperties": false,
         "required": [
+          "name",
           "$type"
         ],
         "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the action\n            ",
+            "minLength": 1
+          },
           "$type": {
             "type": "string"
           }
         }
       },
-      "CharacterMoveToLocationAction": {
+      "MoveAction": {
         "allOf": [
           {
-            "$ref": "#/components/schemas/CharacterAction"
+            "$ref": "#/components/schemas/Action"
           },
           {
             "type": "object",
-            "description": "Character moves to location\n            ",
+            "description": "Move action\n            ",
             "additionalProperties": false,
             "required": [
               "location"
@@ -2141,35 +2123,99 @@
           }
         ]
       },
-      "CharacterInteractWithEntityAction": {
+      "HarvestAction": {
         "allOf": [
           {
-            "$ref": "#/components/schemas/CharacterAction"
+            "$ref": "#/components/schemas/Action"
           },
           {
             "type": "object",
-            "description": "Character interact with entity\n            ",
+            "description": "Harvest action\n            ",
             "additionalProperties": false,
             "required": [
-              "interaction",
+              "harvest",
               "target"
             ],
             "properties": {
-              "interaction": {
-                "description": "The interaction\n            ",
+              "harvest": {
+                "description": "The harvest\n            ",
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/InteractionMinimal"
+                    "$ref": "#/components/schemas/HarvestableEntityHarvestMinimal"
                   }
                 ]
               },
               "target": {
-                "description": "The target of the interaction\n            ",
+                "description": "The target of the harvest\n            ",
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/EntityMinimal"
+                    "$ref": "#/components/schemas/StaticObjectInstance"
                   }
                 ]
+              }
+            }
+          }
+        ]
+      },
+      "StaticObjectInstance": {
+        "type": "object",
+        "description": "Static object instance\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "staticObject"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the entity\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "staticObject": {
+            "description": "The name of the entity\n            ",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/StaticObject"
+              }
+            ]
+          }
+        }
+      },
+      "PveCombatAction": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Action"
+          },
+          {
+            "type": "object",
+            "description": "PVE combat action\n            ",
+            "additionalProperties": false,
+            "required": [
+              "combatId",
+              "attackers",
+              "defenders"
+            ],
+            "properties": {
+              "combatId": {
+                "type": "string",
+                "description": "The unique ID of the combat\n            ",
+                "format": "guid",
+                "minLength": 1
+              },
+              "attackers": {
+                "type": "array",
+                "description": "The attackers in the combat instance\n            ",
+                "items": {
+                  "$ref": "#/components/schemas/EntityMinimal"
+                }
+              },
+              "defenders": {
+                "type": "array",
+                "description": "The defenders in the combat instance\n            ",
+                "items": {
+                  "$ref": "#/components/schemas/EntityMinimal"
+                }
               }
             }
           }
@@ -2247,9 +2293,8 @@
             "deleted": "#/components/schemas/CharacterDeletedHistoryEntry",
             "moved": "#/components/schemas/CharacterMoveLocationHistoryEntry",
             "inventory-changed": "#/components/schemas/CharacterInventoryChangedHistoryEntry",
-            "action-performed": "#/components/schemas/CharacterPerformedActionHistoryEntry",
-            "interaction-started": "#/components/schemas/CharacterStartedInteractionHistoryEntry",
-            "interaction-ended": "#/components/schemas/CharacterEndedInteractionHistoryEntry",
+            "interaction-started": "#/components/schemas/ActionStartedHistoryEntry",
+            "interaction-ended": "#/components/schemas/ActionEndedHistoryEntry",
             "job-learned": "#/components/schemas/CharacterLearnedJobHistoryEntry",
             "job-gained-experience": "#/components/schemas/CharacterJobGainedExperienceHistoryEntry",
             "job-leveled-up": "#/components/schemas/CharacterJobLeveledUpHistoryEntry",
@@ -2430,105 +2475,44 @@
           }
         ]
       },
-      "CharacterPerformedActionHistoryEntry": {
+      "ActionStartedHistoryEntry": {
         "allOf": [
           {
             "$ref": "#/components/schemas/CharacterHistoryEntry"
           },
           {
             "type": "object",
-            "description": "Character performed action\n            ",
+            "description": "Action started history entry\n            ",
             "additionalProperties": false,
             "required": [
-              "action",
-              "success"
+              "actionName"
             ],
             "properties": {
-              "action": {
-                "description": "The action that has been performed\n            ",
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/CharacterAction"
-                  }
-                ]
-              },
-              "success": {
-                "type": "boolean",
-                "description": "Has the action been successful\n            "
-              },
-              "failureReason": {
+              "actionName": {
                 "type": "string",
-                "description": "The reason of the failure\n            ",
-                "nullable": true
-              }
-            }
-          }
-        ]
-      },
-      "CharacterStartedInteractionHistoryEntry": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/CharacterHistoryEntry"
-          },
-          {
-            "type": "object",
-            "description": "Character started interaction history entry\n            ",
-            "additionalProperties": false,
-            "required": [
-              "interactionName",
-              "targetId",
-              "targetName"
-            ],
-            "properties": {
-              "interactionName": {
-                "type": "string",
-                "description": "The name of the interaction that has been started\n            ",
-                "minLength": 1
-              },
-              "targetId": {
-                "type": "string",
-                "description": "The entity that was the target of the interaction\n            ",
-                "format": "guid",
-                "minLength": 1
-              },
-              "targetName": {
-                "type": "string",
-                "description": "The name of the entity that was the target of the interaction\n            ",
+                "description": "The name of the action that has started\n            ",
                 "minLength": 1
               }
             }
           }
         ]
       },
-      "CharacterEndedInteractionHistoryEntry": {
+      "ActionEndedHistoryEntry": {
         "allOf": [
           {
             "$ref": "#/components/schemas/CharacterHistoryEntry"
           },
           {
             "type": "object",
-            "description": "Character ended interaction history entry\n            ",
+            "description": "Action ended history entry\n            ",
             "additionalProperties": false,
             "required": [
-              "interactionName",
-              "targetId",
-              "targetName"
+              "actionName"
             ],
             "properties": {
-              "interactionName": {
+              "actionName": {
                 "type": "string",
-                "description": "The name of the interaction that has been started\n            ",
-                "minLength": 1
-              },
-              "targetId": {
-                "type": "string",
-                "description": "The entity that was the target of the interaction\n            ",
-                "format": "guid",
-                "minLength": 1
-              },
-              "targetName": {
-                "type": "string",
-                "description": "The name of the entity that was the target of the interaction\n            ",
+                "description": "The name of the action that has ended\n            ",
                 "minLength": 1
               }
             }

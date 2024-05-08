@@ -1,19 +1,19 @@
 ﻿using RestAdventure.Core.Combat;
 using RestAdventure.Core.Entities;
-using RestAdventure.Core.Interactions;
 using RestAdventure.Core.Items;
 using RestAdventure.Core.Jobs;
 using RestAdventure.Core.Maps;
 using RestAdventure.Core.Players;
 using RestAdventure.Core.Utils;
+using Action = RestAdventure.Core.Actions.Action;
 
 namespace RestAdventure.Core.Characters;
 
 public record CharacterId(Guid Guid) : GameEntityId(Guid);
 
-public class Character : GameEntity<CharacterId>, IGameEntityWithInventory, IGameEntityWithJobs, IGameEntityWithCombatStatistics, IInteractingEntity, IGameEntityWithMovement
+public class Character : GameEntity<CharacterId>, IGameEntityWithInventory, IGameEntityWithJobs, IGameEntityWithCombatStatistics, IGameEntityWithMovement
 {
-    InteractionInstance? _currentInteraction;
+    Action? _currentInteraction;
 
     public Character(Player player, CharacterClass characterClass, string name) : base(new CharacterId(Guid.NewGuid()), name, characterClass.StartLocation)
     {
@@ -56,13 +56,6 @@ public class Character : GameEntity<CharacterId>, IGameEntityWithInventory, IGam
     public EntityCombatStatistics Combat { get; private set; }
 
     public CombatEntityKind CombatEntityKind => CombatEntityKind.Character;
-
-    /// <summary>
-    ///     The interaction being performed by the character
-    /// </summary>
-    public InteractionInstance? CurrentInteraction => _currentInteraction;
-
-    InteractionInstance? IInteractingEntity.CurrentInteraction { get => _currentInteraction; set => _currentInteraction = value; }
 
     /// <summary>
     ///     The movement of the character

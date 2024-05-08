@@ -2,30 +2,28 @@ import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { ReplaySubject, combineLatest, map, switchMap, tap } from 'rxjs';
 import {
+  ActionEndedHistoryEntry,
+  ActionStartedHistoryEntry,
   CharacterAttackedHistoryEntry,
   CharacterCombatEndedHistoryEntry,
   CharacterCombatInPreparationCanceledHistoryEntry,
   CharacterCombatStartedHistoryEntry,
   CharacterCreatedHistoryEntry,
   CharacterDeletedHistoryEntry,
-  CharacterEndedInteractionHistoryEntry,
   CharacterHistoryEntry,
   CharacterInventoryChangedHistoryEntry,
   CharacterJobGainedExperienceHistoryEntry,
   CharacterJobLeveledUpHistoryEntry,
   CharacterLearnedJobHistoryEntry,
   CharacterMoveLocationHistoryEntry,
-  CharacterPerformedActionHistoryEntry,
   CharacterReceivedAttackHistoryEntry,
   CharacterStartedCombatPreparationHistoryEntry,
-  CharacterStartedInteractionHistoryEntry,
   CombatEntityInHistoryEntry,
   CombatSide,
   TeamCharacter,
   TeamCharactersApiClient,
 } from '../../../../api/game-api-client.generated';
 import { GameService } from '../../services/game.service';
-import { CharacterActionUtils } from '../../utils/character-action-utils';
 
 @Component({
   selector: 'app-character-history',
@@ -111,20 +109,12 @@ export class CharacterHistoryComponent implements OnInit {
       }
     }
 
-    if (entry instanceof CharacterPerformedActionHistoryEntry) {
-      if (entry.success) {
-        return `Performed action successfully: ${CharacterActionUtils.toString(entry.action)}`;
-      } else {
-        return `Failed to perform action: ${CharacterActionUtils.toString(entry.action)}. Reason: ${entry.failureReason}`;
-      }
+    if (entry instanceof ActionStartedHistoryEntry) {
+      return `Started action ${entry.actionName}`;
     }
 
-    if (entry instanceof CharacterStartedInteractionHistoryEntry) {
-      return `Started interaction ${entry.interactionName} with ${entry.targetName}`;
-    }
-
-    if (entry instanceof CharacterEndedInteractionHistoryEntry) {
-      return `Ended interaction ${entry.interactionName} with ${entry.targetName}`;
+    if (entry instanceof ActionEndedHistoryEntry) {
+      return `Ended action ${entry.actionName}`;
     }
 
     if (entry instanceof CharacterLearnedJobHistoryEntry) {

@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { ReplaySubject, switchMap, tap } from 'rxjs';
-import { CharacterInteractWithEntityAction, MonsterGroup, PveApiClient, TeamCharacter } from '../../../../api/game-api-client.generated';
+import { Action, MonsterGroup, PveApiClient, PveCombatAction, TeamCharacter } from '../../../../api/game-api-client.generated';
 import { GameService } from '../../services/game.service';
 
 @Component({
@@ -39,22 +39,6 @@ export class CharacterMonstersComponent implements OnInit {
       .subscribe();
   }
 
-  plansToAttack(monsterGroup?: MonsterGroup) {
-    if (
-      !this.character?.plannedAction ||
-      !(this.character.plannedAction instanceof CharacterInteractWithEntityAction) ||
-      this.character.plannedAction.interaction.name != 'combat'
-    ) {
-      return false;
-    }
-
-    if (monsterGroup && this.character.plannedAction.interaction.name == 'combat' && this.character.plannedAction.target.id != monsterGroup.id) {
-      return false;
-    }
-
-    return true;
-  }
-
   attack(monsterGroup: MonsterGroup) {
     if (!this.character || !monsterGroup.canAttack) {
       return;
@@ -66,15 +50,26 @@ export class CharacterMonstersComponent implements OnInit {
       .subscribe();
   }
 
+  plansToAttack(monsterGroup?: MonsterGroup) {
+    return this.character?.plannedAction && this.isCombatAction(this.character.plannedAction, monsterGroup);
+  }
+
   isAttacking(monsterGroup: MonsterGroup) {
-    if (!this.character?.currentInteraction) {
+    return this.character?.ongoingAction && this.isCombatAction(this.character.ongoingAction, monsterGroup);
+  }
+
+  private isCombatAction(action: Action, monsterGroup?: MonsterGroup) {
+    if (!(action instanceof PveCombatAction)) {
       return false;
     }
 
-    if (monsterGroup && (this.character.currentInteraction.interaction.name != 'combat' || this.character.currentInteraction.target.id != monsterGroup.id)) {
-      return false;
+    if (!monsterGroup) {
+      return true;
     }
 
-    return true;
+    const inCombat = [...action.attackers.map(a => a.id), ...action.defenders.map(a => a.id)];
+    const inGroup = monsterGroup.monsters.map(m => m.id);
+
+    return inGroup.some(id => inCombat.includes(id));
   }
 }

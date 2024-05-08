@@ -42,8 +42,8 @@ public class TeamController : GameApiController
                     c => c.ToDto(
                         new CharacterMappingOptions
                         {
-                            InteractionInstance = state.Interactions.GetCharacterInteraction(c),
-                            NextAction = state.CharacterActions.GetPlannedAction(c)
+                            OngoingAction = state.Actions.GetOngoingAction(c),
+                            PlannedAction = state.Actions.GetQueuedAction(c)
                         }
                     )
                 )

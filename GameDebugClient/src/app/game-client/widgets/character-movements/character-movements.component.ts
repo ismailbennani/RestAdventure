@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { ReplaySubject, switchMap, tap } from 'rxjs';
 import { LocationMinimal } from '../../../../api/admin-api-client.generated';
-import { CharacterMoveToLocationAction, LocationWithAccess, LocationsApiClient, TeamCharacter } from '../../../../api/game-api-client.generated';
+import { LocationWithAccess, LocationsApiClient, MoveAction, TeamCharacter } from '../../../../api/game-api-client.generated';
 import { GameService } from '../../services/game.service';
 
 @Component({
@@ -52,7 +52,7 @@ export class CharacterMovementsComponent implements OnInit {
   }
 
   plansToMove(location?: LocationMinimal) {
-    if (!this.character?.plannedAction || !(this.character.plannedAction instanceof CharacterMoveToLocationAction)) {
+    if (!this.character?.plannedAction || !(this.character.plannedAction instanceof MoveAction)) {
       return false;
     }
 

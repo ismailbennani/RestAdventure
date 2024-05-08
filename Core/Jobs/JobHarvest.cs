@@ -37,3 +37,8 @@ public class JobHarvest
     /// </summary>
     public required int Experience { get; init; }
 }
+
+public static class JobHarvestMappingExtensions
+{
+    public static bool Match(this JobHarvest harvest, StaticObjectInstance instance) => harvest.Targets.Contains(instance.Object);
+}
