@@ -11,6 +11,7 @@ import {
   CombatsApiClient,
   EntityWithInteractions,
   InteractionMinimal,
+  LocationsApiClient,
   Team,
   TeamCharacter,
   TeamCharactersActionsApiClient,
@@ -56,6 +57,7 @@ export class CharacterPageComponent implements OnInit {
     private teamService: TeamService,
     private charactersApiClient: TeamCharactersApiClient,
     private charactersActionsApiClient: TeamCharactersActionsApiClient,
+    private locationsApiClient: LocationsApiClient,
     private combatsApiClient: CombatsApiClient,
   ) {}
 
@@ -98,7 +100,7 @@ export class CharacterPageComponent implements OnInit {
           this.loading = false;
 
           return forkJoin({
-            locations: this.charactersActionsApiClient.getAccessibleLocations(this.character.id),
+            locations: this.locationsApiClient.getAccessibleLocations(this.character.id),
             interactions: this.charactersActionsApiClient.getAvailableInteractions(this.character.id),
           });
         }),
@@ -131,7 +133,7 @@ export class CharacterPageComponent implements OnInit {
       return;
     }
 
-    this.charactersActionsApiClient
+    this.locationsApiClient
       .moveToLocation(this.character.id, location.id)
       .pipe(switchMap(_ => this.gameService.refreshNow(true)))
       .subscribe();

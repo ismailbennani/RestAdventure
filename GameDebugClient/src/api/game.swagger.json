@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0-alpha.0.112+cb880557cb3f552dae2e1607d12381405ccb9ad9"
+    "version": "0.0.0-alpha.0.119+fb8c0a4ed0dfa99981db5bef2d2175f44fa9e563"
   },
   "servers": [
     {
@@ -11,6 +11,88 @@
     }
   ],
   "paths": {
+    "/game/location/{locationGuid}/combats/in-preparation": {
+      "get": {
+        "tags": [
+          "Combats"
+        ],
+        "summary": "Get combats in preparation",
+        "operationId": "Combats_GetCombatsInPreparation",
+        "parameters": [
+          {
+            "name": "locationGuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CombatInPreparation"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ]
+      }
+    },
+    "/game/location/{locationGuid}/combats": {
+      "get": {
+        "tags": [
+          "Combats"
+        ],
+        "summary": "Get combats",
+        "operationId": "Combats_GetCombats",
+        "parameters": [
+          {
+            "name": "locationGuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CombatInstance"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ]
+      }
+    },
     "/game/status/ping": {
       "get": {
         "tags": [
@@ -322,95 +404,13 @@
         ]
       }
     },
-    "/game/location/{locationGuid}/combats/in-preparation": {
-      "get": {
-        "tags": [
-          "Combats"
-        ],
-        "summary": "Get combats in preparation",
-        "operationId": "Combats_GetCombatsInPreparation",
-        "parameters": [
-          {
-            "name": "locationGuid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CombatInPreparation"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "api-key": []
-          }
-        ]
-      }
-    },
-    "/game/location/{locationGuid}/combats": {
-      "get": {
-        "tags": [
-          "Combats"
-        ],
-        "summary": "Get combats",
-        "operationId": "Combats_GetCombats",
-        "parameters": [
-          {
-            "name": "locationGuid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CombatInstance"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "api-key": []
-          }
-        ]
-      }
-    },
     "/game/team/characters/{characterGuid}/locations": {
       "get": {
         "tags": [
-          "Team"
+          "Locations"
         ],
         "summary": "Get accessible locations",
-        "operationId": "TeamCharactersActions_GetAccessibleLocations",
+        "operationId": "Locations_GetAccessibleLocations",
         "parameters": [
           {
             "name": "characterGuid",
@@ -448,10 +448,10 @@
     "/game/team/characters/{characterGuid}/locations/{locationGuid}": {
       "post": {
         "tags": [
-          "Team"
+          "Locations"
         ],
         "summary": "Move to location",
-        "operationId": "TeamCharactersActions_MoveToLocation",
+        "operationId": "Locations_MoveToLocation",
         "parameters": [
           {
             "name": "characterGuid",
@@ -849,6 +849,162 @@
   },
   "components": {
     "schemas": {
+      "CombatInPreparation": {
+        "type": "object",
+        "description": "Combat instance\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "team1",
+          "team2"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the combat instance\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "team1": {
+            "type": "array",
+            "description": "The first team in the combat instance\n            ",
+            "items": {
+              "$ref": "#/components/schemas/EntityMinimal"
+            }
+          },
+          "team2": {
+            "type": "array",
+            "description": "The second team in the combat instance\n            ",
+            "items": {
+              "$ref": "#/components/schemas/EntityMinimal"
+            }
+          }
+        }
+      },
+      "EntityMinimal": {
+        "type": "object",
+        "description": "Entity (minimal)\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the entity\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the entity\n            ",
+            "minLength": 1
+          }
+        }
+      },
+      "CombatInstance": {
+        "type": "object",
+        "description": "Combat instance\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "team1",
+          "team2",
+          "turn"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the combat instance\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "team1": {
+            "type": "array",
+            "description": "The first team in the combat instance\n            ",
+            "items": {
+              "$ref": "#/components/schemas/EntityInCombat"
+            }
+          },
+          "team2": {
+            "type": "array",
+            "description": "The second team in the combat instance\n            ",
+            "items": {
+              "$ref": "#/components/schemas/EntityInCombat"
+            }
+          },
+          "turn": {
+            "type": "integer",
+            "description": "The current turn of the combat instance\n            ",
+            "format": "int32"
+          }
+        }
+      },
+      "EntityInCombat": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/EntityMinimal"
+          },
+          {
+            "type": "object",
+            "description": "Entity in combat\n            ",
+            "additionalProperties": false,
+            "required": [
+              "level",
+              "combat"
+            ],
+            "properties": {
+              "level": {
+                "type": "integer",
+                "description": "The level of the character\n            ",
+                "format": "int32"
+              },
+              "combat": {
+                "description": "The combat statistics of the character\n            ",
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/EntityCombatStatistics"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "EntityCombatStatistics": {
+        "type": "object",
+        "description": "Entity combat statistics\n            ",
+        "additionalProperties": false,
+        "required": [
+          "health",
+          "maxHealth",
+          "speed",
+          "attack"
+        ],
+        "properties": {
+          "health": {
+            "type": "integer",
+            "description": "The health of the entity\n            ",
+            "format": "int32"
+          },
+          "maxHealth": {
+            "type": "integer",
+            "description": "The max health of the entity\n            ",
+            "format": "int32"
+          },
+          "speed": {
+            "type": "integer",
+            "description": "The speed of the entity\n            ",
+            "format": "int32"
+          },
+          "attack": {
+            "type": "integer",
+            "description": "The attack of the entity\n            ",
+            "format": "int32"
+          }
+        }
+      },
       "CharacterClass": {
         "allOf": [
           {
@@ -1199,162 +1355,6 @@
             "description": "If the game is not paused, the date at which next tick will be computed\n            ",
             "format": "date-time",
             "nullable": true
-          }
-        }
-      },
-      "CombatInPreparation": {
-        "type": "object",
-        "description": "Combat instance\n            ",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "team1",
-          "team2"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "The unique ID of the combat instance\n            ",
-            "format": "guid",
-            "minLength": 1
-          },
-          "team1": {
-            "type": "array",
-            "description": "The first team in the combat instance\n            ",
-            "items": {
-              "$ref": "#/components/schemas/EntityMinimal"
-            }
-          },
-          "team2": {
-            "type": "array",
-            "description": "The second team in the combat instance\n            ",
-            "items": {
-              "$ref": "#/components/schemas/EntityMinimal"
-            }
-          }
-        }
-      },
-      "EntityMinimal": {
-        "type": "object",
-        "description": "Entity (minimal)\n            ",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "name"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "The unique ID of the entity\n            ",
-            "format": "guid",
-            "minLength": 1
-          },
-          "name": {
-            "type": "string",
-            "description": "The name of the entity\n            ",
-            "minLength": 1
-          }
-        }
-      },
-      "CombatInstance": {
-        "type": "object",
-        "description": "Combat instance\n            ",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "team1",
-          "team2",
-          "turn"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "The unique ID of the combat instance\n            ",
-            "format": "guid",
-            "minLength": 1
-          },
-          "team1": {
-            "type": "array",
-            "description": "The first team in the combat instance\n            ",
-            "items": {
-              "$ref": "#/components/schemas/EntityInCombat"
-            }
-          },
-          "team2": {
-            "type": "array",
-            "description": "The second team in the combat instance\n            ",
-            "items": {
-              "$ref": "#/components/schemas/EntityInCombat"
-            }
-          },
-          "turn": {
-            "type": "integer",
-            "description": "The current turn of the combat instance\n            ",
-            "format": "int32"
-          }
-        }
-      },
-      "EntityInCombat": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/EntityMinimal"
-          },
-          {
-            "type": "object",
-            "description": "Entity in combat\n            ",
-            "additionalProperties": false,
-            "required": [
-              "level",
-              "combat"
-            ],
-            "properties": {
-              "level": {
-                "type": "integer",
-                "description": "The level of the character\n            ",
-                "format": "int32"
-              },
-              "combat": {
-                "description": "The combat statistics of the character\n            ",
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/EntityCombatStatistics"
-                  }
-                ]
-              }
-            }
-          }
-        ]
-      },
-      "EntityCombatStatistics": {
-        "type": "object",
-        "description": "Entity combat statistics\n            ",
-        "additionalProperties": false,
-        "required": [
-          "health",
-          "maxHealth",
-          "speed",
-          "attack"
-        ],
-        "properties": {
-          "health": {
-            "type": "integer",
-            "description": "The health of the entity\n            ",
-            "format": "int32"
-          },
-          "maxHealth": {
-            "type": "integer",
-            "description": "The max health of the entity\n            ",
-            "format": "int32"
-          },
-          "speed": {
-            "type": "integer",
-            "description": "The speed of the entity\n            ",
-            "format": "int32"
-          },
-          "attack": {
-            "type": "integer",
-            "description": "The attack of the entity\n            ",
-            "format": "int32"
           }
         }
       },
@@ -2739,13 +2739,16 @@
   },
   "tags": [
     {
+      "name": "Combats"
+    },
+    {
       "name": "Status"
     },
     {
       "name": "Game"
     },
     {
-      "name": "Combats"
+      "name": "Locations"
     },
     {
       "name": "Team"
