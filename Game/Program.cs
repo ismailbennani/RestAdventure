@@ -168,9 +168,11 @@ async Task<GameState> LoadGameAsync(WebApplication app)
     MonsterInstance petitPaw = new(baseGameContent.Rattlings.PetitPaw, 1, baseGameContent.GeneratedMaps.Locations.First());
     await state.Entities.AddAsync(petitPaw);
 
+    MonsterInstance biggaud = new(baseGameContent.Rattlings.Biggaud, 1, baseGameContent.GeneratedMaps.Locations.First());
+    await state.Entities.AddAsync(biggaud);
+
     Player player = await state.Players.RegisterPlayerAsync(new User(new UserId(Guid.NewGuid()), "PLAYER"));
     await state.Entities.AddAsync(new Character(player, baseGameContent.CharacterClasses.Dealer, "DEALER"));
-
 
     return state;
 }

@@ -6,6 +6,7 @@ import { ILocationMinimal, LocationMinimal } from '../../../../api/admin-api-cli
 import {
   CharacterInteractWithEntityAction,
   CharacterMoveToLocationAction,
+  CombatInPreparation,
   CombatInstance,
   CombatsApiClient,
   EntityWithInteractions,
@@ -22,6 +23,7 @@ import { PlayersService } from '../../services/players/players.service';
 import { TeamService } from '../../services/team/team.service';
 import { CharacterHistoryComponent } from '../../widgets/character-history/character-history.component';
 import { CharacterComponent } from '../../widgets/character/character.component';
+import { CombatInPreparationComponent } from '../../widgets/combat-in-preparation/combat-in-preparation.component';
 import { CombatComponent } from '../../widgets/combat/combat.component';
 import { InventoryComponent } from '../../widgets/inventory/inventory.component';
 import { JobsComponent } from '../../widgets/jobs/jobs.component';
@@ -30,7 +32,7 @@ import { JobsComponent } from '../../widgets/jobs/jobs.component';
   selector: 'app-character-page',
   templateUrl: './character-page.component.html',
   standalone: true,
-  imports: [CommonModule, SpinnerComponent, InventoryComponent, CharacterComponent, CharacterHistoryComponent, JobsComponent, CombatComponent],
+  imports: [CommonModule, SpinnerComponent, InventoryComponent, CharacterComponent, CharacterHistoryComponent, JobsComponent, CombatComponent, CombatInPreparationComponent],
 })
 export class CharacterPageComponent implements OnInit {
   protected loading: boolean = false;
@@ -39,7 +41,9 @@ export class CharacterPageComponent implements OnInit {
   protected accessibleLocations: LocationMinimal[] = [];
   protected entitiesWithInteractions: EntityWithInteractions[] = [];
   protected combats: CombatInstance[] = [];
+  protected combatsInPreparation: CombatInPreparation[] = [];
   protected selectedCombat: CombatInstance | undefined;
+  protected selectedCombatInPreparation: CombatInPreparation | undefined;
 
   private team: Team | undefined;
   private refreshSubject: ReplaySubject<void> = new ReplaySubject<void>(1);
@@ -75,6 +79,10 @@ export class CharacterPageComponent implements OnInit {
             return of(undefined);
           }
 
+          if (this.character?.id !== this.characterId) {
+            this.clearStateAfterCharacterChanged();
+          }
+
           this.character = this.team?.characters.find(c => c.id === this.characterId);
 
           if (!this.character && this.team && this.team.characters.length > 0) {
@@ -103,16 +111,16 @@ export class CharacterPageComponent implements OnInit {
             return of(undefined);
           }
 
-          return this.combatsApiClient.getCombats(this.character.location.id);
+          return forkJoin({
+            combats: this.combatsApiClient.getCombats(this.character.location.id),
+            combatsInPreparation: this.combatsApiClient.getCombatsInPreparation(this.character.location.id),
+          });
         }),
-        map(combats => {
-          this.combats = combats ?? [];
+        map(result => {
+          this.combats = result?.combats ?? [];
+          this.combatsInPreparation = result?.combatsInPreparation ?? [];
 
-          if (this.combats.length > 0) {
-            this.selectCombat(this.combats[0]);
-          } else {
-            this.unselectCombat();
-          }
+          this.autoSelectCombatAfterRefresh();
         }),
       )
       .subscribe();
@@ -201,9 +209,61 @@ export class CharacterPageComponent implements OnInit {
 
   selectCombat(combat: CombatInstance) {
     this.selectedCombat = combat;
+    this.selectedCombatInPreparation = undefined;
+  }
+
+  selectCombatInPreparation(combatInPreparation: CombatInPreparation) {
+    this.selectedCombatInPreparation = combatInPreparation;
+    this.selectedCombat = undefined;
   }
 
   unselectCombat() {
     this.selectedCombat = undefined;
+    this.selectedCombatInPreparation = undefined;
+  }
+
+  private autoSelectCombatAfterRefresh() {
+    const currentSelection = this.selectedCombat?.id ?? this.selectedCombatInPreparation?.id;
+    if (currentSelection) {
+      const combat = this.combats.find(c => c.id === currentSelection);
+      if (combat) {
+        this.selectCombat(combat);
+        return;
+      }
+
+      const combatInPreparation = this.combats.find(c => c.id === currentSelection);
+      if (combatInPreparation) {
+        this.selectCombatInPreparation(combatInPreparation);
+        return;
+      }
+    }
+
+    const combatInvolvingCharacter = this.combats.find(c => c.team1.some(e => e.id === this.characterId) || c.team2.some(e => e.id === this.characterId));
+    if (combatInvolvingCharacter) {
+      this.selectCombat(combatInvolvingCharacter);
+      return;
+    }
+
+    const combatInPreparationInvolvingCharacter = this.combatsInPreparation.find(c => c.team1.some(e => e.id === this.characterId) || c.team2.some(e => e.id === this.characterId));
+    if (combatInPreparationInvolvingCharacter) {
+      this.selectCombatInPreparation(combatInPreparationInvolvingCharacter);
+      return;
+    }
+
+    if (this.combats.length > 0) {
+      this.selectCombat(this.combats[0]);
+      return;
+    }
+
+    if (this.combatsInPreparation.length > 0) {
+      this.selectCombatInPreparation(this.combatsInPreparation[0]);
+      return;
+    }
+
+    this.unselectCombat();
+  }
+
+  private clearStateAfterCharacterChanged() {
+    this.unselectCombat();
   }
 }

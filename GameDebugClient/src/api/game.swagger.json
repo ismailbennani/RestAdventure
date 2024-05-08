@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0-alpha.0.111+89a09df08b809bd71fb63f4facb8a7fe5d3c95a3"
+    "version": "0.0.0-alpha.0.112+cb880557cb3f552dae2e1607d12381405ccb9ad9"
   },
   "servers": [
     {
@@ -310,6 +310,47 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/GameState"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ]
+      }
+    },
+    "/game/location/{locationGuid}/combats/in-preparation": {
+      "get": {
+        "tags": [
+          "Combats"
+        ],
+        "summary": "Get combats in preparation",
+        "operationId": "Combats_GetCombatsInPreparation",
+        "parameters": [
+          {
+            "name": "locationGuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CombatInPreparation"
+                  }
                 }
               }
             }
@@ -1161,6 +1202,60 @@
           }
         }
       },
+      "CombatInPreparation": {
+        "type": "object",
+        "description": "Combat instance\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "team1",
+          "team2"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the combat instance\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "team1": {
+            "type": "array",
+            "description": "The first team in the combat instance\n            ",
+            "items": {
+              "$ref": "#/components/schemas/EntityMinimal"
+            }
+          },
+          "team2": {
+            "type": "array",
+            "description": "The second team in the combat instance\n            ",
+            "items": {
+              "$ref": "#/components/schemas/EntityMinimal"
+            }
+          }
+        }
+      },
+      "EntityMinimal": {
+        "type": "object",
+        "description": "Entity (minimal)\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the entity\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the entity\n            ",
+            "minLength": 1
+          }
+        }
+      },
       "CombatInstance": {
         "type": "object",
         "description": "Combat instance\n            ",
@@ -1260,28 +1355,6 @@
             "type": "integer",
             "description": "The attack of the entity\n            ",
             "format": "int32"
-          }
-        }
-      },
-      "EntityMinimal": {
-        "type": "object",
-        "description": "Entity (minimal)\n            ",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "name"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "The unique ID of the entity\n            ",
-            "format": "guid",
-            "minLength": 1
-          },
-          "name": {
-            "type": "string",
-            "description": "The name of the entity\n            ",
-            "minLength": 1
           }
         }
       },

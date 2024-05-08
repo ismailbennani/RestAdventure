@@ -103,25 +103,40 @@
                   </div>
                   <hr class="m-0" />
                   <div class="list-group list-group-flush">
-                    @if (combats.length === 0) {
+                    @if (combats.length === 0 && combatsInPreparation.length == 0) {
                       <div class="text-secondary text-center py-2">None</div>
                     } @else {
                       @for (combat of combats; track combat.id) {
                         <a role="button" class="list-group-item list-group-item-action" [class.active]="combat.id === selectedCombat?.id" (click)="selectCombat(combat)">
-                          <div class="d-flex gap-2 align-items-center">
-                            <div>vs.</div>
-                            <div>
-                              <div class="text-truncate">
-                                @for (entity of combat.team1; track entity.id) {
-                                  {{ entity.name }},
-                                }
-                              </div>
-                              <div class="text-truncate">
-                                @for (entity of combat.team2; track entity.id) {
-                                  {{ entity.name }},
-                                }
-                              </div>
-                            </div>
+                          <div class="text-truncate">
+                            @for (entity of combat.team1; track entity.id) {
+                              {{ entity.name }},
+                            }
+                          </div>
+                          <div class="text-truncate">
+                            @for (entity of combat.team2; track entity.id) {
+                              {{ entity.name }},
+                            }
+                          </div>
+                        </a>
+                      }
+
+                      @for (combat of combatsInPreparation; track combat.id) {
+                        <a
+                          role="button"
+                          class="list-group-item list-group-item-action text-secondary"
+                          [ngClass]="combat.id === selectedCombatInPreparation?.id ? 'active text-light' : undefined"
+                          (click)="selectCombatInPreparation(combat)"
+                        >
+                          <div class="text-truncate">
+                            @for (entity of combat.team1; track entity.id) {
+                              {{ entity.name }},
+                            }
+                          </div>
+                          <div class="text-truncate">
+                            @for (entity of combat.team2; track entity.id) {
+                              {{ entity.name }},
+                            }
                           </div>
                         </a>
                       }
@@ -132,6 +147,8 @@
                 <div class="flex-grow-1 py-3 px-4">
                   @if (selectedCombat) {
                     <app-combat [combat]="selectedCombat"></app-combat>
+                  } @else if (selectedCombatInPreparation) {
+                    <app-combat-in-preparation [combat]="selectedCombatInPreparation"></app-combat-in-preparation>
                   } @else {
                     <div class="w-100 h-100 d-flex align-items-center justify-content-center">
                       <h6 class="text-secondary text-center">Select combat</h6>

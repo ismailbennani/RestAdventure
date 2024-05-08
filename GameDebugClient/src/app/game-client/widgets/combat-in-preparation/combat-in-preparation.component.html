@@ -1,0 +1,24 @@
+<div class="w-100 h-100">
+  <div class="row text-center">
+    <h6>Preparation...</h6>
+  </div>
+  <div class="row">
+    <div class="col-lg-5 d-flex gap-2">
+      @for (entity of combat.team1; track entity.id) {
+        <ng-container [ngTemplateOutlet]="entityTpl" [ngTemplateOutletContext]="{ entity }"></ng-container>
+      }
+    </div>
+    <div class="col"></div>
+    <div class="col-lg-5 d-flex gap-2">
+      @for (entity of combat.team2; track entity.id) {
+        <ng-container [ngTemplateOutlet]="entityTpl" [ngTemplateOutletContext]="{ entity }"></ng-container>
+      }
+    </div>
+  </div>
+</div>
+
+<ng-template #entityTpl let-entity="entity">
+  <div class="flex-grow-1 text-center">
+    <div>{{ entity.name }}</div>
+  </div>
+</ng-template>

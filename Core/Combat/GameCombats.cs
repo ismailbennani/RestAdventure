@@ -135,9 +135,9 @@ public class GameCombats : IDisposable
     }
 
     public CombatInPreparation? GetInPreparation(CombatInstanceId combatInstanceId) => _combatsInPreparation.GetValueOrDefault(combatInstanceId);
-
     public CombatInstance? Get(CombatInstanceId combatInstanceId) => _combats.GetValueOrDefault(combatInstanceId);
 
+    public IEnumerable<CombatInPreparation> InPreparationAtLocation(Location location) => _combatsInPreparation.Values.Where(c => c.Location == location);
     public IEnumerable<CombatInstance> AtLocation(Location location) => _combats.Values.Where(c => c.Location == location);
 
     public void Dispose()

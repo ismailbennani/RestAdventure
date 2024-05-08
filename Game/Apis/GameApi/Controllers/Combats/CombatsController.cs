@@ -24,6 +24,25 @@ public class CombatsController : GameApiController
     }
 
     /// <summary>
+    ///     Get combats in preparation
+    /// </summary>
+    [HttpGet("in-preparation")]
+    public ActionResult<IReadOnlyCollection<CombatInPreparationDto>> GetCombatsInPreparation(Guid locationGuid)
+    {
+        GameState state = _gameService.RequireGameState();
+
+        LocationId locationId = new(locationGuid);
+        Location? location = state.Content.Maps.Locations.Get(locationId);
+        if (location == null)
+        {
+            return NotFound();
+        }
+
+        IEnumerable<CombatInPreparation> combats = state.Combats.InPreparationAtLocation(location);
+        return combats.Select(c => c.ToDto()).ToArray();
+    }
+
+    /// <summary>
     ///     Get combats
     /// </summary>
     [HttpGet]
