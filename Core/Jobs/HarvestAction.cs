@@ -41,6 +41,11 @@ public class HarvestAction : Action
 
     public static Maybe CanPerform(GameState state, Job job, JobHarvest harvest, StaticObjectInstance target, Character character)
     {
+        if (character.Busy)
+        {
+            return "Character is busy";
+        }
+
         JobInstance? jobInstance = character.Jobs.Get(job);
 
         if (jobInstance == null)
