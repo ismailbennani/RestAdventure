@@ -8,12 +8,12 @@ using RestAdventure.Core.Players;
 using RestAdventure.Game.Apis.Common.Dtos.Characters;
 using RestAdventure.Game.Apis.Common.Dtos.History;
 using RestAdventure.Game.Apis.Common.Dtos.Queries;
-using RestAdventure.Game.Apis.GameApi.Controllers.Characters.Requests;
+using RestAdventure.Game.Apis.GameApi.Controllers.Requests;
 using RestAdventure.Game.Authentication;
 using RestAdventure.Kernel.Errors;
 using RestAdventure.Kernel.Queries;
 
-namespace RestAdventure.Game.Apis.GameApi.Controllers.Characters;
+namespace RestAdventure.Game.Apis.GameApi.Controllers;
 
 /// <summary>
 ///     Team characters operations

@@ -12,7 +12,7 @@ using RestAdventure.Game.Apis.Common.Dtos.Maps;
 using RestAdventure.Game.Authentication;
 using RestAdventure.Kernel.Errors;
 
-namespace RestAdventure.Game.Apis.GameApi.Controllers.Characters;
+namespace RestAdventure.Game.Apis.GameApi.Controllers;
 
 /// <summary>
 ///     Characters actions operations

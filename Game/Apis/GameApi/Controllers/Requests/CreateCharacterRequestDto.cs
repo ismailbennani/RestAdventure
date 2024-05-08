@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace RestAdventure.Game.Apis.GameApi.Controllers.Characters.Requests;
+namespace RestAdventure.Game.Apis.GameApi.Controllers.Requests;
 
 /// <summary>
 ///     Character creation options

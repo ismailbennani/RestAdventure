@@ -5,7 +5,7 @@ using RestAdventure.Core.Combat;
 using RestAdventure.Core.Maps.Locations;
 using RestAdventure.Game.Apis.Common.Dtos.Combats;
 
-namespace RestAdventure.Game.Apis.GameApi.Controllers.Combats;
+namespace RestAdventure.Game.Apis.GameApi.Controllers;
 
 /// <summary>
 ///     Combats operations

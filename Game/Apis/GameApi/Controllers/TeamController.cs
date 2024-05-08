@@ -6,7 +6,7 @@ using RestAdventure.Core.Players;
 using RestAdventure.Game.Apis.Common.Dtos.Characters;
 using RestAdventure.Game.Authentication;
 
-namespace RestAdventure.Game.Apis.GameApi.Controllers.Characters;
+namespace RestAdventure.Game.Apis.GameApi.Controllers;
 
 /// <summary>
 ///     Team operations
