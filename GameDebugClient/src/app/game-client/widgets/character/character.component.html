@@ -16,38 +16,5 @@
       [maxValue]="character.progression.nextLevelExperience"
       displayValue="absolute"
     ></app-progression-bar>
-    <ul>
-      <li>Location: {{ character.location.positionX }}, {{ character.location.positionY }} ({{ character.location.area.name }})</li>
-      <li>
-        Planned action:
-        @if (character.plannedAction) {
-          {{ actionToString(character.plannedAction) }}
-        } @else {
-          none
-        }
-      </li>
-      <li>
-        Last action result:
-        @if (character.lastActionResult) {
-          {{ actionToString(character.lastActionResult.action) }}
-          @if (character.lastActionResult.success) {
-            (success)
-          } @else {
-            <div class="text-danger">failed: {{ character.lastActionResult.failureReason }}</div>
-          }
-        } @else {
-          none
-        }
-      </li>
-      <li>
-        Current interaction:
-        @if (character.currentInteraction) {
-          {{ character.currentInteraction.interaction.name }}, {{ character.currentInteraction.target.name }}
-        } @else {
-          none
-        }
-      </li>
-      <li>Weight: {{ character.inventory.weight }}</li>
-    </ul>
   </div>
 </div>

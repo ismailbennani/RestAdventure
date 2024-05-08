@@ -21,27 +21,39 @@
             </div>
 
             <div class="col">
-              <div class="w-100 h-100 border py-3 px-4">
-                <h6>Jobs</h6>
-                <app-jobs [jobs]="character.jobs"></app-jobs>
-              </div>
+              <app-jobs [jobs]="character.jobs"></app-jobs>
             </div>
 
             <div class="col">
-              <div class="w-100 h-100 border py-3 px-4">
-                <h6>Inventory</h6>
-                <app-inventory [inventory]="character.inventory"></app-inventory>
-              </div>
+              <app-inventory [inventory]="character.inventory"></app-inventory>
             </div>
           </div>
 
           <div class="row">
             <div class="col">
               <div class="w-100 h-100 border py-3 px-4">
-                <div class="hstack gap-2 mb-2">
-                  <h6 class="m-0">Location</h6>
-                  <div>{{ character.location.positionX }}, {{ character.location.positionY }} ({{ character.location.area.name }})</div>
-                </div>
+                <ul class="list-unstyled">
+                  <li>
+                    <span class="fw-semibold me-1">Location</span>
+                    {{ character.location.area.name }} [{{ character.location.positionX }}, {{ character.location.positionY }}]
+                  </li>
+                  <li>
+                    <span class="fw-semibold me-1">Planned action</span>
+                    @if (character.plannedAction) {
+                      {{ actionToString(character.plannedAction) }}
+                    } @else {
+                      none
+                    }
+                  </li>
+                  <li>
+                    <span class="fw-semibold me-1">Current interaction</span>
+                    @if (character.currentInteraction) {
+                      {{ character.currentInteraction.interaction.name }}, {{ character.currentInteraction.target.name }}
+                    } @else {
+                      none
+                    }
+                  </li>
+                </ul>
 
                 <div class="row">
                   <div class="col">

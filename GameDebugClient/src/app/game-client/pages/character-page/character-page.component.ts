@@ -4,7 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ReplaySubject, combineLatest, forkJoin, map, of, switchMap, tap } from 'rxjs';
 import { LocationMinimal } from '../../../../api/admin-api-client.generated';
 import {
-  CharacterInteractWithEntityAction,
+  CharacterAction,
   CombatInPreparation,
   CombatInstance,
   CombatsApiClient,
@@ -20,6 +20,7 @@ import { CurrentPageService } from '../../services/current-page.service';
 import { GameService } from '../../services/game.service';
 import { PlayersService } from '../../services/players/players.service';
 import { TeamService } from '../../services/team/team.service';
+import { CharacterActionUtils } from '../../utils/character-action-utils';
 import { CharacterHarvestsComponent } from '../../widgets/character-harvests/character-harvests.component';
 import { CharacterHistoryComponent } from '../../widgets/character-history/character-history.component';
 import { CharacterMovementsComponent } from '../../widgets/character-movements/character-movements.component';
@@ -139,12 +140,8 @@ export class CharacterPageComponent implements OnInit {
       .subscribe();
   }
 
-  plansToInteract() {
-    if (!this.character?.plannedAction) {
-      return false;
-    }
-
-    return this.character.plannedAction instanceof CharacterInteractWithEntityAction;
+  actionToString(action: CharacterAction) {
+    return CharacterActionUtils.toString(action);
   }
 
   deleteCharacter() {

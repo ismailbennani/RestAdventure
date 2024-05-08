@@ -1,17 +1,26 @@
-<div class="d-flex gap-2 flex-wrap">
-  @for (stack of inventory.stacks; track stack.itemInstance.id) {
-    <button class="btn btn-outline-secondary">
-      <div class="d-flex gap-2">
-        <div>
-          {{ stack.count }}x
-          {{ stack.itemInstance.item.name }}
+<div class="w-100 h-100 border py-3 px-4">
+  <div class="d-flex justify-content-between mb-2">
+    <span class="fw-semibold me-2">Inventory</span>
+    <span>
+      <i class="bi bi-duffle-fill" ngbTooltip="Weight"></i>
+      {{ inventory.weight }}
+    </span>
+  </div>
+  <div class="d-flex gap-2 flex-wrap">
+    @for (stack of inventory.stacks; track stack.itemInstance.id) {
+      <button class="btn btn-outline-secondary">
+        <div class="flex-shrink-1 d-flex gap-2">
+          <div>
+            {{ stack.count }}x
+            {{ stack.itemInstance.item.name }}
+          </div>
+          <div class="vr"></div>
+          <div>
+            <i class="bi bi-duffle-fill" ngbTooltip="Weight"></i>
+            {{ stack.itemInstance.item.weight * stack.count }}
+          </div>
         </div>
-        <div class="vr"></div>
-        <div>
-          <i class="bi bi-duffle-fill" ngbTooltip="Weight"></i>
-          {{ stack.itemInstance.item.weight * stack.count }}
-        </div>
-      </div>
-    </button>
-  }
+      </button>
+    }
+  </div>
 </div>

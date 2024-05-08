@@ -1,19 +1,22 @@
-<ul>
-  @for (jobInstance of jobs; track jobInstance.job.id) {
-    <li>
-      <div>
-        <div class="d-flex justify-content-between">
-          <span>{{ jobInstance.job.name | titlecase }}</span
-          ><span>lv. {{ jobInstance.progression.level }}</span>
+<div class="w-100 h-100 border py-3 px-4">
+  <h6>Jobs</h6>
+  <ul>
+    @for (jobInstance of jobs; track jobInstance.job.id) {
+      <li>
+        <div>
+          <div class="d-flex justify-content-between">
+            <span>{{ jobInstance.job.name | titlecase }}</span
+            ><span>lv. {{ jobInstance.progression.level }}</span>
+          </div>
+          <app-progression-bar
+            color="info"
+            label="Exp"
+            [value]="jobInstance.progression.experience"
+            [maxValue]="jobInstance.progression.nextLevelExperience"
+            displayValue="absolute"
+          ></app-progression-bar>
         </div>
-        <app-progression-bar
-          color="info"
-          label="Exp"
-          [value]="jobInstance.progression.experience"
-          [maxValue]="jobInstance.progression.nextLevelExperience"
-          displayValue="absolute"
-        ></app-progression-bar>
-      </div>
-    </li>
-  }
-</ul>
+      </li>
+    }
+  </ul>
+</div>
