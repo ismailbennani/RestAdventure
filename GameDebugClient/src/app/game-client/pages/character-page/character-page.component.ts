@@ -5,8 +5,10 @@ import { ReplaySubject, combineLatest, forkJoin, map, of, switchMap, tap } from 
 import { LocationMinimal } from '../../../../api/admin-api-client.generated';
 import {
   CharacterAction,
+  CharacterInteractWithEntityAction,
   CombatInPreparation,
   CombatInstance,
+  CombatSide,
   CombatsApiClient,
   HarvestableEntity,
   JobsHarvestApiClient,
@@ -119,8 +121,8 @@ export class CharacterPageComponent implements OnInit {
           }
 
           return forkJoin({
-            combats: this.combatsApiClient.getCombats(this.character.location.id),
-            combatsInPreparation: this.combatsApiClient.getCombatsInPreparation(this.character.location.id),
+            combats: this.combatsApiClient.getCombats(this.character.id),
+            combatsInPreparation: this.combatsApiClient.getCombatsInPreparation(this.character.id),
           });
         }),
         map(result => {
@@ -161,6 +163,30 @@ export class CharacterPageComponent implements OnInit {
   unselectCombat() {
     this.selectedCombat = undefined;
     this.selectedCombatInPreparation = undefined;
+  }
+
+  plansToJoinCombat(combat: CombatInPreparation) {
+    if (
+      !this.character?.plannedAction ||
+      !(this.character.plannedAction instanceof CharacterInteractWithEntityAction) ||
+      this.character.plannedAction.interaction.name !== 'combat-join' ||
+      this.character.plannedAction.target.id !== combat.defenders[0].id
+    ) {
+      return false;
+    }
+
+    return true;
+  }
+
+  joinCombat(combat: CombatInPreparation) {
+    if (!this.character) {
+      return;
+    }
+
+    this.combatsApiClient
+      .joinCombatInPreparation(this.character.id, combat.id, CombatSide.Attackers)
+      .pipe(switchMap(() => this.gameService.refreshNow(true)))
+      .subscribe();
   }
 
   private autoSelectCombatAfterRefresh() {

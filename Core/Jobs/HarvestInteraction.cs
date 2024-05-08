@@ -34,11 +34,6 @@ public class HarvestInteraction : Interaction
             return "Entity cannot be harvested";
         }
 
-        if (source.Location != target.Location)
-        {
-            return "Entity is inaccessible";
-        }
-
         return true;
     }
 

@@ -172,7 +172,8 @@ async Task<GameState> LoadGameAsync(WebApplication app)
     await state.Entities.AddAsync(biggaud);
 
     Player player = await state.Players.RegisterPlayerAsync(new User(new UserId(Guid.NewGuid()), "PLAYER"));
-    await state.Entities.AddAsync(new Character(player, baseGameContent.CharacterClasses.Dealer, "DEALER"));
+    await state.Entities.AddAsync(new Character(player, baseGameContent.CharacterClasses.Dealer, "Deadea"));
+    await state.Entities.AddAsync(new Character(player, baseGameContent.CharacterClasses.Knight, "Knikni"));
 
     return state;
 }

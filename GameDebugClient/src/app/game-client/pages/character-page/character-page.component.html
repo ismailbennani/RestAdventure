@@ -104,15 +104,24 @@
                           [ngClass]="combat.id === selectedCombatInPreparation?.id ? 'active text-light' : undefined"
                           (click)="selectCombatInPreparation(combat)"
                         >
-                          <div class="text-truncate">
-                            @for (entity of combat.attackers; track entity.id) {
-                              {{ entity.name }},
-                            }
-                          </div>
-                          <div class="text-truncate">
-                            @for (entity of combat.defenders; track entity.id) {
-                              {{ entity.name }},
-                            }
+                          <div class="d-flex">
+                            <div class="flex-grow-1">
+                              <div class="text-truncate">
+                                @for (entity of combat.attackers; track entity.id) {
+                                  {{ entity.name }},
+                                }
+                              </div>
+                              <div class="text-truncate">
+                                @for (entity of combat.defenders; track entity.id) {
+                                  {{ entity.name }},
+                                }
+                              </div>
+                            </div>
+                            <div>
+                              <button class="btn" [ngClass]="combat.id === selectedCombatInPreparation?.id ? 'btn-light' : 'btn-outline-secondary'" (click)="joinCombat(combat)">
+                                Join
+                              </button>
+                            </div>
                           </div>
                         </a>
                       }

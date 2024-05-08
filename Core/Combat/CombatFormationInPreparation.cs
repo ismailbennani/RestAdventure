@@ -1,4 +1,5 @@
 ﻿using RestAdventure.Core.Settings;
+using RestAdventure.Kernel.Errors;
 
 namespace RestAdventure.Core.Combat;
 
@@ -36,16 +37,17 @@ public class CombatFormationInPreparation
             _ => throw new ArgumentOutOfRangeException()
         };
 
-    public void Add(IGameEntityWithCombatStatistics entity)
+    public Maybe Add(IGameEntityWithCombatStatistics entity)
     {
         if (entity.CombatEntityKind != CombatEntityKind)
         {
-            throw new InvalidOperationException($"Cannot add entity of kind {entity.CombatEntityKind}");
+            return $"Cannot add entity of kind {entity.CombatEntityKind}";
         }
 
         _entities.Add(entity);
 
         Added?.Invoke(this, entity);
+        return true;
     }
 
     public void Remove(IGameEntityWithCombatStatistics entity)

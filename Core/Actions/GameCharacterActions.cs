@@ -82,9 +82,10 @@ public class GameCharacterActions
     /// </summary>
     public void PlanInteraction(Character character, Interaction interaction, IInteractibleEntity entity)
     {
-        if (!CanInteract(character, interaction, entity))
+        Maybe canInteract = CanInteract(character, interaction, entity);
+        if (!canInteract.Success)
         {
-            throw new InvalidOperationException("Interaction is not available");
+            throw new InvalidOperationException($"Interaction is not available: {canInteract.WhyNot}");
         }
 
         _actions[character.Id] = new CharacterInteractWithEntityAction(interaction, entity);

@@ -23,4 +23,12 @@ public class CombatInPreparation
 
     public void Tick() => Turn++;
     public void Cancel() => Canceled = true;
+
+    public CombatFormationInPreparation GetTeam(CombatSide side) =>
+        side switch
+        {
+            CombatSide.Attackers => Attackers,
+            CombatSide.Defenders => Defenders,
+            _ => throw new ArgumentOutOfRangeException(nameof(side), side, null)
+        };
 }

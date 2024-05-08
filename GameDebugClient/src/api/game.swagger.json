@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0-alpha.0.130+10098a3876629fa639c72e18959ac759acd3593c"
+    "version": "0.0.0-alpha.0.134+4113a8e497526ad6755f0da9803d2f0bf53409fa"
   },
   "servers": [
     {
@@ -11,7 +11,7 @@
     }
   ],
   "paths": {
-    "/game/location/{locationGuid}/combats/in-preparation": {
+    "/game/team/characters/{characterGuid}/combats/in-preparation": {
       "get": {
         "tags": [
           "Combats"
@@ -20,7 +20,7 @@
         "operationId": "Combats_GetCombatsInPreparation",
         "parameters": [
           {
-            "name": "locationGuid",
+            "name": "characterGuid",
             "in": "path",
             "required": true,
             "schema": {
@@ -43,6 +43,26 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -52,7 +72,77 @@
         ]
       }
     },
-    "/game/location/{locationGuid}/combats": {
+    "/game/team/characters/{characterGuid}/combats/in-preparation/{combatGuid}/join/{side}": {
+      "post": {
+        "tags": [
+          "Combats"
+        ],
+        "summary": "Join combat in preparation",
+        "operationId": "Combats_JoinCombatInPreparation",
+        "parameters": [
+          {
+            "name": "characterGuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "combatGuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 2
+          },
+          {
+            "name": "side",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CombatSide"
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ]
+      }
+    },
+    "/game/team/characters/{characterGuid}/combats": {
       "get": {
         "tags": [
           "Combats"
@@ -61,7 +151,7 @@
         "operationId": "Combats_GetCombats",
         "parameters": [
           {
-            "name": "locationGuid",
+            "name": "characterGuid",
             "in": "path",
             "required": true,
             "schema": {
@@ -81,6 +171,26 @@
                   "items": {
                     "$ref": "#/components/schemas/CombatInstance"
                   }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -1065,6 +1175,47 @@
           }
         }
       },
+      "ProblemDetails": {
+        "type": "object",
+        "additionalProperties": {
+          "nullable": true
+        },
+        "properties": {
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "CombatSide": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "Attackers",
+          "Defenders"
+        ],
+        "enum": [
+          "attackers",
+          "defenders"
+        ]
+      },
       "CombatInstance": {
         "type": "object",
         "description": "Combat instance\n            ",
@@ -1217,35 +1368,6 @@
             "type": "string",
             "description": "The name of the character class\n            ",
             "minLength": 1
-          }
-        }
-      },
-      "ProblemDetails": {
-        "type": "object",
-        "additionalProperties": {
-          "nullable": true
-        },
-        "properties": {
-          "type": {
-            "type": "string",
-            "nullable": true
-          },
-          "title": {
-            "type": "string",
-            "nullable": true
-          },
-          "status": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "detail": {
-            "type": "string",
-            "nullable": true
-          },
-          "instance": {
-            "type": "string",
-            "nullable": true
           }
         }
       },
@@ -2952,18 +3074,6 @@
               }
             }
           }
-        ]
-      },
-      "CombatSide": {
-        "type": "string",
-        "description": "",
-        "x-enumNames": [
-          "Attackers",
-          "Defenders"
-        ],
-        "enum": [
-          "attackers",
-          "defenders"
         ]
       },
       "Team": {

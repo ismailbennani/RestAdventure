@@ -1,16 +1,20 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using RestAdventure.Core;
+using RestAdventure.Core.Characters;
 using RestAdventure.Core.Combat;
-using RestAdventure.Core.Maps.Locations;
+using RestAdventure.Core.Combat.Pve;
+using RestAdventure.Core.Interactions;
+using RestAdventure.Core.Players;
 using RestAdventure.Game.Apis.Common.Dtos.Combats;
+using RestAdventure.Game.Authentication;
 
 namespace RestAdventure.Game.Apis.GameApi.Controllers;
 
 /// <summary>
 ///     Combats operations
 /// </summary>
-[Route("game/location/{locationGuid:guid}/combats")]
+[Route("game/team/characters/{characterGuid:guid}/combats")]
 [OpenApiTag("Combats")]
 public class CombatsController : GameApiController
 {
@@ -27,37 +31,81 @@ public class CombatsController : GameApiController
     ///     Get combats in preparation
     /// </summary>
     [HttpGet("in-preparation")]
-    public ActionResult<IReadOnlyCollection<CombatInPreparationDto>> GetCombatsInPreparation(Guid locationGuid)
+    [ProducesResponseType<IReadOnlyCollection<CombatInPreparationDto>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    public ActionResult<IReadOnlyCollection<CombatInPreparationDto>> GetCombatsInPreparation(Guid characterGuid)
     {
         GameState state = _gameService.RequireGameState();
+        Player player = ControllerContext.RequirePlayer(state);
 
-        LocationId locationId = new(locationGuid);
-        Location? location = state.Content.Maps.Locations.Get(locationId);
-        if (location == null)
+        CharacterId characterId = new(characterGuid);
+        Character? character = state.Entities.Get<Character>(characterId);
+
+        if (character == null || character.Player != player)
+        {
+            return BadRequest();
+        }
+
+        IEnumerable<CombatInPreparation> combats = state.Combats.InPreparationAtLocation(character.Location);
+        return combats.Select(c => c.ToDto()).ToArray();
+    }
+
+    /// <summary>
+    ///     Join combat in preparation
+    /// </summary>
+    [HttpPost("in-preparation/{combatGuid:guid}/join/{side}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    public ActionResult JoinCombatInPreparation(Guid characterGuid, Guid combatGuid, CombatSide side)
+    {
+        GameState state = _gameService.RequireGameState();
+        Player player = ControllerContext.RequirePlayer(state);
+
+        CharacterId characterId = new(characterGuid);
+        Character? character = state.Entities.Get<Character>(characterId);
+
+        if (character == null || character.Player != player)
+        {
+            return BadRequest();
+        }
+
+        CombatInstanceId combatId = new(combatGuid);
+        CombatInPreparation? combatInPreparation = state.Combats.GetInPreparation(combatId);
+        if (combatInPreparation == null || combatInPreparation.Location != character.Location)
         {
             return NotFound();
         }
 
-        IEnumerable<CombatInPreparation> combats = state.Combats.InPreparationAtLocation(location);
-        return combats.Select(c => c.ToDto()).ToArray();
+        PveJoinCombatInteraction interaction = new(combatInPreparation, side);
+        IInteractibleEntity target = (IInteractibleEntity)combatInPreparation.GetTeam(side.OtherSide()).Entities[0];
+        state.CharacterActions.PlanInteraction(character, interaction, target);
+
+        return NoContent();
     }
 
     /// <summary>
     ///     Get combats
     /// </summary>
     [HttpGet]
-    public ActionResult<IReadOnlyCollection<CombatInstanceDto>> GetCombats(Guid locationGuid)
+    [ProducesResponseType<IReadOnlyCollection<CombatInstanceDto>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    public ActionResult<IReadOnlyCollection<CombatInstanceDto>> GetCombats(Guid characterGuid)
     {
         GameState state = _gameService.RequireGameState();
+        Player player = ControllerContext.RequirePlayer(state);
 
-        LocationId locationId = new(locationGuid);
-        Location? location = state.Content.Maps.Locations.Get(locationId);
-        if (location == null)
+        CharacterId characterId = new(characterGuid);
+        Character? character = state.Entities.Get<Character>(characterId);
+
+        if (character == null || character.Player != player)
         {
-            return NotFound();
+            return BadRequest();
         }
 
-        IEnumerable<CombatInstance> combats = state.Combats.AtLocation(location);
+        IEnumerable<CombatInstance> combats = state.Combats.AtLocation(character.Location);
         return combats.Select(c => c.ToDto()).ToArray();
     }
 }
