@@ -9,6 +9,7 @@ using RestAdventure.Core.Players;
 using RestAdventure.Game.Apis.Common.Dtos.Items;
 using RestAdventure.Game.Apis.Common.Dtos.Jobs;
 using RestAdventure.Game.Authentication;
+using RestAdventure.Kernel.Errors;
 
 namespace RestAdventure.Game.Apis.GameApi.Controllers;
 
@@ -35,7 +36,7 @@ public class JobsHarvestController : GameApiController
     ///     Get harvestables
     /// </summary>
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyCollection<HarvestableEntityDto>>> GetHarvestables(Guid characterGuid)
+    public async Task<ActionResult<IReadOnlyCollection<HarvestableEntityDto>>> GetHarvestablesAsync(Guid characterGuid)
     {
         GameState state = _gameService.RequireGameState();
         Player player = ControllerContext.RequirePlayer(state);
@@ -62,6 +63,7 @@ public class JobsHarvestController : GameApiController
             List<HarvestableEntityHarvestDto> harvests = [];
             foreach (HarvestInteraction interaction in availableInteractions)
             {
+                Maybe canHarvest = await interaction.CanInteractAsync(character, entity);
                 harvests.Add(
                     new HarvestableEntityHarvestDto
                     {
@@ -69,7 +71,8 @@ public class JobsHarvestController : GameApiController
                         Name = interaction.Harvest.Name,
                         ExpectedHarvest = interaction.Harvest.Items.Select(i => i.ToDto()).ToArray(),
                         ExpectedExperience = interaction.Harvest.Experience,
-                        CanHarvest = await interaction.CanInteractAsync(character, entity)
+                        CanHarvest = canHarvest.Success,
+                        WhyCannotHarvest = canHarvest.WhyNot
                     }
                 );
             }

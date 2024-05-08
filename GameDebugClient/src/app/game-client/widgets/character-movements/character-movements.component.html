@@ -1,0 +1,17 @@
+<div class="w-100 h-100 border">
+  <div class="p-2">
+    <h6 class="m-0" [class.fw-bold]="plansToMove()">Movements</h6>
+  </div>
+  <hr class="m-0" />
+  <div class="list-group list-group-flush">
+    @if (locations.length > 0) {
+      @for (location of locations; track location.id) {
+        <a role="button" class="list-group-item list-group-item-action" [class.active]="plansToMove(location)" (click)="moveToLocation(location)">
+          {{ location.area.name }} [{{ location.positionX }}, {{ location.positionY }}]
+        </a>
+      }
+    } @else {
+      <div class="list-group-item text-center text-secondary">None</div>
+    }
+  </div>
+</div>

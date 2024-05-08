@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0-alpha.0.120+db229bc913528932523ab1e72dafde19b6f10b1a"
+    "version": "0.0.0-alpha.0.121+e12d4911631a6d2a542bbfe653ee9697ede46a7c"
   },
   "servers": [
     {
@@ -1410,6 +1410,11 @@
           "canHarvest": {
             "type": "boolean",
             "description": "Can the harvest be performed\n            "
+          },
+          "whyCannotHarvest": {
+            "type": "string",
+            "description": "Why cannot the harves be performed\n            ",
+            "nullable": true
           },
           "expectedHarvest": {
             "type": "array",

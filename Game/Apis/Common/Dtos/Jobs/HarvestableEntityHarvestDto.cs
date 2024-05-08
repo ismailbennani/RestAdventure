@@ -27,6 +27,11 @@ public class HarvestableEntityHarvestDto
     public required bool CanHarvest { get; init; }
 
     /// <summary>
+    ///     Why cannot the harvest be performed
+    /// </summary>
+    public string? WhyCannotHarvest { get; init; }
+
+    /// <summary>
     ///     The expected result of the harvest
     /// </summary>
     [Required]

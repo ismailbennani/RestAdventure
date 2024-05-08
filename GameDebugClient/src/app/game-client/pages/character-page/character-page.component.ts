@@ -2,15 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ReplaySubject, combineLatest, forkJoin, map, of, switchMap, tap } from 'rxjs';
-import { ILocationMinimal, LocationMinimal } from '../../../../api/admin-api-client.generated';
+import { LocationMinimal } from '../../../../api/admin-api-client.generated';
 import {
   CharacterInteractWithEntityAction,
-  CharacterMoveToLocationAction,
   CombatInPreparation,
   CombatInstance,
   CombatsApiClient,
   HarvestableEntity,
-  HarvestableEntityHarvest,
   JobsHarvestApiClient,
   LocationsApiClient,
   Team,
@@ -22,7 +20,9 @@ import { CurrentPageService } from '../../services/current-page.service';
 import { GameService } from '../../services/game.service';
 import { PlayersService } from '../../services/players/players.service';
 import { TeamService } from '../../services/team/team.service';
+import { CharacterHarvestsComponent } from '../../widgets/character-harvests/character-harvests.component';
 import { CharacterHistoryComponent } from '../../widgets/character-history/character-history.component';
+import { CharacterMovementsComponent } from '../../widgets/character-movements/character-movements.component';
 import { CharacterComponent } from '../../widgets/character/character.component';
 import { CombatInPreparationComponent } from '../../widgets/combat-in-preparation/combat-in-preparation.component';
 import { CombatComponent } from '../../widgets/combat/combat.component';
@@ -33,7 +33,18 @@ import { JobsComponent } from '../../widgets/jobs/jobs.component';
   selector: 'app-character-page',
   templateUrl: './character-page.component.html',
   standalone: true,
-  imports: [CommonModule, SpinnerComponent, InventoryComponent, CharacterComponent, CharacterHistoryComponent, JobsComponent, CombatComponent, CombatInPreparationComponent],
+  imports: [
+    CommonModule,
+    SpinnerComponent,
+    InventoryComponent,
+    CharacterComponent,
+    CharacterHistoryComponent,
+    JobsComponent,
+    CombatComponent,
+    CombatInPreparationComponent,
+    CharacterMovementsComponent,
+    CharacterHarvestsComponent,
+  ],
 })
 export class CharacterPageComponent implements OnInit {
   protected loading: boolean = false;
@@ -128,74 +139,12 @@ export class CharacterPageComponent implements OnInit {
       .subscribe();
   }
 
-  moveToLocation(location: LocationMinimal) {
-    if (!this.character) {
-      return;
-    }
-
-    this.locationsApiClient
-      .moveToLocation(this.character.id, location.id)
-      .pipe(switchMap(_ => this.gameService.refreshNow(true)))
-      .subscribe();
-  }
-
-  harvest(entity: HarvestableEntity, harvest: HarvestableEntityHarvest) {
-    if (!this.character) {
-      return;
-    }
-
-    this.jobsHarvestApiClient
-      .harvest(this.character.id, entity.id, harvest.name)
-      .pipe(switchMap(_ => this.gameService.refreshNow(true)))
-      .subscribe();
-  }
-
-  plansToMove() {
-    if (!this.character?.plannedAction) {
-      return false;
-    }
-
-    return this.character.plannedAction instanceof CharacterMoveToLocationAction;
-  }
-
-  plansToMoveToLocation(location: ILocationMinimal) {
-    if (!this.character?.plannedAction || !(this.character.plannedAction instanceof CharacterMoveToLocationAction)) {
-      return false;
-    }
-
-    return this.character.plannedAction.location.id == location.id;
-  }
-
   plansToInteract() {
     if (!this.character?.plannedAction) {
       return false;
     }
 
     return this.character.plannedAction instanceof CharacterInteractWithEntityAction;
-  }
-
-  plansToHarvestEntity(harvestable: HarvestableEntity) {
-    if (!this.character?.plannedAction || !(this.character.plannedAction instanceof CharacterInteractWithEntityAction)) {
-      return false;
-    }
-
-    return this.character.plannedAction.target.id == harvestable.id;
-  }
-
-  plansToHarvest(harvestable: HarvestableEntity, harvest: HarvestableEntityHarvest) {
-    if (!this.character?.plannedAction || !(this.character.plannedAction instanceof CharacterInteractWithEntityAction)) {
-      return false;
-    }
-
-    return this.character.plannedAction.target.id == harvestable.id && this.character.plannedAction.interaction.name == harvest.job.name + '-' + harvest.name;
-  }
-
-  isHarvesting(harvestable: HarvestableEntity, harvest: HarvestableEntityHarvest) {
-    if (!this.character?.currentInteraction) {
-      return false;
-    }
-
-    return this.character.currentInteraction.target.id == harvestable.id && this.character.currentInteraction.interaction.name == harvest.job.name + '-' + harvest.name;
   }
 
   deleteCharacter() {

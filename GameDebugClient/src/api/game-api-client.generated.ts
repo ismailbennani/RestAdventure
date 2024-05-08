@@ -2379,6 +2379,9 @@ export class HarvestableEntityHarvest implements IHarvestableEntityHarvest {
     /** Can the harvest be performed
              */
     canHarvest!: boolean;
+    /** Why cannot the harves be performed
+             */
+    whyCannotHarvest?: string | undefined;
     /** The expected result of the harvest
              */
     expectedHarvest!: ItemStack[];
@@ -2404,6 +2407,7 @@ export class HarvestableEntityHarvest implements IHarvestableEntityHarvest {
             this.job = _data["job"] ? JobMinimal.fromJS(_data["job"]) : new JobMinimal();
             this.name = _data["name"];
             this.canHarvest = _data["canHarvest"];
+            this.whyCannotHarvest = _data["whyCannotHarvest"];
             if (Array.isArray(_data["expectedHarvest"])) {
                 this.expectedHarvest = [] as any;
                 for (let item of _data["expectedHarvest"])
@@ -2425,6 +2429,7 @@ export class HarvestableEntityHarvest implements IHarvestableEntityHarvest {
         data["job"] = this.job ? this.job.toJSON() : <any>undefined;
         data["name"] = this.name;
         data["canHarvest"] = this.canHarvest;
+        data["whyCannotHarvest"] = this.whyCannotHarvest;
         if (Array.isArray(this.expectedHarvest)) {
             data["expectedHarvest"] = [];
             for (let item of this.expectedHarvest)
@@ -2446,6 +2451,9 @@ export interface IHarvestableEntityHarvest {
     /** Can the harvest be performed
              */
     canHarvest: boolean;
+    /** Why cannot the harves be performed
+             */
+    whyCannotHarvest?: string | undefined;
     /** The expected result of the harvest
              */
     expectedHarvest: ItemStack[];

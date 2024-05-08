@@ -1,0 +1,35 @@
+<div class="w-100 h-100 border">
+  <div class="p-2">
+    <h6 class="m-0" [class.fw-bold]="plansToHarvest()">Harvests</h6>
+  </div>
+  <hr class="m-0" />
+  <div class="list-group list-group-flush">
+    @if (harvestables.length > 0) {
+      @for (harvestable of harvestables; track harvestable.id) {
+        <div class="list-group-item">
+          <div [class.fw-bold]="plansToHarvest(harvestable)">
+            {{ harvestable.name }}
+          </div>
+          <div class="list-group list-group-flush">
+            @for (jobHarvest of harvestable.harvests; track jobHarvest.name) {
+              <a
+                role="button"
+                class="list-group-item list-group-item-action d-flex justify-content-between"
+                [class.active]="plansToHarvest(harvestable, jobHarvest)"
+                [class.disabled]="!jobHarvest.canHarvest"
+                [class.text-danger]="!jobHarvest.canHarvest"
+                (click)="harvest(harvestable, jobHarvest)"
+                [attr.aria-disabled]="!jobHarvest.canHarvest"
+              >
+                <span>{{ jobHarvest.name }}</span>
+                <span class="text-danger small">{{ jobHarvest.whyCannotHarvest }}</span>
+              </a>
+            }
+          </div>
+        </div>
+      }
+    } @else {
+      <div class="list-group-item text-center text-secondary">None</div>
+    }
+  </div>
+</div>
