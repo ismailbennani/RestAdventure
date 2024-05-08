@@ -24,7 +24,9 @@
         @for (monster of monsterGroup.monsters; track monster.id) {
           <div class="text-truncate" [class.text-danger]="!monsterGroup.canAttack && !isAttacking">{{ monster.name }} lv. {{ monster.level }}</div>
         }
-        <div class="text-truncate small">{{ monsterGroup.expectedExperience }} exp</div>
+        @if (isAttacking || monsterGroup.canAttack) {
+          <div class="text-truncate small">{{ monsterGroup.expectedExperience }} exp</div>
+        }
       </div>
       <div class="d-flex align-items-center justify-content-center">
         @if (isAttacking) {
