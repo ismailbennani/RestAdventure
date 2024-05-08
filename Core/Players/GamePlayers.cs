@@ -1,18 +1,18 @@
-﻿using RestAdventure.Core.Players.Notifications;
+﻿using MediatR;
+using RestAdventure.Core.Players.Notifications;
 using RestAdventure.Kernel.Security;
 
 namespace RestAdventure.Core.Players;
 
 public class GamePlayers : IDisposable
 {
+    readonly IPublisher _publisher;
     readonly Dictionary<UserId, Player> _players = [];
 
-    public GamePlayers(GameState gameState)
+    public GamePlayers(IPublisher publisher)
     {
-        GameState = gameState;
+        _publisher = publisher;
     }
-
-    internal GameState GameState { get; }
 
     public IEnumerable<Player> All => _players.Values;
 
@@ -23,9 +23,9 @@ public class GamePlayers : IDisposable
             player = new Player(user);
             _players[user.Id] = player;
 
-            player.Knowledge.Discovered += (_, resource) => GameState.Publisher.Publish(new PlayerDiscoveredResource { Player = player, Resource = resource }).Wait();
+            player.Knowledge.Discovered += (_, resource) => _publisher.Publish(new PlayerDiscoveredResource { Player = player, Resource = resource }).Wait();
 
-            await GameState.Publisher.Publish(new PlayerJoined { Player = player });
+            await _publisher.Publish(new PlayerJoined { Player = player });
         }
 
         return player;
