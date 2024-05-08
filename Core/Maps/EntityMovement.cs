@@ -1,4 +1,5 @@
 ﻿using RestAdventure.Core.Entities;
+using RestAdventure.Core.Entities.Notifications;
 using RestAdventure.Core.Maps.Locations;
 using RestAdventure.Kernel.Errors;
 
@@ -24,7 +25,7 @@ public class EntityMovement
         return true;
     }
 
-    public Maybe MoveTo(GameState state, Location location)
+    public async Task<Maybe> MoveToAsync(GameState state, Location location)
     {
         Maybe canMove = CanMoveTo(state, location);
         if (!canMove)
@@ -32,7 +33,11 @@ public class EntityMovement
             return canMove;
         }
 
-        _entity.SetLocation(location);
+        Location oldLocation = _entity.Location;
+        _entity.Location = location;
+
+        await state.Publisher.Publish(new GameEntityMovedToLocation { Entity = _entity, OldLocation = oldLocation, NewLocation = _entity.Location });
+
         return true;
     }
 }

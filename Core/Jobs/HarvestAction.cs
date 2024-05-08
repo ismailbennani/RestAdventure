@@ -25,7 +25,7 @@ public class HarvestAction : Action
 
     protected override Task OnStartAsync(GameState state, Character character)
     {
-        Target.Disabled = true;
+        Target.Busy = true;
         return Task.CompletedTask;
     }
 
@@ -53,7 +53,7 @@ public class HarvestAction : Action
             return "Job level too low";
         }
 
-        if (!harvest.Match(target) || target.Disabled)
+        if (!harvest.Match(target) || target.Busy)
         {
             return "Entity cannot be harvested";
         }

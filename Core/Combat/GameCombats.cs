@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
-using RestAdventure.Core.Actions;
 using RestAdventure.Core.Characters;
 using RestAdventure.Core.Combat.Notifications;
 using RestAdventure.Core.Extensions;
@@ -31,12 +30,12 @@ public class GameCombats : IDisposable
 
     public Maybe CanStartCombat(IReadOnlyList<IGameEntityWithCombatStatistics> attackers, IReadOnlyList<IGameEntityWithCombatStatistics> defenders)
     {
-        if (attackers.Any(attacker => attacker is IGameEntityWithDisabled { Disabled: true }))
+        if (attackers.Any(attacker => attacker.Busy))
         {
             return "Attacker is busy";
         }
 
-        if (defenders.Any(target => target is IGameEntityWithDisabled { Disabled: true }))
+        if (defenders.Any(target => target.Busy))
         {
             return "Target is busy";
         }

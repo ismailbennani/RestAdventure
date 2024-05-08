@@ -16,5 +16,5 @@ public class MoveAction : Action
 
     protected override Maybe CanPerformInternal(GameState state, Character character) => character.Movement.CanMoveTo(state, Location);
     public override bool IsOver(GameState state, Character character) => true;
-    protected override Task<Maybe> OnStartAsync(GameState state, Character character) => Task.FromResult(character.Movement.MoveTo(state, Location));
+    protected override async Task<Maybe> OnStartAsync(GameState state, Character character) => await character.Movement.MoveToAsync(state, Location);
 }

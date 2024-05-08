@@ -54,11 +54,6 @@ public class PveController : GameApiController
         List<MonsterGroupDto> result = new();
         foreach (MonsterInstance monster in monsters)
         {
-            if (monster.Disabled)
-            {
-                continue;
-            }
-
             Maybe canStartCombat = state.Combats.CanStartCombat([character], [monster]);
             result.Add(
                 new MonsterGroupDto

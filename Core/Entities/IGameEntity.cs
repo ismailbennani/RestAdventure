@@ -20,6 +20,11 @@ public interface IGameEntity : IDisposable
     Location Location { get; }
 
     /// <summary>
+    ///     If the character is busy, they cannot perform or be the target of actions
+    /// </summary>
+    bool Busy { get; }
+
+    /// <summary>
     ///     Event fired each time this entity moves
     /// </summary>
     event EventHandler<EntityMovedEvent>? LocationChanged;

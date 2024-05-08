@@ -25,7 +25,7 @@ public abstract class Action
     /// </summary>
     public Maybe CanPerform(GameState state, Character character)
     {
-        if (state.Actions.GetOngoingAction(character) != null)
+        if (character.Busy)
         {
             return "Character is busy";
         }
@@ -40,6 +40,7 @@ public abstract class Action
     {
         StartTick = state.Tick;
         Started = true;
+        character.Busy = true;
 
         await OnStartAsync(state, character);
 
@@ -51,6 +52,7 @@ public abstract class Action
     public async Task EndAsync(GameState state, Character character)
     {
         Ended = true;
+        character.Busy = false;
 
         await OnEndAsync(state, character);
 

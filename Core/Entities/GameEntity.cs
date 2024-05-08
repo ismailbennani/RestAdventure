@@ -21,26 +21,16 @@ public abstract class GameEntity : IEquatable<GameEntity>, IGameEntity
     public GameEntityId Id { get; }
 
     /// <inheritdoc />
-    public string Name { get; protected set; }
+    public string Name { get; set; }
 
     /// <inheritdoc />
-    public Location Location { get; private set; }
+    public Location Location { get; set; }
+
+    /// <inheritdoc />
+    public bool Busy { get; set; }
 
     /// <inheritdoc />
     public event EventHandler<EntityMovedEvent>? LocationChanged;
-
-    public void SetLocation(Location location)
-    {
-        if (Location == location)
-        {
-            return;
-        }
-
-        Location oldLocation = Location;
-        Location = location;
-
-        LocationChanged?.Invoke(this, new EntityMovedEvent { OldLocation = oldLocation, NewLocation = Location });
-    }
 
     public async Task KillAsync(GameState state) => await state.Entities.DestroyAsync(this);
 
