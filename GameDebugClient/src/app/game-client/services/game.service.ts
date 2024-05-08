@@ -9,6 +9,7 @@ import { GameSettings, GameState } from '../../../api/game-api-client.generated'
 export class GameService {
   static readonly RECONNECTION_DELAY: number = 5000;
   static readonly PAUSE_REFRESH_PERIOD: number = 5000;
+  static readonly TICKING_DELAY: number = 100;
 
   private refreshingInternal: boolean = false;
   private refreshSubject: Subject<boolean> = new Subject<boolean>();
@@ -157,6 +158,6 @@ export class GameService {
       return;
     }
 
-    this.refreshIn(GameService.PAUSE_REFRESH_PERIOD);
+    this.refreshIn(GameService.TICKING_DELAY);
   }
 }

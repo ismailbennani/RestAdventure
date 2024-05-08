@@ -1913,6 +1913,10 @@ export class GameState implements IGameState {
     /** The current game tick
              */
     tick!: number;
+    /** Is the next tick being computed.
+In that case NextTickDate refers to the old tick's next tick date, which means that it is probably in the past.
+             */
+    isComputingNextTick!: boolean;
     /** Is the game paused?
              */
     paused!: boolean;
@@ -1935,6 +1939,7 @@ export class GameState implements IGameState {
     init(_data?: any) {
         if (_data) {
             this.tick = _data["tick"];
+            this.isComputingNextTick = _data["isComputingNextTick"];
             this.paused = _data["paused"];
             this.lastTickDate = _data["lastTickDate"] ? new Date(_data["lastTickDate"].toString()) : <any>undefined;
             this.nextTickDate = _data["nextTickDate"] ? new Date(_data["nextTickDate"].toString()) : <any>undefined;
@@ -1951,6 +1956,7 @@ export class GameState implements IGameState {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["tick"] = this.tick;
+        data["isComputingNextTick"] = this.isComputingNextTick;
         data["paused"] = this.paused;
         data["lastTickDate"] = this.lastTickDate ? this.lastTickDate.toISOString() : <any>undefined;
         data["nextTickDate"] = this.nextTickDate ? this.nextTickDate.toISOString() : <any>undefined;
@@ -1963,6 +1969,10 @@ export interface IGameState {
     /** The current game tick
              */
     tick: number;
+    /** Is the next tick being computed.
+In that case NextTickDate refers to the old tick's next tick date, which means that it is probably in the past.
+             */
+    isComputingNextTick: boolean;
     /** Is the game paused?
              */
     paused: boolean;

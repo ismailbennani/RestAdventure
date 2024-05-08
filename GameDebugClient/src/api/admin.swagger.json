@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Admin API",
-    "version": "0.0.0-alpha.0.107+f33fc56db12e32dfa44ec0e21af8e4e34d448974"
+    "version": "0.0.0-alpha.0.110+aa10c276661d0d0446b8466092d8c011c6b2fbf4"
   },
   "servers": [
     {
@@ -954,6 +954,7 @@
         "additionalProperties": false,
         "required": [
           "tick",
+          "isComputingNextTick",
           "paused"
         ],
         "properties": {
@@ -961,6 +962,10 @@
             "type": "integer",
             "description": "The current game tick\n            ",
             "format": "int64"
+          },
+          "isComputingNextTick": {
+            "type": "boolean",
+            "description": "Is the next tick being computed.\nIn that case NextTickDate refers to the old tick's next tick date, which means that it is probably in the past.\n            "
           },
           "paused": {
             "type": "boolean",

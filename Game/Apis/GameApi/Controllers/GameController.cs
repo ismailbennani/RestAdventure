@@ -37,13 +37,6 @@ public class GameController : GameApiController
     public GameStateDto GetGameState()
     {
         GameState state = _gameService.RequireGameState();
-
-        return new GameStateDto
-        {
-            Tick = state.Tick,
-            Paused = _gameScheduler.Paused,
-            LastTickDate = _gameScheduler.LastStepDate,
-            NextTickDate = _gameScheduler.Paused ? null : _gameScheduler.NextStepDate
-        };
+        return state.ToDto(_gameScheduler);
     }
 }

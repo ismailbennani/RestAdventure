@@ -40,6 +40,11 @@ public class GameScheduler : IDisposable
     public bool Paused { get; private set; } = true;
 
     /// <summary>
+    ///     Is the simulation in the middle of processing a tick
+    /// </summary>
+    public bool IsComputingNextTick { get; private set; } = true;
+
+    /// <summary>
     ///     Start the simulation
     /// </summary>
     public void Start(TimeSpan? firstTickDelay = null)
@@ -93,6 +98,8 @@ public class GameScheduler : IDisposable
     /// </summary>
     public async Task TickNowAsync()
     {
+        IsComputingNextTick = true;
+
         try
         {
             await _gameService.TickAsync();
@@ -106,6 +113,8 @@ public class GameScheduler : IDisposable
 
         LastStepDate = DateTime.Now;
         NextStepDate = LastStepDate + tickDuration;
+
+        IsComputingNextTick = false;
     }
 
     async Task MainLoopAsync(TimeSpan? firstTickDelay, CancellationToken cancellationToken = default)
