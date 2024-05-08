@@ -1539,6 +1539,12 @@ export class CombatInPreparation implements ICombatInPreparation {
     /** The defenders in the combat instance
              */
     defenders!: EntityMinimal[];
+    /** Can the character join the combat
+             */
+    canJoin!: boolean;
+    /** Why cannot the character join the combat
+             */
+    whyCannotJoin!: string;
 
     constructor(data?: ICombatInPreparation) {
         if (data) {
@@ -1566,6 +1572,8 @@ export class CombatInPreparation implements ICombatInPreparation {
                 for (let item of _data["defenders"])
                     this.defenders!.push(EntityMinimal.fromJS(item));
             }
+            this.canJoin = _data["canJoin"];
+            this.whyCannotJoin = _data["whyCannotJoin"];
         }
     }
 
@@ -1589,6 +1597,8 @@ export class CombatInPreparation implements ICombatInPreparation {
             for (let item of this.defenders)
                 data["defenders"].push(item.toJSON());
         }
+        data["canJoin"] = this.canJoin;
+        data["whyCannotJoin"] = this.whyCannotJoin;
         return data;
     }
 }
@@ -1604,6 +1614,12 @@ export interface ICombatInPreparation {
     /** The defenders in the combat instance
              */
     defenders: EntityMinimal[];
+    /** Can the character join the combat
+             */
+    canJoin: boolean;
+    /** Why cannot the character join the combat
+             */
+    whyCannotJoin: string;
 }
 
 /** Entity (minimal) */

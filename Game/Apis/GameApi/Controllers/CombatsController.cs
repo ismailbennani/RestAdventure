@@ -49,7 +49,7 @@ public class CombatsController : GameApiController
         }
 
         IEnumerable<CombatInPreparation> combats = state.Combats.InPreparationAtLocation(character.Location);
-        return combats.Select(c => c.ToDto()).ToArray();
+        return combats.Select(c => c.ToDto(c.Attackers.CanJoin(character))).ToArray();
     }
 
     /// <summary>

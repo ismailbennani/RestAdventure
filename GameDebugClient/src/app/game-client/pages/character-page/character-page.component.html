@@ -98,36 +98,10 @@
                       }
 
                       @for (combat of combatsInPreparation; track combat.id) {
-                        <a
-                          role="button"
-                          class="list-group-item list-group-item-action text-secondary"
-                          [ngClass]="combat.id === selectedCombatInPreparation?.id ? 'active text-light' : undefined"
-                          (click)="selectCombatInPreparation(combat)"
-                        >
-                          <div class="d-flex">
-                            <div class="flex-grow-1">
-                              <div class="text-truncate">
-                                @for (entity of combat.attackers; track entity.id) {
-                                  {{ entity.name }},
-                                }
-                              </div>
-                              <div class="text-truncate">
-                                @for (entity of combat.defenders; track entity.id) {
-                                  {{ entity.name }},
-                                }
-                              </div>
-                            </div>
-                            <div>
-                              @if (plansToJoinCombat(combat) || isInCombat(combat)) {
-                                <button class="btn btn-outline-light disabled">Joined</button>
-                              } @else {
-                                <button class="btn" [ngClass]="combat.id === selectedCombatInPreparation?.id ? 'btn-light' : 'btn-outline-secondary'" (click)="joinCombat(combat)">
-                                  Join
-                                </button>
-                              }
-                            </div>
-                          </div>
-                        </a>
+                        <ng-container
+                          [ngTemplateOutlet]="combatInPreparationListItem"
+                          [ngTemplateOutletContext]="{ combat, plansToJoinCombat: plansToJoinCombat(combat), isInCombat: isInCombat(combat) }"
+                        ></ng-container>
                       }
                     }
                   </div>
@@ -164,3 +138,44 @@
     </div>
   </div>
 }
+
+<ng-template #combatInPreparationListItem let-combat="combat" let-plansToJoinCombat="plansToJoinCombat" let-isInCombat="isInCombat">
+  <a
+    role="button"
+    class="list-group-item list-group-item-action text-secondary"
+    [ngClass]="combat.id === selectedCombatInPreparation?.id ? 'active text-light' : undefined"
+    (click)="selectCombatInPreparation(combat)"
+  >
+    <div class="d-flex">
+      <div class="flex-grow-1">
+        <div class="text-truncate">
+          @for (entity of combat.attackers; track entity.id) {
+            {{ entity.name }},
+          }
+        </div>
+        <div class="text-truncate">
+          @for (entity of combat.defenders; track entity.id) {
+            {{ entity.name }},
+          }
+        </div>
+      </div>
+      <div>
+        @if (plansToJoinCombat || isInCombat) {
+          <button class="btn btn-outline-light disabled">Joined</button>
+        } @else {
+          <button
+            class="btn"
+            [ngClass]="combat.id === selectedCombatInPreparation?.id ? 'btn-light' : 'btn-outline-secondary'"
+            [class.disabled]="!combat.canJoin"
+            (click)="joinCombat(combat)"
+          >
+            Join
+          </button>
+        }
+      </div>
+    </div>
+    @if (!plansToJoinCombat && !isInCombat && !combat.canJoin) {
+      <div class="text-danger">{{ combat.whyCannotJoin }}</div>
+    }
+  </a>
+</ng-template>

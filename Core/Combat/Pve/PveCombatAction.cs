@@ -7,17 +7,11 @@ namespace RestAdventure.Core.Combat.Pve;
 
 public class PveCombatAction : Action
 {
-    IReadOnlyList<IGameEntityWithCombatStatistics>? _attackers;
     IReadOnlyList<IGameEntityWithCombatStatistics>? _defenders;
     readonly ILogger<PveCombatAction> _logger;
 
-    public PveCombatAction(
-        IReadOnlyList<IGameEntityWithCombatStatistics> attackers,
-        IReadOnlyList<IGameEntityWithCombatStatistics> defenders,
-        ILogger<PveCombatAction> logger
-    ) : base("combat")
+    public PveCombatAction(IReadOnlyList<IGameEntityWithCombatStatistics> defenders, ILogger<PveCombatAction> logger) : base("combat")
     {
-        _attackers = attackers;
         _defenders = defenders;
         _logger = logger;
 
@@ -30,7 +24,7 @@ public class PveCombatAction : Action
     }
 
     public IReadOnlyList<IGameEntityWithCombatStatistics> Attackers =>
-        _attackers ?? CombatInPreparation?.Attackers.Entities ?? Combat?.Attackers.Entities ?? Array.Empty<IGameEntityWithCombatStatistics>();
+        CombatInPreparation?.Attackers.Entities ?? Combat?.Attackers.Entities ?? Array.Empty<IGameEntityWithCombatStatistics>();
 
     public IReadOnlyList<IGameEntityWithCombatStatistics> Defenders =>
         _defenders ?? CombatInPreparation?.Defenders.Entities ?? Combat?.Defenders.Entities ?? Array.Empty<IGameEntityWithCombatStatistics>();
@@ -39,20 +33,35 @@ public class PveCombatAction : Action
     public CombatInstance? Combat { get; private set; }
     public bool Failed { get; private set; }
 
+    protected override Maybe CanPerformInternal(GameState state, Character character)
+    {
+        if (CombatInPreparation != null)
+        {
+            return state.Combats.CanJoinCombat(character, CombatInPreparation, CombatSide.Attackers);
+        }
+
+        if (_defenders != null)
+        {
+            return state.Combats.CanStartCombat([character], _defenders);
+        }
+
+        return "Internal error";
+    }
+
     public override bool IsOver(GameState state, Character character) => Failed || CombatInPreparation is { Canceled: true } || Combat is { IsOver: true };
 
     protected override async Task OnStartAsync(GameState state, Character character)
     {
         if (CombatInPreparation == null)
         {
-            if (_attackers == null || _defenders == null)
+            if (_defenders == null)
             {
-                _logger.LogError("Combat creation failed: no attackers or no defenders");
+                _logger.LogError("Combat creation failed: no defenders");
                 Failed = true;
                 return;
             }
 
-            Maybe<CombatInPreparation> combat = await state.Combats.StartCombatAsync(_attackers, _defenders);
+            Maybe<CombatInPreparation> combat = await state.Combats.StartCombatAsync([character], _defenders);
             if (!combat.Success)
             {
                 _logger.LogError("Combat creation failed: {reason}", combat.WhyNot);
@@ -61,7 +70,6 @@ public class PveCombatAction : Action
             }
 
             CombatInPreparation = combat.Value;
-            _attackers = null;
             _defenders = null;
         }
         else

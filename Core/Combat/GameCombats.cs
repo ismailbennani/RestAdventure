@@ -38,6 +38,8 @@ public class GameCombats : IDisposable
         return true;
     }
 
+    public Maybe CanJoinCombat(IGameEntityWithCombatStatistics entity, CombatInPreparation combat, CombatSide side) => combat.GetTeam(side).CanJoin(entity);
+
     public async Task<Maybe<CombatInPreparation>> StartCombatAsync(
         IReadOnlyList<IGameEntityWithCombatStatistics> attackers,
         IReadOnlyList<IGameEntityWithCombatStatistics> defenders

@@ -10,8 +10,6 @@ import {
   CombatSide,
   CombatsApiClient,
   HarvestableEntity,
-  JobsHarvestApiClient,
-  LocationsApiClient,
   PveCombatAction,
   Team,
   TeamCharacter,
@@ -20,7 +18,6 @@ import {
 import { SpinnerComponent } from '../../../common/spinner/spinner.component';
 import { CurrentPageService } from '../../services/current-page.service';
 import { GameService } from '../../services/game.service';
-import { PlayersService } from '../../services/players/players.service';
 import { TeamService } from '../../services/team/team.service';
 import { CharacterActionUtils } from '../../utils/character-action-utils';
 import { CharacterHarvestsComponent } from '../../widgets/character-harvests/character-harvests.component';
@@ -69,20 +66,16 @@ export class CharacterPageComponent implements OnInit {
     private route: ActivatedRoute,
     private currentPageService: CurrentPageService,
     private gameService: GameService,
-    private playersService: PlayersService,
     private teamService: TeamService,
     private charactersApiClient: TeamCharactersApiClient,
-    private locationsApiClient: LocationsApiClient,
-    private jobsHarvestApiClient: JobsHarvestApiClient,
     private combatsApiClient: CombatsApiClient,
   ) {}
 
   ngOnInit(): void {
     combineLatest({
       characterId: this.route.paramMap.pipe(map(paramMap => paramMap.get('character-id') ?? undefined)),
-      player: this.playersService.selected$,
       team: this.teamService.team$,
-    }).subscribe(({ characterId, player, team }) => {
+    }).subscribe(({ characterId, team }) => {
       this.characterId = characterId;
       this.team = team;
       this.refreshSubject.next();
@@ -197,7 +190,7 @@ export class CharacterPageComponent implements OnInit {
         return;
       }
 
-      const combatInPreparation = this.combats.find(c => c.id === currentSelection);
+      const combatInPreparation = this.combatsInPreparation.find(c => c.id === currentSelection);
       if (combatInPreparation) {
         this.selectCombatInPreparation(combatInPreparation);
         return;

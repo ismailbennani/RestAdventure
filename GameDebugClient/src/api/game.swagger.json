@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0-alpha.0.142+7a5a295ecc110a8591e53293ebee75fcd6ffe508"
+    "version": "0.0.0-alpha.0.144+01ce5875315197eafb0a4c1cedd0fc53ac2dfb5a"
   },
   "servers": [
     {
@@ -1128,7 +1128,9 @@
         "required": [
           "id",
           "attackers",
-          "defenders"
+          "defenders",
+          "canJoin",
+          "whyCannotJoin"
         ],
         "properties": {
           "id": {
@@ -1150,6 +1152,15 @@
             "items": {
               "$ref": "#/components/schemas/EntityMinimal"
             }
+          },
+          "canJoin": {
+            "type": "boolean",
+            "description": "Can the character join the combat\n            "
+          },
+          "whyCannotJoin": {
+            "type": "string",
+            "description": "Why cannot the character join the combat\n            ",
+            "minLength": 1
           }
         }
       },

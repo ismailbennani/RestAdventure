@@ -37,11 +37,27 @@ public class CombatFormationInPreparation
             _ => throw new ArgumentOutOfRangeException()
         };
 
-    public Maybe Add(IGameEntityWithCombatStatistics entity)
+    public Maybe CanJoin(IGameEntityWithCombatStatistics entity)
     {
         if (entity.CombatEntityKind != CombatEntityKind)
         {
             return $"Cannot add entity of kind {entity.CombatEntityKind}";
+        }
+
+        if (_entities.Count >= MaxCount)
+        {
+            return "Team full";
+        }
+
+        return true;
+    }
+
+    public Maybe Add(IGameEntityWithCombatStatistics entity)
+    {
+        Maybe canJoin = CanJoin(entity);
+        if (!canJoin.Success)
+        {
+            return canJoin;
         }
 
         _entities.Add(entity);

@@ -8,6 +8,7 @@ public class GameActions
 {
     readonly GameState _state;
     readonly ILogger<GameActions> _logger;
+    readonly Dictionary<CharacterId, Action> _availableActions = new();
     Dictionary<CharacterId, Action> _queuedActions = new();
     readonly Dictionary<CharacterId, Action> _ongoingActions = new();
 
