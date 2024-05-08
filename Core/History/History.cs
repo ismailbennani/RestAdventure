@@ -7,14 +7,7 @@ public class GameHistory
 {
     readonly List<HistoryEntry> _entries = [];
 
-    public GameHistory(GameState gameState)
-    {
-        GameState = gameState;
-    }
-
     public IEnumerable<HistoryEntry> All => _entries;
-
-    internal GameState GameState { get; }
 
     public void Record(HistoryEntry entry) => _entries.Add(entry);
 

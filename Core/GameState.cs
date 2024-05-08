@@ -17,7 +17,7 @@ public class GameState : IDisposable
         Publisher = publisher;
         Settings = settings;
         Content = content;
-        History = new GameHistory(this);
+        History = new GameHistory();
         Players = new GamePlayers(this);
         Entities = new GameEntities(this);
         Actions = new GameActions(this, loggerFactory.CreateLogger<GameActions>());
