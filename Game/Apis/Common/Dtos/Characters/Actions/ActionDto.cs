@@ -13,8 +13,6 @@ namespace RestAdventure.Game.Apis.Common.Dtos.Characters.Actions;
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "$type", IgnoreUnrecognizedTypeDiscriminators = true)]
 [JsonDerivedType(typeof(MoveActionDto), "move")]
 [JsonDerivedType(typeof(HarvestActionDto), "harvest")]
-[JsonDerivedType(typeof(StartPveCombatActionDto), "start-combat-pve")]
-[JsonDerivedType(typeof(JoinPveCombatActionDto), "join-combat-pve")]
 [JsonDerivedType(typeof(PveCombatActionDto), "combat-pve")]
 public class ActionDto
 {
@@ -32,8 +30,6 @@ static class CharacterActionMappingExtensions
         {
             MoveAction moveAction => moveAction.ToDto(),
             HarvestAction harvestAction => harvestAction.ToDto(),
-            StartPveCombatAction startPveCombatAction => startPveCombatAction.ToDto(),
-            JoinPveCombatAction joinPveCombatAction => joinPveCombatAction.ToDto(),
             PveCombatAction pveCombatAction => pveCombatAction.ToDto(),
             _ => new ActionDto { Name = action.Name }
         };

@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0-alpha.0.139+e225f7c4dab9539a4a62a2aa507727b6be1547ca"
+    "version": "0.0.0-alpha.0.142+7a5a295ecc110a8591e53293ebee75fcd6ffe508"
   },
   "servers": [
     {
@@ -2070,8 +2070,6 @@
           "mapping": {
             "move": "#/components/schemas/MoveAction",
             "harvest": "#/components/schemas/HarvestAction",
-            "start-combat-pve": "#/components/schemas/StartPveCombatAction",
-            "join-combat-pve": "#/components/schemas/JoinPveCombatAction",
             "combat-pve": "#/components/schemas/PveCombatAction"
           }
         },
@@ -2175,77 +2173,6 @@
             ]
           }
         }
-      },
-      "StartPveCombatAction": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Action"
-          },
-          {
-            "type": "object",
-            "description": "PVE combat action\n            ",
-            "additionalProperties": false,
-            "required": [
-              "attackers",
-              "defenders"
-            ],
-            "properties": {
-              "attackers": {
-                "type": "array",
-                "description": "The attackers in the combat instance\n            ",
-                "items": {
-                  "$ref": "#/components/schemas/EntityMinimal"
-                }
-              },
-              "defenders": {
-                "type": "array",
-                "description": "The defenders in the combat instance\n            ",
-                "items": {
-                  "$ref": "#/components/schemas/EntityMinimal"
-                }
-              }
-            }
-          }
-        ]
-      },
-      "JoinPveCombatAction": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Action"
-          },
-          {
-            "type": "object",
-            "description": "PVE combat action\n            ",
-            "additionalProperties": false,
-            "required": [
-              "combatId",
-              "attackers",
-              "defenders"
-            ],
-            "properties": {
-              "combatId": {
-                "type": "string",
-                "description": "The unique ID of the combat\n            ",
-                "format": "guid",
-                "minLength": 1
-              },
-              "attackers": {
-                "type": "array",
-                "description": "The attackers in the combat instance\n            ",
-                "items": {
-                  "$ref": "#/components/schemas/EntityMinimal"
-                }
-              },
-              "defenders": {
-                "type": "array",
-                "description": "The defenders in the combat instance\n            ",
-                "items": {
-                  "$ref": "#/components/schemas/EntityMinimal"
-                }
-              }
-            }
-          }
-        ]
       },
       "PveCombatAction": {
         "allOf": [

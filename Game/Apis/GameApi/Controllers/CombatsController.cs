@@ -18,12 +18,14 @@ namespace RestAdventure.Game.Apis.GameApi.Controllers;
 public class CombatsController : GameApiController
 {
     readonly GameService _gameService;
+    readonly ILoggerFactory _loggerFactory;
 
     /// <summary>
     /// </summary>
-    public CombatsController(GameService gameService)
+    public CombatsController(GameService gameService, ILoggerFactory loggerFactory)
     {
         _gameService = gameService;
+        _loggerFactory = loggerFactory;
     }
 
     /// <summary>
@@ -77,7 +79,7 @@ public class CombatsController : GameApiController
             return NotFound();
         }
 
-        JoinPveCombatAction action = new(combatInPreparation);
+        PveCombatAction action = new(combatInPreparation, _loggerFactory.CreateLogger<PveCombatAction>());
         state.Actions.QueueAction(character, action);
 
         return NoContent();

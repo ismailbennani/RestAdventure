@@ -11,10 +11,8 @@ import {
   CombatsApiClient,
   HarvestableEntity,
   JobsHarvestApiClient,
-  JoinPveCombatAction,
   LocationsApiClient,
   PveCombatAction,
-  StartPveCombatAction,
   Team,
   TeamCharacter,
   TeamCharactersApiClient,
@@ -187,7 +185,7 @@ export class CharacterPageComponent implements OnInit {
   }
 
   private isCombatAction(action: Action, combat: CombatInPreparation | CombatInstance) {
-    return action instanceof PveCombatAction || action instanceof StartPveCombatAction || (action instanceof JoinPveCombatAction && action.combatId === combat.id);
+    return action instanceof PveCombatAction && action.combatId === combat.id;
   }
 
   private autoSelectCombatAfterRefresh() {

@@ -94,7 +94,7 @@ public class PveController : GameApiController
             return NotFound();
         }
 
-        StartPveCombatAction action = new([character], [monster], _loggerFactory.CreateLogger<StartPveCombatAction>());
+        PveCombatAction action = new([character], [monster], _loggerFactory.CreateLogger<PveCombatAction>());
         state.Actions.QueueAction(character, action);
 
         return NoContent();

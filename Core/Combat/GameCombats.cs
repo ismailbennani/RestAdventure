@@ -30,11 +30,6 @@ public class GameCombats : IDisposable
 
     public Maybe CanStartCombat(IReadOnlyList<IGameEntityWithCombatStatistics> attackers, IReadOnlyList<IGameEntityWithCombatStatistics> defenders)
     {
-        if (attackers.Any(attacker => attacker.Busy))
-        {
-            return "Attacker is busy";
-        }
-
         if (defenders.Any(target => target.Busy))
         {
             return "Target is busy";
