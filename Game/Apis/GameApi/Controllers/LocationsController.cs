@@ -29,6 +29,9 @@ public class LocationsController : GameApiController
     ///     Get accessible locations
     /// </summary>
     [HttpGet]
+    [ProducesResponseType<IReadOnlyCollection<LocationMinimalDto>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public ActionResult<IReadOnlyCollection<LocationMinimalDto>> GetAccessibleLocations(Guid characterGuid)
     {
         GameContent content = _gameService.RequireGameContent();
@@ -52,8 +55,8 @@ public class LocationsController : GameApiController
     /// </summary>
     [HttpPost("{locationGuid:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public ActionResult MoveToLocation(Guid characterGuid, Guid locationGuid)
     {
         GameContent content = _gameService.RequireGameContent();

@@ -66,11 +66,6 @@ public class TeamCharacterDto
     public required EntityCombatStatisticsDto Combat { get; init; }
 
     /// <summary>
-    ///     The result of the action that has been performed on last tick
-    /// </summary>
-    public CharacterActionResultDto? LastActionResult { get; init; }
-
-    /// <summary>
     ///     The interaction being performed by the character
     /// </summary>
     public InteractionInstanceDto? CurrentInteraction { get; init; }
@@ -94,7 +89,6 @@ static class TeamCharacterMappingExtensions
             Inventory = character.Inventory.ToDto(),
             Jobs = character.Jobs.Select(j => j.ToDto()).ToArray(),
             Combat = character.Combat.ToDto(),
-            LastActionResult = options?.LastActionResult?.ToDto(),
             CurrentInteraction = options?.InteractionInstance?.ToDto(),
             PlannedAction = options?.NextAction?.ToDto()
         };
@@ -102,7 +96,6 @@ static class TeamCharacterMappingExtensions
 
 class CharacterMappingOptions
 {
-    public CharacterActionResult? LastActionResult { get; init; }
     public InteractionInstance? InteractionInstance { get; init; }
     public CharacterAction? NextAction { get; init; }
 }

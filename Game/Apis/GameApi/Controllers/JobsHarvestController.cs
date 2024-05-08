@@ -36,6 +36,9 @@ public class JobsHarvestController : GameApiController
     ///     Get harvestables
     /// </summary>
     [HttpGet]
+    [ProducesResponseType<IReadOnlyCollection<HarvestableEntityDto>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<IReadOnlyCollection<HarvestableEntityDto>>> GetHarvestablesAsync(Guid characterGuid)
     {
         GameState state = _gameService.RequireGameState();
@@ -95,8 +98,8 @@ public class JobsHarvestController : GameApiController
     /// </summary>
     [HttpPost("{entityGuid:guid}/{harvest}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public ActionResult Harvest(Guid characterGuid, Guid entityGuid, string harvest)
     {
         GameState state = _gameService.RequireGameState();

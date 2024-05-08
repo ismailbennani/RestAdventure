@@ -30,7 +30,6 @@ public class TeamController : GameApiController
     [HttpGet]
     public ActionResult<TeamDto> GetTeam()
     {
-        GameContent content = _gameService.RequireGameContent();
         GameState state = _gameService.RequireGameState();
         Player player = ControllerContext.RequirePlayer(state);
 
@@ -43,7 +42,6 @@ public class TeamController : GameApiController
                     c => c.ToDto(
                         new CharacterMappingOptions
                         {
-                            LastActionResult = state.Actions.GetLastActionResult(c),
                             InteractionInstance = state.Interactions.GetCharacterInteraction(c),
                             NextAction = state.Actions.GetNextAction(c)
                         }
