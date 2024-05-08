@@ -1,5 +1,4 @@
-﻿using RestAdventure.Core.Characters;
-using RestAdventure.Core.Interactions;
+﻿using RestAdventure.Core.Interactions;
 using RestAdventure.Core.Items;
 
 namespace RestAdventure.Core.Jobs;
@@ -8,11 +7,17 @@ public class HarvestInteractionInstance : InteractionInstance
 {
     long _startTick;
 
-    internal HarvestInteractionInstance(Character character, HarvestInteraction interaction, IInteractibleEntity entity) : base(character, interaction, entity)
+    internal HarvestInteractionInstance(IGameEntityWithJobs sourceWithJobs, HarvestInteraction interaction, IInteractibleEntity entity) : base(
+        (IInteractingEntity)sourceWithJobs,
+        interaction,
+        entity
+    )
     {
+        SourceWithJobs = sourceWithJobs;
         HarvestInteraction = interaction;
     }
 
+    public IGameEntityWithJobs SourceWithJobs { get; }
     public HarvestInteraction HarvestInteraction { get; }
 
     public override Task OnStartAsync(GameState state)
@@ -26,8 +31,12 @@ public class HarvestInteractionInstance : InteractionInstance
 
     public override async Task OnEndAsync(GameState state)
     {
-        Character.Inventory.Add(HarvestInteraction.Harvest.Items);
-        Character.Jobs.Get(HarvestInteraction.Job)?.Progression.Progress(HarvestInteraction.Harvest.Experience);
+        if (Source is IGameEntityWithInventory withInventory)
+        {
+            withInventory.Inventory.Add(HarvestInteraction.Harvest.Items);
+        }
+
+        SourceWithJobs.Jobs.Get(HarvestInteraction.Job)?.Progression.Progress(HarvestInteraction.Harvest.Experience);
         await Target.KillAsync(state);
     }
 }

@@ -1,5 +1,4 @@
-﻿using RestAdventure.Core.Characters;
-using RestAdventure.Core.Interactions;
+﻿using RestAdventure.Core.Interactions;
 
 namespace RestAdventure.Core.Combat;
 
@@ -8,8 +7,8 @@ public class CharacterCombatInteractionInstance : InteractionInstance
     public CombatInPreparation CombatInPreparation { get; }
     public CombatInstance? Combat { get; private set; }
 
-    public CharacterCombatInteractionInstance(CombatInPreparation combatInPreparation, Character character, Interaction interaction, IInteractibleEntity target) : base(
-        character,
+    public CharacterCombatInteractionInstance(CombatInPreparation combatInPreparation, IInteractingEntity source, Interaction interaction, IInteractibleEntity target) : base(
+        source,
         interaction,
         target
     )

@@ -1,16 +1,17 @@
-﻿using RestAdventure.Core.Characters;
+﻿using RestAdventure.Core.Entities;
 using RestAdventure.Core.History.Entities;
+using RestAdventure.Core.Interactions;
 
 namespace RestAdventure.Core.History.Characters;
 
 public abstract class CharacterHistoryEntry : EntityHistoryEntry
 {
-    protected CharacterHistoryEntry(Character character, long tick) : base(character, tick)
+    protected CharacterHistoryEntry(IInteractingEntity source, long tick) : base(source, tick)
     {
-        CharacterId = character.Id;
-        CharacterName = character.Name;
+        SourceId = source.Id;
+        SourceName = source.Name;
     }
 
-    public CharacterId CharacterId { get; }
-    public string CharacterName { get; }
+    public GameEntityId SourceId { get; }
+    public string SourceName { get; }
 }

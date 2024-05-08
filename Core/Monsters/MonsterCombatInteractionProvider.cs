@@ -7,7 +7,13 @@ namespace RestAdventure.Core.Monsters;
 
 public class MonsterCombatInteractionProvider : IInteractionProvider
 {
-    readonly MonsterCombatInteraction _cachedMonsterCombatInteraction = new();
+    readonly GameService _gameService;
+    MonsterCombatInteraction? _cachedMonsterCombatInteraction;
+
+    public MonsterCombatInteractionProvider(GameService gameService)
+    {
+        _gameService = gameService;
+    }
 
     public IEnumerable<Interaction> GetAvailableInteractions(Character character, IGameEntity entity)
     {
@@ -16,6 +22,7 @@ public class MonsterCombatInteractionProvider : IInteractionProvider
             yield break;
         }
 
-        yield return _cachedMonsterCombatInteraction;
+        GameState state = _gameService.RequireGameState();
+        yield return _cachedMonsterCombatInteraction ??= new MonsterCombatInteraction(state.Combats);
     }
 }

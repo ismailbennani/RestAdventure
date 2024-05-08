@@ -1,5 +1,4 @@
-﻿using RestAdventure.Core.Characters;
-using RestAdventure.Core.Combat;
+﻿using RestAdventure.Core.Combat;
 using RestAdventure.Core.Interactions;
 using RestAdventure.Kernel.Errors;
 
@@ -7,18 +6,23 @@ namespace RestAdventure.Core.Monsters;
 
 public class MonsterCombatInteraction : CombatInteraction
 {
-    protected override Task<Maybe> CanInteractInternalAsync(GameState state, Character character, IInteractibleEntity target)
+    public MonsterCombatInteraction(GameCombats combats) : base(combats)
     {
-        if (target is not MonsterInstance monster)
+    }
+
+    protected override async Task<Maybe> CanInteractInternalAsync(IInteractingEntity source, IInteractibleEntity target)
+    {
+        Maybe baseResult = await base.CanInteractInternalAsync(source, target);
+        if (!baseResult)
         {
-            return Task.FromResult<Maybe>("Target is not a monster");
+            return baseResult;
         }
 
-        if (character.Location != monster.Location)
+        if (target is not MonsterInstance)
         {
-            return Task.FromResult<Maybe>("Monster is inaccessible");
+            return "Target is not a monster";
         }
 
-        return Task.FromResult<Maybe>(true);
+        return true;
     }
 }

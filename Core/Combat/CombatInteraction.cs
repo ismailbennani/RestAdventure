@@ -1,19 +1,36 @@
-﻿using RestAdventure.Core.Characters;
-using RestAdventure.Core.Interactions;
+﻿using RestAdventure.Core.Interactions;
 using RestAdventure.Kernel.Errors;
 
 namespace RestAdventure.Core.Combat;
 
 public abstract class CombatInteraction : Interaction
 {
-    public override string Name => "combat";
-
-    public override async Task<Maybe<InteractionInstance>> InstantiateInteractionAsync(GameState state, Character character, IInteractibleEntity target)
+    protected CombatInteraction(GameCombats combats)
     {
-        IGameEntityWithCombatStatistics entityWithCombat = (IGameEntityWithCombatStatistics)target;
+        Combats = combats;
+    }
 
-        CombatInPreparation combatInPreparation = await state.Combats.StartCombatAsync(character, entityWithCombat);
+    public override string Name => "combat";
+    public GameCombats Combats { get; }
 
-        return new CharacterCombatInteractionInstance(combatInPreparation, character, this, target);
+    protected override Task<Maybe> CanInteractInternalAsync(IInteractingEntity source, IInteractibleEntity target)
+    {
+        if (source is not IGameEntityWithCombatStatistics)
+        {
+            return Task.FromResult<Maybe>("Source cannot enter combat");
+        }
+
+        if (target is not IGameEntityWithCombatStatistics)
+        {
+            return Task.FromResult<Maybe>("Target cannot enter combat");
+        }
+
+        return Task.FromResult<Maybe>(true);
+    }
+
+    protected override async Task<Maybe<InteractionInstance>> InstantiateInteractionInternalAsync(IInteractingEntity source, IInteractibleEntity target)
+    {
+        CombatInPreparation combatInPreparation = await Combats.StartCombatAsync((IGameEntityWithCombatStatistics)source, (IGameEntityWithCombatStatistics)target);
+        return new CharacterCombatInteractionInstance(combatInPreparation, source, this, target);
     }
 }

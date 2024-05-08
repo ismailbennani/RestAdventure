@@ -1,5 +1,4 @@
-﻿using RestAdventure.Core.Characters;
-using RestAdventure.Kernel.Errors;
+﻿using RestAdventure.Kernel.Errors;
 
 namespace RestAdventure.Core.Interactions;
 
@@ -10,10 +9,9 @@ public abstract class Interaction
     /// </summary>
     public abstract string Name { get; }
 
-    public async Task<Maybe> CanInteractAsync(GameState state, Character character, IInteractibleEntity target)
+    public async Task<Maybe> CanInteractAsync(IInteractingEntity source, IInteractibleEntity target)
     {
-        InteractionInstance? ongoingInteraction = state.Interactions.GetCharacterInteraction(character);
-        if (ongoingInteraction != null)
+        if (source.CurrentInteraction != null)
         {
             return "Character is busy";
         }
@@ -23,16 +21,28 @@ public abstract class Interaction
             return "Target is busy";
         }
 
-        if (character.Location != target.Location)
+        if (source.Location != target.Location)
         {
             return "Target is inaccessible";
         }
 
-        return await CanInteractInternalAsync(state, character, target);
+        return await CanInteractInternalAsync(source, target);
     }
 
-    protected abstract Task<Maybe> CanInteractInternalAsync(GameState state, Character character, IInteractibleEntity target);
-    public abstract Task<Maybe<InteractionInstance>> InstantiateInteractionAsync(GameState state, Character character, IInteractibleEntity target);
+    protected abstract Task<Maybe> CanInteractInternalAsync(IInteractingEntity source, IInteractibleEntity target);
+
+    public async Task<Maybe<InteractionInstance>> InstantiateInteractionAsync(IInteractingEntity source, IInteractibleEntity target)
+    {
+        Maybe canInteract = await CanInteractAsync(source, target);
+        if (!canInteract.Success)
+        {
+            return canInteract.WhyNot;
+        }
+
+        return await InstantiateInteractionInternalAsync(source, target);
+    }
+
+    protected abstract Task<Maybe<InteractionInstance>> InstantiateInteractionInternalAsync(IInteractingEntity source, IInteractibleEntity target);
 
     public override string ToString() => Name;
 }

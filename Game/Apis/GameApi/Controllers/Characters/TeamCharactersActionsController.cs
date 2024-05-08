@@ -118,7 +118,7 @@ public class TeamCharactersActionsController : GameApiController
             List<InteractionDto> interactions = [];
             foreach (Interaction interaction in availableInteractions)
             {
-                Maybe canInteract = await interaction.CanInteractAsync(state, character, entity);
+                Maybe canInteract = await interaction.CanInteractAsync(character, entity);
                 interactions.Add(interaction.ToDto(canInteract));
             }
 

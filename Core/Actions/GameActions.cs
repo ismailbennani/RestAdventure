@@ -14,15 +14,13 @@ namespace RestAdventure.Core.Actions;
 /// </summary>
 public class GameActions
 {
-    readonly GameInteractions _interactions;
     readonly IPublisher _publisher;
     readonly ILogger<GameActions> _logger;
     readonly Dictionary<CharacterId, CharacterAction> _actions = new();
     readonly Dictionary<CharacterId, CharacterActionResult> _results = new();
 
-    public GameActions(GameInteractions interactions, IPublisher publisher, ILogger<GameActions> logger)
+    public GameActions(IPublisher publisher, ILogger<GameActions> logger)
     {
-        _interactions = interactions;
         _publisher = publisher;
         _logger = logger;
     }
@@ -80,9 +78,9 @@ public class GameActions
         _actions.Clear();
     }
 
-    void AssertCharacterCanPerformAction(Character character)
+    static void AssertCharacterCanPerformAction(Character character)
     {
-        if (_interactions.GetCharacterInteraction(character) != null)
+        if (character.CurrentInteraction != null)
         {
             throw new InvalidOperationException($"Character {character} cannot perform action because they are currently locked in an interaction.");
         }

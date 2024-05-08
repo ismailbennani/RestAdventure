@@ -7,7 +7,7 @@ namespace RestAdventure.Core.History.Characters;
 
 public class CharacterPerformedActionHistoryEntry : CharacterHistoryEntry
 {
-    public CharacterPerformedActionHistoryEntry(Character character, CharacterActionResult result) : base(character, result.Tick)
+    public CharacterPerformedActionHistoryEntry(Character source, CharacterActionResult result) : base(source, result.Tick)
     {
         Action = result.Action;
         Success = result.Success;

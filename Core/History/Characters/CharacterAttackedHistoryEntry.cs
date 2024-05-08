@@ -8,8 +8,8 @@ namespace RestAdventure.Core.History.Characters;
 
 public class CharacterAttackedHistoryEntry : CharacterHistoryEntry
 {
-    public CharacterAttackedHistoryEntry(Character character, EntityAttack attackDealt, EntityAttack attackReceived, IGameEntityWithCombatStatistics target, long tick) : base(
-        character,
+    public CharacterAttackedHistoryEntry(Character source, EntityAttack attackDealt, EntityAttack attackReceived, IGameEntityWithCombatStatistics target, long tick) : base(
+        source,
         tick
     )
     {

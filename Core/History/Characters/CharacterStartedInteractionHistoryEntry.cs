@@ -7,7 +7,7 @@ namespace RestAdventure.Core.History.Characters;
 
 public class CharacterStartedInteractionHistoryEntry : CharacterHistoryEntry
 {
-    public CharacterStartedInteractionHistoryEntry(InteractionInstance interactionInstance, long tick) : base(interactionInstance.Character, tick)
+    public CharacterStartedInteractionHistoryEntry(InteractionInstance interactionInstance, long tick) : base(interactionInstance.Source, tick)
     {
         InteractionName = interactionInstance.Interaction.Name;
         TargetId = interactionInstance.Target.Id;

@@ -1,5 +1,4 @@
-﻿using RestAdventure.Core.Characters;
-using RestAdventure.Core.Interactions;
+﻿using RestAdventure.Core.Interactions;
 using RestAdventure.Core.StaticObjects;
 using RestAdventure.Kernel.Errors;
 
@@ -17,12 +16,17 @@ public class HarvestInteraction : Interaction
     public Job Job { get; }
     public JobHarvest Harvest { get; }
 
-    protected override Task<Maybe> CanInteractInternalAsync(GameState state, Character character, IInteractibleEntity target)
+    protected override Task<Maybe> CanInteractInternalAsync(IInteractingEntity source, IInteractibleEntity target)
     {
-        JobInstance? job = character.Jobs.Get(Job);
+        if (source is not IGameEntityWithJobs entityWithJobs)
+        {
+            return Task.FromResult<Maybe>("Source doesn't have jobs");
+        }
+
+        JobInstance? job = entityWithJobs.Jobs.Get(Job);
         if (job == null || Harvest.Level > job.Progression.Level)
         {
-            return Task.FromResult<Maybe>("Character doesn't fulfill the conditions");
+            return Task.FromResult<Maybe>("Source doesn't fulfill the conditions");
         }
 
         if (target is not StaticObjectInstance staticObjectInstance || !Harvest.Targets.Contains(staticObjectInstance.Object))
@@ -30,7 +34,7 @@ public class HarvestInteraction : Interaction
             return Task.FromResult<Maybe>("Entity cannot be harvested");
         }
 
-        if (character.Location != target.Location)
+        if (source.Location != target.Location)
         {
             return Task.FromResult<Maybe>("Entity is inaccessible");
         }
@@ -38,6 +42,6 @@ public class HarvestInteraction : Interaction
         return Task.FromResult<Maybe>(true);
     }
 
-    public override Task<Maybe<InteractionInstance>> InstantiateInteractionAsync(GameState state, Character character, IInteractibleEntity target) =>
-        Task.FromResult<Maybe<InteractionInstance>>(new HarvestInteractionInstance(character, this, target));
+    protected override Task<Maybe<InteractionInstance>> InstantiateInteractionInternalAsync(IInteractingEntity source, IInteractibleEntity target) =>
+        Task.FromResult<Maybe<InteractionInstance>>(new HarvestInteractionInstance((IGameEntityWithJobs)source, this, target));
 }

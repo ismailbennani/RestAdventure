@@ -20,8 +20,8 @@ public class GameState : IDisposable
         History = new GameHistory();
         Players = new GamePlayers(publisher);
         Entities = new GameEntities(publisher);
-        Interactions = new GameInteractions(this);
-        Actions = new GameActions(Interactions, publisher, loggerFactory.CreateLogger<GameActions>());
+        Interactions = new GameInteractions(publisher, loggerFactory.CreateLogger<GameInteractions>());
+        Actions = new GameActions(publisher, loggerFactory.CreateLogger<GameActions>());
         Combats = new GameCombats(settings, publisher, loggerFactory.CreateLogger<GameCombats>());
     }
 

@@ -1,4 +1,6 @@
-﻿using RestAdventure.Core.Characters;
+﻿using MediatR;
+using Microsoft.Extensions.Logging;
+using RestAdventure.Core.Entities;
 using RestAdventure.Core.Interactions.Notifications;
 using RestAdventure.Kernel.Errors;
 
@@ -6,28 +8,30 @@ namespace RestAdventure.Core.Interactions;
 
 public class GameInteractions
 {
+    readonly IPublisher _publisher;
+    readonly ILogger<GameInteractions> _logger;
     readonly List<InteractionInstance> _newInteractions = new();
-    readonly Dictionary<CharacterId, InteractionInstance> _interactions = new();
+    readonly Dictionary<GameEntityId, InteractionInstance> _interactions = new();
 
-    public GameInteractions(GameState gameState)
+    public GameInteractions(IPublisher publisher, ILogger<GameInteractions> logger)
     {
-        GameState = gameState;
+        _publisher = publisher;
+        _logger = logger;
     }
 
-    internal GameState GameState { get; }
-
-    public async Task<Maybe<InteractionInstance>> StartInteractionAsync(Character character, Interaction interaction, IInteractibleEntity entity)
+    public async Task<Maybe<InteractionInstance>> StartInteractionAsync(IInteractingEntity source, Interaction interaction, IInteractibleEntity entity)
     {
-        Maybe canInteract = await interaction.CanInteractAsync(GameState, character, entity);
+        Maybe canInteract = await interaction.CanInteractAsync(source, entity);
         if (!canInteract.Success)
         {
-            return $"Character {character} cannot perform interaction {interaction} on entity {entity}: {canInteract.WhyNot}";
+            return $"Character {source} cannot perform interaction {interaction} on entity {entity}: {canInteract.WhyNot}";
         }
 
-        Maybe<InteractionInstance> instance = await interaction.InstantiateInteractionAsync(GameState, character, entity);
+        Maybe<InteractionInstance> instance = await interaction.InstantiateInteractionAsync(source, entity);
         if (instance.Success)
         {
             _newInteractions.Add(instance.Value);
+            source.CurrentInteraction = instance.Value;
         }
 
         return instance;
@@ -38,9 +42,9 @@ public class GameInteractions
         foreach (InteractionInstance newInteraction in _newInteractions)
         {
             await newInteraction.OnStartAsync(state);
-            _interactions[newInteraction.Character.Id] = newInteraction;
+            _interactions[newInteraction.Source.Id] = newInteraction;
 
-            await GameState.Publisher.Publish(new InteractionStarted { InteractionInstance = newInteraction });
+            await _publisher.Publish(new InteractionStarted { InteractionInstance = newInteraction });
         }
         _newInteractions.Clear();
 
@@ -49,26 +53,29 @@ public class GameInteractions
             await instance.OnTickAsync(state);
         }
 
-        List<CharacterId> toRemove = [];
-        foreach ((CharacterId? characterId, InteractionInstance? instance) in _interactions)
+        List<GameEntityId> toRemove = [];
+        foreach ((GameEntityId sourceId, InteractionInstance instance) in _interactions)
         {
             if (instance.IsOver(state))
             {
                 await instance.OnEndAsync(state);
-                toRemove.Add(characterId);
+                toRemove.Add(sourceId);
             }
         }
 
-        foreach (CharacterId characterId in toRemove)
+        foreach (GameEntityId sourceId in toRemove)
         {
-            if (!_interactions.Remove(characterId, out InteractionInstance? instance))
+            if (!_interactions.Remove(sourceId, out InteractionInstance? instance))
             {
+                _logger.LogWarning("Could not remove interaction for {id}", sourceId);
                 continue;
             }
 
-            await GameState.Publisher.Publish(new InteractionEnded { InteractionInstance = instance });
+            instance.Source.CurrentInteraction = null;
+
+            await _publisher.Publish(new InteractionEnded { InteractionInstance = instance });
         }
     }
 
-    public InteractionInstance? GetCharacterInteraction(Character character) => _interactions.GetValueOrDefault(character.Id);
+    public InteractionInstance? GetCharacterInteraction(IInteractingEntity source) => _interactions.GetValueOrDefault(source.Id);
 }

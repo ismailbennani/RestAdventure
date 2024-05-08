@@ -1,14 +1,12 @@
-﻿using RestAdventure.Core.Characters;
-
-namespace RestAdventure.Core.Interactions;
+﻿namespace RestAdventure.Core.Interactions;
 
 public record InteractionInstanceId(Guid Guid);
 
 public abstract class InteractionInstance
 {
-    protected InteractionInstance(Character character, Interaction interaction, IInteractibleEntity target)
+    protected InteractionInstance(IInteractingEntity source, Interaction interaction, IInteractibleEntity target)
     {
-        Character = character;
+        Source = source;
         Interaction = interaction;
         Target = target;
     }
@@ -21,9 +19,9 @@ public abstract class InteractionInstance
     public Interaction Interaction { get; }
 
     /// <summary>
-    ///     The character performing the operation
+    ///     The entity performing the operation
     /// </summary>
-    public Character Character { get; }
+    public IInteractingEntity Source { get; }
 
     /// <summary>
     ///     The target of the interaction
