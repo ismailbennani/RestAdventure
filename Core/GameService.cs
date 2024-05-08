@@ -60,8 +60,12 @@ public class GameService
 
         state.Tick++;
 
-        await state.Actions.ResolveActionsAsync(state);
+        await state.Actions.StartQueuedActionsAsync(state);
+
         await state.Combats.ResolveCombatsAsync(state);
+
+        await state.Actions.TickOngoingActionsAsync(state);
+        await state.Actions.RemoveFinishedActionsAsync(state);
 
         await _publisher.Publish(new GameTick { GameState = state });
 
