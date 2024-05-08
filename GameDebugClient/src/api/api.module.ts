@@ -7,6 +7,7 @@ import {
   GameApiStatusApiClient,
   JobsHarvestApiClient,
   LocationsApiClient,
+  PveApiClient,
   TeamApiClient,
   TeamCharactersApiClient,
 } from './game-api-client.generated';
@@ -27,6 +28,7 @@ const API_BASE_URL: InjectionToken<string> = new InjectionToken<string>('BASE_UR
     TeamCharactersApiClient,
     LocationsApiClient,
     JobsHarvestApiClient,
+    PveApiClient,
     CombatsApiClient,
   ],
 })

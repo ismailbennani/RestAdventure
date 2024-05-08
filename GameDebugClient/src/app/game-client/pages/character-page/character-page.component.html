@@ -10,14 +10,12 @@
   </div>
 } @else {
   <div class="w-100 h-100 p-4">
-    <div class="w-100 h-100 row">
+    <div class="w-100 h-100 row gy-4">
       <div class="col">
         <div class="vstack gap-4">
-          <div class="row">
+          <div class="row gy-4">
             <div class="col">
-              <div class="w-100 h-100 border p-4">
-                <app-character [character]="character"></app-character>
-              </div>
+              <app-character [character]="character"></app-character>
             </div>
 
             <div class="col">
@@ -55,13 +53,17 @@
                   </li>
                 </ul>
 
-                <div class="row">
+                <div class="row gy-4">
                   <div class="col">
                     <app-character-movements [character]="character"></app-character-movements>
                   </div>
 
                   <div class="col">
                     <app-character-harvests [character]="character"></app-character-harvests>
+                  </div>
+
+                  <div class="col">
+                    <app-character-monsters [character]="character"></app-character-monsters>
                   </div>
                 </div>
               </div>

@@ -1,0 +1,34 @@
+<div class="w-100 h-100 border">
+  <div class="p-2">
+    <h6 class="m-0" [class.fw-bold]="plansToAttack()">Monsters</h6>
+  </div>
+  <hr class="m-0" />
+  <ul class="list-group list-group-flush">
+    @if (monsterGroups.length > 0) {
+      @for (monsterGroup of monsterGroups; track monsterGroup.id) {
+        <li class="list-group-item" [class.active]="plansToAttack(monsterGroup)" (click)="attack(monsterGroup)">
+          <div class="d-flex">
+            <ul class="flex-grow-1 list-group list-group-flush">
+              @for (monster of monsterGroup.monsters; track monster.id) {
+                <li class="list-group-item bg-transparent">{{ monster.name }} lv. {{ monster.level }}</li>
+              }
+            </ul>
+            <div class="d-flex align-items-center justify-content-center">
+              @if (isAttacking(monsterGroup)) {
+                <button class="btn btn-primary">In combat</button>
+              } @else if (monsterGroup.canAttack) {
+                <button class="btn btn-outline-secondary">Attack</button>
+              } @else {
+                <span class="text-danger small text-truncate" [title]="monsterGroup.whyCannotAttack">
+                  {{ monsterGroup.whyCannotAttack }}
+                </span>
+              }
+            </div>
+          </div>
+        </li>
+      }
+    } @else {
+      <li class="list-group-item text-center text-secondary">None</li>
+    }
+  </ul>
+</div>

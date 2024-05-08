@@ -22,7 +22,7 @@
                 [attr.aria-disabled]="!jobHarvest.canHarvest"
               >
                 <span>{{ jobHarvest.name }}</span>
-                <span class="text-danger small">{{ jobHarvest.whyCannotHarvest }}</span>
+                <span class="text-danger small" [title]="jobHarvest.whyCannotHarvest">{{ jobHarvest.whyCannotHarvest }}</span>
               </a>
             }
           </div>

@@ -11,7 +11,7 @@ public abstract class CombatInteraction : Interaction
     }
 
     public override string Name => "combat";
-    public GameCombats Combats { get; }
+    protected GameCombats Combats { get; }
 
     protected override Task<Maybe> CanInteractInternalAsync(IInteractingEntity source, IInteractibleEntity target)
     {

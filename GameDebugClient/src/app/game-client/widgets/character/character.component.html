@@ -1,20 +1,18 @@
-<div class="row">
-  <div class="col">
-    <div class="hstack">
-      <h2>
-        <span class="text-uppercase">{{ character.class.name }}</span>
-        {{ character.name }}
-      </h2>
-      <div class="flex-grow-1"></div>
-      <div>lv.{{ character.progression.level }}</div>
-    </div>
-    <app-progression-bar color="danger" label="HP" [value]="character.combat.health" [maxValue]="character.combat.maxHealth" displayValue="absolute"></app-progression-bar>
-    <app-progression-bar
-      color="info"
-      label="Exp"
-      [value]="character.progression.experience"
-      [maxValue]="character.progression.nextLevelExperience"
-      displayValue="absolute"
-    ></app-progression-bar>
+<div class="w-100 h-100 border p-4">
+  <div class="hstack">
+    <h2>
+      <span class="text-uppercase">{{ character.class.name }}</span>
+      {{ character.name }}
+    </h2>
+    <div class="flex-grow-1"></div>
+    <div>lv.{{ character.progression.level }}</div>
   </div>
+  <app-progression-bar color="danger" label="HP" [value]="character.combat.health" [maxValue]="character.combat.maxHealth" displayValue="absolute"></app-progression-bar>
+  <app-progression-bar
+    color="info"
+    label="Exp"
+    [value]="character.progression.experience"
+    [maxValue]="character.progression.nextLevelExperience"
+    displayValue="absolute"
+  ></app-progression-bar>
 </div>

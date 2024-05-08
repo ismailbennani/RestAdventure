@@ -1,6 +1,6 @@
 <div class="row">
   @if (label) {
-    <div class="col-sm-{{ labelSize }} text-end text-truncate">
+    <div class="col-sm-{{ labelSize }} text-end text-truncate" [title]="label">
       {{ label }}
     </div>
   }

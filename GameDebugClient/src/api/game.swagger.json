@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0-alpha.0.121+e12d4911631a6d2a542bbfe653ee9697ede46a7c"
+    "version": "0.0.0-alpha.0.124+ca09a48a6aa9ad5dac68a68220504954906d4c8e"
   },
   "servers": [
     {
@@ -436,6 +436,26 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -547,6 +567,26 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -576,6 +616,128 @@
           },
           {
             "name": "locationGuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ]
+      }
+    },
+    "/game/team/characters/{characterGuid}/pve/monsters": {
+      "get": {
+        "tags": [
+          "Pve"
+        ],
+        "summary": "Get monsters",
+        "operationId": "Pve_GetMonsters",
+        "parameters": [
+          {
+            "name": "characterGuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MonsterGroup"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ]
+      }
+    },
+    "/game/team/characters/{characterGuid}/pve/monsters/{groupId}": {
+      "post": {
+        "tags": [
+          "Pve"
+        ],
+        "summary": "Attack monsters",
+        "operationId": "Pve_AttackMonsters",
+        "parameters": [
+          {
+            "name": "characterGuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "groupId",
             "in": "path",
             "required": true,
             "schema": {
@@ -1413,7 +1575,7 @@
           },
           "whyCannotHarvest": {
             "type": "string",
-            "description": "Why cannot the harves be performed\n            ",
+            "description": "Why cannot the harvest be performed\n            ",
             "nullable": true
           },
           "expectedHarvest": {
@@ -1453,6 +1615,62 @@
             "format": "int32"
           }
         }
+      },
+      "MonsterGroup": {
+        "type": "object",
+        "description": "Monster group\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "monsters",
+          "canAttack"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the group\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "monsters": {
+            "type": "array",
+            "description": "The monsters in the group\n            ",
+            "items": {
+              "$ref": "#/components/schemas/MonsterMinimal"
+            }
+          },
+          "canAttack": {
+            "type": "boolean",
+            "description": "Can the character attack the monsters\n            "
+          },
+          "whyCannotAttack": {
+            "type": "string",
+            "description": "Why cannot the character attack the monsters\n            ",
+            "nullable": true
+          }
+        }
+      },
+      "MonsterMinimal": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/EntityMinimal"
+          },
+          {
+            "type": "object",
+            "description": "Monster minimal\n            ",
+            "additionalProperties": false,
+            "required": [
+              "level"
+            ],
+            "properties": {
+              "level": {
+                "type": "integer",
+                "description": "The level of the monster\n            ",
+                "format": "int32"
+              }
+            }
+          }
+        ]
       },
       "TeamCharacter": {
         "type": "object",
@@ -1524,15 +1742,6 @@
             "oneOf": [
               {
                 "$ref": "#/components/schemas/EntityCombatStatistics"
-              }
-            ]
-          },
-          "lastActionResult": {
-            "description": "The result of the action that has been performed on last tick\n            ",
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/CharacterActionResult"
               }
             ]
           },
@@ -1682,37 +1891,52 @@
           }
         }
       },
-      "CharacterActionResult": {
+      "InteractionInstance": {
         "type": "object",
-        "description": "The result of an action performed by a character\n            ",
+        "description": "Interaction instance\n            ",
         "additionalProperties": false,
         "required": [
-          "tick",
-          "action",
-          "success"
+          "id",
+          "interaction",
+          "target"
         ],
         "properties": {
-          "tick": {
-            "type": "integer",
-            "description": "The tick at which the action has been performed\n            ",
-            "format": "int64"
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the instance\n            ",
+            "format": "guid",
+            "minLength": 1
           },
-          "action": {
-            "description": "The action\n            ",
+          "interaction": {
+            "description": "The interaction associated with the instance\n            ",
             "oneOf": [
               {
-                "$ref": "#/components/schemas/CharacterAction"
+                "$ref": "#/components/schemas/InteractionMinimal"
               }
             ]
           },
-          "success": {
-            "type": "boolean",
-            "description": "Has the action been successful\n            "
-          },
-          "failureReason": {
+          "target": {
+            "description": "The target of the interaction\n            ",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/EntityMinimal"
+              }
+            ]
+          }
+        }
+      },
+      "InteractionMinimal": {
+        "type": "object",
+        "description": "Interaction (minimal)\n            ",
+        "additionalProperties": false,
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
             "type": "string",
-            "description": "Why the action has failed\n            ",
-            "nullable": true
+            "description": "The name of the interaction\n            ",
+            "minLength": 1
           }
         }
       },
@@ -1794,55 +2018,6 @@
             }
           }
         ]
-      },
-      "InteractionMinimal": {
-        "type": "object",
-        "description": "Interaction (minimal)\n            ",
-        "additionalProperties": false,
-        "required": [
-          "name"
-        ],
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "The name of the interaction\n            ",
-            "minLength": 1
-          }
-        }
-      },
-      "InteractionInstance": {
-        "type": "object",
-        "description": "Interaction instance\n            ",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "interaction",
-          "target"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "The unique ID of the instance\n            ",
-            "format": "guid",
-            "minLength": 1
-          },
-          "interaction": {
-            "description": "The interaction associated with the instance\n            ",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/InteractionMinimal"
-              }
-            ]
-          },
-          "target": {
-            "description": "The target of the interaction\n            ",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/EntityMinimal"
-              }
-            ]
-          }
-        }
       },
       "CreateCharacterRequest": {
         "type": "object",
@@ -2798,6 +2973,9 @@
     },
     {
       "name": "Locations"
+    },
+    {
+      "name": "Pve"
     },
     {
       "name": "Team"
