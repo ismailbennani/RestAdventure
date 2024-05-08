@@ -640,6 +640,149 @@ export class GameApiClient {
 }
 
 @Injectable()
+export class JobsHarvestApiClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "https://localhost:7056";
+    }
+
+    /**
+     * Get harvestables
+     */
+    getHarvestables(characterGuid: string): Observable<HarvestableEntity[]> {
+        let url_ = this.baseUrl + "/game/team/characters/{characterGuid}/jobs/harvestables";
+        if (characterGuid === undefined || characterGuid === null)
+            throw new Error("The parameter 'characterGuid' must be defined.");
+        url_ = url_.replace("{characterGuid}", encodeURIComponent("" + characterGuid));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetHarvestables(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetHarvestables(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<HarvestableEntity[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<HarvestableEntity[]>;
+        }));
+    }
+
+    protected processGetHarvestables(response: HttpResponseBase): Observable<HarvestableEntity[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(HarvestableEntity.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * Harvest
+     */
+    harvest(characterGuid: string, entityGuid: string, harvest: string): Observable<void> {
+        let url_ = this.baseUrl + "/game/team/characters/{characterGuid}/jobs/harvestables/{entityGuid}/{harvest}";
+        if (characterGuid === undefined || characterGuid === null)
+            throw new Error("The parameter 'characterGuid' must be defined.");
+        url_ = url_.replace("{characterGuid}", encodeURIComponent("" + characterGuid));
+        if (entityGuid === undefined || entityGuid === null)
+            throw new Error("The parameter 'entityGuid' must be defined.");
+        url_ = url_.replace("{entityGuid}", encodeURIComponent("" + entityGuid));
+        if (harvest === undefined || harvest === null)
+            throw new Error("The parameter 'harvest' must be defined.");
+        url_ = url_.replace("{harvest}", encodeURIComponent("" + harvest));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processHarvest(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processHarvest(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processHarvest(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+            }));
+        } else if (status === 404) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ProblemDetails.fromJS(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
 export class LocationsApiClient {
     private http: HttpClient;
     private baseUrl: string;
@@ -746,149 +889,6 @@ export class LocationsApiClient {
     }
 
     protected processMoveToLocation(response: HttpResponseBase): Observable<void> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
-            }));
-        } else if (status === 400) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result400: any = null;
-            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result400 = ProblemDetails.fromJS(resultData400);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
-            }));
-        } else if (status === 404) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result404: any = null;
-            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result404 = ProblemDetails.fromJS(resultData404);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-}
-
-@Injectable()
-export class TeamCharactersActionsApiClient {
-    private http: HttpClient;
-    private baseUrl: string;
-    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
-
-    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
-        this.http = http;
-        this.baseUrl = baseUrl ?? "https://localhost:7056";
-    }
-
-    /**
-     * Get available interactions
-     */
-    getAvailableInteractions(characterGuid: string): Observable<EntityWithInteractions[]> {
-        let url_ = this.baseUrl + "/game/team/characters/{characterGuid}/interactions";
-        if (characterGuid === undefined || characterGuid === null)
-            throw new Error("The parameter 'characterGuid' must be defined.");
-        url_ = url_.replace("{characterGuid}", encodeURIComponent("" + characterGuid));
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "application/json"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetAvailableInteractions(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetAvailableInteractions(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<EntityWithInteractions[]>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<EntityWithInteractions[]>;
-        }));
-    }
-
-    protected processGetAvailableInteractions(response: HttpResponseBase): Observable<EntityWithInteractions[]> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            if (Array.isArray(resultData200)) {
-                result200 = [] as any;
-                for (let item of resultData200)
-                    result200!.push(EntityWithInteractions.fromJS(item));
-            }
-            else {
-                result200 = <any>null;
-            }
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    /**
-     * Interact
-     */
-    interact(characterGuid: string, entityGuid: string, interactionName: string): Observable<void> {
-        let url_ = this.baseUrl + "/game/team/characters/{characterGuid}/interactions/entity/{entityGuid}/{interactionName}";
-        if (characterGuid === undefined || characterGuid === null)
-            throw new Error("The parameter 'characterGuid' must be defined.");
-        url_ = url_.replace("{characterGuid}", encodeURIComponent("" + characterGuid));
-        if (entityGuid === undefined || entityGuid === null)
-            throw new Error("The parameter 'entityGuid' must be defined.");
-        url_ = url_.replace("{entityGuid}", encodeURIComponent("" + entityGuid));
-        if (interactionName === undefined || interactionName === null)
-            throw new Error("The parameter 'interactionName' must be defined.");
-        url_ = url_.replace("{interactionName}", encodeURIComponent("" + interactionName));
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-            })
-        };
-
-        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processInteract(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processInteract(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<void>;
-        }));
-    }
-
-    protected processInteract(response: HttpResponseBase): Observable<void> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -2318,143 +2318,193 @@ In that case NextTickDate refers to the old tick's next tick date, which means t
     nextTickDate?: Date | undefined;
 }
 
-/** Entity with interactions */
-export class EntityWithInteractions extends EntityMinimal implements IEntityWithInteractions {
-    /** The interactions that can be performed on the entity
+/** Harvestable entity */
+export class HarvestableEntity extends EntityMinimal implements IHarvestableEntity {
+    /** The harvests available on the entity
              */
-    interactions!: Interaction[];
+    harvests!: HarvestableEntityHarvest[];
 
-    constructor(data?: IEntityWithInteractions) {
+    constructor(data?: IHarvestableEntity) {
         super(data);
         if (!data) {
-            this.interactions = [];
+            this.harvests = [];
         }
     }
 
     override init(_data?: any) {
         super.init(_data);
         if (_data) {
-            if (Array.isArray(_data["interactions"])) {
-                this.interactions = [] as any;
-                for (let item of _data["interactions"])
-                    this.interactions!.push(Interaction.fromJS(item));
+            if (Array.isArray(_data["harvests"])) {
+                this.harvests = [] as any;
+                for (let item of _data["harvests"])
+                    this.harvests!.push(HarvestableEntityHarvest.fromJS(item));
             }
         }
     }
 
-    static override fromJS(data: any): EntityWithInteractions {
+    static override fromJS(data: any): HarvestableEntity {
         data = typeof data === 'object' ? data : {};
-        let result = new EntityWithInteractions();
+        let result = new HarvestableEntity();
         result.init(data);
         return result;
     }
 
     override toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        if (Array.isArray(this.interactions)) {
-            data["interactions"] = [];
-            for (let item of this.interactions)
-                data["interactions"].push(item.toJSON());
+        if (Array.isArray(this.harvests)) {
+            data["harvests"] = [];
+            for (let item of this.harvests)
+                data["harvests"].push(item.toJSON());
         }
         super.toJSON(data);
         return data;
     }
 }
 
-/** Entity with interactions */
-export interface IEntityWithInteractions extends IEntityMinimal {
-    /** The interactions that can be performed on the entity
+/** Harvestable entity */
+export interface IHarvestableEntity extends IEntityMinimal {
+    /** The harvests available on the entity
              */
-    interactions: Interaction[];
+    harvests: HarvestableEntityHarvest[];
 }
 
-/** Interaction (minimal) */
-export class InteractionMinimal implements IInteractionMinimal {
-    /** The name of the interaction
+/** Job harvest */
+export class HarvestableEntityHarvest implements IHarvestableEntityHarvest {
+    /** The job providing the harvest
+             */
+    job!: JobMinimal;
+    /** The name of the harvest
              */
     name!: string;
+    /** Can the harvest be performed
+             */
+    canHarvest!: boolean;
+    /** The expected result of the harvest
+             */
+    expectedHarvest!: ItemStack[];
+    /** The expected experience gain from the harvest
+             */
+    expectedExperience!: number;
 
-    constructor(data?: IInteractionMinimal) {
+    constructor(data?: IHarvestableEntityHarvest) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
                     (<any>this)[property] = (<any>data)[property];
             }
         }
+        if (!data) {
+            this.job = new JobMinimal();
+            this.expectedHarvest = [];
+        }
     }
 
     init(_data?: any) {
         if (_data) {
+            this.job = _data["job"] ? JobMinimal.fromJS(_data["job"]) : new JobMinimal();
             this.name = _data["name"];
+            this.canHarvest = _data["canHarvest"];
+            if (Array.isArray(_data["expectedHarvest"])) {
+                this.expectedHarvest = [] as any;
+                for (let item of _data["expectedHarvest"])
+                    this.expectedHarvest!.push(ItemStack.fromJS(item));
+            }
+            this.expectedExperience = _data["expectedExperience"];
         }
     }
 
-    static fromJS(data: any): InteractionMinimal {
+    static fromJS(data: any): HarvestableEntityHarvest {
         data = typeof data === 'object' ? data : {};
-        let result = new InteractionMinimal();
+        let result = new HarvestableEntityHarvest();
         result.init(data);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
+        data["job"] = this.job ? this.job.toJSON() : <any>undefined;
         data["name"] = this.name;
+        data["canHarvest"] = this.canHarvest;
+        if (Array.isArray(this.expectedHarvest)) {
+            data["expectedHarvest"] = [];
+            for (let item of this.expectedHarvest)
+                data["expectedHarvest"].push(item.toJSON());
+        }
+        data["expectedExperience"] = this.expectedExperience;
         return data;
     }
 }
 
-/** Interaction (minimal) */
-export interface IInteractionMinimal {
-    /** The name of the interaction
+/** Job harvest */
+export interface IHarvestableEntityHarvest {
+    /** The job providing the harvest
+             */
+    job: JobMinimal;
+    /** The name of the harvest
              */
     name: string;
+    /** Can the harvest be performed
+             */
+    canHarvest: boolean;
+    /** The expected result of the harvest
+             */
+    expectedHarvest: ItemStack[];
+    /** The expected experience gain from the harvest
+             */
+    expectedExperience: number;
 }
 
-/** Interaction */
-export class Interaction extends InteractionMinimal implements IInteraction {
-    /** Can this interaction be performed
+/** Item stack */
+export class ItemStack implements IItemStack {
+    /** The item instance representing this stack
              */
-    canInteract!: boolean;
-    /** Why cannot this interaction be performed
+    item!: ItemMinimal;
+    /** The number of instances in this stack
              */
-    whyNot?: string | undefined;
+    count!: number;
 
-    constructor(data?: IInteraction) {
-        super(data);
-    }
-
-    override init(_data?: any) {
-        super.init(_data);
-        if (_data) {
-            this.canInteract = _data["canInteract"];
-            this.whyNot = _data["whyNot"];
+    constructor(data?: IItemStack) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.item = new ItemMinimal();
         }
     }
 
-    static override fromJS(data: any): Interaction {
+    init(_data?: any) {
+        if (_data) {
+            this.item = _data["item"] ? ItemMinimal.fromJS(_data["item"]) : new ItemMinimal();
+            this.count = _data["count"];
+        }
+    }
+
+    static fromJS(data: any): ItemStack {
         data = typeof data === 'object' ? data : {};
-        let result = new Interaction();
+        let result = new ItemStack();
         result.init(data);
         return result;
     }
 
-    override toJSON(data?: any) {
+    toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["canInteract"] = this.canInteract;
-        data["whyNot"] = this.whyNot;
-        super.toJSON(data);
+        data["item"] = this.item ? this.item.toJSON() : <any>undefined;
+        data["count"] = this.count;
         return data;
     }
 }
 
-/** Interaction */
-export interface IInteraction extends IInteractionMinimal {
-    /** Can this interaction be performed
+/** Item stack */
+export interface IItemStack {
+    /** The item instance representing this stack
              */
-    canInteract: boolean;
-    /** Why cannot this interaction be performed
+    item: ItemMinimal;
+    /** The number of instances in this stack
              */
-    whyNot?: string | undefined;
+    count: number;
 }
 
 /** Character */
@@ -3082,6 +3132,48 @@ export interface ICharacterInteractWithEntityAction extends ICharacterAction {
     /** The target of the interaction
              */
     target: EntityMinimal;
+}
+
+/** Interaction (minimal) */
+export class InteractionMinimal implements IInteractionMinimal {
+    /** The name of the interaction
+             */
+    name!: string;
+
+    constructor(data?: IInteractionMinimal) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): InteractionMinimal {
+        data = typeof data === 'object' ? data : {};
+        let result = new InteractionMinimal();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        return data;
+    }
+}
+
+/** Interaction (minimal) */
+export interface IInteractionMinimal {
+    /** The name of the interaction
+             */
+    name: string;
 }
 
 /** Interaction instance */

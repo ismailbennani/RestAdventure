@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0-alpha.0.119+fb8c0a4ed0dfa99981db5bef2d2175f44fa9e563"
+    "version": "0.0.0-alpha.0.120+db229bc913528932523ab1e72dafde19b6f10b1a"
   },
   "servers": [
     {
@@ -404,6 +404,117 @@
         ]
       }
     },
+    "/game/team/characters/{characterGuid}/jobs/harvestables": {
+      "get": {
+        "tags": [
+          "Jobs"
+        ],
+        "summary": "Get harvestables",
+        "operationId": "JobsHarvest_GetHarvestables",
+        "parameters": [
+          {
+            "name": "characterGuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/HarvestableEntity"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ]
+      }
+    },
+    "/game/team/characters/{characterGuid}/jobs/harvestables/{entityGuid}/{harvest}": {
+      "post": {
+        "tags": [
+          "Jobs"
+        ],
+        "summary": "Harvest",
+        "operationId": "JobsHarvest_Harvest",
+        "parameters": [
+          {
+            "name": "characterGuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "entityGuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 2
+          },
+          {
+            "name": "harvest",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ]
+      }
+    },
     "/game/team/characters/{characterGuid}/locations": {
       "get": {
         "tags": [
@@ -472,117 +583,6 @@
               "format": "guid"
             },
             "x-position": 2
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": ""
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "api-key": []
-          }
-        ]
-      }
-    },
-    "/game/team/characters/{characterGuid}/interactions": {
-      "get": {
-        "tags": [
-          "Team"
-        ],
-        "summary": "Get available interactions",
-        "operationId": "TeamCharactersActions_GetAvailableInteractions",
-        "parameters": [
-          {
-            "name": "characterGuid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/EntityWithInteractions"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "api-key": []
-          }
-        ]
-      }
-    },
-    "/game/team/characters/{characterGuid}/interactions/entity/{entityGuid}/{interactionName}": {
-      "post": {
-        "tags": [
-          "Team"
-        ],
-        "summary": "Interact",
-        "operationId": "TeamCharactersActions_Interact",
-        "parameters": [
-          {
-            "name": "characterGuid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid"
-            },
-            "x-position": 1
-          },
-          {
-            "name": "entityGuid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid"
-            },
-            "x-position": 2
-          },
-          {
-            "name": "interactionName",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 3
           }
         ],
         "responses": {
@@ -1358,68 +1358,94 @@
           }
         }
       },
-      "EntityWithInteractions": {
+      "HarvestableEntity": {
         "allOf": [
           {
             "$ref": "#/components/schemas/EntityMinimal"
           },
           {
             "type": "object",
-            "description": "Entity with interactions\n            ",
+            "description": "Harvestable entity\n            ",
             "additionalProperties": false,
             "required": [
-              "interactions"
+              "harvests"
             ],
             "properties": {
-              "interactions": {
+              "harvests": {
                 "type": "array",
-                "description": "The interactions that can be performed on the entity\n            ",
+                "description": "The harvests available on the entity\n            ",
                 "items": {
-                  "$ref": "#/components/schemas/Interaction"
+                  "$ref": "#/components/schemas/HarvestableEntityHarvest"
                 }
               }
             }
           }
         ]
       },
-      "Interaction": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/InteractionMinimal"
-          },
-          {
-            "type": "object",
-            "description": "Interaction\n            ",
-            "additionalProperties": false,
-            "required": [
-              "canInteract"
-            ],
-            "properties": {
-              "canInteract": {
-                "type": "boolean",
-                "description": "Can this interaction be performed\n            "
-              },
-              "whyNot": {
-                "type": "string",
-                "description": "Why cannot this interaction be performed\n            ",
-                "nullable": true
-              }
-            }
-          }
-        ]
-      },
-      "InteractionMinimal": {
+      "HarvestableEntityHarvest": {
         "type": "object",
-        "description": "Interaction (minimal)\n            ",
+        "description": "Job harvest\n            ",
         "additionalProperties": false,
         "required": [
-          "name"
+          "job",
+          "name",
+          "canHarvest",
+          "expectedHarvest",
+          "expectedExperience"
         ],
         "properties": {
+          "job": {
+            "description": "The job providing the harvest\n            ",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/JobMinimal"
+              }
+            ]
+          },
           "name": {
             "type": "string",
-            "description": "The name of the interaction\n            ",
+            "description": "The name of the harvest\n            ",
             "minLength": 1
+          },
+          "canHarvest": {
+            "type": "boolean",
+            "description": "Can the harvest be performed\n            "
+          },
+          "expectedHarvest": {
+            "type": "array",
+            "description": "The expected result of the harvest\n            ",
+            "items": {
+              "$ref": "#/components/schemas/ItemStack"
+            }
+          },
+          "expectedExperience": {
+            "type": "integer",
+            "description": "The expected experience gain from the harvest\n            ",
+            "format": "int32"
+          }
+        }
+      },
+      "ItemStack": {
+        "type": "object",
+        "description": "Item stack\n            ",
+        "additionalProperties": false,
+        "required": [
+          "item",
+          "count"
+        ],
+        "properties": {
+          "item": {
+            "description": "The item instance representing this stack\n            ",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ItemMinimal"
+              }
+            ]
+          },
+          "count": {
+            "type": "integer",
+            "description": "The number of instances in this stack\n            ",
+            "format": "int32"
           }
         }
       },
@@ -1763,6 +1789,21 @@
             }
           }
         ]
+      },
+      "InteractionMinimal": {
+        "type": "object",
+        "description": "Interaction (minimal)\n            ",
+        "additionalProperties": false,
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the interaction\n            ",
+            "minLength": 1
+          }
+        }
       },
       "InteractionInstance": {
         "type": "object",
@@ -2746,6 +2787,9 @@
     },
     {
       "name": "Game"
+    },
+    {
+      "name": "Jobs"
     },
     {
       "name": "Locations"

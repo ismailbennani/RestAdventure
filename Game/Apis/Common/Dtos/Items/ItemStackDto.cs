@@ -12,7 +12,7 @@ public class ItemStackDto
     ///     The item instance representing this stack
     /// </summary>
     [Required]
-    public required ItemDto Item { get; init; }
+    public required ItemMinimalDto Item { get; init; }
 
     /// <summary>
     ///     The number of instances in this stack
@@ -26,7 +26,7 @@ static class ItemStackMappingExtensions
     public static ItemStackDto ToDto(this ItemStack stack) =>
         new()
         {
-            Item = stack.Item.ToDto(),
+            Item = stack.Item.ToMinimalDto(),
             Count = stack.Count
         };
 }

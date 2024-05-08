@@ -4,27 +4,27 @@ using RestAdventure.Core;
 using RestAdventure.Core.Characters;
 using RestAdventure.Core.Entities;
 using RestAdventure.Core.Interactions;
+using RestAdventure.Core.Jobs;
 using RestAdventure.Core.Players;
-using RestAdventure.Game.Apis.Common.Dtos.Entities;
-using RestAdventure.Game.Apis.Common.Dtos.Interactions;
+using RestAdventure.Game.Apis.Common.Dtos.Items;
+using RestAdventure.Game.Apis.Common.Dtos.Jobs;
 using RestAdventure.Game.Authentication;
-using RestAdventure.Kernel.Errors;
 
 namespace RestAdventure.Game.Apis.GameApi.Controllers;
 
 /// <summary>
-///     Characters actions operations
+///     Jobs operations
 /// </summary>
-[Route("game/team/characters/{characterGuid:guid}")]
-[OpenApiTag("Team")]
-public class TeamCharactersActionsController : GameApiController
+[Route("game/team/characters/{characterGuid:guid}/jobs/harvestables")]
+[OpenApiTag("Jobs")]
+public class JobsHarvestController : GameApiController
 {
     readonly GameService _gameService;
     readonly AvailableInteractionsService _availableInteractionsService;
 
     /// <summary>
     /// </summary>
-    public TeamCharactersActionsController(GameService gameService, AvailableInteractionsService availableInteractionsService)
+    public JobsHarvestController(GameService gameService, AvailableInteractionsService availableInteractionsService)
     {
         _gameService = gameService;
         _availableInteractionsService = availableInteractionsService;
@@ -32,10 +32,10 @@ public class TeamCharactersActionsController : GameApiController
 
 
     /// <summary>
-    ///     Get available interactions
+    ///     Get harvestables
     /// </summary>
-    [HttpGet("interactions")]
-    public async Task<ActionResult<IReadOnlyCollection<EntityWithInteractionsDto>>> GetAvailableInteractionsAsync(Guid characterGuid)
+    [HttpGet]
+    public async Task<ActionResult<IReadOnlyCollection<HarvestableEntityDto>>> GetHarvestables(Guid characterGuid)
     {
         GameState state = _gameService.RequireGameState();
         Player player = ControllerContext.RequirePlayer(state);
@@ -50,44 +50,51 @@ public class TeamCharactersActionsController : GameApiController
 
         IEnumerable<IInteractibleEntity> entities = state.Entities.AtLocation<IInteractibleEntity>(character.Location);
 
-        List<EntityWithInteractionsDto> result = [];
+        List<HarvestableEntityDto> result = [];
         foreach (IInteractibleEntity entity in entities)
         {
-            Interaction[] availableInteractions = _availableInteractionsService.GetAvailableInteractions(character, entity).ToArray();
+            HarvestInteraction[] availableInteractions = _availableInteractionsService.GetAvailableInteractions(character, entity).OfType<HarvestInteraction>().ToArray();
             if (availableInteractions.Length == 0)
             {
                 continue;
             }
 
-            List<InteractionDto> interactions = [];
-            foreach (Interaction interaction in availableInteractions)
+            List<HarvestableEntityHarvestDto> harvests = [];
+            foreach (HarvestInteraction interaction in availableInteractions)
             {
-                Maybe canInteract = await interaction.CanInteractAsync(character, entity);
-                interactions.Add(interaction.ToDto(canInteract));
+                harvests.Add(
+                    new HarvestableEntityHarvestDto
+                    {
+                        Job = interaction.Job.ToMinimalDto(),
+                        Name = interaction.Harvest.Name,
+                        ExpectedHarvest = interaction.Harvest.Items.Select(i => i.ToDto()).ToArray(),
+                        ExpectedExperience = interaction.Harvest.Experience,
+                        CanHarvest = await interaction.CanInteractAsync(character, entity)
+                    }
+                );
             }
 
             result.Add(
-                new EntityWithInteractionsDto
+                new HarvestableEntityDto
                 {
                     Id = entity.Id.Guid,
                     Name = entity.Name,
-                    Interactions = interactions
+                    Harvests = harvests
                 }
             );
         }
-
 
         return result;
     }
 
     /// <summary>
-    ///     Interact
+    ///     Harvest
     /// </summary>
-    [HttpPost("interactions/entity/{entityGuid:guid}/{interactionName}")]
+    [HttpPost("{entityGuid:guid}/{harvest}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public ActionResult Interact(Guid characterGuid, Guid entityGuid, string interactionName)
+    public ActionResult Harvest(Guid characterGuid, Guid entityGuid, string harvest)
     {
         GameState state = _gameService.RequireGameState();
         Player player = ControllerContext.RequirePlayer(state);
@@ -107,7 +114,9 @@ public class TeamCharactersActionsController : GameApiController
             return NotFound();
         }
 
-        Interaction? interaction = _availableInteractionsService.GetAvailableInteractions(character, entity).SingleOrDefault(i => i.Name == interactionName);
+        HarvestInteraction? interaction = _availableInteractionsService.GetAvailableInteractions(character, entity)
+            .OfType<HarvestInteraction>()
+            .SingleOrDefault(i => i.Harvest.Name == harvest);
         if (interaction == null)
         {
             return NotFound();

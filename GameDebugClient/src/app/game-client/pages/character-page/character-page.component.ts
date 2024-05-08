@@ -9,12 +9,12 @@ import {
   CombatInPreparation,
   CombatInstance,
   CombatsApiClient,
-  EntityWithInteractions,
-  InteractionMinimal,
+  HarvestableEntity,
+  HarvestableEntityHarvest,
+  JobsHarvestApiClient,
   LocationsApiClient,
   Team,
   TeamCharacter,
-  TeamCharactersActionsApiClient,
   TeamCharactersApiClient,
 } from '../../../../api/game-api-client.generated';
 import { SpinnerComponent } from '../../../common/spinner/spinner.component';
@@ -40,7 +40,7 @@ export class CharacterPageComponent implements OnInit {
   protected characterId: string | undefined;
   protected character: TeamCharacter | undefined;
   protected accessibleLocations: LocationMinimal[] = [];
-  protected entitiesWithInteractions: EntityWithInteractions[] = [];
+  protected harvestableEntities: HarvestableEntity[] = [];
   protected combats: CombatInstance[] = [];
   protected combatsInPreparation: CombatInPreparation[] = [];
   protected selectedCombat: CombatInstance | undefined;
@@ -56,8 +56,8 @@ export class CharacterPageComponent implements OnInit {
     private playersService: PlayersService,
     private teamService: TeamService,
     private charactersApiClient: TeamCharactersApiClient,
-    private charactersActionsApiClient: TeamCharactersActionsApiClient,
     private locationsApiClient: LocationsApiClient,
+    private jobsHarvestApiClient: JobsHarvestApiClient,
     private combatsApiClient: CombatsApiClient,
   ) {}
 
@@ -101,12 +101,12 @@ export class CharacterPageComponent implements OnInit {
 
           return forkJoin({
             locations: this.locationsApiClient.getAccessibleLocations(this.character.id),
-            interactions: this.charactersActionsApiClient.getAvailableInteractions(this.character.id),
+            harvestables: this.jobsHarvestApiClient.getHarvestables(this.character.id),
           });
         }),
         tap(result => {
           this.accessibleLocations = result?.locations ?? [];
-          this.entitiesWithInteractions = result?.interactions ?? [];
+          this.harvestableEntities = result?.harvestables ?? [];
         }),
         switchMap(_ => {
           if (!this.character) {
@@ -139,13 +139,13 @@ export class CharacterPageComponent implements OnInit {
       .subscribe();
   }
 
-  interact(entity: EntityWithInteractions, interaction: InteractionMinimal) {
+  harvest(entity: HarvestableEntity, harvest: HarvestableEntityHarvest) {
     if (!this.character) {
       return;
     }
 
-    this.charactersActionsApiClient
-      .interact(this.character.id, entity.id, interaction.name)
+    this.jobsHarvestApiClient
+      .harvest(this.character.id, entity.id, harvest.name)
       .pipe(switchMap(_ => this.gameService.refreshNow(true)))
       .subscribe();
   }
@@ -174,28 +174,28 @@ export class CharacterPageComponent implements OnInit {
     return this.character.plannedAction instanceof CharacterInteractWithEntityAction;
   }
 
-  plansToInteractWithEntity(entity: EntityWithInteractions) {
+  plansToHarvestEntity(harvestable: HarvestableEntity) {
     if (!this.character?.plannedAction || !(this.character.plannedAction instanceof CharacterInteractWithEntityAction)) {
       return false;
     }
 
-    return this.character.plannedAction.target.id == entity.id;
+    return this.character.plannedAction.target.id == harvestable.id;
   }
 
-  plansToPerformInteraction(entity: EntityWithInteractions, interaction: InteractionMinimal) {
+  plansToHarvest(harvestable: HarvestableEntity, harvest: HarvestableEntityHarvest) {
     if (!this.character?.plannedAction || !(this.character.plannedAction instanceof CharacterInteractWithEntityAction)) {
       return false;
     }
 
-    return this.character.plannedAction.target.id == entity.id && this.character.plannedAction.interaction.name == interaction.name;
+    return this.character.plannedAction.target.id == harvestable.id && this.character.plannedAction.interaction.name == harvest.job.name + '-' + harvest.name;
   }
 
-  isPerformingInteraction(entity: EntityWithInteractions, interaction: InteractionMinimal) {
+  isHarvesting(harvestable: HarvestableEntity, harvest: HarvestableEntityHarvest) {
     if (!this.character?.currentInteraction) {
       return false;
     }
 
-    return this.character.currentInteraction.target.id == entity.id && this.character.currentInteraction.interaction.name == interaction.name;
+    return this.character.currentInteraction.target.id == harvestable.id && this.character.currentInteraction.interaction.name == harvest.job.name + '-' + harvest.name;
   }
 
   deleteCharacter() {
