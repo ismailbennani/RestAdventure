@@ -14,6 +14,8 @@ public class CombatInstance : IDisposable
 
     internal CombatInstance(CombatInPreparation combatInPreparation)
     {
+        Id = combatInPreparation.Id;
+        Location = combatInPreparation.Location;
         CombatFormation team1 = combatInPreparation.Team1.Lock();
         CombatFormation team2 = combatInPreparation.Team2.Lock();
 
@@ -29,7 +31,6 @@ public class CombatInstance : IDisposable
 
         _settings = combatInPreparation.Settings;
 
-        Location = team1.Entities[0].Location;
         Team1 = team1;
         Team2 = team2;
 
@@ -47,7 +48,7 @@ public class CombatInstance : IDisposable
         }
     }
 
-    public CombatInstanceId Id { get; } = new(Guid.NewGuid());
+    public CombatInstanceId Id { get; }
     public Location Location { get; }
     public CombatFormation Team1 { get; }
     public CombatFormation Team2 { get; }

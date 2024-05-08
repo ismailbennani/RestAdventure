@@ -1,5 +1,5 @@
-﻿using MediatR;
-using RestAdventure.Core.Entities.Notifications;
+﻿using RestAdventure.Core.Entities.Notifications;
+using RestAdventure.Core.Extensions;
 using RestAdventure.Core.Items;
 using RestAdventure.Core.Jobs;
 using RestAdventure.Core.Jobs.Notifications;
@@ -24,7 +24,8 @@ public class GameEntities : IDisposable
     {
         _entities[entity.Id] = entity;
 
-        entity.Moved += (_, args) => PublishSync(new GameEntityMovedToLocation { Entity = entity, OldLocation = args.OldLocation, NewLocation = args.NewLocation });
+        entity.Moved += (_, args) =>
+            GameState.Publisher.PublishSync(new GameEntityMovedToLocation { Entity = entity, OldLocation = args.OldLocation, NewLocation = args.NewLocation });
 
         if (entity is IGameEntityWithInventory withInventory)
         {
@@ -60,7 +61,7 @@ public class GameEntities : IDisposable
     public IEnumerable<TEntity> AtLocation<TEntity>(Location location) where TEntity: IGameEntity => All.OfType<TEntity>().Where(e => e.Location == location);
 
     void RegisterInventoryEvents(IGameEntityWithInventory entity) =>
-        entity.Inventory.Changed += (_, args) => PublishSync(
+        entity.Inventory.Changed += (_, args) => GameState.Publisher.PublishSync(
             new GameEntityInventoryChanged
             {
                 Entity = entity,
@@ -72,13 +73,14 @@ public class GameEntities : IDisposable
 
     void RegisterJobsEvents(IGameEntityWithJobs entity)
     {
-        entity.Jobs.JobLearned += (_, job) => PublishSync(new GameEntityLearnedJob { Entity = entity, Job = job });
-        entity.Jobs.JobGainedExperience += (_, args) =>
-            PublishSync(new GameEntityJobGainedExperience { Entity = entity, Job = args.Job, OldExperience = args.OldExperience, NewExperience = args.NewExperience });
-        entity.Jobs.JobLeveledUp += (_, args) => PublishSync(new GameEntityJobLeveledUp { Entity = entity, Job = args.Job, OldLevel = args.OldLevel, NewLevel = args.NewLevel });
+        entity.Jobs.JobLearned += (_, job) => GameState.Publisher.PublishSync(new GameEntityLearnedJob { Entity = entity, Job = job });
+        entity.Jobs.JobGainedExperience += (_, args) => GameState.Publisher.PublishSync(
+            new GameEntityJobGainedExperience { Entity = entity, Job = args.Job, OldExperience = args.OldExperience, NewExperience = args.NewExperience }
+        );
+        entity.Jobs.JobLeveledUp += (_, args) =>
+            GameState.Publisher.PublishSync(new GameEntityJobLeveledUp { Entity = entity, Job = args.Job, OldLevel = args.OldLevel, NewLevel = args.NewLevel });
     }
 
-    void PublishSync(INotification notification) => GameState.Publisher.Publish(notification).Wait();
 
     public void Dispose()
     {

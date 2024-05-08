@@ -3206,6 +3206,21 @@ export class CharacterHistoryEntry implements ICharacterHistoryEntry {
             result.init(data);
             return result;
         }
+        if (data["$type"] === "combat-preparation-started") {
+            let result = new CharacterStartedCombatPreparationHistoryEntry();
+            result.init(data);
+            return result;
+        }
+        if (data["$type"] === "combat-preparation-canceled") {
+            let result = new CharacterCombatInPreparationCanceledHistoryEntry();
+            result.init(data);
+            return result;
+        }
+        if (data["$type"] === "combat-started") {
+            let result = new CharacterCombatStartedHistoryEntry();
+            result.init(data);
+            return result;
+        }
         if (data["$type"] === "attacked") {
             let result = new CharacterAttackedHistoryEntry();
             result.init(data);
@@ -3213,6 +3228,11 @@ export class CharacterHistoryEntry implements ICharacterHistoryEntry {
         }
         if (data["$type"] === "received-attack") {
             let result = new CharacterReceivedAttackHistoryEntry();
+            result.init(data);
+            return result;
+        }
+        if (data["$type"] === "combat-ended") {
+            let result = new CharacterCombatEndedHistoryEntry();
             result.init(data);
             return result;
         }
@@ -3827,6 +3847,404 @@ export interface ICharacterJobLeveledUpHistoryEntry extends ICharacterHistoryEnt
     newLevel: number;
 }
 
+/** Character started combat in preparation */
+export class CharacterStartedCombatPreparationHistoryEntry extends CharacterHistoryEntry implements ICharacterStartedCombatPreparationHistoryEntry {
+    /** The unique ID of the combat instance
+             */
+    combatInstanceId!: string;
+    /** The unique ID of the location of the combat
+             */
+    locationId!: string;
+    /** The unique ID of the area of the location of the combat
+             */
+    locationAreaId!: string;
+    /** The name of the area of the location of the combat
+             */
+    locationAreaName!: string;
+    /** The X position of the location of the combat
+             */
+    locationPositionX!: number;
+    /** The Y position of the location of the combat
+             */
+    locationPositionY!: number;
+    /** The first team of the combat
+             */
+    team1!: CombatEntityInHistoryEntry[];
+    /** The second team of the combat
+             */
+    team2!: CombatEntityInHistoryEntry[];
+
+    constructor(data?: ICharacterStartedCombatPreparationHistoryEntry) {
+        super(data);
+        if (!data) {
+            this.team1 = [];
+            this.team2 = [];
+        }
+        this._discriminator = "combat-preparation-started";
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.combatInstanceId = _data["combatInstanceId"];
+            this.locationId = _data["locationId"];
+            this.locationAreaId = _data["locationAreaId"];
+            this.locationAreaName = _data["locationAreaName"];
+            this.locationPositionX = _data["locationPositionX"];
+            this.locationPositionY = _data["locationPositionY"];
+            if (Array.isArray(_data["team1"])) {
+                this.team1 = [] as any;
+                for (let item of _data["team1"])
+                    this.team1!.push(CombatEntityInHistoryEntry.fromJS(item));
+            }
+            if (Array.isArray(_data["team2"])) {
+                this.team2 = [] as any;
+                for (let item of _data["team2"])
+                    this.team2!.push(CombatEntityInHistoryEntry.fromJS(item));
+            }
+        }
+    }
+
+    static override fromJS(data: any): CharacterStartedCombatPreparationHistoryEntry {
+        data = typeof data === 'object' ? data : {};
+        let result = new CharacterStartedCombatPreparationHistoryEntry();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["combatInstanceId"] = this.combatInstanceId;
+        data["locationId"] = this.locationId;
+        data["locationAreaId"] = this.locationAreaId;
+        data["locationAreaName"] = this.locationAreaName;
+        data["locationPositionX"] = this.locationPositionX;
+        data["locationPositionY"] = this.locationPositionY;
+        if (Array.isArray(this.team1)) {
+            data["team1"] = [];
+            for (let item of this.team1)
+                data["team1"].push(item.toJSON());
+        }
+        if (Array.isArray(this.team2)) {
+            data["team2"] = [];
+            for (let item of this.team2)
+                data["team2"].push(item.toJSON());
+        }
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Character started combat in preparation */
+export interface ICharacterStartedCombatPreparationHistoryEntry extends ICharacterHistoryEntry {
+    /** The unique ID of the combat instance
+             */
+    combatInstanceId: string;
+    /** The unique ID of the location of the combat
+             */
+    locationId: string;
+    /** The unique ID of the area of the location of the combat
+             */
+    locationAreaId: string;
+    /** The name of the area of the location of the combat
+             */
+    locationAreaName: string;
+    /** The X position of the location of the combat
+             */
+    locationPositionX: number;
+    /** The Y position of the location of the combat
+             */
+    locationPositionY: number;
+    /** The first team of the combat
+             */
+    team1: CombatEntityInHistoryEntry[];
+    /** The second team of the combat
+             */
+    team2: CombatEntityInHistoryEntry[];
+}
+
+/** Combat entity in history entry */
+export class CombatEntityInHistoryEntry implements ICombatEntityInHistoryEntry {
+    /** The unique ID of the entity
+             */
+    id!: string;
+    /** The name of the entity
+             */
+    name!: string;
+
+    constructor(data?: ICombatEntityInHistoryEntry) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): CombatEntityInHistoryEntry {
+        data = typeof data === 'object' ? data : {};
+        let result = new CombatEntityInHistoryEntry();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        return data;
+    }
+}
+
+/** Combat entity in history entry */
+export interface ICombatEntityInHistoryEntry {
+    /** The unique ID of the entity
+             */
+    id: string;
+    /** The name of the entity
+             */
+    name: string;
+}
+
+/** Character combat in preparation canceled */
+export class CharacterCombatInPreparationCanceledHistoryEntry extends CharacterHistoryEntry implements ICharacterCombatInPreparationCanceledHistoryEntry {
+    /** The unique ID of the combat instance
+             */
+    combatInstanceId!: string;
+    /** The unique ID of the location of the combat
+             */
+    locationId!: string;
+    /** The unique ID of the area of the location of the combat
+             */
+    locationAreaId!: string;
+    /** The name of the area of the location of the combat
+             */
+    locationAreaName!: string;
+    /** The X position of the location of the combat
+             */
+    locationPositionX!: number;
+    /** The Y position of the location of the combat
+             */
+    locationPositionY!: number;
+    /** The first team of the combat
+             */
+    team1!: CombatEntityInHistoryEntry[];
+    /** The second team of the combat
+             */
+    team2!: CombatEntityInHistoryEntry[];
+
+    constructor(data?: ICharacterCombatInPreparationCanceledHistoryEntry) {
+        super(data);
+        if (!data) {
+            this.team1 = [];
+            this.team2 = [];
+        }
+        this._discriminator = "combat-preparation-canceled";
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.combatInstanceId = _data["combatInstanceId"];
+            this.locationId = _data["locationId"];
+            this.locationAreaId = _data["locationAreaId"];
+            this.locationAreaName = _data["locationAreaName"];
+            this.locationPositionX = _data["locationPositionX"];
+            this.locationPositionY = _data["locationPositionY"];
+            if (Array.isArray(_data["team1"])) {
+                this.team1 = [] as any;
+                for (let item of _data["team1"])
+                    this.team1!.push(CombatEntityInHistoryEntry.fromJS(item));
+            }
+            if (Array.isArray(_data["team2"])) {
+                this.team2 = [] as any;
+                for (let item of _data["team2"])
+                    this.team2!.push(CombatEntityInHistoryEntry.fromJS(item));
+            }
+        }
+    }
+
+    static override fromJS(data: any): CharacterCombatInPreparationCanceledHistoryEntry {
+        data = typeof data === 'object' ? data : {};
+        let result = new CharacterCombatInPreparationCanceledHistoryEntry();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["combatInstanceId"] = this.combatInstanceId;
+        data["locationId"] = this.locationId;
+        data["locationAreaId"] = this.locationAreaId;
+        data["locationAreaName"] = this.locationAreaName;
+        data["locationPositionX"] = this.locationPositionX;
+        data["locationPositionY"] = this.locationPositionY;
+        if (Array.isArray(this.team1)) {
+            data["team1"] = [];
+            for (let item of this.team1)
+                data["team1"].push(item.toJSON());
+        }
+        if (Array.isArray(this.team2)) {
+            data["team2"] = [];
+            for (let item of this.team2)
+                data["team2"].push(item.toJSON());
+        }
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Character combat in preparation canceled */
+export interface ICharacterCombatInPreparationCanceledHistoryEntry extends ICharacterHistoryEntry {
+    /** The unique ID of the combat instance
+             */
+    combatInstanceId: string;
+    /** The unique ID of the location of the combat
+             */
+    locationId: string;
+    /** The unique ID of the area of the location of the combat
+             */
+    locationAreaId: string;
+    /** The name of the area of the location of the combat
+             */
+    locationAreaName: string;
+    /** The X position of the location of the combat
+             */
+    locationPositionX: number;
+    /** The Y position of the location of the combat
+             */
+    locationPositionY: number;
+    /** The first team of the combat
+             */
+    team1: CombatEntityInHistoryEntry[];
+    /** The second team of the combat
+             */
+    team2: CombatEntityInHistoryEntry[];
+}
+
+/** Character combat in preparation canceled */
+export class CharacterCombatStartedHistoryEntry extends CharacterHistoryEntry implements ICharacterCombatStartedHistoryEntry {
+    /** The unique ID of the combat instance
+             */
+    combatInstanceId!: string;
+    /** The unique ID of the location of the combat
+             */
+    locationId!: string;
+    /** The unique ID of the area of the location of the combat
+             */
+    locationAreaId!: string;
+    /** The name of the area of the location of the combat
+             */
+    locationAreaName!: string;
+    /** The X position of the location of the combat
+             */
+    locationPositionX!: number;
+    /** The Y position of the location of the combat
+             */
+    locationPositionY!: number;
+    /** The first team of the combat
+             */
+    team1!: CombatEntityInHistoryEntry[];
+    /** The second team of the combat
+             */
+    team2!: CombatEntityInHistoryEntry[];
+
+    constructor(data?: ICharacterCombatStartedHistoryEntry) {
+        super(data);
+        if (!data) {
+            this.team1 = [];
+            this.team2 = [];
+        }
+        this._discriminator = "combat-started";
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.combatInstanceId = _data["combatInstanceId"];
+            this.locationId = _data["locationId"];
+            this.locationAreaId = _data["locationAreaId"];
+            this.locationAreaName = _data["locationAreaName"];
+            this.locationPositionX = _data["locationPositionX"];
+            this.locationPositionY = _data["locationPositionY"];
+            if (Array.isArray(_data["team1"])) {
+                this.team1 = [] as any;
+                for (let item of _data["team1"])
+                    this.team1!.push(CombatEntityInHistoryEntry.fromJS(item));
+            }
+            if (Array.isArray(_data["team2"])) {
+                this.team2 = [] as any;
+                for (let item of _data["team2"])
+                    this.team2!.push(CombatEntityInHistoryEntry.fromJS(item));
+            }
+        }
+    }
+
+    static override fromJS(data: any): CharacterCombatStartedHistoryEntry {
+        data = typeof data === 'object' ? data : {};
+        let result = new CharacterCombatStartedHistoryEntry();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["combatInstanceId"] = this.combatInstanceId;
+        data["locationId"] = this.locationId;
+        data["locationAreaId"] = this.locationAreaId;
+        data["locationAreaName"] = this.locationAreaName;
+        data["locationPositionX"] = this.locationPositionX;
+        data["locationPositionY"] = this.locationPositionY;
+        if (Array.isArray(this.team1)) {
+            data["team1"] = [];
+            for (let item of this.team1)
+                data["team1"].push(item.toJSON());
+        }
+        if (Array.isArray(this.team2)) {
+            data["team2"] = [];
+            for (let item of this.team2)
+                data["team2"].push(item.toJSON());
+        }
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Character combat in preparation canceled */
+export interface ICharacterCombatStartedHistoryEntry extends ICharacterHistoryEntry {
+    /** The unique ID of the combat instance
+             */
+    combatInstanceId: string;
+    /** The unique ID of the location of the combat
+             */
+    locationId: string;
+    /** The unique ID of the area of the location of the combat
+             */
+    locationAreaId: string;
+    /** The name of the area of the location of the combat
+             */
+    locationAreaName: string;
+    /** The X position of the location of the combat
+             */
+    locationPositionX: number;
+    /** The Y position of the location of the combat
+             */
+    locationPositionY: number;
+    /** The first team of the combat
+             */
+    team1: CombatEntityInHistoryEntry[];
+    /** The second team of the combat
+             */
+    team2: CombatEntityInHistoryEntry[];
+}
+
 /** Character attacked history entry */
 export class CharacterAttackedHistoryEntry extends CharacterHistoryEntry implements ICharacterAttackedHistoryEntry {
     /** The attack dealt by the character
@@ -4003,6 +4421,143 @@ export interface ICharacterReceivedAttackHistoryEntry extends ICharacterHistoryE
     /** The name of the target receiving the attack
              */
     attackerName: string;
+}
+
+/** Character combat in preparation canceled */
+export class CharacterCombatEndedHistoryEntry extends CharacterHistoryEntry implements ICharacterCombatEndedHistoryEntry {
+    /** The unique ID of the combat instance
+             */
+    combatInstanceId!: string;
+    /** The unique ID of the location of the combat
+             */
+    locationId!: string;
+    /** The unique ID of the area of the location of the combat
+             */
+    locationAreaId!: string;
+    /** The name of the area of the location of the combat
+             */
+    locationAreaName!: string;
+    /** The X position of the location of the combat
+             */
+    locationPositionX!: number;
+    /** The Y position of the location of the combat
+             */
+    locationPositionY!: number;
+    /** The first team of the combat
+             */
+    team1!: CombatEntityInHistoryEntry[];
+    /** The second team of the combat
+             */
+    team2!: CombatEntityInHistoryEntry[];
+    /** The winner of the combat
+             */
+    winner!: CombatSide;
+    /** The number of ticks during which the combat was being played
+             */
+    duration!: number;
+
+    constructor(data?: ICharacterCombatEndedHistoryEntry) {
+        super(data);
+        if (!data) {
+            this.team1 = [];
+            this.team2 = [];
+        }
+        this._discriminator = "combat-ended";
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.combatInstanceId = _data["combatInstanceId"];
+            this.locationId = _data["locationId"];
+            this.locationAreaId = _data["locationAreaId"];
+            this.locationAreaName = _data["locationAreaName"];
+            this.locationPositionX = _data["locationPositionX"];
+            this.locationPositionY = _data["locationPositionY"];
+            if (Array.isArray(_data["team1"])) {
+                this.team1 = [] as any;
+                for (let item of _data["team1"])
+                    this.team1!.push(CombatEntityInHistoryEntry.fromJS(item));
+            }
+            if (Array.isArray(_data["team2"])) {
+                this.team2 = [] as any;
+                for (let item of _data["team2"])
+                    this.team2!.push(CombatEntityInHistoryEntry.fromJS(item));
+            }
+            this.winner = _data["winner"];
+            this.duration = _data["duration"];
+        }
+    }
+
+    static override fromJS(data: any): CharacterCombatEndedHistoryEntry {
+        data = typeof data === 'object' ? data : {};
+        let result = new CharacterCombatEndedHistoryEntry();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["combatInstanceId"] = this.combatInstanceId;
+        data["locationId"] = this.locationId;
+        data["locationAreaId"] = this.locationAreaId;
+        data["locationAreaName"] = this.locationAreaName;
+        data["locationPositionX"] = this.locationPositionX;
+        data["locationPositionY"] = this.locationPositionY;
+        if (Array.isArray(this.team1)) {
+            data["team1"] = [];
+            for (let item of this.team1)
+                data["team1"].push(item.toJSON());
+        }
+        if (Array.isArray(this.team2)) {
+            data["team2"] = [];
+            for (let item of this.team2)
+                data["team2"].push(item.toJSON());
+        }
+        data["winner"] = this.winner;
+        data["duration"] = this.duration;
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Character combat in preparation canceled */
+export interface ICharacterCombatEndedHistoryEntry extends ICharacterHistoryEntry {
+    /** The unique ID of the combat instance
+             */
+    combatInstanceId: string;
+    /** The unique ID of the location of the combat
+             */
+    locationId: string;
+    /** The unique ID of the area of the location of the combat
+             */
+    locationAreaId: string;
+    /** The name of the area of the location of the combat
+             */
+    locationAreaName: string;
+    /** The X position of the location of the combat
+             */
+    locationPositionX: number;
+    /** The Y position of the location of the combat
+             */
+    locationPositionY: number;
+    /** The first team of the combat
+             */
+    team1: CombatEntityInHistoryEntry[];
+    /** The second team of the combat
+             */
+    team2: CombatEntityInHistoryEntry[];
+    /** The winner of the combat
+             */
+    winner: CombatSide;
+    /** The number of ticks during which the combat was being played
+             */
+    duration: number;
+}
+
+export enum CombatSide {
+    Team1 = "team1",
+    Team2 = "team2",
 }
 
 /** Team of characters */

@@ -9,9 +9,11 @@ public class CombatEndedHistoryEntry : CombatHistoryEntry
     public CombatEndedHistoryEntry(CombatInstance combatInstance, long tick) : base(combatInstance, tick)
     {
         Winner = combatInstance.Winner ?? throw new ArgumentNullException(nameof(combatInstance.Winner));
+        Duration = combatInstance.Turn;
     }
 
     public CombatSide Winner { get; }
+    public int Duration { get; }
 }
 
 public class CreateCharacterEndedMonsterCombatHistoryEntry : INotificationHandler<CombatEnded>

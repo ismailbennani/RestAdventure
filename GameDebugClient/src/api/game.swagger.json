@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0-alpha.0.110+aa10c276661d0d0446b8466092d8c011c6b2fbf4"
+    "version": "0.0.0-alpha.0.111+89a09df08b809bd71fb63f4facb8a7fe5d3c95a3"
   },
   "servers": [
     {
@@ -1803,8 +1803,12 @@
             "job-learned": "#/components/schemas/CharacterLearnedJobHistoryEntry",
             "job-gained-experience": "#/components/schemas/CharacterJobGainedExperienceHistoryEntry",
             "job-leveled-up": "#/components/schemas/CharacterJobLeveledUpHistoryEntry",
+            "combat-preparation-started": "#/components/schemas/CharacterStartedCombatPreparationHistoryEntry",
+            "combat-preparation-canceled": "#/components/schemas/CharacterCombatInPreparationCanceledHistoryEntry",
+            "combat-started": "#/components/schemas/CharacterCombatStartedHistoryEntry",
             "attacked": "#/components/schemas/CharacterAttackedHistoryEntry",
-            "received-attack": "#/components/schemas/CharacterReceivedAttackHistoryEntry"
+            "received-attack": "#/components/schemas/CharacterReceivedAttackHistoryEntry",
+            "combat-ended": "#/components/schemas/CharacterCombatEndedHistoryEntry"
           }
         },
         "description": "Character history entry\n            ",
@@ -2192,6 +2196,241 @@
           }
         ]
       },
+      "CharacterStartedCombatPreparationHistoryEntry": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CharacterHistoryEntry"
+          },
+          {
+            "type": "object",
+            "description": "Character started combat in preparation\n            ",
+            "additionalProperties": false,
+            "required": [
+              "combatInstanceId",
+              "locationId",
+              "locationAreaId",
+              "locationAreaName",
+              "locationPositionX",
+              "locationPositionY",
+              "team1",
+              "team2"
+            ],
+            "properties": {
+              "combatInstanceId": {
+                "type": "string",
+                "description": "The unique ID of the combat instance\n            ",
+                "format": "guid",
+                "minLength": 1
+              },
+              "locationId": {
+                "type": "string",
+                "description": "The unique ID of the location of the combat\n            ",
+                "format": "guid",
+                "minLength": 1
+              },
+              "locationAreaId": {
+                "type": "string",
+                "description": "The unique ID of the area of the location of the combat\n            ",
+                "format": "guid",
+                "minLength": 1
+              },
+              "locationAreaName": {
+                "type": "string",
+                "description": "The name of the area of the location of the combat\n            ",
+                "minLength": 1
+              },
+              "locationPositionX": {
+                "type": "integer",
+                "description": "The X position of the location of the combat\n            ",
+                "format": "int32"
+              },
+              "locationPositionY": {
+                "type": "integer",
+                "description": "The Y position of the location of the combat\n            ",
+                "format": "int32"
+              },
+              "team1": {
+                "type": "array",
+                "description": "The first team of the combat\n            ",
+                "items": {
+                  "$ref": "#/components/schemas/CombatEntityInHistoryEntry"
+                }
+              },
+              "team2": {
+                "type": "array",
+                "description": "The second team of the combat\n            ",
+                "items": {
+                  "$ref": "#/components/schemas/CombatEntityInHistoryEntry"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "CombatEntityInHistoryEntry": {
+        "type": "object",
+        "description": "Combat entity in history entry\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the entity\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the entity\n            ",
+            "minLength": 1
+          }
+        }
+      },
+      "CharacterCombatInPreparationCanceledHistoryEntry": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CharacterHistoryEntry"
+          },
+          {
+            "type": "object",
+            "description": "Character combat in preparation canceled\n            ",
+            "additionalProperties": false,
+            "required": [
+              "combatInstanceId",
+              "locationId",
+              "locationAreaId",
+              "locationAreaName",
+              "locationPositionX",
+              "locationPositionY",
+              "team1",
+              "team2"
+            ],
+            "properties": {
+              "combatInstanceId": {
+                "type": "string",
+                "description": "The unique ID of the combat instance\n            ",
+                "format": "guid",
+                "minLength": 1
+              },
+              "locationId": {
+                "type": "string",
+                "description": "The unique ID of the location of the combat\n            ",
+                "format": "guid",
+                "minLength": 1
+              },
+              "locationAreaId": {
+                "type": "string",
+                "description": "The unique ID of the area of the location of the combat\n            ",
+                "format": "guid",
+                "minLength": 1
+              },
+              "locationAreaName": {
+                "type": "string",
+                "description": "The name of the area of the location of the combat\n            ",
+                "minLength": 1
+              },
+              "locationPositionX": {
+                "type": "integer",
+                "description": "The X position of the location of the combat\n            ",
+                "format": "int32"
+              },
+              "locationPositionY": {
+                "type": "integer",
+                "description": "The Y position of the location of the combat\n            ",
+                "format": "int32"
+              },
+              "team1": {
+                "type": "array",
+                "description": "The first team of the combat\n            ",
+                "items": {
+                  "$ref": "#/components/schemas/CombatEntityInHistoryEntry"
+                }
+              },
+              "team2": {
+                "type": "array",
+                "description": "The second team of the combat\n            ",
+                "items": {
+                  "$ref": "#/components/schemas/CombatEntityInHistoryEntry"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "CharacterCombatStartedHistoryEntry": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CharacterHistoryEntry"
+          },
+          {
+            "type": "object",
+            "description": "Character combat in preparation canceled\n            ",
+            "additionalProperties": false,
+            "required": [
+              "combatInstanceId",
+              "locationId",
+              "locationAreaId",
+              "locationAreaName",
+              "locationPositionX",
+              "locationPositionY",
+              "team1",
+              "team2"
+            ],
+            "properties": {
+              "combatInstanceId": {
+                "type": "string",
+                "description": "The unique ID of the combat instance\n            ",
+                "format": "guid",
+                "minLength": 1
+              },
+              "locationId": {
+                "type": "string",
+                "description": "The unique ID of the location of the combat\n            ",
+                "format": "guid",
+                "minLength": 1
+              },
+              "locationAreaId": {
+                "type": "string",
+                "description": "The unique ID of the area of the location of the combat\n            ",
+                "format": "guid",
+                "minLength": 1
+              },
+              "locationAreaName": {
+                "type": "string",
+                "description": "The name of the area of the location of the combat\n            ",
+                "minLength": 1
+              },
+              "locationPositionX": {
+                "type": "integer",
+                "description": "The X position of the location of the combat\n            ",
+                "format": "int32"
+              },
+              "locationPositionY": {
+                "type": "integer",
+                "description": "The Y position of the location of the combat\n            ",
+                "format": "int32"
+              },
+              "team1": {
+                "type": "array",
+                "description": "The first team of the combat\n            ",
+                "items": {
+                  "$ref": "#/components/schemas/CombatEntityInHistoryEntry"
+                }
+              },
+              "team2": {
+                "type": "array",
+                "description": "The second team of the combat\n            ",
+                "items": {
+                  "$ref": "#/components/schemas/CombatEntityInHistoryEntry"
+                }
+              }
+            }
+          }
+        ]
+      },
       "CharacterAttackedHistoryEntry": {
         "allOf": [
           {
@@ -2299,6 +2538,104 @@
               }
             }
           }
+        ]
+      },
+      "CharacterCombatEndedHistoryEntry": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CharacterHistoryEntry"
+          },
+          {
+            "type": "object",
+            "description": "Character combat in preparation canceled\n            ",
+            "additionalProperties": false,
+            "required": [
+              "combatInstanceId",
+              "locationId",
+              "locationAreaId",
+              "locationAreaName",
+              "locationPositionX",
+              "locationPositionY",
+              "team1",
+              "team2",
+              "winner",
+              "duration"
+            ],
+            "properties": {
+              "combatInstanceId": {
+                "type": "string",
+                "description": "The unique ID of the combat instance\n            ",
+                "format": "guid",
+                "minLength": 1
+              },
+              "locationId": {
+                "type": "string",
+                "description": "The unique ID of the location of the combat\n            ",
+                "format": "guid",
+                "minLength": 1
+              },
+              "locationAreaId": {
+                "type": "string",
+                "description": "The unique ID of the area of the location of the combat\n            ",
+                "format": "guid",
+                "minLength": 1
+              },
+              "locationAreaName": {
+                "type": "string",
+                "description": "The name of the area of the location of the combat\n            ",
+                "minLength": 1
+              },
+              "locationPositionX": {
+                "type": "integer",
+                "description": "The X position of the location of the combat\n            ",
+                "format": "int32"
+              },
+              "locationPositionY": {
+                "type": "integer",
+                "description": "The Y position of the location of the combat\n            ",
+                "format": "int32"
+              },
+              "team1": {
+                "type": "array",
+                "description": "The first team of the combat\n            ",
+                "items": {
+                  "$ref": "#/components/schemas/CombatEntityInHistoryEntry"
+                }
+              },
+              "team2": {
+                "type": "array",
+                "description": "The second team of the combat\n            ",
+                "items": {
+                  "$ref": "#/components/schemas/CombatEntityInHistoryEntry"
+                }
+              },
+              "winner": {
+                "description": "The winner of the combat\n            ",
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/CombatSide"
+                  }
+                ]
+              },
+              "duration": {
+                "type": "integer",
+                "description": "The number of ticks during which the combat was being played\n            ",
+                "format": "int32"
+              }
+            }
+          }
+        ]
+      },
+      "CombatSide": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "Team1",
+          "Team2"
+        ],
+        "enum": [
+          "team1",
+          "team2"
         ]
       },
       "Team": {

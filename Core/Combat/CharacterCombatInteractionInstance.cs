@@ -5,24 +5,29 @@ namespace RestAdventure.Core.Combat;
 
 public class CharacterCombatInteractionInstance : InteractionInstance
 {
-    public CombatInstance Combat { get; }
+    public CombatInPreparation CombatInPreparation { get; }
+    public CombatInstance? Combat { get; private set; }
 
-    public CharacterCombatInteractionInstance(CombatInstance combat, Character character, Interaction interaction, IInteractibleEntity target) : base(
+    public CharacterCombatInteractionInstance(CombatInPreparation combatInPreparation, Character character, Interaction interaction, IInteractibleEntity target) : base(
         character,
         interaction,
         target
     )
     {
-        Combat = combat;
+        CombatInPreparation = combatInPreparation;
     }
 
-    public override bool IsOver(GameState state) => Combat.IsOver;
+    public override bool IsOver(GameState state) => CombatInPreparation is { Canceled: true } || Combat is { IsOver: true };
 
-    public override async Task OnTickAsync(GameState state) => await Combat.PlayTurnAsync();
+    public override Task OnTickAsync(GameState state)
+    {
+        Combat = state.Combats.Get(CombatInPreparation.Id);
+        return Task.CompletedTask;
+    }
 
     public override async Task OnEndAsync(GameState state)
     {
-        if (!Combat.Winner.HasValue)
+        if (Combat is not { Winner: not null })
         {
             return;
         }

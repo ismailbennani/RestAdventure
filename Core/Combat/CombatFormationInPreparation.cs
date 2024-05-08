@@ -24,6 +24,10 @@ public class CombatFormationInPreparation
 
     public CombatEntityKind CombatEntityKind { get; }
 
+    public event EventHandler<IGameEntityWithCombatStatistics>? Added;
+    public event EventHandler<IGameEntityWithCombatStatistics>? Removed;
+    public event EventHandler<CombatFormationInPreparationReorderedEvent>? Reordered;
+
     public int MaxCount =>
         CombatEntityKind switch
         {
@@ -40,6 +44,8 @@ public class CombatFormationInPreparation
         }
 
         _entities.Add(entity);
+
+        Added?.Invoke(this, entity);
     }
 
     public void Remove(IGameEntityWithCombatStatistics entity)
@@ -53,6 +59,8 @@ public class CombatFormationInPreparation
         {
             throw new InvalidOperationException("Cannot remove entity because it is not part of the formation");
         }
+
+        Removed?.Invoke(this, entity);
     }
 
     public void Reorder(IReadOnlyList<IGameEntityWithCombatStatistics> newOrder)
@@ -64,8 +72,17 @@ public class CombatFormationInPreparation
             throw new InvalidOperationException("Bad new order");
         }
 
+        List<IGameEntityWithCombatStatistics> oldOrder = _entities;
         _entities = newOrder.ToList();
+
+        Reordered?.Invoke(this, new CombatFormationInPreparationReorderedEvent { OldOrder = oldOrder, NewOrder = _entities });
     }
 
     public CombatFormation Lock() => new() { Entities = Entities };
+}
+
+public class CombatFormationInPreparationReorderedEvent
+{
+    public required IReadOnlyList<IGameEntityWithCombatStatistics> OldOrder { get; init; }
+    public required IReadOnlyList<IGameEntityWithCombatStatistics> NewOrder { get; init; }
 }

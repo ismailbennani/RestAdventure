@@ -3,6 +3,9 @@ import { Component, Input, OnInit } from '@angular/core';
 import { ReplaySubject, combineLatest, map, switchMap, tap } from 'rxjs';
 import {
   CharacterAttackedHistoryEntry,
+  CharacterCombatEndedHistoryEntry,
+  CharacterCombatInPreparationCanceledHistoryEntry,
+  CharacterCombatStartedHistoryEntry,
   CharacterCreatedHistoryEntry,
   CharacterDeletedHistoryEntry,
   CharacterEndedInteractionHistoryEntry,
@@ -14,7 +17,10 @@ import {
   CharacterMoveLocationHistoryEntry,
   CharacterPerformedActionHistoryEntry,
   CharacterReceivedAttackHistoryEntry,
+  CharacterStartedCombatPreparationHistoryEntry,
   CharacterStartedInteractionHistoryEntry,
+  CombatEntityInHistoryEntry,
+  CombatSide,
   TeamCharacter,
   TeamCharactersApiClient,
 } from '../../../../api/game-api-client.generated';
@@ -133,6 +139,18 @@ export class CharacterHistoryComponent implements OnInit {
       return `${entry.jobName}: +${entry.newLevel - entry.oldLevel} lv. (${entry.newLevel})`;
     }
 
+    if (entry instanceof CharacterStartedCombatPreparationHistoryEntry) {
+      return `Started combat preparation: ${entry.team1.map(e => e.name).join(',')} v. ${entry.team2.map(e => e.name).join(',')} at ${entry.locationAreaName} [${entry.locationPositionX}, ${entry.locationPositionY}]`;
+    }
+
+    if (entry instanceof CharacterCombatInPreparationCanceledHistoryEntry) {
+      return `Combat preparation canceled`;
+    }
+
+    if (entry instanceof CharacterCombatStartedHistoryEntry) {
+      return `Started combat: ${entry.team1.map(e => e.name).join(',')} v. ${entry.team2.map(e => e.name).join(',')} at ${entry.locationAreaName} [${entry.locationPositionX}, ${entry.locationPositionY}]`;
+    }
+
     if (entry instanceof CharacterAttackedHistoryEntry) {
       const reduction = entry.attackReceived.damage - entry.attackDealt.damage;
       if (reduction === 0) {
@@ -149,6 +167,20 @@ export class CharacterHistoryComponent implements OnInit {
       } else {
         return `Attacked by ${entry.attackerName}: -${entry.attackReceived.damage} HP (${entry.attackDealt.damage}-${reduction})`;
       }
+    }
+
+    if (entry instanceof CharacterCombatEndedHistoryEntry) {
+      let winners: CombatEntityInHistoryEntry[] = [];
+      switch (entry.winner) {
+        case CombatSide.Team1:
+          winners = entry.team1;
+          break;
+        case CombatSide.Team2:
+          winners = entry.team2;
+          break;
+      }
+
+      return `Combat ended in ${entry.duration} turns, winner: ${winners.map(e => e.name).join(', ')}`;
     }
 
     return '???';
