@@ -1,12 +1,11 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
-using RestAdventure.Core.Characters;
 using RestAdventure.Core.Combat.Notifications;
+using RestAdventure.Core.Entities.Characters;
+using RestAdventure.Core.Entities.Monsters;
 using RestAdventure.Core.Extensions;
 using RestAdventure.Core.Items;
 using RestAdventure.Core.Maps.Locations;
-using RestAdventure.Core.Monsters;
-using RestAdventure.Core.Settings;
 using RestAdventure.Kernel.Errors;
 
 namespace RestAdventure.Core.Combat;

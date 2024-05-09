@@ -1,15 +1,15 @@
 ﻿using BaseGame.Jobs;
 using BaseGame.Maps;
 using BaseGame.Monsters;
-using RestAdventure.Core.Characters;
 using RestAdventure.Core.Content;
+using RestAdventure.Core.Entities.Characters;
+using RestAdventure.Core.Entities.Monsters;
+using RestAdventure.Core.Entities.StaticObjects;
 using RestAdventure.Core.Items;
 using RestAdventure.Core.Jobs;
 using RestAdventure.Core.Maps.Areas;
 using RestAdventure.Core.Maps.Locations;
-using RestAdventure.Core.Monsters;
 using RestAdventure.Core.Plugins;
-using RestAdventure.Core.StaticObjects;
 
 namespace BaseGame;
 

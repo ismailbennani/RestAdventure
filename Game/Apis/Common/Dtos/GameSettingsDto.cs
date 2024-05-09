@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using RestAdventure.Core.Settings;
+using RestAdventure.Core;
 
 namespace RestAdventure.Game.Apis.Common.Dtos;
 

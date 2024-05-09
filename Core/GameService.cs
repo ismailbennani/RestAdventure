@@ -2,7 +2,6 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
 using RestAdventure.Core.Content;
-using RestAdventure.Core.Settings;
 using RestAdventure.Core.Simulation.Notifications;
 
 namespace RestAdventure.Core;

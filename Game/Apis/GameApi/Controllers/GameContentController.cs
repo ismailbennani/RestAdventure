@@ -1,14 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using RestAdventure.Core;
-using RestAdventure.Core.Characters;
 using RestAdventure.Core.Content;
+using RestAdventure.Core.Entities.Characters;
+using RestAdventure.Core.Entities.StaticObjects;
 using RestAdventure.Core.Items;
 using RestAdventure.Core.Jobs;
 using RestAdventure.Core.Maps.Locations;
 using RestAdventure.Core.Players;
 using RestAdventure.Core.Resources;
-using RestAdventure.Core.StaticObjects;
 using RestAdventure.Game.Apis.Common.Dtos.Characters;
 using RestAdventure.Game.Apis.Common.Dtos.Items;
 using RestAdventure.Game.Apis.Common.Dtos.Jobs;

@@ -1,7 +1,7 @@
 ﻿using RestAdventure.Core.Items;
 using RestAdventure.Core.Resources;
 
-namespace RestAdventure.Core.Monsters;
+namespace RestAdventure.Core.Entities.Monsters;
 
 public record MonsterFamilyId(Guid Guid) : ResourceId(Guid);
 

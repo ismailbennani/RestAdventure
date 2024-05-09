@@ -9,7 +9,6 @@ using RestAdventure.Core.History;
 using RestAdventure.Core.Jobs;
 using RestAdventure.Core.Maps;
 using RestAdventure.Core.Players;
-using RestAdventure.Core.Settings;
 
 namespace RestAdventure.Core;
 

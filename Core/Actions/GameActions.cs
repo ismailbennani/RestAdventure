@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
 using RestAdventure.Core.Actions.Providers;
-using RestAdventure.Core.Characters;
+using RestAdventure.Core.Entities.Characters;
 using RestAdventure.Kernel.Errors;
 
 namespace RestAdventure.Core.Actions;

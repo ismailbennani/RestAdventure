@@ -1,8 +1,7 @@
 ﻿using RestAdventure.Core.Combat;
-using RestAdventure.Core.Entities;
 using RestAdventure.Core.Maps.Locations;
 
-namespace RestAdventure.Core.Monsters;
+namespace RestAdventure.Core.Entities.Monsters;
 
 public record MonsterInstanceId(Guid Guid) : GameEntityId(Guid);
 

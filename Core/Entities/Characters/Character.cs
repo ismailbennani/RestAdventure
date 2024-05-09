@@ -1,12 +1,11 @@
 ﻿using RestAdventure.Core.Combat;
-using RestAdventure.Core.Entities;
 using RestAdventure.Core.Items;
 using RestAdventure.Core.Jobs;
 using RestAdventure.Core.Maps;
 using RestAdventure.Core.Players;
 using RestAdventure.Core.Utils;
 
-namespace RestAdventure.Core.Characters;
+namespace RestAdventure.Core.Entities.Characters;
 
 public record CharacterId(Guid Guid) : GameEntityId(Guid);
 

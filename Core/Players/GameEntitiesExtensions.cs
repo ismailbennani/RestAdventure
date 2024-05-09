@@ -1,5 +1,5 @@
-﻿using RestAdventure.Core.Characters;
-using RestAdventure.Core.Entities;
+﻿using RestAdventure.Core.Entities;
+using RestAdventure.Core.Entities.Characters;
 
 namespace RestAdventure.Core.Players;
 

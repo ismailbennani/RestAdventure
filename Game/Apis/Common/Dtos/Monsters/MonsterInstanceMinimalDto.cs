@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using RestAdventure.Core.Monsters;
+using RestAdventure.Core.Entities.Monsters;
 using RestAdventure.Game.Apis.Common.Dtos.Entities;
 
 namespace RestAdventure.Game.Apis.Common.Dtos.Monsters;

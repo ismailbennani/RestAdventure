@@ -1,5 +1,5 @@
 ﻿using RestAdventure.Core.Actions.Providers;
-using RestAdventure.Core.Characters;
+using RestAdventure.Core.Entities.Characters;
 using RestAdventure.Core.Maps.Locations;
 using Action = RestAdventure.Core.Actions.Action;
 

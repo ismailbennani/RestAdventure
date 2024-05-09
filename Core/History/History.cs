@@ -1,4 +1,4 @@
-﻿using RestAdventure.Core.Characters;
+﻿using RestAdventure.Core.Entities.Characters;
 using RestAdventure.Core.History.Entities;
 
 namespace RestAdventure.Core.History;

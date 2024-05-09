@@ -1,6 +1,6 @@
 ﻿using RestAdventure.Core.Resources;
 
-namespace RestAdventure.Core.StaticObjects;
+namespace RestAdventure.Core.Entities.StaticObjects;
 
 public record StaticObjectId(Guid Guid) : ResourceId(Guid);
 

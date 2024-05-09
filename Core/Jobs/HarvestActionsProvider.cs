@@ -1,6 +1,6 @@
 ﻿using RestAdventure.Core.Actions.Providers;
-using RestAdventure.Core.Characters;
-using RestAdventure.Core.StaticObjects;
+using RestAdventure.Core.Entities.Characters;
+using RestAdventure.Core.Entities.StaticObjects;
 using Action = RestAdventure.Core.Actions.Action;
 
 namespace RestAdventure.Core.Jobs;

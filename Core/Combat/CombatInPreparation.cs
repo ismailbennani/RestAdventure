@@ -1,5 +1,4 @@
 ﻿using RestAdventure.Core.Maps.Locations;
-using RestAdventure.Core.Settings;
 
 namespace RestAdventure.Core.Combat;
 

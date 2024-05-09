@@ -1,6 +1,6 @@
-﻿using RestAdventure.Core.Items;
+﻿using RestAdventure.Core.Entities.StaticObjects;
+using RestAdventure.Core.Items;
 using RestAdventure.Core.Jobs;
-using RestAdventure.Core.StaticObjects;
 
 namespace BaseGame.Jobs;
 

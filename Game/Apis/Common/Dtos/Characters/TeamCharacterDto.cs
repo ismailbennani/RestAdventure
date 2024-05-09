@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using RestAdventure.Core.Characters;
+using RestAdventure.Core.Entities.Characters;
 using RestAdventure.Game.Apis.Common.Dtos.Characters.Actions;
 using RestAdventure.Game.Apis.Common.Dtos.Entities;
 using RestAdventure.Game.Apis.Common.Dtos.Items;

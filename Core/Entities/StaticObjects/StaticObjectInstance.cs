@@ -1,7 +1,6 @@
-﻿using RestAdventure.Core.Entities;
-using RestAdventure.Core.Maps.Locations;
+﻿using RestAdventure.Core.Maps.Locations;
 
-namespace RestAdventure.Core.StaticObjects;
+namespace RestAdventure.Core.Entities.StaticObjects;
 
 public record StaticObjectInstanceId(Guid Guid) : GameEntityId(Guid);
 

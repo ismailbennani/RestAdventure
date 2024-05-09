@@ -1,6 +1,4 @@
-﻿using RestAdventure.Core.Entities;
-
-namespace RestAdventure.Core.Characters;
+﻿namespace RestAdventure.Core.Entities.Characters;
 
 public static class GameEntitiesExtensions
 {

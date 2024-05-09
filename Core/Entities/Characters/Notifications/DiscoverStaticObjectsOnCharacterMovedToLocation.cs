@@ -1,8 +1,8 @@
 ﻿using MediatR;
 using RestAdventure.Core.Entities.Notifications;
-using RestAdventure.Core.StaticObjects;
+using RestAdventure.Core.Entities.StaticObjects;
 
-namespace RestAdventure.Core.Characters.Notifications;
+namespace RestAdventure.Core.Entities.Characters.Notifications;
 
 public class DiscoverStaticObjectsOnCharacterMovedToLocation : INotificationHandler<GameEntityMovedToLocation>
 {

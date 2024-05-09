@@ -1,7 +1,7 @@
 ﻿using RestAdventure.Core.Players;
 using RestAdventure.Kernel.Errors;
 
-namespace RestAdventure.Core.Characters.Services;
+namespace RestAdventure.Core.Entities.Characters.Services;
 
 public class CharactersService
 {

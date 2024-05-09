@@ -1,7 +1,7 @@
 ﻿using RestAdventure.Core.Maps.Locations;
 using RestAdventure.Core.Resources;
 
-namespace RestAdventure.Core.Characters;
+namespace RestAdventure.Core.Entities.Characters;
 
 public record CharacterClassId(Guid Guid) : ResourceId(Guid);
 

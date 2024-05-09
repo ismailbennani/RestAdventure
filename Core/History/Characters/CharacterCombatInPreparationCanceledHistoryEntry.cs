@@ -1,8 +1,8 @@
 ﻿using MediatR;
-using RestAdventure.Core.Characters;
 using RestAdventure.Core.Combat;
 using RestAdventure.Core.Combat.Notifications;
 using RestAdventure.Core.Entities;
+using RestAdventure.Core.Entities.Characters;
 using RestAdventure.Core.Maps.Areas;
 using RestAdventure.Core.Maps.Locations;
 

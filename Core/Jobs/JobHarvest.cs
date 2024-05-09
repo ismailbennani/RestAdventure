@@ -1,5 +1,5 @@
-﻿using RestAdventure.Core.Items;
-using RestAdventure.Core.StaticObjects;
+﻿using RestAdventure.Core.Entities.StaticObjects;
+using RestAdventure.Core.Items;
 
 namespace RestAdventure.Core.Jobs;
 

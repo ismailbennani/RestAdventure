@@ -1,5 +1,5 @@
 ﻿using BaseGame.Maps;
-using RestAdventure.Core.Characters;
+using RestAdventure.Core.Entities.Characters;
 
 namespace BaseGame;
 

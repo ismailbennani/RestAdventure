@@ -1,5 +1,5 @@
-﻿using RestAdventure.Core.Items;
-using RestAdventure.Core.Monsters;
+﻿using RestAdventure.Core.Entities.Monsters;
+using RestAdventure.Core.Items;
 
 namespace BaseGame.Monsters;
 

@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using RestAdventure.Core;
-using RestAdventure.Core.Characters;
-using RestAdventure.Core.Characters.Services;
 using RestAdventure.Core.Content;
+using RestAdventure.Core.Entities.Characters;
+using RestAdventure.Core.Entities.Characters.Services;
 using RestAdventure.Core.History.Entities;
 using RestAdventure.Core.Players;
 using RestAdventure.Game.Apis.Common.Dtos.Characters;

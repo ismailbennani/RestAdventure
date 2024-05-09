@@ -1,5 +1,4 @@
-﻿using RestAdventure.Core.Settings;
-using RestAdventure.Kernel.Errors;
+﻿using RestAdventure.Kernel.Errors;
 
 namespace RestAdventure.Core.Combat;
 

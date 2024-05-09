@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using RestAdventure.Core.StaticObjects;
+using RestAdventure.Core.Entities.StaticObjects;
 
 namespace RestAdventure.Game.Apis.Common.Dtos.StaticObjects;
 

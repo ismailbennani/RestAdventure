@@ -1,6 +1,6 @@
-﻿using RestAdventure.Core.Characters;
+﻿using RestAdventure.Core.Entities.Characters;
+using RestAdventure.Core.Entities.StaticObjects;
 using RestAdventure.Core.Items;
-using RestAdventure.Core.StaticObjects;
 using RestAdventure.Kernel.Errors;
 using Action = RestAdventure.Core.Actions.Action;
 

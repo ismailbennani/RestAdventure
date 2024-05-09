@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace RestAdventure.Core.Characters.Services;
+namespace RestAdventure.Core.Entities.Characters.Services;
 
 public class CharacterCreationResult
 {

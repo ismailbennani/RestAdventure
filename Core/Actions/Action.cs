@@ -1,5 +1,5 @@
 ﻿using RestAdventure.Core.Actions.Notifications;
-using RestAdventure.Core.Characters;
+using RestAdventure.Core.Entities.Characters;
 using RestAdventure.Kernel.Errors;
 
 namespace RestAdventure.Core.Actions;

@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using RestAdventure.Core.Actions.Notifications;
-using RestAdventure.Core.Characters;
+using RestAdventure.Core.Entities.Characters;
 using RestAdventure.Core.History.Characters;
 using Action = RestAdventure.Core.Actions.Action;
 

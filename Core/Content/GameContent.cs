@@ -1,9 +1,10 @@
-﻿using RestAdventure.Core.Characters;
+﻿using RestAdventure.Core.Entities.Characters;
+using RestAdventure.Core.Entities.Monsters;
+using RestAdventure.Core.Entities.StaticObjects;
 using RestAdventure.Core.Items;
 using RestAdventure.Core.Jobs;
 using RestAdventure.Core.Maps;
-using RestAdventure.Core.Monsters;
-using RestAdventure.Core.StaticObjects;
+using RestAdventure.Core.Resources;
 
 namespace RestAdventure.Core.Content;
 
@@ -17,12 +18,12 @@ public class GameContent
     /// <summary>
     ///     The static objects of the game
     /// </summary>
-    public GameStaticObjects StaticObjects { get; } = new();
+    public GameResourcesStore<StaticObjectId, StaticObject> StaticObjects { get; } = new();
 
     /// <summary>
     ///     The items of the game
     /// </summary>
-    public GameItems Items { get; } = new();
+    public GameResourcesStore<ItemId, Item> Items { get; } = new();
 
     /// <summary>
     ///     The jobs of the game

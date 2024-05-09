@@ -1,4 +1,4 @@
-﻿using RestAdventure.Core.Characters;
+﻿using RestAdventure.Core.Entities.Characters;
 using RestAdventure.Core.Maps.Locations;
 using RestAdventure.Kernel.Errors;
 using Action = RestAdventure.Core.Actions.Action;

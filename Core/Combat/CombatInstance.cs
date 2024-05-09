@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using RestAdventure.Core.Entities;
 using RestAdventure.Core.Maps.Locations;
-using RestAdventure.Core.Settings;
 
 namespace RestAdventure.Core.Combat;
 

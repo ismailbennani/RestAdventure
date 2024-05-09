@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using RestAdventure.Core.Characters.Services;
+using RestAdventure.Core.Entities.Characters.Services;
 
 namespace RestAdventure.Core.Hosting;
 
