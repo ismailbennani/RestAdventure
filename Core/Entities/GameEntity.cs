@@ -29,18 +29,11 @@ public abstract class GameEntity : IEquatable<GameEntity>, IGameEntity
     /// <inheritdoc />
     public bool Busy { get; set; }
 
-    /// <inheritdoc />
-    public event EventHandler<EntityMovedEvent>? LocationChanged;
-
     public async Task KillAsync(GameState state) => await state.Entities.DestroyAsync(this);
 
     public override string ToString() => Name;
 
-    public virtual void Dispose()
-    {
-        LocationChanged = null;
-        GC.SuppressFinalize(this);
-    }
+    public virtual void Dispose() => GC.SuppressFinalize(this);
 
     public bool Equals(GameEntity? other)
     {

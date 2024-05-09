@@ -7,6 +7,8 @@ using NSwag;
 using NSwag.Generation.Processors.Security;
 using RestAdventure.Core;
 using RestAdventure.Core.Characters;
+using RestAdventure.Core.Content;
+using RestAdventure.Core.Hosting;
 using RestAdventure.Core.Monsters;
 using RestAdventure.Core.Players;
 using RestAdventure.Core.Settings;

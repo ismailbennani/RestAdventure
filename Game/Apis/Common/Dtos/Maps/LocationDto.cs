@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using RestAdventure.Core;
+using RestAdventure.Core.Content;
 using RestAdventure.Core.Maps.Locations;
 
 namespace RestAdventure.Game.Apis.Common.Dtos.Maps;

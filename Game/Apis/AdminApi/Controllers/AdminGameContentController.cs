@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using RestAdventure.Core;
+using RestAdventure.Core.Content;
 using RestAdventure.Game.Apis.Common.Dtos.Characters;
 using RestAdventure.Game.Apis.Common.Dtos.Items;
 using RestAdventure.Game.Apis.Common.Dtos.Jobs;

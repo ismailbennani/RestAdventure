@@ -20,8 +20,4 @@
       <ProjectReference Include="..\Kernel\Kernel.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Interactions\" />
-    </ItemGroup>
-
 </Project>

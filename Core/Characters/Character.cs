@@ -5,7 +5,6 @@ using RestAdventure.Core.Jobs;
 using RestAdventure.Core.Maps;
 using RestAdventure.Core.Players;
 using RestAdventure.Core.Utils;
-using Action = RestAdventure.Core.Actions.Action;
 
 namespace RestAdventure.Core.Characters;
 
@@ -13,8 +12,6 @@ public record CharacterId(Guid Guid) : GameEntityId(Guid);
 
 public class Character : GameEntity<CharacterId>, IGameEntityWithInventory, IGameEntityWithJobs, IGameEntityWithCombatStatistics, IGameEntityWithMovement
 {
-    Action? _currentInteraction;
-
     public Character(Player player, CharacterClass characterClass, string name) : base(new CharacterId(Guid.NewGuid()), name, characterClass.StartLocation)
     {
         Player = player;

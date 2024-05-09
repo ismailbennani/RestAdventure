@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using RestAdventure.Core.Actions;
 using RestAdventure.Core.Combat;
 using RestAdventure.Core.Combat.Pve;
+using RestAdventure.Core.Content;
 using RestAdventure.Core.Entities;
 using RestAdventure.Core.History;
 using RestAdventure.Core.Jobs;

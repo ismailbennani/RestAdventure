@@ -5,7 +5,7 @@ using RestAdventure.Core.Maps;
 using RestAdventure.Core.Monsters;
 using RestAdventure.Core.StaticObjects;
 
-namespace RestAdventure.Core;
+namespace RestAdventure.Core.Content;
 
 public class GameContent
 {

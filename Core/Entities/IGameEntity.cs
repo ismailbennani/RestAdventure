@@ -25,11 +25,6 @@ public interface IGameEntity : IDisposable
     bool Busy { get; }
 
     /// <summary>
-    ///     Event fired each time this entity moves
-    /// </summary>
-    event EventHandler<EntityMovedEvent>? LocationChanged;
-
-    /// <summary>
     ///     Kill the entity
     /// </summary>
     Task KillAsync(GameState state);

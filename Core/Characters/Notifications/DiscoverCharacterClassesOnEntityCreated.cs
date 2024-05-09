@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using RestAdventure.Core.Content;
 using RestAdventure.Core.Entities.Notifications;
 
 namespace RestAdventure.Core.Characters.Notifications;

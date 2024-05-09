@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using RestAdventure.Core.Characters.Services;
 
-namespace RestAdventure.Core;
+namespace RestAdventure.Core.Hosting;
 
 public static class CoreHostingExtensions
 {

@@ -2,6 +2,7 @@
 using NSwag.Annotations;
 using RestAdventure.Core;
 using RestAdventure.Core.Characters;
+using RestAdventure.Core.Content;
 using RestAdventure.Core.Items;
 using RestAdventure.Core.Jobs;
 using RestAdventure.Core.Maps.Locations;

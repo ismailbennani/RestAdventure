@@ -1,4 +1,6 @@
-﻿namespace RestAdventure.Core.Plugins;
+﻿using RestAdventure.Core.Content;
+
+namespace RestAdventure.Core.Plugins;
 
 /// <summary>
 ///     A plugin that adds content to the game
