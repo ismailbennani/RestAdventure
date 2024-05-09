@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using RestAdventure.Core;
-using RestAdventure.Game.Apis.GameApi.Services.Game;
+using RestAdventure.Game.Services;
 
 namespace RestAdventure.Game.Apis.Common.Dtos;
 
@@ -41,13 +41,13 @@ public class GameStateDto
 
 static class GameStateMappingExtensions
 {
-    public static GameStateDto ToDto(this GameState state, GameScheduler scheduler) =>
+    public static GameStateDto ToDto(this GameState state, GameSimulation simulation) =>
         new()
         {
             Tick = state.Tick,
-            IsComputingNextTick = scheduler.IsComputingNextTick,
-            Paused = scheduler.Paused,
-            LastTickDate = scheduler.LastStepDate,
-            NextTickDate = scheduler.Paused ? null : scheduler.NextStepDate
+            IsComputingNextTick = simulation.IsComputingNextTick,
+            Paused = simulation.Paused,
+            LastTickDate = simulation.LastStepDate,
+            NextTickDate = simulation.Paused ? null : simulation.NextStepDate
         };
 }

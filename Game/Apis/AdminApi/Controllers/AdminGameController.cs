@@ -2,7 +2,7 @@
 using NSwag.Annotations;
 using RestAdventure.Core;
 using RestAdventure.Game.Apis.Common.Dtos;
-using RestAdventure.Game.Apis.GameApi.Services.Game;
+using RestAdventure.Game.Services;
 
 namespace RestAdventure.Game.Apis.AdminApi.Controllers;
 
@@ -14,13 +14,13 @@ namespace RestAdventure.Game.Apis.AdminApi.Controllers;
 public class AdminGameController : AdminApiController
 {
     readonly GameService _gameService;
-    readonly GameScheduler _gameScheduler;
+    readonly GameSimulation _gameSimulation;
 
     /// <summary>
     /// </summary>
-    public AdminGameController(GameService gameService, GameScheduler gameScheduler)
+    public AdminGameController(GameService gameService, GameSimulation gameSimulation)
     {
-        _gameScheduler = gameScheduler;
+        _gameSimulation = gameSimulation;
         _gameService = gameService;
     }
 
@@ -37,14 +37,14 @@ public class AdminGameController : AdminApiController
     public GameStateDto GetGameState()
     {
         GameState state = _gameService.RequireGameState();
-        return state.ToDto(_gameScheduler);
+        return state.ToDto(_gameSimulation);
     }
 
     /// <summary>
     ///     Start simulation
     /// </summary>
     [HttpPost("start")]
-    public void StartSimulation() => _gameScheduler.Start();
+    public void StartSimulation() => _gameSimulation.Start();
 
     /// <summary>
     ///     Tick now
@@ -52,18 +52,18 @@ public class AdminGameController : AdminApiController
     [HttpPost("tick")]
     public async Task TickNowAsync()
     {
-        bool paused = _gameScheduler.Paused;
+        bool paused = _gameSimulation.Paused;
 
         if (!paused)
         {
-            _gameScheduler.Stop();
+            _gameSimulation.Stop();
         }
 
-        await _gameScheduler.TickNowAsync();
+        await _gameSimulation.TickNowAsync();
 
         if (!paused)
         {
-            _gameScheduler.Start(_gameScheduler.NextStepDate - DateTime.Now);
+            _gameSimulation.Start(_gameSimulation.NextStepDate - DateTime.Now);
         }
     }
 
@@ -71,5 +71,5 @@ public class AdminGameController : AdminApiController
     ///     Stop simulation
     /// </summary>
     [HttpPost("stop")]
-    public void StopSimulation() => _gameScheduler.Stop();
+    public void StopSimulation() => _gameSimulation.Stop();
 }

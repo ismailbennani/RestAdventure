@@ -2,22 +2,22 @@
 using RestAdventure.Core;
 using RestAdventure.Game.Settings;
 
-namespace RestAdventure.Game.Apis.GameApi.Services.Game;
+namespace RestAdventure.Game.Services;
 
 /// <summary>
 ///     Game scheduler
 /// </summary>
-public class GameScheduler : IDisposable
+public class GameSimulation : IDisposable
 {
     readonly GameService _gameService;
     readonly IOptions<ServerSettings> _serverSettings;
-    readonly ILogger<GameScheduler> _logger;
+    readonly ILogger<GameSimulation> _logger;
 
     CancellationTokenSource? _mainLoopCancellationSource;
 
     /// <summary>
     /// </summary>
-    public GameScheduler(GameService gameService, IOptions<ServerSettings> serverSettings, ILogger<GameScheduler> logger)
+    public GameSimulation(GameService gameService, IOptions<ServerSettings> serverSettings, ILogger<GameSimulation> logger)
     {
         _gameService = gameService;
         _serverSettings = serverSettings;

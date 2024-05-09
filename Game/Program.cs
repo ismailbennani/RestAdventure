@@ -13,8 +13,8 @@ using RestAdventure.Core.Settings;
 using RestAdventure.Core.StaticObjects;
 using RestAdventure.Game.Apis.AdminApi;
 using RestAdventure.Game.Apis.GameApi;
-using RestAdventure.Game.Apis.GameApi.Services.Game;
 using RestAdventure.Game.Authentication;
+using RestAdventure.Game.Services;
 using RestAdventure.Game.Settings;
 using RestAdventure.Kernel.OpenApi;
 using RestAdventure.Kernel.Security;
@@ -57,7 +57,7 @@ try
     }
 
     builder.Services.AddOptions<ServerSettings>();
-    builder.Services.AddSingleton<GameScheduler>();
+    builder.Services.AddSingleton<GameSimulation>();
 
     builder.Services.ConfigureCoreServices();
 
@@ -180,6 +180,6 @@ async Task<GameState> LoadGameAsync(WebApplication app)
 
 void StartScheduler(WebApplication app)
 {
-    GameScheduler scheduler = app.Services.GetRequiredService<GameScheduler>();
-    scheduler.Start();
+    GameSimulation simulation = app.Services.GetRequiredService<GameSimulation>();
+    simulation.Start();
 }

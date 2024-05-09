@@ -2,7 +2,7 @@
 using NSwag.Annotations;
 using RestAdventure.Core;
 using RestAdventure.Game.Apis.Common.Dtos;
-using RestAdventure.Game.Apis.GameApi.Services.Game;
+using RestAdventure.Game.Services;
 
 namespace RestAdventure.Game.Apis.GameApi.Controllers;
 
@@ -14,14 +14,14 @@ namespace RestAdventure.Game.Apis.GameApi.Controllers;
 public class GameController : GameApiController
 {
     readonly GameService _gameService;
-    readonly GameScheduler _gameScheduler;
+    readonly GameSimulation _gameSimulation;
 
     /// <summary>
     /// </summary>
-    public GameController(GameService gameService, GameScheduler gameScheduler)
+    public GameController(GameService gameService, GameSimulation gameSimulation)
     {
         _gameService = gameService;
-        _gameScheduler = gameScheduler;
+        _gameSimulation = gameSimulation;
     }
 
     /// <summary>
@@ -37,6 +37,6 @@ public class GameController : GameApiController
     public GameStateDto GetGameState()
     {
         GameState state = _gameService.RequireGameState();
-        return state.ToDto(_gameScheduler);
+        return state.ToDto(_gameSimulation);
     }
 }
