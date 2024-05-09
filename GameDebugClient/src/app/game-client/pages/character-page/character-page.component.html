@@ -15,11 +15,16 @@
         <div class="vstack gap-4">
           <div class="row gy-4">
             <div class="col">
-              <app-character [character]="character"></app-character>
+              <div class="h-100 d-flex flex-column gap-4">
+                <app-character [character]="character"></app-character>
+                <div class="flex-grow-1">
+                  <app-jobs [jobs]="character.jobs"></app-jobs>
+                </div>
+              </div>
             </div>
 
             <div class="col">
-              <app-jobs [jobs]="character.jobs"></app-jobs>
+              <app-character-map [character]="character"></app-character-map>
             </div>
 
             <div class="col">

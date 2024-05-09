@@ -1,20 +1,19 @@
 <div class="w-100 h-100 border py-3 px-4">
   <h6>Jobs</h6>
-  <ul>
+  <ul class="list-group list-group-flush">
     @for (jobInstance of jobs; track jobInstance.job.id) {
-      <li>
-        <div>
-          <div class="d-flex justify-content-between">
-            <span>{{ jobInstance.job.name | titlecase }}</span
-            ><span>lv. {{ jobInstance.progression.level }}</span>
+      <li class="list-group-item">
+        <div class="d-flex gap-4 align-items-center">
+          <div>{{ jobInstance.job.name | titlecase }}</div>
+          <div class="flex-grow-1">
+            <app-progression-bar
+              color="info"
+              [value]="jobInstance.progression.experience"
+              [maxValue]="jobInstance.progression.nextLevelExperience"
+              displayValue="absolute"
+            ></app-progression-bar>
           </div>
-          <app-progression-bar
-            color="info"
-            label="Exp"
-            [value]="jobInstance.progression.experience"
-            [maxValue]="jobInstance.progression.nextLevelExperience"
-            displayValue="absolute"
-          ></app-progression-bar>
+          <div>lv. {{ jobInstance.progression.level }}</div>
         </div>
       </li>
     }

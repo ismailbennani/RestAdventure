@@ -1,0 +1,9 @@
+<div class="w-100 h-100 border">
+  @if (locations.length == 0) {
+    <div class="w-100 h-100 d-flex align-items-center justify-content-center">
+      <h6 class="text-secondary">No map data</h6>
+    </div>
+  } @else {
+    <app-map [locations]="locations" [centerAt]="centerAt"></app-map>
+  }
+</div>
