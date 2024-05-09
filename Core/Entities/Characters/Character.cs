@@ -58,6 +58,12 @@ public class Character : GameEntity<CharacterId>, IGameEntityWithInventory, IGam
     /// </summary>
     public EntityMovement Movement { get; }
 
+    public override async Task KillAsync(GameState state)
+    {
+        await TeleportAsync(state, Class.StartLocation);
+        CombatStatistics.Revive();
+    }
+
     public override string ToString() => $"{Class} {Name} ({Player})";
 
     public override void Dispose()

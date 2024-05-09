@@ -3361,6 +3361,11 @@ export class CharacterHistoryEntry implements ICharacterHistoryEntry {
             result.init(data);
             return result;
         }
+        if (data["$type"] === "teleported") {
+            let result = new CharacterTeleporteLocationHistoryEntry();
+            result.init(data);
+            return result;
+        }
         if (data["$type"] === "moved") {
             let result = new CharacterMoveLocationHistoryEntry();
             result.init(data);
@@ -3489,6 +3494,118 @@ export class CharacterDeletedHistoryEntry extends CharacterHistoryEntry implemen
 
 /** Character deleted history entry */
 export interface ICharacterDeletedHistoryEntry extends ICharacterHistoryEntry {
+}
+
+/** Character teleported to location history entry */
+export class CharacterTeleporteLocationHistoryEntry extends CharacterHistoryEntry implements ICharacterTeleporteLocationHistoryEntry {
+    /** The unique ID of the old location
+             */
+    oldLocationId!: string;
+    /** The X position of the old location
+             */
+    oldLocationPositionX!: number;
+    /** The Y position of the old location
+             */
+    oldLocationPositionY!: number;
+    /** The unique ID of the area of the old location
+             */
+    oldLocationAreaId!: string;
+    /** The name of the area of the old location
+             */
+    oldLocationAreaName!: string;
+    /** The unique ID of the new location
+             */
+    newLocationId!: string;
+    /** The X position of the new location
+             */
+    newLocationPositionX!: number;
+    /** The Y position of the new location
+             */
+    newLocationPositionY!: number;
+    /** The unique ID of the area of the new location
+             */
+    newLocationAreaId!: string;
+    /** The name of the area of the new location
+             */
+    newLocationAreaName!: string;
+
+    constructor(data?: ICharacterTeleporteLocationHistoryEntry) {
+        super(data);
+        this._discriminator = "teleported";
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.oldLocationId = _data["oldLocationId"];
+            this.oldLocationPositionX = _data["oldLocationPositionX"];
+            this.oldLocationPositionY = _data["oldLocationPositionY"];
+            this.oldLocationAreaId = _data["oldLocationAreaId"];
+            this.oldLocationAreaName = _data["oldLocationAreaName"];
+            this.newLocationId = _data["newLocationId"];
+            this.newLocationPositionX = _data["newLocationPositionX"];
+            this.newLocationPositionY = _data["newLocationPositionY"];
+            this.newLocationAreaId = _data["newLocationAreaId"];
+            this.newLocationAreaName = _data["newLocationAreaName"];
+        }
+    }
+
+    static override fromJS(data: any): CharacterTeleporteLocationHistoryEntry {
+        data = typeof data === 'object' ? data : {};
+        let result = new CharacterTeleporteLocationHistoryEntry();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["oldLocationId"] = this.oldLocationId;
+        data["oldLocationPositionX"] = this.oldLocationPositionX;
+        data["oldLocationPositionY"] = this.oldLocationPositionY;
+        data["oldLocationAreaId"] = this.oldLocationAreaId;
+        data["oldLocationAreaName"] = this.oldLocationAreaName;
+        data["newLocationId"] = this.newLocationId;
+        data["newLocationPositionX"] = this.newLocationPositionX;
+        data["newLocationPositionY"] = this.newLocationPositionY;
+        data["newLocationAreaId"] = this.newLocationAreaId;
+        data["newLocationAreaName"] = this.newLocationAreaName;
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Character teleported to location history entry */
+export interface ICharacterTeleporteLocationHistoryEntry extends ICharacterHistoryEntry {
+    /** The unique ID of the old location
+             */
+    oldLocationId: string;
+    /** The X position of the old location
+             */
+    oldLocationPositionX: number;
+    /** The Y position of the old location
+             */
+    oldLocationPositionY: number;
+    /** The unique ID of the area of the old location
+             */
+    oldLocationAreaId: string;
+    /** The name of the area of the old location
+             */
+    oldLocationAreaName: string;
+    /** The unique ID of the new location
+             */
+    newLocationId: string;
+    /** The X position of the new location
+             */
+    newLocationPositionX: number;
+    /** The Y position of the new location
+             */
+    newLocationPositionY: number;
+    /** The unique ID of the area of the new location
+             */
+    newLocationAreaId: string;
+    /** The name of the area of the new location
+             */
+    newLocationAreaName: string;
 }
 
 /** Character moved to location history entry */

@@ -12,6 +12,7 @@ namespace RestAdventure.Game.Apis.Common.Dtos.History.Characters;
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "$type", IgnoreUnrecognizedTypeDiscriminators = true)]
 [JsonDerivedType(typeof(CharacterCreatedHistoryEntryDto), "created")]
 [JsonDerivedType(typeof(CharacterDeletedHistoryEntryDto), "deleted")]
+[JsonDerivedType(typeof(CharacterTeleportedToLocationHistoryEntryDto), "teleported")]
 [JsonDerivedType(typeof(CharacterMovedToLocationHistoryEntryDto), "moved")]
 [JsonDerivedType(typeof(CharacterInventoryChangedHistoryEntryDto), "inventory-changed")]
 [JsonDerivedType(typeof(ActionStartedHistoryEntryDto), "interaction-started")]

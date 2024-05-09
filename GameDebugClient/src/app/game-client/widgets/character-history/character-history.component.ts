@@ -15,6 +15,7 @@ import {
   CharacterLearnedJobHistoryEntry,
   CharacterMoveLocationHistoryEntry,
   CharacterStartedCombatPreparationHistoryEntry,
+  CharacterTeleporteLocationHistoryEntry,
   CharactersApiClient,
   CombatEntityInHistoryEntry,
   CombatSide,
@@ -95,6 +96,18 @@ export class CharacterHistoryComponent implements OnInit {
         }
       } else {
         return `Moved to [${entry.newLocationPositionX}, ${entry.newLocationPositionY}] (${entry.newLocationAreaName})`;
+      }
+    }
+
+    if (entry instanceof CharacterTeleporteLocationHistoryEntry) {
+      if (entry.oldLocationId) {
+        if (entry.oldLocationAreaId !== entry.newLocationAreaId) {
+          return `Teleported from [${entry.oldLocationPositionX}, ${entry.oldLocationPositionY}] (${entry.oldLocationAreaName}) to [${entry.newLocationPositionX}, ${entry.newLocationPositionY}] (${entry.newLocationAreaName})`;
+        } else {
+          return `Teleported from [${entry.oldLocationPositionX}, ${entry.oldLocationPositionY}] to [${entry.newLocationPositionX}, ${entry.newLocationPositionY}] (${entry.newLocationAreaName})`;
+        }
+      } else {
+        return `Teleported to [${entry.newLocationPositionX}, ${entry.newLocationPositionY}] (${entry.newLocationAreaName})`;
       }
     }
 

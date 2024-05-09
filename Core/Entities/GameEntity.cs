@@ -1,4 +1,5 @@
-﻿using RestAdventure.Core.Maps.Locations;
+﻿using RestAdventure.Core.Entities.Notifications;
+using RestAdventure.Core.Maps.Locations;
 
 namespace RestAdventure.Core.Entities;
 
@@ -35,7 +36,15 @@ public abstract class GameEntity : IEquatable<GameEntity>, IGameEntity
     /// <inheritdoc />
     public bool Busy { get; set; }
 
-    public async Task KillAsync(GameState state) => await state.Entities.DestroyAsync(this);
+    public async Task TeleportAsync(GameState state, Location location)
+    {
+        Location oldLocation = Location;
+        Location = location;
+
+        await state.Publisher.Publish(new GameEntityTeleportedToLocation { Entity = this, OldLocation = oldLocation, NewLocation = Location });
+    }
+
+    public virtual async Task KillAsync(GameState state) => await state.Entities.DestroyAsync(this);
 
     public override string ToString() => Name;
 

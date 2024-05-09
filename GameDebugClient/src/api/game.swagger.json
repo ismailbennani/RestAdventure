@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0-alpha.0.167+3b9592f2ea37dd80e07b8720cea1d85d70d9eb7d"
+    "version": "0.0.0-alpha.0.171+1e9da3d9b32afb772baa834f0991018652b9a828"
   },
   "servers": [
     {
@@ -2181,6 +2181,7 @@
           "mapping": {
             "created": "#/components/schemas/CharacterCreatedHistoryEntry",
             "deleted": "#/components/schemas/CharacterDeletedHistoryEntry",
+            "teleported": "#/components/schemas/CharacterTeleporteLocationHistoryEntry",
             "moved": "#/components/schemas/CharacterMoveLocationHistoryEntry",
             "inventory-changed": "#/components/schemas/CharacterInventoryChangedHistoryEntry",
             "interaction-started": "#/components/schemas/ActionStartedHistoryEntry",
@@ -2231,6 +2232,86 @@
             "type": "object",
             "description": "Character deleted history entry\n            ",
             "additionalProperties": false
+          }
+        ]
+      },
+      "CharacterTeleporteLocationHistoryEntry": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CharacterHistoryEntry"
+          },
+          {
+            "type": "object",
+            "description": "Character teleported to location history entry\n            ",
+            "additionalProperties": false,
+            "required": [
+              "oldLocationId",
+              "oldLocationPositionX",
+              "oldLocationPositionY",
+              "oldLocationAreaId",
+              "oldLocationAreaName",
+              "newLocationId",
+              "newLocationPositionX",
+              "newLocationPositionY",
+              "newLocationAreaId",
+              "newLocationAreaName"
+            ],
+            "properties": {
+              "oldLocationId": {
+                "type": "string",
+                "description": "The unique ID of the old location\n            ",
+                "format": "guid",
+                "minLength": 1
+              },
+              "oldLocationPositionX": {
+                "type": "integer",
+                "description": "The X position of the old location\n            ",
+                "format": "int32"
+              },
+              "oldLocationPositionY": {
+                "type": "integer",
+                "description": "The Y position of the old location\n            ",
+                "format": "int32"
+              },
+              "oldLocationAreaId": {
+                "type": "string",
+                "description": "The unique ID of the area of the old location\n            ",
+                "format": "guid",
+                "minLength": 1
+              },
+              "oldLocationAreaName": {
+                "type": "string",
+                "description": "The name of the area of the old location\n            ",
+                "minLength": 1
+              },
+              "newLocationId": {
+                "type": "string",
+                "description": "The unique ID of the new location\n            ",
+                "format": "guid",
+                "minLength": 1
+              },
+              "newLocationPositionX": {
+                "type": "integer",
+                "description": "The X position of the new location\n            ",
+                "format": "int32"
+              },
+              "newLocationPositionY": {
+                "type": "integer",
+                "description": "The Y position of the new location\n            ",
+                "format": "int32"
+              },
+              "newLocationAreaId": {
+                "type": "string",
+                "description": "The unique ID of the area of the new location\n            ",
+                "format": "guid",
+                "minLength": 1
+              },
+              "newLocationAreaName": {
+                "type": "string",
+                "description": "The name of the area of the new location\n            ",
+                "minLength": 1
+              }
+            }
           }
         ]
       },

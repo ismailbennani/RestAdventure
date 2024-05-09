@@ -28,6 +28,8 @@ public class EntityCombatStatistics
 
         return attack;
     }
+
+    public void Revive() => Health = 1;
 }
 
 public class EntityDamagedEvent
