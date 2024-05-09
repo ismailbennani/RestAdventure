@@ -34,7 +34,6 @@ public class PveCombatAction : Action
 
     public CombatInPreparation? CombatInPreparation { get; private set; }
     public CombatInstance? Combat { get; private set; }
-    public bool Over { get; private set; }
 
     protected override Maybe CanPerformInternal(GameState state, Character character)
     {
@@ -51,8 +50,6 @@ public class PveCombatAction : Action
         return "Internal error";
     }
 
-    public override bool IsOver(GameState state, Character character) => Over;
-
     protected override async Task OnStartAsync(GameState state, Character character)
     {
         if (CombatInPreparation == null)
@@ -64,7 +61,7 @@ public class PveCombatAction : Action
                 return;
             }
 
-            Maybe<CombatInPreparation> combat = await state.Combats.StartCombatAsync([character], _defenders);
+            Maybe<CombatInPreparation> combat = await state.Combats.StartCombatPreparationAsync([character], _defenders);
             if (!combat.Success)
             {
                 _logger.LogError("Combat creation failed: {reason}", combat.WhyNot);
@@ -93,15 +90,9 @@ public class PveCombatAction : Action
 
     protected override Task OnTickAsync(GameState state, Character character)
     {
-        if (CombatInPreparation is { Canceled: true })
-        {
-            Over = true;
-            return Task.CompletedTask;
-        }
-
         if (CombatInPreparation is { Started: true })
         {
-            CombatInstance? combat = state.Combats.Get(CombatInPreparation.Id);
+            CombatInstance? combat = state.Combats.GetCombat(CombatInPreparation.Id);
             if (combat != null)
             {
                 Combat = combat;

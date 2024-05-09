@@ -1,4 +1,4 @@
-﻿using RestAdventure.Core.Actions.Providers;
+﻿using RestAdventure.Core.Actions;
 using RestAdventure.Core.Entities.Characters;
 using RestAdventure.Core.Entities.StaticObjects;
 using Action = RestAdventure.Core.Actions.Action;

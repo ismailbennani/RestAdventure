@@ -17,31 +17,13 @@ public class CombatInPreparation
     public CombatFormationInPreparation Attackers { get; }
     public CombatFormationInPreparation Defenders { get; }
     public GameSettings Settings { get; }
-    public int Turn { get; private set; }
+    public int Turn { get; set; }
     public bool Started { get; private set; }
-    public bool Canceled { get; private set; }
-
-    public void Tick() => Turn++;
 
     public CombatInstance Start()
     {
-        if (Canceled)
-        {
-            throw new InvalidOperationException("Cannot start a canceled combat");
-        }
-
         Started = true;
         return new CombatInstance(this);
-    }
-
-    public void Cancel()
-    {
-        if (Started)
-        {
-            throw new InvalidOperationException("Cannot cancel a started combat");
-        }
-
-        Canceled = true;
     }
 
     public CombatFormationInPreparation GetTeam(CombatSide side) =>

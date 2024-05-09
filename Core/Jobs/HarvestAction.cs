@@ -46,11 +46,18 @@ public class HarvestAction : Action
         return true;
     }
 
-    public override bool IsOver(GameState state, Character character) => state.Tick - StartTick >= Harvest.HarvestDuration;
-
     protected override Task OnStartAsync(GameState state, Character character)
     {
         Target.Busy = true;
+        return Task.CompletedTask;
+    }
+
+    protected override Task OnTickAsync(GameState state, Character character)
+    {
+        if (state.Tick - StartTick >= Harvest.HarvestDuration)
+        {
+            Over = true;
+        }
         return Task.CompletedTask;
     }
 

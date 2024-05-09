@@ -48,7 +48,7 @@ public class CombatsController : GameApiController
             return BadRequest();
         }
 
-        IEnumerable<CombatInPreparation> combats = state.Combats.InPreparationAtLocation(character.Location);
+        IEnumerable<CombatInPreparation> combats = state.Combats.GetCombatInPreparationAtLocation(character.Location);
         return combats.Select(c => c.ToDto(c.Attackers.CanJoin(character))).ToArray();
     }
 
@@ -73,7 +73,7 @@ public class CombatsController : GameApiController
         }
 
         CombatInstanceId combatId = new(combatGuid);
-        CombatInPreparation? combatInPreparation = state.Combats.GetInPreparation(combatId);
+        CombatInPreparation? combatInPreparation = state.Combats.GetCombatInPreparation(combatId);
         if (combatInPreparation == null || combatInPreparation.Location != character.Location)
         {
             return NotFound();
@@ -105,7 +105,7 @@ public class CombatsController : GameApiController
             return BadRequest();
         }
 
-        IEnumerable<CombatInstance> combats = state.Combats.AtLocation(character.Location);
+        IEnumerable<CombatInstance> combats = state.Combats.GetCombatAtLocation(character.Location);
         return combats.Select(c => c.ToDto()).ToArray();
     }
 }

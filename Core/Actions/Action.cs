@@ -6,7 +6,7 @@ namespace RestAdventure.Core.Actions;
 
 public record ActionId(Guid Guid);
 
-public abstract class Action
+public abstract class Action : IEquatable<Action>
 {
     protected Action(string name)
     {
@@ -18,6 +18,7 @@ public abstract class Action
     public string Name { get; }
     public long StartTick { get; private set; }
     public bool Started { get; private set; }
+    public bool Over { get; protected set; }
     public bool Ended { get; private set; }
 
     /// <summary>
@@ -60,13 +61,13 @@ public abstract class Action
     }
 
     /// <summary>
-    ///     This hook is called on the first tick, even if <see cref="IsOver" /> returns true. It is guaranteed to be called exactly once per interaction.
+    ///     Called on the first tick, even if <see cref="Over" /> is true. It is guaranteed to be called exactly once per interaction.
     ///     When this hook is called on the same tick as <see cref="OnStartAsync" /> or <see cref="OnTickAsync" />, it is always called first.
     /// </summary>
     protected virtual Task OnStartAsync(GameState state, Character character) => Task.CompletedTask;
 
     /// <summary>
-    ///     Called once per tick between the first and the last one.
+    ///     Called once per tick.
     ///     This hook is called on every tick. It is guaranteed to be called at least once (on the first tick).
     ///     When this hook is called on the same tick as <see cref="OnStartAsync" />, it will be called AFTER it.
     ///     When this hook is called on the same tick as <see cref="OnEndAsync" />, it will be called BEFORE it.
@@ -74,15 +75,46 @@ public abstract class Action
     protected virtual Task OnTickAsync(GameState state, Character character) => Task.CompletedTask;
 
     /// <summary>
-    ///     Is the action over
-    /// </summary>
-    public abstract bool IsOver(GameState state, Character character);
-
-    /// <summary>
-    ///     This hook is called on the last tick, even if it is the first one. It is guaranteed to be called exactly once per interaction.
-    ///     The last tick is the first tick after the start of the interaction where <see cref="IsOver" /> returns true.
-    ///     This means that this hook MIGHT be called on the same tick as <see cref="OnStartAsync" />, if <see cref="IsOver" /> returns true on the first tick.
+    ///     Called on the last tick, even if it is the first one. It is guaranteed to be called exactly once per interaction.
+    ///     The last tick is the first tick after the start of the interaction where <see cref="Over" /> is true.
+    ///     This means that this hook MIGHT be called on the same tick as <see cref="OnStartAsync" />, if <see cref="Over" /> is true on the first tick.
     ///     When this hook is called on the same tick as <see cref="OnStartAsync" /> or <see cref="OnTickAsync" />, it is always called last.
     /// </summary>
     protected virtual Task OnEndAsync(GameState state, Character character) => Task.CompletedTask;
+
+    public bool Equals(Action? other)
+    {
+        if (ReferenceEquals(null, other))
+        {
+            return false;
+        }
+        if (ReferenceEquals(this, other))
+        {
+            return true;
+        }
+        return Id.Equals(other.Id);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (ReferenceEquals(null, obj))
+        {
+            return false;
+        }
+        if (ReferenceEquals(this, obj))
+        {
+            return true;
+        }
+        if (obj.GetType() != GetType())
+        {
+            return false;
+        }
+        return Equals((Action)obj);
+    }
+
+    public override int GetHashCode() => Id.GetHashCode();
+
+    public static bool operator ==(Action? left, Action? right) => Equals(left, right);
+
+    public static bool operator !=(Action? left, Action? right) => !Equals(left, right);
 }

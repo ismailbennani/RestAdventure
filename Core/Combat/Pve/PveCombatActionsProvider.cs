@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using RestAdventure.Core.Actions.Providers;
+using RestAdventure.Core.Actions;
 using RestAdventure.Core.Entities.Characters;
 using RestAdventure.Core.Entities.Monsters;
 using Action = RestAdventure.Core.Actions.Action;

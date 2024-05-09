@@ -1,6 +1,6 @@
 ﻿using RestAdventure.Core.Entities.Characters;
 
-namespace RestAdventure.Core.Actions.Providers;
+namespace RestAdventure.Core.Actions;
 
 public interface IActionsProvider
 {

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
-using RestAdventure.Core.Actions.Providers;
 using RestAdventure.Core.Entities.Characters;
 using RestAdventure.Kernel.Errors;
 
@@ -11,16 +10,19 @@ public class GameActions
     readonly GameState _state;
     readonly ILogger<GameActions> _logger;
     readonly ConcurrentDictionary<CharacterId, IReadOnlyCollection<Action>> _availableActions = new();
-    Dictionary<CharacterId, Action> _queuedActions = new();
+    readonly Dictionary<CharacterId, Action> _queuedActions = new();
     readonly Dictionary<CharacterId, Action> _ongoingActions = new();
     readonly IReadOnlyCollection<IActionsProvider> _actionProviders;
 
-    public GameActions(GameState state, IReadOnlyCollection<IActionsProvider> actionProviders, ILogger<GameActions> logger)
+    public GameActions(GameState state, IReadOnlyCollection<IActionsProvider> actionProviders)
     {
         _state = state;
         _actionProviders = actionProviders;
-        _logger = logger;
+        _logger = state.LoggerFactory.CreateLogger<GameActions>();
     }
+
+    public IEnumerable<KeyValuePair<CharacterId, Action>> Queued => _queuedActions;
+    public IEnumerable<KeyValuePair<CharacterId, Action>> Ongoing => _ongoingActions;
 
     public IReadOnlyCollection<Action> GetAvailableActions(Character character) =>
         _availableActions.GetOrAdd(character.Id, _ => _actionProviders.SelectMany(p => p.GetActions(_state, character)).ToArray());
@@ -35,100 +37,75 @@ public class GameActions
 
         _queuedActions[character.Id] = action;
 
-        _logger.LogInformation("Action queued for {character}: {action} ({actionType})", character, action, action.GetType().Name);
+        _logger.LogDebug("Action queued for {character}: {action} ({actionType})", character, action, action.GetType().Name);
         return true;
     }
 
     public Action? GetQueuedAction(Character character) => _queuedActions.GetValueOrDefault(character.Id);
 
+    public void RemoveQueuedAction(Character character, Action action)
+    {
+        if (_queuedActions.GetValueOrDefault(character.Id) != action)
+        {
+            return;
+        }
+
+        _queuedActions.Remove(character.Id);
+    }
+
+    public async Task<Maybe> StartQueuedActionAsync(Character character)
+    {
+        if (!_queuedActions.Remove(character.Id, out Action? action))
+        {
+            return "Could not find action queued for character";
+        }
+
+        Maybe canPerform = action.CanPerform(_state, character);
+        if (!canPerform.Success)
+        {
+            return canPerform.WhyNot;
+        }
+
+        await action.StartAsync(_state, character);
+        _ongoingActions[character.Id] = action;
+
+        return true;
+    }
+
+    public async Task<Maybe> TickOngoingActionAsync(Character character)
+    {
+        if (!_ongoingActions.TryGetValue(character.Id, out Action? action))
+        {
+            return "Could not find ongoing action for character";
+        }
+
+        await action.TickAsync(_state, character);
+        return true;
+    }
+
     public Action? GetOngoingAction(Character character) => _ongoingActions.GetValueOrDefault(character.Id);
 
-    public async Task TickAsync(GameState state)
+    public async Task<Maybe> EndOngoingActionAsync(Character character)
     {
-        await state.Actions.StartQueuedActionsAsync(state);
-        await state.Actions.TickOngoingActionsAsync(state);
-        await state.Actions.RemoveFinishedActionsAsync(state);
-        state.Actions.OnTickEnd(state);
-    }
-
-    async Task StartQueuedActionsAsync(GameState state)
-    {
-        const int fuel = 1000;
-        for (int i = 0; i < fuel; i++)
+        if (!_ongoingActions.TryGetValue(character.Id, out Action? action))
         {
-            Dictionary<CharacterId, Action> queuedActions = _queuedActions;
-            _queuedActions = new Dictionary<CharacterId, Action>();
-
-            foreach ((CharacterId characterId, Action queuedAction) in queuedActions)
-            {
-                Character? character = state.Entities.Get<Character>(characterId);
-                if (character == null)
-                {
-                    continue;
-                }
-
-                Maybe canPerform = queuedAction.CanPerform(state, character);
-                if (!canPerform.Success)
-                {
-                    _logger.LogError("Could not perform action {action}: {reason}", queuedAction, canPerform.WhyNot);
-                    continue;
-                }
-
-                await queuedAction.StartAsync(state, character);
-                _ongoingActions[character.Id] = queuedAction;
-            }
-
-            if (_queuedActions.Count == 0)
-            {
-                return;
-            }
+            return "Could not find ongoing action for character";
         }
 
-        _logger.LogWarning("Queued actions loop aborted, is there a cycle ?");
+        if (!action.Over)
+        {
+            return "Action is not over";
+        }
+
+        await action.EndAsync(_state, character);
+        _ongoingActions.Remove(character.Id);
+
+        return true;
     }
 
-    async Task TickOngoingActionsAsync(GameState state)
+    public void ClearTickCache()
     {
-        foreach ((CharacterId characterId, Action action) in _ongoingActions)
-        {
-            Character? character = state.Entities.Get<Character>(characterId);
-            if (character == null)
-            {
-                continue;
-            }
-
-            await action.TickAsync(state, character);
-        }
+        _availableActions.Clear();
+        _queuedActions.Clear();
     }
-
-    async Task RemoveFinishedActionsAsync(GameState state)
-    {
-        List<CharacterId> toRemove = [];
-        foreach ((CharacterId characterId, Action instance) in _ongoingActions)
-        {
-            Character? character = state.Entities.Get<Character>(characterId);
-            if (character == null)
-            {
-                _logger.LogWarning("Character performing action {action} not found. Action will be removed without calling {onEnd}", instance, nameof(Action.EndAsync));
-                toRemove.Add(characterId);
-                continue;
-            }
-
-            if (instance.IsOver(state, character))
-            {
-                await instance.EndAsync(state, character);
-                toRemove.Add(characterId);
-            }
-        }
-
-        foreach (CharacterId characterId in toRemove)
-        {
-            if (!_ongoingActions.Remove(characterId))
-            {
-                _logger.LogWarning("Could not remove action of character {characterId}", characterId);
-            }
-        }
-    }
-
-    void OnTickEnd(GameState state) => _availableActions.Clear();
 }
