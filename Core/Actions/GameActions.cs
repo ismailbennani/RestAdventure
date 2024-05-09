@@ -39,7 +39,19 @@ public class GameActions
         return true;
     }
 
-    public async Task StartQueuedActionsAsync(GameState state)
+    public Action? GetQueuedAction(Character character) => _queuedActions.GetValueOrDefault(character.Id);
+
+    public Action? GetOngoingAction(Character character) => _ongoingActions.GetValueOrDefault(character.Id);
+
+    public async Task TickAsync(GameState state)
+    {
+        await state.Actions.StartQueuedActionsAsync(state);
+        await state.Actions.TickOngoingActionsAsync(state);
+        await state.Actions.RemoveFinishedActionsAsync(state);
+        state.Actions.OnTickEnd(state);
+    }
+
+    async Task StartQueuedActionsAsync(GameState state)
     {
         const int fuel = 1000;
         for (int i = 0; i < fuel; i++)
@@ -75,7 +87,7 @@ public class GameActions
         _logger.LogWarning("Queued actions loop aborted, is there a cycle ?");
     }
 
-    public async Task TickOngoingActionsAsync(GameState state)
+    async Task TickOngoingActionsAsync(GameState state)
     {
         foreach ((CharacterId characterId, Action action) in _ongoingActions)
         {
@@ -89,7 +101,7 @@ public class GameActions
         }
     }
 
-    public async Task RemoveFinishedActionsAsync(GameState state)
+    async Task RemoveFinishedActionsAsync(GameState state)
     {
         List<CharacterId> toRemove = [];
         foreach ((CharacterId characterId, Action instance) in _ongoingActions)
@@ -118,8 +130,5 @@ public class GameActions
         }
     }
 
-    public void OnTickEnd(GameState state) => _availableActions.Clear();
-
-    public Action? GetQueuedAction(Character character) => _queuedActions.GetValueOrDefault(character.Id);
-    public Action? GetOngoingAction(Character character) => _ongoingActions.GetValueOrDefault(character.Id);
+    void OnTickEnd(GameState state) => _availableActions.Clear();
 }

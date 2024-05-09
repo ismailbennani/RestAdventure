@@ -17,11 +17,7 @@ public class GameSimulation
         state.Tick++;
 
         await state.Combats.ResolveCombatsAsync(state);
-
-        await state.Actions.StartQueuedActionsAsync(state);
-        await state.Actions.TickOngoingActionsAsync(state);
-        await state.Actions.RemoveFinishedActionsAsync(state);
-        state.Actions.OnTickEnd(state);
+        await state.Actions.TickAsync(state);
 
 
         await _publisher.Publish(new GameTick { GameState = state });
