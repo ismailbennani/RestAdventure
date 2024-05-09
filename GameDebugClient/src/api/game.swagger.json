@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0-alpha.0.156+772719e5e07249efc60eca7e46a17fb029d1107f"
+    "version": "0.0.0-alpha.0.160+b48117b22855c5db219ae45f9d091ddc66acb8e4"
   },
   "servers": [
     {
@@ -72,7 +72,7 @@
         ]
       }
     },
-    "/game/team/characters/{characterGuid}/combats/in-preparation/{combatGuid}/join/{side}": {
+    "/game/team/characters/{characterGuid}/combats/in-preparation/{combatGuid}/{side}/join": {
       "post": {
         "tags": [
           "Combats"
@@ -110,6 +110,88 @@
             "x-position": 3
           }
         ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ]
+      }
+    },
+    "/game/team/characters/{characterGuid}/combats/in-preparation/{combatGuid}/{side}/options": {
+      "post": {
+        "tags": [
+          "Combats"
+        ],
+        "summary": "Set combat in preparation options",
+        "operationId": "Combats_SetCombatInPreparationOptions",
+        "parameters": [
+          {
+            "name": "characterGuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "combatGuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 2
+          },
+          {
+            "name": "side",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CombatSide"
+            },
+            "x-position": 3
+          }
+        ],
+        "requestBody": {
+          "x-name": "options",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CombatFormationOptions"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 4
+        },
         "responses": {
           "204": {
             "description": ""
@@ -857,6 +939,17 @@
             "x-position": 2
           }
         ],
+        "requestBody": {
+          "x-name": "options",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CombatFormationOptions"
+              }
+            }
+          },
+          "x-position": 3
+        },
         "responses": {
           "204": {
             "description": ""
@@ -1140,18 +1233,20 @@
             "minLength": 1
           },
           "attackers": {
-            "type": "array",
             "description": "The attackers in the combat instance\n            ",
-            "items": {
-              "$ref": "#/components/schemas/EntityMinimal"
-            }
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CombatFormationInPreparation"
+              }
+            ]
           },
           "defenders": {
-            "type": "array",
             "description": "The defenders in the combat instance\n            ",
-            "items": {
-              "$ref": "#/components/schemas/EntityMinimal"
-            }
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CombatFormationInPreparation"
+              }
+            ]
           },
           "canJoin": {
             "type": "boolean",
@@ -1161,6 +1256,32 @@
             "type": "string",
             "description": "Why cannot the character join the combat\n            ",
             "minLength": 1
+          }
+        }
+      },
+      "CombatFormationInPreparation": {
+        "type": "object",
+        "description": "Combat formation\n            ",
+        "additionalProperties": false,
+        "required": [
+          "entities",
+          "options"
+        ],
+        "properties": {
+          "entities": {
+            "type": "array",
+            "description": "The entities in the formation\n            ",
+            "items": {
+              "$ref": "#/components/schemas/EntityMinimal"
+            }
+          },
+          "options": {
+            "description": "The options of the formation\n            ",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CombatFormationOptions"
+              }
+            ]
           }
         }
       },
@@ -1185,6 +1306,36 @@
             "minLength": 1
           }
         }
+      },
+      "CombatFormationOptions": {
+        "type": "object",
+        "description": "Combat formation options\n            ",
+        "additionalProperties": false,
+        "required": [
+          "accessibility"
+        ],
+        "properties": {
+          "accessibility": {
+            "description": "The accessibility of the formation\n            ",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CombatFormationAccessibility"
+              }
+            ]
+          }
+        }
+      },
+      "CombatFormationAccessibility": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "Everyone",
+          "TeamOnly"
+        ],
+        "enum": [
+          "everyone",
+          "teamOnly"
+        ]
       },
       "ProblemDetails": {
         "type": "object",

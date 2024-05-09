@@ -25,7 +25,7 @@ public class GameState : IDisposable
         History = new GameHistory();
         Players = new GamePlayers(publisher);
         Entities = new GameEntities(publisher);
-        Actions = new GameActions(this, [new PveCombatActionsProvider(loggerFactory), new HarvestActionsProvider(), new MoveActionsProvider()]);
+        Actions = new GameActions(this, [new PveCombatActionsProvider(), new HarvestActionsProvider(), new MoveActionsProvider()]);
         Combats = new GameCombats(this);
     }
 

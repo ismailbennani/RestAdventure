@@ -1,4 +1,5 @@
-﻿using RestAdventure.Kernel.Security;
+﻿using RestAdventure.Core.Entities;
+using RestAdventure.Kernel.Security;
 
 namespace RestAdventure.Core.Players;
 
@@ -13,6 +14,7 @@ public class Player : IDisposable
     }
 
     public User User { get; }
+    public Team Team { get; } = new();
     public PlayerKnowledge Knowledge { get; } = new();
 
     public override string ToString() => User.Name;

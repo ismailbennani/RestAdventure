@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using RestAdventure.Core.Combat.Notifications;
+using RestAdventure.Core.Combat.Options;
 using RestAdventure.Core.Entities.Characters;
 using RestAdventure.Core.Entities.Monsters;
 using RestAdventure.Core.Items;
@@ -17,6 +18,14 @@ public class CombatSimulationWorkProvider : SimulationWorkProvider
     {
         _state = state;
         _logger = state.LoggerFactory.CreateLogger<CombatSimulationWorkProvider>();
+    }
+
+    public override IEnumerable<GameSimulation.Work> PreTick()
+    {
+        foreach (CombatInPreparation combat in _state.Combats.InPreparation)
+        {
+            yield return new GameSimulation.Work(combat.Id.Guid, () => EnforceCombatOptionsAsync(combat));
+        }
     }
 
     public override IEnumerable<GameSimulation.Work> Early()
@@ -51,6 +60,13 @@ public class CombatSimulationWorkProvider : SimulationWorkProvider
     Task TickCombatsInPreparationAsync(CombatInPreparation combatInPreparation)
     {
         combatInPreparation.Turn++;
+        return Task.CompletedTask;
+    }
+
+    Task EnforceCombatOptionsAsync(CombatInPreparation combatInPreparation)
+    {
+        KickPlayersIfNecessary(combatInPreparation.Attackers);
+        KickPlayersIfNecessary(combatInPreparation.Defenders);
         return Task.CompletedTask;
     }
 
@@ -105,5 +121,21 @@ public class CombatSimulationWorkProvider : SimulationWorkProvider
         await _state.Publisher.Publish(new CombatEnded { Combat = combat });
 
         _state.Combats.RemoveCombat(combat);
+    }
+
+    void KickPlayersIfNecessary(CombatFormationInPreparation formations)
+    {
+        switch (formations.Options.Accessibility)
+        {
+            case CombatFormationAccessibility.TeamOnly:
+                foreach (IGameEntityWithCombatStatistics entityInCombat in formations.Entities.ToArray())
+                {
+                    if (entityInCombat.Team != formations.Owner.Team)
+                    {
+                        formations.Remove(entityInCombat);
+                    }
+                }
+                break;
+        }
     }
 }

@@ -10,8 +10,11 @@ public record GameEntityId(Guid Guid);
 /// </remarks>
 public abstract class GameEntity : IEquatable<GameEntity>, IGameEntity
 {
-    public GameEntity(GameEntityId id, string name, Location location)
+    public GameEntity(GameEntityId id, string name, Location location) : this(null, id, name, location) { }
+
+    public GameEntity(Team? team, GameEntityId id, string name, Location location)
     {
+        Team = team;
         Id = id;
         Name = name;
         Location = location;
@@ -19,6 +22,9 @@ public abstract class GameEntity : IEquatable<GameEntity>, IGameEntity
 
     /// <inheritdoc />
     public GameEntityId Id { get; }
+
+    /// <inheritdoc />
+    public Team? Team { get; }
 
     /// <inheritdoc />
     public string Name { get; set; }
@@ -83,7 +89,11 @@ public class EntityMovedEvent
 /// </summary>
 public abstract class GameEntity<TId> : GameEntity where TId: GameEntityId
 {
-    public GameEntity(TId id, string name, Location location) : base(id, name, location)
+    public GameEntity(TId id, string name, Location location) : this(null, id, name, location)
+    {
+    }
+
+    protected GameEntity(Team? team, TId id, string name, Location location) : base(team, id, name, location)
     {
         Id = id;
     }

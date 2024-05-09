@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using RestAdventure.Core.Combat;
-using RestAdventure.Game.Apis.Common.Dtos.Entities;
 using RestAdventure.Kernel.Errors;
 
 namespace RestAdventure.Game.Apis.Common.Dtos.Combats;
@@ -20,13 +19,13 @@ public class CombatInPreparationDto
     ///     The attackers in the combat instance
     /// </summary>
     [Required]
-    public required IReadOnlyList<EntityMinimalDto> Attackers { get; init; }
+    public required CombatFormationInPreparationDto Attackers { get; init; }
 
     /// <summary>
     ///     The defenders in the combat instance
     /// </summary>
     [Required]
-    public required IReadOnlyList<EntityMinimalDto> Defenders { get; init; }
+    public required CombatFormationInPreparationDto Defenders { get; init; }
 
     /// <summary>
     ///     Can the character join the combat
@@ -47,8 +46,8 @@ static class CombatInPreparationMappingExtensions
         new()
         {
             Id = combat.Id.Guid,
-            Attackers = combat.Attackers.Entities.Select(e => e.ToMinimalDto()).ToArray(),
-            Defenders = combat.Defenders.Entities.Select(e => e.ToMinimalDto()).ToArray(),
+            Attackers = combat.Attackers.ToDto(),
+            Defenders = combat.Defenders.ToDto(),
             CanJoin = canJoin.Success,
             WhyCannotJoin = canJoin.WhyNot
         };

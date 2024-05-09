@@ -1,4 +1,5 @@
-﻿using RestAdventure.Kernel.Errors;
+﻿using RestAdventure.Core.Combat.Options;
+using RestAdventure.Kernel.Errors;
 
 namespace RestAdventure.Core.Combat;
 
@@ -7,15 +8,18 @@ public class CombatFormationInPreparation
     readonly GameSettings _gameSettings;
     List<IGameEntityWithCombatStatistics> _entities;
 
-    public CombatFormationInPreparation(IReadOnlyList<IGameEntityWithCombatStatistics> entities, GameSettings gameSettings)
+    public CombatFormationInPreparation(IReadOnlyList<IGameEntityWithCombatStatistics> entities, CombatFormationOptions options, GameSettings gameSettings)
     {
-        _gameSettings = gameSettings;
         Owner = entities[0];
         _entities = entities.ToList();
         CombatEntityKind = Owner.CombatEntityKind;
+        Options = options;
+        _gameSettings = gameSettings;
     }
 
     public IGameEntityWithCombatStatistics Owner { get; }
+
+    public CombatFormationOptions Options { get; private set; }
 
     /// <summary>
     ///     The characters in order
@@ -43,11 +47,27 @@ public class CombatFormationInPreparation
             return $"Cannot add entity of kind {entity.CombatEntityKind}";
         }
 
+        if (Options.Accessibility == CombatFormationAccessibility.TeamOnly && Owner.Team != entity.Team)
+        {
+            return "Team locked";
+        }
+
         if (_entities.Count >= MaxCount)
         {
             return "Team full";
         }
 
+        return true;
+    }
+
+    public Maybe SetOptions(IGameEntityWithCombatStatistics entity, CombatFormationOptions options)
+    {
+        if (entity != Owner)
+        {
+            return "Only the owner can change the options";
+        }
+
+        Options = options;
         return true;
     }
 

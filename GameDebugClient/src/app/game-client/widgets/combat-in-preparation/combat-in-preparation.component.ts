@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { CombatInPreparation } from '../../../../api/game-api-client.generated';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { CombatFormationAccessibility, CombatInPreparation, EntityMinimal } from '../../../../api/game-api-client.generated';
 import { ProgressionBarComponent } from '../../../common/spinner/progression-bar/progression-bar.component';
 
 @Component({
@@ -11,5 +11,29 @@ import { ProgressionBarComponent } from '../../../common/spinner/progression-bar
   imports: [CommonModule, ProgressionBarComponent],
 })
 export class CombatInPreparationComponent {
-  @Input({ required: true }) combat: CombatInPreparation = null!;
+  @Input({ required: true })
+  public get combat(): CombatInPreparation {
+    return this._combat;
+  }
+  public set combat(value: CombatInPreparation) {
+    this._combat = value;
+    this.attackers = [...value.attackers.entities].reverse();
+    this.defenders = value.defenders.entities;
+  }
+  private _combat: CombatInPreparation = null!;
+
+  @Output() public changeAccessibility: EventEmitter<CombatFormationAccessibility> = new EventEmitter<CombatFormationAccessibility>();
+
+  protected updating: boolean = false;
+  protected attackers: EntityMinimal[] = [];
+  protected defenders: EntityMinimal[] = [];
+
+  protected accessiblityOptions: { id: string; value: CombatFormationAccessibility; displayValue: string }[] = [
+    { id: 'everyone', value: CombatFormationAccessibility.Everyone, displayValue: 'Everyone' },
+    { id: 'team-only', value: CombatFormationAccessibility.TeamOnly, displayValue: 'Team only' },
+  ];
+
+  setAccessibility(accessibility: CombatFormationAccessibility) {
+    this.changeAccessibility.next(accessibility);
+  }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using Microsoft.Extensions.Logging;
 using RestAdventure.Core.Combat.Notifications;
+using RestAdventure.Core.Combat.Options;
 using RestAdventure.Core.Extensions;
 using RestAdventure.Core.Maps.Locations;
 using RestAdventure.Kernel.Errors;
@@ -41,7 +42,9 @@ public class GameCombats : IEnumerable<CombatInstance>, IDisposable
 
     public async Task<Maybe<CombatInPreparation>> StartCombatPreparationAsync(
         IReadOnlyList<IGameEntityWithCombatStatistics> attackers,
-        IReadOnlyList<IGameEntityWithCombatStatistics> defenders
+        CombatFormationOptions attackersOptions,
+        IReadOnlyList<IGameEntityWithCombatStatistics> defenders,
+        CombatFormationOptions defendersOptions
     )
     {
         Maybe canStartCombat = CanStartCombat(attackers, defenders);
@@ -50,7 +53,7 @@ public class GameCombats : IEnumerable<CombatInstance>, IDisposable
             return canStartCombat.WhyNot;
         }
 
-        CombatInPreparation combatInPreparation = new(attackers, defenders, _settings);
+        CombatInPreparation combatInPreparation = new(attackers, attackersOptions, defenders, defendersOptions, _settings);
         _combatsInPreparation[combatInPreparation.Id] = combatInPreparation;
 
         await _state.Publisher.Publish(new CombatPreparationStarted { Combat = combatInPreparation });

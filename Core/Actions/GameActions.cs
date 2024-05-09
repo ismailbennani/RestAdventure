@@ -32,7 +32,7 @@ public class GameActions
         Maybe canPerform = action.CanPerform(_state, character);
         if (!canPerform.Success)
         {
-            return $"Character {character} cannot perform action {action}: {canPerform.WhyNot}";
+            return canPerform.WhyNot;
         }
 
         _queuedActions[character.Id] = action;

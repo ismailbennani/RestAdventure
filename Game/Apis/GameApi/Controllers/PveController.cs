@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using RestAdventure.Core;
+using RestAdventure.Core.Combat;
 using RestAdventure.Core.Combat.Pve;
 using RestAdventure.Core.Entities.Characters;
 using RestAdventure.Core.Players;
+using RestAdventure.Game.Apis.Common.Dtos.Combats;
 using RestAdventure.Game.Apis.Common.Dtos.Monsters;
 using RestAdventure.Game.Authentication;
 using RestAdventure.Kernel.Errors;
@@ -76,7 +78,7 @@ public class PveController : GameApiController
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
-    public ActionResult AttackMonsters(Guid characterGuid, Guid groupId)
+    public ActionResult AttackMonsters(Guid characterGuid, Guid groupId, CombatFormationOptionsDto? options = null)
     {
         GameState state = _gameService.RequireGameState();
         Player player = ControllerContext.RequirePlayer(state);
@@ -89,10 +91,15 @@ public class PveController : GameApiController
             return BadRequest();
         }
 
-        PveCombatAction? action = state.Actions.GetAvailableActions(character).OfType<PveCombatAction>().SingleOrDefault(a => a.Defenders.First().Id.Guid == groupId);
+        PveCombatAction? action = state.Actions.GetAvailableActions(character).OfType<PveCombatAction>().SingleOrDefault(a => a.Defenders[0].Id.Guid == groupId);
         if (action == null)
         {
             return NotFound();
+        }
+
+        if (options != null)
+        {
+            action.SetOptions(CombatSide.Attackers, options.ToBusiness());
         }
 
         state.Actions.QueueAction(character, action);

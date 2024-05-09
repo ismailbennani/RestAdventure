@@ -3,16 +3,39 @@
     <h6>Preparation...</h6>
   </div>
   <div class="row">
-    <div class="col-lg-5 d-flex gap-2">
-      @for (entity of combat.attackers; track entity.id) {
-        <ng-container [ngTemplateOutlet]="entityTpl" [ngTemplateOutletContext]="{ entity }"></ng-container>
-      }
+    <label class="col-sm-2 col-form-label">Accessibility</label>
+    <div class="col">
+      <div class="input-group mb-3">
+        @for (accessibilityOption of accessiblityOptions; track accessibilityOption.id) {
+          <button
+            class="btn"
+            [ngClass]="combat.attackers.options.accessibility === accessibilityOption.value ? 'btn-secondary' : 'btn-outline-secondary'"
+            (click)="setAccessibility(accessibilityOption.value)"
+          >
+            {{ accessibilityOption.displayValue }}
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+  <hr />
+  <div class="row">
+    <div class="col-lg-5">
+      <h6 class="text-center">Attackers</h6>
+      <div class="d-flex gap-2">
+        @for (entity of attackers; track entity.id) {
+          <ng-container [ngTemplateOutlet]="entityTpl" [ngTemplateOutletContext]="{ entity }"></ng-container>
+        }
+      </div>
     </div>
     <div class="col"></div>
-    <div class="col-lg-5 d-flex gap-2">
-      @for (entity of combat.defenders; track entity.id) {
-        <ng-container [ngTemplateOutlet]="entityTpl" [ngTemplateOutletContext]="{ entity }"></ng-container>
-      }
+    <div class="col-lg-5">
+      <h6 class="text-center">Defenders</h6>
+      <div class="d-flex gap-2">
+        @for (entity of defenders; track entity.id) {
+          <ng-container [ngTemplateOutlet]="entityTpl" [ngTemplateOutletContext]="{ entity }"></ng-container>
+        }
+      </div>
     </div>
   </div>
 </div>

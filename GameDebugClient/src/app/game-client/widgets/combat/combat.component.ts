@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { CombatInstance } from '../../../../api/game-api-client.generated';
+import { CombatInstance, EntityMinimal } from '../../../../api/game-api-client.generated';
 import { ProgressionBarComponent } from '../../../common/spinner/progression-bar/progression-bar.component';
 
 @Component({
@@ -11,5 +11,17 @@ import { ProgressionBarComponent } from '../../../common/spinner/progression-bar
   imports: [CommonModule, ProgressionBarComponent],
 })
 export class CombatComponent {
-  @Input({ required: true }) combat: CombatInstance = null!;
+  @Input({ required: true })
+  public get combat(): CombatInstance {
+    return this._combat;
+  }
+  public set combat(value: CombatInstance) {
+    this._combat = value;
+    this.attackers = [...value.attackers].reverse();
+    this.defenders = value.defenders;
+  }
+  private _combat: CombatInstance = null!;
+
+  protected attackers: EntityMinimal[] = [];
+  protected defenders: EntityMinimal[] = [];
 }

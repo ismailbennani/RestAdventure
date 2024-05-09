@@ -7,6 +7,7 @@ using RestAdventure.Core.Entities.Characters;
 using RestAdventure.Core.Players;
 using RestAdventure.Game.Apis.Common.Dtos.Combats;
 using RestAdventure.Game.Authentication;
+using RestAdventure.Kernel.Errors;
 
 namespace RestAdventure.Game.Apis.GameApi.Controllers;
 
@@ -55,7 +56,7 @@ public class CombatsController : GameApiController
     /// <summary>
     ///     Join combat in preparation
     /// </summary>
-    [HttpPost("in-preparation/{combatGuid:guid}/join/{side}")]
+    [HttpPost("in-preparation/{combatGuid:guid}/{side}/join")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -79,8 +80,44 @@ public class CombatsController : GameApiController
             return NotFound();
         }
 
-        PveCombatAction action = new(combatInPreparation, _loggerFactory.CreateLogger<PveCombatAction>());
+        PveCombatAction action = new(combatInPreparation);
         state.Actions.QueueAction(character, action);
+
+        return NoContent();
+    }
+
+    /// <summary>
+    ///     Set combat in preparation options
+    /// </summary>
+    [HttpPost("in-preparation/{combatGuid:guid}/{side}/options")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    public ActionResult SetCombatInPreparationOptions(Guid characterGuid, Guid combatGuid, CombatSide side, CombatFormationOptionsDto options)
+    {
+        GameState state = _gameService.RequireGameState();
+        Player player = ControllerContext.RequirePlayer(state);
+
+        CharacterId characterId = new(characterGuid);
+        Character? character = state.Entities.Get<Character>(characterId);
+
+        if (character == null || character.Player != player)
+        {
+            return BadRequest();
+        }
+
+        CombatInstanceId combatId = new(combatGuid);
+        CombatInPreparation? combatInPreparation = state.Combats.GetCombatInPreparation(combatId);
+        if (combatInPreparation == null || combatInPreparation.Location != character.Location)
+        {
+            return NotFound();
+        }
+
+        Maybe performed = combatInPreparation.GetTeam(side).SetOptions(character, options.ToBusiness());
+        if (!performed.Success)
+        {
+            return Problem(performed.WhyNot, statusCode: StatusCodes.Status400BadRequest);
+        }
 
         return NoContent();
     }

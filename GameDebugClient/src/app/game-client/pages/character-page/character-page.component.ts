@@ -5,6 +5,8 @@ import { ReplaySubject, combineLatest, forkJoin, map, of, switchMap, tap } from 
 import { LocationMinimal } from '../../../../api/admin-api-client.generated';
 import {
   Action,
+  CombatFormationAccessibility,
+  CombatFormationOptions,
   CombatInPreparation,
   CombatInstance,
   CombatSide,
@@ -177,6 +179,18 @@ export class CharacterPageComponent implements OnInit {
     return this.character?.ongoingAction && this.isCombatAction(this.character.ongoingAction, combat);
   }
 
+  changeAccessibility(combat: CombatInPreparation, accessibility: CombatFormationAccessibility) {
+    if (!this.character) {
+      return;
+    }
+
+    const newOptions = new CombatFormationOptions({ ...combat.attackers.options, accessibility: accessibility });
+    this.combatsApiClient
+      .setCombatInPreparationOptions(this.character.id, combat.id, CombatSide.Attackers, newOptions)
+      .pipe(switchMap(() => this.gameService.refreshNow(true)))
+      .subscribe();
+  }
+
   private isCombatAction(action: Action, combat: CombatInPreparation | CombatInstance) {
     return action instanceof PveCombatAction && action.combatId === combat.id;
   }
@@ -204,7 +218,7 @@ export class CharacterPageComponent implements OnInit {
     }
 
     const combatInPreparationInvolvingCharacter = this.combatsInPreparation.find(
-      c => c.attackers.some(e => e.id === this.characterId) || c.defenders.some(e => e.id === this.characterId),
+      c => c.attackers.entities.some(e => e.id === this.characterId) || c.defenders.entities.some(e => e.id === this.characterId),
     );
     if (combatInPreparationInvolvingCharacter) {
       this.selectCombatInPreparation(combatInPreparationInvolvingCharacter);

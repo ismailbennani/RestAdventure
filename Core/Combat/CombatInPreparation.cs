@@ -1,14 +1,21 @@
-﻿using RestAdventure.Core.Maps.Locations;
+﻿using RestAdventure.Core.Combat.Options;
+using RestAdventure.Core.Maps.Locations;
 
 namespace RestAdventure.Core.Combat;
 
 public class CombatInPreparation
 {
-    internal CombatInPreparation(IReadOnlyList<IGameEntityWithCombatStatistics> attackers, IReadOnlyList<IGameEntityWithCombatStatistics> defenders, GameSettings settings)
+    internal CombatInPreparation(
+        IReadOnlyList<IGameEntityWithCombatStatistics> attackers,
+        CombatFormationOptions attackersOptions,
+        IReadOnlyList<IGameEntityWithCombatStatistics> defenders,
+        CombatFormationOptions defendersOptions,
+        GameSettings settings
+    )
     {
         Location = attackers[0].Location;
-        Attackers = new CombatFormationInPreparation(attackers, settings);
-        Defenders = new CombatFormationInPreparation(defenders, settings);
+        Attackers = new CombatFormationInPreparation(attackers, attackersOptions, settings);
+        Defenders = new CombatFormationInPreparation(defenders, defendersOptions, settings);
         Settings = settings;
     }
 

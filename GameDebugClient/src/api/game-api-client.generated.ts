@@ -105,7 +105,7 @@ export class CombatsApiClient {
      * Join combat in preparation
      */
     joinCombatInPreparation(characterGuid: string, combatGuid: string, side: CombatSide): Observable<void> {
-        let url_ = this.baseUrl + "/game/team/characters/{characterGuid}/combats/in-preparation/{combatGuid}/join/{side}";
+        let url_ = this.baseUrl + "/game/team/characters/{characterGuid}/combats/in-preparation/{combatGuid}/{side}/join";
         if (characterGuid === undefined || characterGuid === null)
             throw new Error("The parameter 'characterGuid' must be defined.");
         url_ = url_.replace("{characterGuid}", encodeURIComponent("" + characterGuid));
@@ -139,6 +139,80 @@ export class CombatsApiClient {
     }
 
     protected processJoinCombatInPreparation(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+            }));
+        } else if (status === 404) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ProblemDetails.fromJS(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * Set combat in preparation options
+     */
+    setCombatInPreparationOptions(characterGuid: string, combatGuid: string, side: CombatSide, options: CombatFormationOptions): Observable<void> {
+        let url_ = this.baseUrl + "/game/team/characters/{characterGuid}/combats/in-preparation/{combatGuid}/{side}/options";
+        if (characterGuid === undefined || characterGuid === null)
+            throw new Error("The parameter 'characterGuid' must be defined.");
+        url_ = url_.replace("{characterGuid}", encodeURIComponent("" + characterGuid));
+        if (combatGuid === undefined || combatGuid === null)
+            throw new Error("The parameter 'combatGuid' must be defined.");
+        url_ = url_.replace("{combatGuid}", encodeURIComponent("" + combatGuid));
+        if (side === undefined || side === null)
+            throw new Error("The parameter 'side' must be defined.");
+        url_ = url_.replace("{side}", encodeURIComponent("" + side));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(options);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSetCombatInPreparationOptions(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSetCombatInPreparationOptions(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processSetCombatInPreparationOptions(response: HttpResponseBase): Observable<void> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1136,8 +1210,9 @@ export class PveApiClient {
 
     /**
      * Attack monsters
+     * @param options (optional) 
      */
-    attackMonsters(characterGuid: string, groupId: string): Observable<void> {
+    attackMonsters(characterGuid: string, groupId: string, options?: CombatFormationOptions | undefined): Observable<void> {
         let url_ = this.baseUrl + "/game/team/characters/{characterGuid}/pve/monsters/{groupId}";
         if (characterGuid === undefined || characterGuid === null)
             throw new Error("The parameter 'characterGuid' must be defined.");
@@ -1147,10 +1222,14 @@ export class PveApiClient {
         url_ = url_.replace("{groupId}", encodeURIComponent("" + groupId));
         url_ = url_.replace(/[?&]$/, "");
 
+        const content_ = JSON.stringify(options);
+
         let options_ : any = {
+            body: content_,
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Content-Type": "application/json",
             })
         };
 
@@ -1535,10 +1614,10 @@ export class CombatInPreparation implements ICombatInPreparation {
     id!: string;
     /** The attackers in the combat instance
              */
-    attackers!: EntityMinimal[];
+    attackers!: CombatFormationInPreparation;
     /** The defenders in the combat instance
              */
-    defenders!: EntityMinimal[];
+    defenders!: CombatFormationInPreparation;
     /** Can the character join the combat
              */
     canJoin!: boolean;
@@ -1554,24 +1633,16 @@ export class CombatInPreparation implements ICombatInPreparation {
             }
         }
         if (!data) {
-            this.attackers = [];
-            this.defenders = [];
+            this.attackers = new CombatFormationInPreparation();
+            this.defenders = new CombatFormationInPreparation();
         }
     }
 
     init(_data?: any) {
         if (_data) {
             this.id = _data["id"];
-            if (Array.isArray(_data["attackers"])) {
-                this.attackers = [] as any;
-                for (let item of _data["attackers"])
-                    this.attackers!.push(EntityMinimal.fromJS(item));
-            }
-            if (Array.isArray(_data["defenders"])) {
-                this.defenders = [] as any;
-                for (let item of _data["defenders"])
-                    this.defenders!.push(EntityMinimal.fromJS(item));
-            }
+            this.attackers = _data["attackers"] ? CombatFormationInPreparation.fromJS(_data["attackers"]) : new CombatFormationInPreparation();
+            this.defenders = _data["defenders"] ? CombatFormationInPreparation.fromJS(_data["defenders"]) : new CombatFormationInPreparation();
             this.canJoin = _data["canJoin"];
             this.whyCannotJoin = _data["whyCannotJoin"];
         }
@@ -1587,16 +1658,8 @@ export class CombatInPreparation implements ICombatInPreparation {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
-        if (Array.isArray(this.attackers)) {
-            data["attackers"] = [];
-            for (let item of this.attackers)
-                data["attackers"].push(item.toJSON());
-        }
-        if (Array.isArray(this.defenders)) {
-            data["defenders"] = [];
-            for (let item of this.defenders)
-                data["defenders"].push(item.toJSON());
-        }
+        data["attackers"] = this.attackers ? this.attackers.toJSON() : <any>undefined;
+        data["defenders"] = this.defenders ? this.defenders.toJSON() : <any>undefined;
         data["canJoin"] = this.canJoin;
         data["whyCannotJoin"] = this.whyCannotJoin;
         return data;
@@ -1610,16 +1673,78 @@ export interface ICombatInPreparation {
     id: string;
     /** The attackers in the combat instance
              */
-    attackers: EntityMinimal[];
+    attackers: CombatFormationInPreparation;
     /** The defenders in the combat instance
              */
-    defenders: EntityMinimal[];
+    defenders: CombatFormationInPreparation;
     /** Can the character join the combat
              */
     canJoin: boolean;
     /** Why cannot the character join the combat
              */
     whyCannotJoin: string;
+}
+
+/** Combat formation */
+export class CombatFormationInPreparation implements ICombatFormationInPreparation {
+    /** The entities in the formation
+             */
+    entities!: EntityMinimal[];
+    /** The options of the formation
+             */
+    options!: CombatFormationOptions;
+
+    constructor(data?: ICombatFormationInPreparation) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.entities = [];
+            this.options = new CombatFormationOptions();
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["entities"])) {
+                this.entities = [] as any;
+                for (let item of _data["entities"])
+                    this.entities!.push(EntityMinimal.fromJS(item));
+            }
+            this.options = _data["options"] ? CombatFormationOptions.fromJS(_data["options"]) : new CombatFormationOptions();
+        }
+    }
+
+    static fromJS(data: any): CombatFormationInPreparation {
+        data = typeof data === 'object' ? data : {};
+        let result = new CombatFormationInPreparation();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.entities)) {
+            data["entities"] = [];
+            for (let item of this.entities)
+                data["entities"].push(item.toJSON());
+        }
+        data["options"] = this.options ? this.options.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+/** Combat formation */
+export interface ICombatFormationInPreparation {
+    /** The entities in the formation
+             */
+    entities: EntityMinimal[];
+    /** The options of the formation
+             */
+    options: CombatFormationOptions;
 }
 
 /** Entity (minimal) */
@@ -1670,6 +1795,53 @@ export interface IEntityMinimal {
     /** The name of the entity
              */
     name: string;
+}
+
+/** Combat formation options */
+export class CombatFormationOptions implements ICombatFormationOptions {
+    /** The accessibility of the formation
+             */
+    accessibility!: CombatFormationAccessibility;
+
+    constructor(data?: ICombatFormationOptions) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.accessibility = _data["accessibility"];
+        }
+    }
+
+    static fromJS(data: any): CombatFormationOptions {
+        data = typeof data === 'object' ? data : {};
+        let result = new CombatFormationOptions();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["accessibility"] = this.accessibility;
+        return data;
+    }
+}
+
+/** Combat formation options */
+export interface ICombatFormationOptions {
+    /** The accessibility of the formation
+             */
+    accessibility: CombatFormationAccessibility;
+}
+
+export enum CombatFormationAccessibility {
+    Everyone = "everyone",
+    TeamOnly = "teamOnly",
 }
 
 export class ProblemDetails implements IProblemDetails {

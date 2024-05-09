@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using RestAdventure.Core.Combat.Options;
 using RestAdventure.Core.Entities.Characters;
 using RestAdventure.Core.Entities.Monsters;
 using RestAdventure.Kernel.Errors;
@@ -8,33 +9,58 @@ namespace RestAdventure.Core.Combat.Pve;
 
 public class PveCombatAction : Action
 {
+    CombatFormationOptions? _attackersOptions;
+    CombatFormationOptions? _defendersOptions;
     IReadOnlyList<MonsterInstance>? _defenders;
-    readonly ILogger<PveCombatAction> _logger;
 
-    public PveCombatAction(IReadOnlyList<MonsterInstance> defenders, ILogger<PveCombatAction> logger) : base("combat")
+    public PveCombatAction(IReadOnlyList<MonsterInstance> defenders) : base("combat")
     {
         _defenders = defenders;
-        _logger = logger;
 
     }
 
-    public PveCombatAction(CombatInPreparation combatInPreparation, ILogger<PveCombatAction> logger) : base("combat")
+    public PveCombatAction(CombatInPreparation combatInPreparation) : base("combat")
     {
         CombatInPreparation = combatInPreparation;
-        _logger = logger;
     }
 
     public IReadOnlyList<Character> Attackers =>
         CombatInPreparation?.Attackers.Entities.OfType<Character>().ToArray() ?? Combat?.Attackers.Entities.OfType<Character>().ToArray() ?? Array.Empty<Character>();
+
+    public CombatFormationOptions AttackersOptions => CombatInPreparation?.Attackers.Options ?? _attackersOptions ?? CombatFormationOptions.Default;
 
     public IReadOnlyList<MonsterInstance> Defenders =>
         _defenders
         ?? CombatInPreparation?.Defenders.Entities.OfType<MonsterInstance>().ToArray()
         ?? Combat?.Defenders.Entities.OfType<MonsterInstance>().ToArray() ?? Array.Empty<MonsterInstance>();
 
+    public CombatFormationOptions DefendersOptions => CombatInPreparation?.Defenders.Options ?? _attackersOptions ?? CombatFormationOptions.Default;
+
     public CombatInPreparation? CombatInPreparation { get; private set; }
     public CombatInstance? Combat { get; private set; }
+
     public bool Interrupt { get; private set; }
+
+    public Maybe SetOptions(CombatSide side, CombatFormationOptions options)
+    {
+        //FIXME: hard ot use
+
+        if (CombatInPreparation == null)
+        {
+            switch (side)
+            {
+                case CombatSide.Attackers:
+                    _attackersOptions = options;
+                    break;
+                case CombatSide.Defenders:
+                    _defendersOptions = options;
+                    break;
+            }
+            return true;
+        }
+
+        return "Combat is in preparation";
+    }
 
     protected override Maybe CanPerformInternal(GameState state, Character character)
     {
@@ -51,23 +77,36 @@ public class PveCombatAction : Action
         return "Internal error";
     }
 
-    public override bool IsOver(GameState state, Character character) => Interrupt || Combat is { Over: true };
+    public override bool IsOver(GameState state, Character character) =>
+        // interrupted
+        Interrupt
+        // character kicked from combat in preparation
+        || CombatInPreparation != null && !CombatInPreparation.Attackers.Entities.Contains(character) && !CombatInPreparation.Defenders.Entities.Contains(character)
+        // combat over
+        || Combat is { Over: true };
 
     protected override async Task OnStartAsync(GameState state, Character character)
     {
+        ILogger<PveCombatAction> logger = state.LoggerFactory.CreateLogger<PveCombatAction>();
+
         if (CombatInPreparation == null)
         {
             if (_defenders == null)
             {
-                _logger.LogError("Combat creation failed: no defenders");
+                logger.LogError("Combat creation failed: no defenders");
                 Interrupt = true;
                 return;
             }
 
-            Maybe<CombatInPreparation> combat = await state.Combats.StartCombatPreparationAsync([character], _defenders);
+            Maybe<CombatInPreparation> combat = await state.Combats.StartCombatPreparationAsync(
+                [character],
+                _attackersOptions ?? CombatFormationOptions.Default,
+                _defenders,
+                _defendersOptions ?? CombatFormationOptions.Default
+            );
             if (!combat.Success)
             {
-                _logger.LogError("Combat creation failed: {reason}", combat.WhyNot);
+                logger.LogError("Combat creation failed: {reason}", combat.WhyNot);
                 Interrupt = true;
                 return;
             }
@@ -86,7 +125,7 @@ public class PveCombatAction : Action
             if (!added.Success)
             {
                 Interrupt = true;
-                _logger.LogError("Join combat failed: {reason}", added.WhyNot);
+                logger.LogError("Join combat failed: {reason}", added.WhyNot);
             }
         }
     }
