@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0-alpha.0.162+abf6e112866cea5b30dac5f91f3ea843cb316bbc"
+    "version": "0.0.0-alpha.0.163+ab1bc761cf2dbd7fa53ec1b998f3a82f672edfac"
   },
   "servers": [
     {
@@ -2043,10 +2043,7 @@
             "job-gained-experience": "#/components/schemas/CharacterJobGainedExperienceHistoryEntry",
             "job-leveled-up": "#/components/schemas/CharacterJobLeveledUpHistoryEntry",
             "combat-preparation-started": "#/components/schemas/CharacterStartedCombatPreparationHistoryEntry",
-            "combat-preparation-canceled": "#/components/schemas/CharacterCombatInPreparationCanceledHistoryEntry",
             "combat-started": "#/components/schemas/CharacterCombatStartedHistoryEntry",
-            "attacked": "#/components/schemas/CharacterAttackedHistoryEntry",
-            "received-attack": "#/components/schemas/CharacterReceivedAttackHistoryEntry",
             "combat-ended": "#/components/schemas/CharacterCombatEndedHistoryEntry"
           }
         },
@@ -2467,77 +2464,6 @@
           }
         }
       },
-      "CharacterCombatInPreparationCanceledHistoryEntry": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/CharacterHistoryEntry"
-          },
-          {
-            "type": "object",
-            "description": "Character combat in preparation canceled\n            ",
-            "additionalProperties": false,
-            "required": [
-              "combatInstanceId",
-              "locationId",
-              "locationAreaId",
-              "locationAreaName",
-              "locationPositionX",
-              "locationPositionY",
-              "attackers",
-              "defenders"
-            ],
-            "properties": {
-              "combatInstanceId": {
-                "type": "string",
-                "description": "The unique ID of the combat instance\n            ",
-                "format": "guid",
-                "minLength": 1
-              },
-              "locationId": {
-                "type": "string",
-                "description": "The unique ID of the location of the combat\n            ",
-                "format": "guid",
-                "minLength": 1
-              },
-              "locationAreaId": {
-                "type": "string",
-                "description": "The unique ID of the area of the location of the combat\n            ",
-                "format": "guid",
-                "minLength": 1
-              },
-              "locationAreaName": {
-                "type": "string",
-                "description": "The name of the area of the location of the combat\n            ",
-                "minLength": 1
-              },
-              "locationPositionX": {
-                "type": "integer",
-                "description": "The X position of the location of the combat\n            ",
-                "format": "int32"
-              },
-              "locationPositionY": {
-                "type": "integer",
-                "description": "The Y position of the location of the combat\n            ",
-                "format": "int32"
-              },
-              "attackers": {
-                "type": "array",
-                "description": "The attackers of the combat\n            ",
-                "items": {
-                  "$ref": "#/components/schemas/CombatEntityInHistoryEntry"
-                }
-              },
-              "defenders": {
-                "type": "array",
-                "description": "The defenders of the combat\n            ",
-                "items": {
-                  "$ref": "#/components/schemas/CombatEntityInHistoryEntry"
-                }
-              }
-            }
-          }
-        ]
-      },
       "CharacterCombatStartedHistoryEntry": {
         "allOf": [
           {
@@ -2604,115 +2530,6 @@
                 "items": {
                   "$ref": "#/components/schemas/CombatEntityInHistoryEntry"
                 }
-              }
-            }
-          }
-        ]
-      },
-      "CharacterAttackedHistoryEntry": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/CharacterHistoryEntry"
-          },
-          {
-            "type": "object",
-            "description": "Character attacked history entry\n            ",
-            "additionalProperties": false,
-            "required": [
-              "attackDealt",
-              "attackReceived",
-              "targetId",
-              "targetName"
-            ],
-            "properties": {
-              "attackDealt": {
-                "description": "The attack dealt by the character\n            ",
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/EntityAttack"
-                  }
-                ]
-              },
-              "attackReceived": {
-                "description": "The attack received by the target\n            ",
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/EntityAttack"
-                  }
-                ]
-              },
-              "targetId": {
-                "type": "string",
-                "description": "The unique ID of the target receiving the attack\n            ",
-                "format": "guid",
-                "minLength": 1
-              },
-              "targetName": {
-                "type": "string",
-                "description": "The name of the target receiving the attack\n            ",
-                "minLength": 1
-              }
-            }
-          }
-        ]
-      },
-      "EntityAttack": {
-        "type": "object",
-        "description": "Entity attack\n            ",
-        "additionalProperties": false,
-        "required": [
-          "damage"
-        ],
-        "properties": {
-          "damage": {
-            "type": "integer",
-            "description": "The damage of the attack\n            ",
-            "format": "int32"
-          }
-        }
-      },
-      "CharacterReceivedAttackHistoryEntry": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/CharacterHistoryEntry"
-          },
-          {
-            "type": "object",
-            "description": "Character attacked history entry\n            ",
-            "additionalProperties": false,
-            "required": [
-              "attackDealt",
-              "attackReceived",
-              "attackerId",
-              "attackerName"
-            ],
-            "properties": {
-              "attackDealt": {
-                "description": "The attack dealt by the character\n            ",
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/EntityAttack"
-                  }
-                ]
-              },
-              "attackReceived": {
-                "description": "The attack received by the target\n            ",
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/EntityAttack"
-                  }
-                ]
-              },
-              "attackerId": {
-                "type": "string",
-                "description": "The unique ID of the target receiving the attack\n            ",
-                "format": "guid",
-                "minLength": 1
-              },
-              "attackerName": {
-                "type": "string",
-                "description": "The name of the target receiving the attack\n            ",
-                "minLength": 1
               }
             }
           }

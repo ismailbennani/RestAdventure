@@ -20,10 +20,7 @@ namespace RestAdventure.Game.Apis.Common.Dtos.History;
 [JsonDerivedType(typeof(CharacterJobGainedExperienceHistoryEntryDto), "job-gained-experience")]
 [JsonDerivedType(typeof(CharacterJobLeveledUpHistoryEntryDto), "job-leveled-up")]
 [JsonDerivedType(typeof(CharacterStartedCombatPreparationHistoryEntryDto), "combat-preparation-started")]
-[JsonDerivedType(typeof(CharacterCombatInPreparationCanceledHistoryEntryDto), "combat-preparation-canceled")]
 [JsonDerivedType(typeof(CharacterCombatStartedHistoryEntryDto), "combat-started")]
-[JsonDerivedType(typeof(CharacterAttackedHistoryEntryDto), "attacked")]
-[JsonDerivedType(typeof(CharacterReceivedAttackHistoryEntryDto), "received-attack")]
 [JsonDerivedType(typeof(CharacterCombatEndedHistoryEntryDto), "combat-ended")]
 public class CharacterHistoryEntryDto
 {
@@ -49,10 +46,7 @@ static class CharacterHistoryEntryMappingExtensions
             EntityJobGainedExperienceHistoryEntry entityJobGainedExperienceHistoryEntry => entityJobGainedExperienceHistoryEntry.ToDto(),
             EntityJobLeveledUpHistoryEntry entityJobLeveledUpHistoryEntry => entityJobLeveledUpHistoryEntry.ToDto(),
             CharacterStartedCombatPreparationHistoryEntry characterStartedCombatPreparationHistoryEntry => characterStartedCombatPreparationHistoryEntry.ToDto(),
-            CharacterCombatInPreparationCanceledHistoryEntry characterCombatInPreparationCanceledHistoryEntry => characterCombatInPreparationCanceledHistoryEntry.ToDto(),
             CharacterCombatStartedHistoryEntry characterCombatStartedHistoryEntry => characterCombatStartedHistoryEntry.ToDto(),
-            CharacterAttackedHistoryEntry characterAttackedHistoryEntry => characterAttackedHistoryEntry.ToDto(),
-            CharacterReceivedAttackHistoryEntry characterReceivedAttackHistoryEntry => characterReceivedAttackHistoryEntry.ToDto(),
             CharacterCombatEndedHistoryEntry characterCombatEndedHistoryEntry => characterCombatEndedHistoryEntry.ToDto(),
             _ => throw new ArgumentOutOfRangeException(nameof(entry))
         };

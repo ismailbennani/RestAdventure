@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Admin API",
-    "version": "0.0.0-alpha.0.162+abf6e112866cea5b30dac5f91f3ea843cb316bbc"
+    "version": "0.0.0-alpha.0.163+ab1bc761cf2dbd7fa53ec1b998f3a82f672edfac"
   },
   "servers": [
     {

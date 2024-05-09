@@ -4,9 +4,7 @@ import { ReplaySubject, combineLatest, map, switchMap, tap } from 'rxjs';
 import {
   ActionEndedHistoryEntry,
   ActionStartedHistoryEntry,
-  CharacterAttackedHistoryEntry,
   CharacterCombatEndedHistoryEntry,
-  CharacterCombatInPreparationCanceledHistoryEntry,
   CharacterCombatStartedHistoryEntry,
   CharacterCreatedHistoryEntry,
   CharacterDeletedHistoryEntry,
@@ -16,7 +14,6 @@ import {
   CharacterJobLeveledUpHistoryEntry,
   CharacterLearnedJobHistoryEntry,
   CharacterMoveLocationHistoryEntry,
-  CharacterReceivedAttackHistoryEntry,
   CharacterStartedCombatPreparationHistoryEntry,
   CharactersApiClient,
   CombatEntityInHistoryEntry,
@@ -133,30 +130,8 @@ export class CharacterHistoryComponent implements OnInit {
       return `Started combat preparation: ${entry.attackers.map(e => e.name).join(',')} v. ${entry.defenders.map(e => e.name).join(',')} at ${entry.locationAreaName} [${entry.locationPositionX}, ${entry.locationPositionY}]`;
     }
 
-    if (entry instanceof CharacterCombatInPreparationCanceledHistoryEntry) {
-      return `Combat preparation canceled`;
-    }
-
     if (entry instanceof CharacterCombatStartedHistoryEntry) {
       return `Started combat: ${entry.attackers.map(e => e.name).join(',')} v. ${entry.defenders.map(e => e.name).join(',')} at ${entry.locationAreaName} [${entry.locationPositionX}, ${entry.locationPositionY}]`;
-    }
-
-    if (entry instanceof CharacterAttackedHistoryEntry) {
-      const reduction = entry.attackReceived.damage - entry.attackDealt.damage;
-      if (reduction === 0) {
-        return `Attacked ${entry.targetName}: -${entry.attackReceived.damage} HP`;
-      } else {
-        return `Attacked ${entry.targetName}: -${entry.attackReceived.damage} HP (${entry.attackDealt.damage}-${reduction})`;
-      }
-    }
-
-    if (entry instanceof CharacterReceivedAttackHistoryEntry) {
-      const reduction = entry.attackReceived.damage - entry.attackDealt.damage;
-      if (reduction === 0) {
-        return `Attacked by ${entry.attackerName}: -${entry.attackReceived.damage} HP`;
-      } else {
-        return `Attacked by ${entry.attackerName}: -${entry.attackReceived.damage} HP (${entry.attackDealt.damage}-${reduction})`;
-      }
     }
 
     if (entry instanceof CharacterCombatEndedHistoryEntry) {
