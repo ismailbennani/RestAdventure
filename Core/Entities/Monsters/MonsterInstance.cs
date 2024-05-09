@@ -7,7 +7,11 @@ public record MonsterInstanceId(Guid Guid) : GameEntityId(Guid);
 
 public class MonsterInstance : GameEntity<MonsterInstanceId>, IGameEntityWithCombatStatistics
 {
-    public MonsterInstance(MonsterSpecies species, int level, Location location) : base(new MonsterInstanceId(Guid.NewGuid()), species.Name, location)
+    public MonsterInstance(MonsterSpecies species, int level, Location location) : this(null, species, level, location)
+    {
+    }
+
+    public MonsterInstance(Team? team, MonsterSpecies species, int level, Location location) : base(new MonsterInstanceId(Guid.NewGuid()), team, species.Name, location)
     {
         Species = species;
         Level = level;
