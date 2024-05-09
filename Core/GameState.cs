@@ -10,6 +10,7 @@ using RestAdventure.Core.Jobs;
 using RestAdventure.Core.Maps;
 using RestAdventure.Core.Players;
 using RestAdventure.Core.Simulation;
+using RestAdventure.Core.Spawners;
 
 namespace RestAdventure.Core;
 
@@ -21,7 +22,7 @@ public class GameState : IDisposable
         Publisher = publisher;
         LoggerFactory = loggerFactory;
         Settings = settings;
-        Simulation = new GameSimulation(this, [new CombatSimulationWorkProvider(this), new ActionSimulationWorkProvider(this)]);
+        Simulation = new GameSimulation(this, [new CombatSimulationWorkProvider(this), new ActionSimulationWorkProvider(this), new SpawnerSimulationWorkProvider(this)]);
         History = new GameHistory();
         Players = new GamePlayers(publisher);
         Entities = new GameEntities(publisher);

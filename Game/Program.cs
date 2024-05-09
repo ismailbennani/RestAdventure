@@ -153,13 +153,7 @@ async Task<GameState> LoadGameAsync(WebApplication app)
     Scenario scenario = exampleGameScenarioBuilder.Build();
 
     GameService gameService = app.Services.GetRequiredService<GameService>();
-    GameState state = gameService.NewGame(scenario, new GameSettings());
-
-    StaticObjectInstance appleTree1 = new(exampleGameScenarioBuilder.Gatherer.AppleTree, exampleGameScenarioBuilder.GeneratedMaps.Locations.First());
-    await state.Entities.AddAsync(appleTree1);
-
-    StaticObjectInstance appleTree2 = new(exampleGameScenarioBuilder.Gatherer.AppleTree, exampleGameScenarioBuilder.GeneratedMaps.Locations.First());
-    await state.Entities.AddAsync(appleTree2);
+    GameState state = await gameService.NewGameAsync(scenario, new GameSettings());
 
     StaticObjectInstance pearTree = new(exampleGameScenarioBuilder.Gatherer.PearTree, exampleGameScenarioBuilder.GeneratedMaps.Locations.First());
     await state.Entities.AddAsync(pearTree);

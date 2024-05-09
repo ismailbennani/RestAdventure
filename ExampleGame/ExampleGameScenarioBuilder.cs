@@ -10,6 +10,7 @@ using RestAdventure.Core.Jobs;
 using RestAdventure.Core.Maps.Areas;
 using RestAdventure.Core.Maps.Locations;
 using RestAdventure.Core.Plugins;
+using RestAdventure.Core.Spawners;
 
 namespace ExampleGame;
 
@@ -39,6 +40,8 @@ public class ExampleGameScenarioBuilder
         ExtractContent(scenario, Gatherer);
         ExtractContent(scenario, GeneratedMaps);
 
+        scenario.Spawners.Add(new StaticObjectRandomAreaSpawner(Gatherer.AppleTree, GeneratedMaps.Areas.First(), 5));
+
         return scenario;
     }
 
@@ -51,6 +54,7 @@ public class ExampleGameScenarioBuilder
         scenario.Areas.AddRange(ObjectExplorer.FindValuesOfType<T, MapArea>(instance).ToArray());
         scenario.Locations.AddRange(ObjectExplorer.FindValuesOfType<T, Location>(instance).ToArray());
         scenario.Connections.AddRange(ObjectExplorer.FindValuesOfType<T, (Location, Location)>(instance).ToArray());
+        scenario.Spawners.AddRange(ObjectExplorer.FindValuesOfType<T, Spawner>(instance).ToArray());
         scenario.MonsterFamilies.AddRange(ObjectExplorer.FindValuesOfType<T, MonsterFamily>(instance).ToArray());
         scenario.MonsterSpecies.AddRange(ObjectExplorer.FindValuesOfType<T, MonsterSpecies>(instance).ToArray());
     }

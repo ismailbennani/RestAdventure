@@ -38,7 +38,7 @@ public class GameContent
     public GameCharacters Characters { get; } = new();
 
     /// <summary>
-    ///     The mosnters of the game
+    ///     The monsters of the game
     /// </summary>
     public GameMonsters Monsters { get; } = new();
 }

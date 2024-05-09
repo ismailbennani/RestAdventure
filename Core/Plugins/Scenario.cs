@@ -6,6 +6,7 @@ using RestAdventure.Core.Items;
 using RestAdventure.Core.Jobs;
 using RestAdventure.Core.Maps.Areas;
 using RestAdventure.Core.Maps.Locations;
+using RestAdventure.Core.Spawners;
 
 namespace RestAdventure.Core.Plugins;
 
@@ -16,6 +17,7 @@ public class Scenario
     public List<MapArea> Areas { get; } = new();
     public List<Location> Locations { get; } = new();
     public List<(Location, Location)> Connections { get; } = new();
+    public List<Spawner> Spawners { get; } = new();
 
     public List<StaticObject> StaticObjects { get; } = new();
 
@@ -35,6 +37,7 @@ public class Scenario
         content.Maps.Areas.Register(Areas);
         content.Maps.Locations.Register(Locations);
         content.Maps.Locations.Register(Connections);
+        content.Maps.Spawners.Register(Spawners);
 
         content.StaticObjects.Register(StaticObjects);
 

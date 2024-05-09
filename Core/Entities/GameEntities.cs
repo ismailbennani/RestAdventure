@@ -1,14 +1,16 @@
-﻿using MediatR;
+﻿using System.Collections;
+using MediatR;
 using RestAdventure.Core.Entities.Notifications;
 using RestAdventure.Core.Extensions;
 using RestAdventure.Core.Items;
 using RestAdventure.Core.Jobs;
 using RestAdventure.Core.Jobs.Notifications;
+using RestAdventure.Core.Maps.Areas;
 using RestAdventure.Core.Maps.Locations;
 
 namespace RestAdventure.Core.Entities;
 
-public class GameEntities : IDisposable
+public class GameEntities : IEnumerable<IGameEntity>, IDisposable
 {
     readonly IPublisher _publisher;
     readonly Dictionary<GameEntityId, IGameEntity> _entities = [];
@@ -18,7 +20,8 @@ public class GameEntities : IDisposable
         _publisher = publisher;
     }
 
-    public IEnumerable<IGameEntity> All => _entities.Values;
+    public IEnumerator<IGameEntity> GetEnumerator() => _entities.Values.GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_entities.Values).GetEnumerator();
 
     public async Task AddAsync(IGameEntity entity)
     {
@@ -54,8 +57,10 @@ public class GameEntities : IDisposable
 
     public IGameEntity? Get(GameEntityId id) => _entities.SingleOrDefault(kv => kv.Key.Guid == id.Guid).Value;
     public TEntity? Get<TEntity>(GameEntityId id) where TEntity: class, IGameEntity => Get(id) as TEntity;
-    public IEnumerable<IGameEntity> AtLocation(Location location) => All.Where(e => e.Location == location);
-    public IEnumerable<TEntity> AtLocation<TEntity>(Location location) where TEntity: IGameEntity => All.OfType<TEntity>().Where(e => e.Location == location);
+    public IEnumerable<IGameEntity> AtLocation(Location location) => this.Where(e => e.Location == location);
+    public IEnumerable<TEntity> AtLocation<TEntity>(Location location) where TEntity: IGameEntity => this.OfType<TEntity>().Where(e => e.Location == location);
+    public IEnumerable<IGameEntity> InArea(MapArea mapArea) => this.Where(e => e.Location.Area == mapArea);
+    public IEnumerable<TEntity> InArea<TEntity>(MapArea mapArea) where TEntity: IGameEntity => this.OfType<TEntity>().Where(e => e.Location.Area == mapArea);
 
     void RegisterInventoryEvents(IGameEntityWithInventory entity) =>
         entity.Inventory.Changed += (_, args) => _publisher.PublishSync(

@@ -13,6 +13,8 @@ public class GameSimulation
         _providers = providers;
     }
 
+    public async Task StartAsync() => await ExecuteWorkAsync(p => p.Initialization());
+
     public async Task TickAsync()
     {
         _state.Tick++;

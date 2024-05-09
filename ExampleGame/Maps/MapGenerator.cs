@@ -15,7 +15,8 @@ public class MapGenerator
         {
             Areas = [area],
             Locations = [location1, location2],
-            Connections = [(location1, location2)]
+            Connections = [(location1, location2)],
+            Spawners = []
         };
     }
 }

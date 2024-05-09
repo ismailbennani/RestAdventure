@@ -22,10 +22,11 @@ public class GameService
         _logger = loggerFactory.CreateLogger<GameService>();
     }
 
-    public GameState NewGame(Scenario scenario, GameSettings settings)
+    public async Task<GameState> NewGameAsync(Scenario scenario, GameSettings settings)
     {
         _gameContent = scenario.ToGameContent();
         _gameState = new GameState(settings, _gameContent, _publisher, _loggerFactory);
+        await _gameState.Simulation.StartAsync();
 
         _logger.LogInformation("Game state has been initialized with settings: {settingsJson}.", JsonSerializer.Serialize(settings));
 
@@ -38,7 +39,7 @@ public class GameService
     {
         if (_gameState == null)
         {
-            throw new InvalidOperationException($"No game has been loaded. Please call {nameof(NewGame)} or {nameof(LoadGame)}.");
+            throw new InvalidOperationException($"No game has been loaded. Please call {nameof(NewGameAsync)} or {nameof(LoadGame)}.");
         }
 
         return _gameState;
@@ -48,7 +49,7 @@ public class GameService
     {
         if (_gameContent == null)
         {
-            throw new InvalidOperationException($"No game has been loaded. Please call {nameof(NewGame)} or {nameof(LoadGame)}.");
+            throw new InvalidOperationException($"No game has been loaded. Please call {nameof(NewGameAsync)} or {nameof(LoadGame)}.");
         }
 
         return _gameContent;
