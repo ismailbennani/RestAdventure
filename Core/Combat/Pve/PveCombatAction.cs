@@ -34,6 +34,7 @@ public class PveCombatAction : Action
 
     public CombatInPreparation? CombatInPreparation { get; private set; }
     public CombatInstance? Combat { get; private set; }
+    public bool Interrupt { get; private set; }
 
     protected override Maybe CanPerformInternal(GameState state, Character character)
     {
@@ -50,6 +51,8 @@ public class PveCombatAction : Action
         return "Internal error";
     }
 
+    public override bool IsOver(GameState state, Character character) => Interrupt || Combat is { Over: true };
+
     protected override async Task OnStartAsync(GameState state, Character character)
     {
         if (CombatInPreparation == null)
@@ -57,7 +60,7 @@ public class PveCombatAction : Action
             if (_defenders == null)
             {
                 _logger.LogError("Combat creation failed: no defenders");
-                Over = true;
+                Interrupt = true;
                 return;
             }
 
@@ -65,7 +68,7 @@ public class PveCombatAction : Action
             if (!combat.Success)
             {
                 _logger.LogError("Combat creation failed: {reason}", combat.WhyNot);
-                Over = true;
+                Interrupt = true;
                 return;
             }
 
@@ -82,7 +85,7 @@ public class PveCombatAction : Action
             Maybe added = CombatInPreparation.Attackers.Add(character);
             if (!added.Success)
             {
-                Over = true;
+                Interrupt = true;
                 _logger.LogError("Join combat failed: {reason}", added.WhyNot);
             }
         }
@@ -99,13 +102,8 @@ public class PveCombatAction : Action
             }
             else
             {
-                Over = true;
+                Interrupt = true;
             }
-        }
-
-        if (Combat is { Over: true })
-        {
-            Over = true;
         }
 
         return Task.CompletedTask;

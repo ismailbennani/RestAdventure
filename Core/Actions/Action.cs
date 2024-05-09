@@ -18,7 +18,6 @@ public abstract class Action : IEquatable<Action>
     public string Name { get; }
     public long StartTick { get; private set; }
     public bool Started { get; private set; }
-    public bool Over { get; protected set; }
     public bool Ended { get; private set; }
 
     /// <summary>
@@ -36,6 +35,8 @@ public abstract class Action : IEquatable<Action>
 
     /// <inheritdoc cref="CanPerform" />
     protected virtual Maybe CanPerformInternal(GameState state, Character character) => true;
+
+    public abstract bool IsOver(GameState state, Character character);
 
     public async Task StartAsync(GameState state, Character character)
     {

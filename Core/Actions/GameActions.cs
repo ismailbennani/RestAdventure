@@ -92,11 +92,6 @@ public class GameActions
             return "Could not find ongoing action for character";
         }
 
-        if (!action.Over)
-        {
-            return "Action is not over";
-        }
-
         await action.EndAsync(_state, character);
         _ongoingActions.Remove(character.Id);
 
