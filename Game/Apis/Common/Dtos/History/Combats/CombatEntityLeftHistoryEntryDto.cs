@@ -10,19 +10,19 @@ namespace RestAdventure.Game.Apis.Common.Dtos.History.Combats;
 public class CombatEntityLeftHistoryEntryDto : CombatHistoryEntryDto
 {
     /// <summary>
-    ///     The unique ID of the entity that joined the combat
+    ///     The unique ID of the entity that left the combat
     /// </summary>
     [Required]
     public required Guid EntityId { get; init; }
 
     /// <summary>
-    ///     The name of the entity that joined the combat
+    ///     The name of the entity that left the combat
     /// </summary>
     [Required]
     public required string EntityName { get; init; }
 
     /// <summary>
-    ///     The side of the combat joined by the entity
+    ///     The side of the combat left by the entity
     /// </summary>
     [Required]
     public required CombatSide Side { get; init; }

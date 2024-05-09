@@ -30,6 +30,7 @@ public abstract class CombatHistoryEntry : HistoryEntry
         LocationPositionY = combat.Location.PositionY;
         Attackers = combat.Attackers.Entities.Select(e => (e.Id, e.Name)).ToArray();
         Defenders = combat.Defenders.Entities.Select(e => (e.Id, e.Name)).ToArray();
+        Turn = combat.Turn;
     }
 
     public CombatInstanceId CombatInstanceId { get; }

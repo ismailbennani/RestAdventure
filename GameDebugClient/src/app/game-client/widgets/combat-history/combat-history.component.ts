@@ -3,6 +3,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { ReplaySubject, combineLatest, debounceTime, map, switchMap, tap } from 'rxjs';
 import {
   CombatEndedHistoryEntry,
+  CombatEntityAttackedHistoryEntry,
   CombatEntityJoinedHistoryEntry,
   CombatEntityLeftHistoryEntry,
   CombatHistoryEntry,
@@ -107,6 +108,10 @@ export class CombatHistoryComponent implements OnInit {
 
     if (entry instanceof CombatEntityLeftHistoryEntry) {
       return `${entry.entityName} left the ${entry.side}`;
+    }
+
+    if (entry instanceof CombatEntityAttackedHistoryEntry) {
+      return `${entry.attackerName} attacked ${entry.targetName}: -${entry.damage} HP`;
     }
 
     if (entry instanceof CombatEndedHistoryEntry) {

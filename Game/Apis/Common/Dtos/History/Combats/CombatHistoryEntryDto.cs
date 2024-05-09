@@ -12,6 +12,7 @@ namespace RestAdventure.Game.Apis.Common.Dtos.History.Combats;
 [JsonDerivedType(typeof(CombatStartedHistoryEntryDto), "started")]
 [JsonDerivedType(typeof(CombatEntityJoinedHistoryEntryDto), "entity-joined")]
 [JsonDerivedType(typeof(CombatEntityLeftHistoryEntryDto), "entity-left")]
+[JsonDerivedType(typeof(CombatEntityAttackedHistoryEntryDto), "entity-attacked")]
 [JsonDerivedType(typeof(CombatEndedHistoryEntryDto), "ended")]
 public class CombatHistoryEntryDto
 {
@@ -37,6 +38,7 @@ static class CombatHistoryEntryMappingExtensions
             CombatStartedHistoryEntry combatStartedHistoryEntry => combatStartedHistoryEntry.ToDto(),
             CombatEntityJoinedHistoryEntry combatEntityJoinedHistoryEntry => combatEntityJoinedHistoryEntry.ToDto(),
             CombatEntityLeftHistoryEntry combatEntityLeftHistoryEntry => combatEntityLeftHistoryEntry.ToDto(),
+            CombatEntityAttackedHistoryEntry combatEntityAttackedHistoryEntry => combatEntityAttackedHistoryEntry.ToDto(),
             CombatEndedHistoryEntry combatEndedHistoryEntry => combatEndedHistoryEntry.ToDto(),
             _ => new CombatHistoryEntryDto { Tick = entry.Tick, Turn = entry.Turn }
         };

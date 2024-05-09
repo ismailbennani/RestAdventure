@@ -177,7 +177,7 @@ export class CharacterPageComponent implements OnInit {
     return this.character?.plannedAction && this.isCombatAction(this.character.plannedAction, combat);
   }
 
-  isInCombat(combat: CombatInPreparation) {
+  isInCombat(combat: CombatInPreparation | CombatInstance) {
     return this.character?.ongoingAction && this.isCombatAction(this.character.ongoingAction, combat);
   }
 

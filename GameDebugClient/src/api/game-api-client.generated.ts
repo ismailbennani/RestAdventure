@@ -4639,6 +4639,11 @@ export class CombatHistoryEntry implements ICombatHistoryEntry {
             result.init(data);
             return result;
         }
+        if (data["$type"] === "entity-attacked") {
+            let result = new CombatEntityAttackedHistoryEntry();
+            result.init(data);
+            return result;
+        }
         if (data["$type"] === "ended") {
             let result = new CombatEndedHistoryEntry();
             result.init(data);
@@ -4786,13 +4791,13 @@ export interface ICombatEntityJoinedHistoryEntry extends ICombatHistoryEntry {
 
 /** Combat entity left history entry */
 export class CombatEntityLeftHistoryEntry extends CombatHistoryEntry implements ICombatEntityLeftHistoryEntry {
-    /** The unique ID of the entity that joined the combat
+    /** The unique ID of the entity that left the combat
              */
     entityId!: string;
-    /** The name of the entity that joined the combat
+    /** The name of the entity that left the combat
              */
     entityName!: string;
-    /** The side of the combat joined by the entity
+    /** The side of the combat left by the entity
              */
     side!: CombatSide;
 
@@ -4829,15 +4834,87 @@ export class CombatEntityLeftHistoryEntry extends CombatHistoryEntry implements 
 
 /** Combat entity left history entry */
 export interface ICombatEntityLeftHistoryEntry extends ICombatHistoryEntry {
-    /** The unique ID of the entity that joined the combat
+    /** The unique ID of the entity that left the combat
              */
     entityId: string;
-    /** The name of the entity that joined the combat
+    /** The name of the entity that left the combat
              */
     entityName: string;
-    /** The side of the combat joined by the entity
+    /** The side of the combat left by the entity
              */
     side: CombatSide;
+}
+
+/** Combat entity attacked history entry */
+export class CombatEntityAttackedHistoryEntry extends CombatHistoryEntry implements ICombatEntityAttackedHistoryEntry {
+    /** The unique ID of the entity that attacked
+             */
+    attackerId!: string;
+    /** The name of the entity that attacked
+             */
+    attackerName!: string;
+    /** The unique ID of the entity that was attacked
+             */
+    targetId!: string;
+    /** The name of the entity that was attacked
+             */
+    targetName!: string;
+    /** The damages dealt by the attacker to the target
+             */
+    damage!: number;
+
+    constructor(data?: ICombatEntityAttackedHistoryEntry) {
+        super(data);
+        this._discriminator = "entity-attacked";
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.attackerId = _data["attackerId"];
+            this.attackerName = _data["attackerName"];
+            this.targetId = _data["targetId"];
+            this.targetName = _data["targetName"];
+            this.damage = _data["damage"];
+        }
+    }
+
+    static override fromJS(data: any): CombatEntityAttackedHistoryEntry {
+        data = typeof data === 'object' ? data : {};
+        let result = new CombatEntityAttackedHistoryEntry();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["attackerId"] = this.attackerId;
+        data["attackerName"] = this.attackerName;
+        data["targetId"] = this.targetId;
+        data["targetName"] = this.targetName;
+        data["damage"] = this.damage;
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Combat entity attacked history entry */
+export interface ICombatEntityAttackedHistoryEntry extends ICombatHistoryEntry {
+    /** The unique ID of the entity that attacked
+             */
+    attackerId: string;
+    /** The name of the entity that attacked
+             */
+    attackerName: string;
+    /** The unique ID of the entity that was attacked
+             */
+    targetId: string;
+    /** The name of the entity that was attacked
+             */
+    targetName: string;
+    /** The damages dealt by the attacker to the target
+             */
+    damage: number;
 }
 
 /** Combat ended history entry */
