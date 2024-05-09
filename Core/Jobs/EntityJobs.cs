@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using RestAdventure.Core.StaticObjects;
 
 namespace RestAdventure.Core.Jobs;
 
@@ -46,20 +45,6 @@ public class EntityJobs : IReadOnlyCollection<JobInstance>, IDisposable
     }
 
     public JobInstance? Get(Job job) => _jobs.GetValueOrDefault(job.Id);
-
-    public IEnumerable<JobHarvest> GetAvailableHarvests(StaticObjectInstance staticObject)
-    {
-        foreach (JobInstance job in _jobs.Values)
-        {
-            foreach (JobHarvest harvest in job.Harvests)
-            {
-                if (job.Progression.Level >= harvest.Level && harvest.Match(staticObject))
-                {
-                    yield return harvest;
-                }
-            }
-        }
-    }
 
     public void Dispose()
     {

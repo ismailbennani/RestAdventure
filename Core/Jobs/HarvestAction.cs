@@ -37,7 +37,7 @@ public class HarvestAction : Action
         await Target.KillAsync(state);
     }
 
-    public override string ToString() => $"{Harvest} | ${Target}";
+    public override string ToString() => $"{Harvest} | {Target}";
 
     public static Maybe CanPerform(GameState state, Job job, JobHarvest harvest, StaticObjectInstance target, Character character)
     {

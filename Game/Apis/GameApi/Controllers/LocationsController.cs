@@ -3,7 +3,6 @@ using NSwag.Annotations;
 using RestAdventure.Core;
 using RestAdventure.Core.Characters;
 using RestAdventure.Core.Maps;
-using RestAdventure.Core.Maps.Locations;
 using RestAdventure.Core.Players;
 using RestAdventure.Game.Apis.Common.Dtos.Maps;
 using RestAdventure.Game.Authentication;
@@ -48,16 +47,16 @@ public class LocationsController : GameApiController
             return BadRequest();
         }
 
-        IEnumerable<Location> accessibleLocations = content.Maps.Locations.ConnectedTo(character.Location);
+        IEnumerable<MoveAction> actions = state.Actions.GetAvailableActions(character).OfType<MoveAction>();
 
         List<LocationWithAccessDto> result = [];
-        foreach (Location location in accessibleLocations)
+        foreach (MoveAction action in actions)
         {
-            Maybe canMove = character.Movement.CanMoveTo(state, location);
+            Maybe canMove = action.CanPerform(state, character);
             result.Add(
                 new LocationWithAccessDto
                 {
-                    Location = location.ToMinimalDto(),
+                    Location = action.Location.ToMinimalDto(),
                     IsAccessible = canMove.Success,
                     WhyIsNotAccessible = canMove.WhyNot
                 }
@@ -88,14 +87,13 @@ public class LocationsController : GameApiController
             return BadRequest();
         }
 
-        LocationId locationId = new(locationGuid);
-        Location? location = content.Maps.Locations.Get(locationId);
-        if (location == null)
+        MoveAction? action = state.Actions.GetAvailableActions(character).OfType<MoveAction>().SingleOrDefault(a => a.Location.Id.Guid == locationGuid);
+        if (action == null)
         {
             return NotFound();
         }
 
-        state.Actions.QueueAction(character, new MoveAction(location));
+        state.Actions.QueueAction(character, action);
 
         return NoContent();
     }

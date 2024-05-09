@@ -66,6 +66,7 @@ public class GameService
 
         await state.Actions.TickOngoingActionsAsync(state);
         await state.Actions.RemoveFinishedActionsAsync(state);
+        state.Actions.OnTickEnd(state);
 
         await _publisher.Publish(new GameTick { GameState = state });
 

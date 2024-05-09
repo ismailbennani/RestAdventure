@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Collections.Concurrent;
+using Microsoft.Extensions.Logging;
+using RestAdventure.Core.Actions.Providers;
 using RestAdventure.Core.Characters;
 using RestAdventure.Kernel.Errors;
 
@@ -8,15 +10,20 @@ public class GameActions
 {
     readonly GameState _state;
     readonly ILogger<GameActions> _logger;
-    readonly Dictionary<CharacterId, Action> _availableActions = new();
+    readonly ConcurrentDictionary<CharacterId, IReadOnlyCollection<Action>> _availableActions = new();
     Dictionary<CharacterId, Action> _queuedActions = new();
     readonly Dictionary<CharacterId, Action> _ongoingActions = new();
+    readonly IReadOnlyCollection<IActionsProvider> _actionProviders;
 
-    public GameActions(GameState state, ILogger<GameActions> logger)
+    public GameActions(GameState state, IReadOnlyCollection<IActionsProvider> actionProviders, ILogger<GameActions> logger)
     {
         _state = state;
+        _actionProviders = actionProviders;
         _logger = logger;
     }
+
+    public IReadOnlyCollection<Action> GetAvailableActions(Character character) =>
+        _availableActions.GetOrAdd(character.Id, _ => _actionProviders.SelectMany(p => p.GetActions(_state, character)).ToArray());
 
     public Maybe QueueAction(Character character, Action action)
     {
@@ -45,6 +52,13 @@ public class GameActions
                 Character? character = state.Entities.Get<Character>(characterId);
                 if (character == null)
                 {
+                    continue;
+                }
+
+                Maybe canPerform = queuedAction.CanPerform(state, character);
+                if (!canPerform.Success)
+                {
+                    _logger.LogError("Could not perform action {action}: {reason}", queuedAction, canPerform.WhyNot);
                     continue;
                 }
 
@@ -101,9 +115,10 @@ public class GameActions
             {
                 _logger.LogWarning("Could not remove action of character {characterId}", characterId);
             }
-
         }
     }
+
+    public void OnTickEnd(GameState state) => _availableActions.Clear();
 
     public Action? GetQueuedAction(Character character) => _queuedActions.GetValueOrDefault(character.Id);
     public Action? GetOngoingAction(Character character) => _ongoingActions.GetValueOrDefault(character.Id);

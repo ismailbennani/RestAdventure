@@ -3,7 +3,6 @@ using NSwag.Annotations;
 using RestAdventure.Core;
 using RestAdventure.Core.Characters;
 using RestAdventure.Core.Combat.Pve;
-using RestAdventure.Core.Monsters;
 using RestAdventure.Core.Players;
 using RestAdventure.Game.Apis.Common.Dtos.Monsters;
 using RestAdventure.Game.Authentication;
@@ -49,17 +48,20 @@ public class PveController : GameApiController
             return BadRequest();
         }
 
-        IEnumerable<MonsterInstance> monsters = state.Entities.AtLocation<MonsterInstance>(character.Location);
+        IEnumerable<PveCombatAction> actions = state.Actions.GetAvailableActions(character).OfType<PveCombatAction>();
 
-        List<MonsterGroupDto> result = new();
-        foreach (MonsterInstance monster in monsters)
+        List<MonsterGroupDto> result = [];
+        foreach (PveCombatAction action in actions)
         {
-            Maybe canStartCombat = state.Combats.CanStartCombat([character], [monster]);
+            Maybe canStartCombat = action.CanPerform(state, character);
             result.Add(
                 new MonsterGroupDto
                 {
-                    Id = monster.Id.Guid, Monsters = [monster.ToDto()], CanAttack = canStartCombat.Success, WhyCannotAttack = canStartCombat.WhyNot,
-                    ExpectedExperience = monster.Species.Experience
+                    Id = action.Defenders.First().Id.Guid,
+                    Monsters = action.Defenders.Select(m => m.ToDto()).ToArray(),
+                    CanAttack = canStartCombat.Success,
+                    WhyCannotAttack = canStartCombat.WhyNot,
+                    ExpectedExperience = action.Defenders.Sum(m => m.Species.Experience)
                 }
             );
         }
@@ -87,14 +89,12 @@ public class PveController : GameApiController
             return BadRequest();
         }
 
-        MonsterInstanceId monsterId = new(groupId);
-        MonsterInstance? monster = state.Entities.Get<MonsterInstance>(monsterId);
-        if (monster == null)
+        PveCombatAction? action = state.Actions.GetAvailableActions(character).OfType<PveCombatAction>().SingleOrDefault(a => a.Defenders.First().Id.Guid == groupId);
+        if (action == null)
         {
             return NotFound();
         }
 
-        PveCombatAction action = new([monster], _loggerFactory.CreateLogger<PveCombatAction>());
         state.Actions.QueueAction(character, action);
 
         return NoContent();

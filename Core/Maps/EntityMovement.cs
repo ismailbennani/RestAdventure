@@ -16,11 +16,6 @@ public class EntityMovement
 
     public Maybe CanMoveTo(GameState state, Location location)
     {
-        if (_entity.Busy)
-        {
-            return "Entity is busy";
-        }
-
         bool isAccessible = state.Content.Maps.Locations.AreConnected(_entity.Location, location);
         if (!isAccessible)
         {

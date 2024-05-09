@@ -6,21 +6,17 @@ using Action = RestAdventure.Core.Actions.Action;
 
 namespace RestAdventure.Core.Combat.Pve;
 
-public class PveCombatActionProvider : IActionProvider
+public class PveCombatActionsProvider : IActionsProvider
 {
-    readonly GameService _gameService;
     readonly ILoggerFactory _loggerFactory;
 
-    public PveCombatActionProvider(GameService gameService, ILoggerFactory loggerFactory)
+    public PveCombatActionsProvider(ILoggerFactory loggerFactory)
     {
-        _gameService = gameService;
         _loggerFactory = loggerFactory;
     }
 
-    public IEnumerable<Action> GetActions(Character character)
+    public IEnumerable<Action> GetActions(GameState state, Character character)
     {
-        GameState state = _gameService.RequireGameState();
-
         IEnumerable<MonsterInstance> monsters = state.Entities.AtLocation<MonsterInstance>(character.Location);
         foreach (MonsterInstance monster in monsters)
         {

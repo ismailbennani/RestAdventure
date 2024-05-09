@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using RestAdventure.Core.Characters;
+using RestAdventure.Core.Monsters;
 using RestAdventure.Kernel.Errors;
 using Action = RestAdventure.Core.Actions.Action;
 
@@ -7,10 +8,10 @@ namespace RestAdventure.Core.Combat.Pve;
 
 public class PveCombatAction : Action
 {
-    IReadOnlyList<IGameEntityWithCombatStatistics>? _defenders;
+    IReadOnlyList<MonsterInstance>? _defenders;
     readonly ILogger<PveCombatAction> _logger;
 
-    public PveCombatAction(IReadOnlyList<IGameEntityWithCombatStatistics> defenders, ILogger<PveCombatAction> logger) : base("combat")
+    public PveCombatAction(IReadOnlyList<MonsterInstance> defenders, ILogger<PveCombatAction> logger) : base("combat")
     {
         _defenders = defenders;
         _logger = logger;
@@ -23,11 +24,13 @@ public class PveCombatAction : Action
         _logger = logger;
     }
 
-    public IReadOnlyList<IGameEntityWithCombatStatistics> Attackers =>
-        CombatInPreparation?.Attackers.Entities ?? Combat?.Attackers.Entities ?? Array.Empty<IGameEntityWithCombatStatistics>();
+    public IReadOnlyList<Character> Attackers =>
+        CombatInPreparation?.Attackers.Entities.OfType<Character>().ToArray() ?? Combat?.Attackers.Entities.OfType<Character>().ToArray() ?? Array.Empty<Character>();
 
-    public IReadOnlyList<IGameEntityWithCombatStatistics> Defenders =>
-        _defenders ?? CombatInPreparation?.Defenders.Entities ?? Combat?.Defenders.Entities ?? Array.Empty<IGameEntityWithCombatStatistics>();
+    public IReadOnlyList<MonsterInstance> Defenders =>
+        _defenders
+        ?? CombatInPreparation?.Defenders.Entities.OfType<MonsterInstance>().ToArray()
+        ?? Combat?.Defenders.Entities.OfType<MonsterInstance>().ToArray() ?? Array.Empty<MonsterInstance>();
 
     public CombatInPreparation? CombatInPreparation { get; private set; }
     public CombatInstance? Combat { get; private set; }

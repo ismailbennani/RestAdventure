@@ -2,8 +2,11 @@
 using Microsoft.Extensions.Logging;
 using RestAdventure.Core.Actions;
 using RestAdventure.Core.Combat;
+using RestAdventure.Core.Combat.Pve;
 using RestAdventure.Core.Entities;
 using RestAdventure.Core.History;
+using RestAdventure.Core.Jobs;
+using RestAdventure.Core.Maps;
 using RestAdventure.Core.Players;
 using RestAdventure.Core.Settings;
 
@@ -19,7 +22,11 @@ public class GameState : IDisposable
         History = new GameHistory();
         Players = new GamePlayers(publisher);
         Entities = new GameEntities(publisher);
-        Actions = new GameActions(this, loggerFactory.CreateLogger<GameActions>());
+        Actions = new GameActions(
+            this,
+            [new PveCombatActionsProvider(loggerFactory), new HarvestActionsProvider(), new MoveActionsProvider()],
+            loggerFactory.CreateLogger<GameActions>()
+        );
         Combats = new GameCombats(this, loggerFactory.CreateLogger<GameCombats>());
     }
 

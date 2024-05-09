@@ -50,45 +50,34 @@ public class JobsHarvestController : GameApiController
             return BadRequest();
         }
 
-        IEnumerable<StaticObjectInstance> entities = state.Entities.AtLocation<StaticObjectInstance>(character.Location);
+        IEnumerable<HarvestAction> actions = state.Actions.GetAvailableActions(character).OfType<HarvestAction>();
 
         List<HarvestableEntityDto> result = [];
-        foreach (StaticObjectInstance staticObject in entities)
+        foreach (IGrouping<StaticObjectInstance, HarvestAction> group in actions.GroupBy(a => a.Target))
         {
             List<HarvestableEntityHarvestDto> harvests = [];
 
-            foreach (JobInstance job in character.Jobs)
-            foreach (JobHarvest harvest in job.Harvests)
+            foreach (HarvestAction action in group)
             {
-                if (!harvest.Match(staticObject))
-                {
-                    continue;
-                }
-
-                Maybe canHarvest = HarvestAction.CanPerform(state, job.Job, harvest, staticObject, character);
+                Maybe canHarvest = action.CanPerform(state, character);
                 harvests.Add(
                     new HarvestableEntityHarvestDto
                     {
-                        Job = job.Job.ToMinimalDto(),
-                        Name = harvest.Name,
-                        ExpectedHarvest = harvest.Items.Select(i => i.ToDto()).ToArray(),
-                        ExpectedExperience = harvest.Experience,
+                        Job = action.Job.ToMinimalDto(),
+                        Name = action.Harvest.Name,
+                        ExpectedHarvest = action.Harvest.Items.Select(i => i.ToDto()).ToArray(),
+                        ExpectedExperience = action.Harvest.Experience,
                         CanHarvest = canHarvest.Success,
                         WhyCannotHarvest = canHarvest.WhyNot
                     }
                 );
             }
 
-            if (harvests.Count == 0)
-            {
-                continue;
-            }
-
             result.Add(
                 new HarvestableEntityDto
                 {
-                    Id = staticObject.Id.Guid,
-                    Name = staticObject.Name,
+                    Id = group.Key.Id.Guid,
+                    Name = group.Key.Name,
                     Harvests = harvests
                 }
             );
@@ -124,13 +113,14 @@ public class JobsHarvestController : GameApiController
             return NotFound();
         }
 
-        var jobAndHarvest = character.Jobs.SelectMany(j => j.Harvests.Select(h => new { Job = j, Harvest = h })).SingleOrDefault(x => x.Harvest.Name == harvestName);
-        if (jobAndHarvest == null)
+        HarvestAction? action = state.Actions.GetAvailableActions(character)
+            .OfType<HarvestAction>()
+            .SingleOrDefault(a => a.Harvest.Name == harvestName && a.Target.Id.Guid == entityGuid);
+        if (action == null)
         {
             return NotFound();
         }
 
-        HarvestAction action = new(jobAndHarvest.Job.Job, jobAndHarvest.Harvest, entity);
         state.Actions.QueueAction(character, action);
 
         return NoContent();
