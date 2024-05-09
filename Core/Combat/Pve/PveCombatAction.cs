@@ -73,6 +73,11 @@ public class PveCombatAction : Action
             }
 
             CombatInPreparation = combat.Value;
+
+            foreach (MonsterInstance defender in _defenders)
+            {
+                defender.Busy = true;
+            }
             _defenders = null;
         }
         else

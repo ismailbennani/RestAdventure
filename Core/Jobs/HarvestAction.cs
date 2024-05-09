@@ -19,7 +19,32 @@ public class HarvestAction : Action
     public JobHarvest Harvest { get; }
     public StaticObjectInstance Target { get; }
 
-    protected override Maybe CanPerformInternal(GameState state, Character character) => CanPerform(state, Job, Harvest, Target, character);
+    protected override Maybe CanPerformInternal(GameState state, Character character)
+    {
+        if (character.Busy)
+        {
+            return "Character is busy";
+        }
+
+        JobInstance? jobInstance = character.Jobs.Get(Job);
+
+        if (jobInstance == null)
+        {
+            return "Unknown job";
+        }
+
+        if (Harvest.Level > jobInstance.Progression.Level)
+        {
+            return "Job level too low";
+        }
+
+        if (!Harvest.Match(Target) || Target.Busy)
+        {
+            return "Entity cannot be harvested";
+        }
+
+        return true;
+    }
 
     public override bool IsOver(GameState state, Character character) => state.Tick - StartTick >= Harvest.HarvestDuration;
 
@@ -38,31 +63,4 @@ public class HarvestAction : Action
     }
 
     public override string ToString() => $"{Harvest} | {Target}";
-
-    public static Maybe CanPerform(GameState state, Job job, JobHarvest harvest, StaticObjectInstance target, Character character)
-    {
-        if (character.Busy)
-        {
-            return "Character is busy";
-        }
-
-        JobInstance? jobInstance = character.Jobs.Get(job);
-
-        if (jobInstance == null)
-        {
-            return "Unknown job";
-        }
-
-        if (harvest.Level > jobInstance.Progression.Level)
-        {
-            return "Job level too low";
-        }
-
-        if (!harvest.Match(target) || target.Busy)
-        {
-            return "Entity cannot be harvested";
-        }
-
-        return true;
-    }
 }
