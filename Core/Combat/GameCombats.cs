@@ -95,6 +95,16 @@ public class GameCombats : IEnumerable<CombatInstance>, IDisposable
             }
         );
 
+        combat.Died += (_, args) => _state.Publisher.PublishSync(
+            new CombatEntityDied
+            {
+                Combat = combat,
+                SubTurn = args.SubTurn,
+                Attacker = args.Attacker,
+                Entity = args.Entity
+            }
+        );
+
         _combats.Add(combat.Id, combat);
         _combatsInPreparation.Remove(combatInPreparation.Id);
 

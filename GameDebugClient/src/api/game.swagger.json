@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0-alpha.0.164+a6167cc6db4edb0fbccc6fcfe0c4f68c0325e73b"
+    "version": "0.0.0-alpha.0.166+8f47877bbceac5c028489e18f983ebf0efa154e7"
   },
   "servers": [
     {
@@ -2854,6 +2854,7 @@
             "entity-joined": "#/components/schemas/CombatEntityJoinedHistoryEntry",
             "entity-left": "#/components/schemas/CombatEntityLeftHistoryEntry",
             "entity-attacked": "#/components/schemas/CombatEntityAttackedHistoryEntry",
+            "entity-died": "#/components/schemas/CombatEntityDiedHistoryEntry",
             "ended": "#/components/schemas/CombatEndedHistoryEntry"
           }
         },
@@ -3023,6 +3024,48 @@
                 "type": "integer",
                 "description": "The damages dealt by the attacker to the target\n            ",
                 "format": "int32"
+              }
+            }
+          }
+        ]
+      },
+      "CombatEntityDiedHistoryEntry": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CombatHistoryEntry"
+          },
+          {
+            "type": "object",
+            "description": "Combat entity died history entry\n            ",
+            "additionalProperties": false,
+            "required": [
+              "entityId",
+              "entityName",
+              "attackerId",
+              "attackerName"
+            ],
+            "properties": {
+              "entityId": {
+                "type": "string",
+                "description": "The unique ID of the entity that died\n            ",
+                "format": "guid",
+                "minLength": 1
+              },
+              "entityName": {
+                "type": "string",
+                "description": "The name of the entity that died\n            ",
+                "minLength": 1
+              },
+              "attackerId": {
+                "type": "string",
+                "description": "The unique ID of the entity that attacked\n            ",
+                "format": "guid",
+                "minLength": 1
+              },
+              "attackerName": {
+                "type": "string",
+                "description": "The name of the entity that attacked\n            ",
+                "minLength": 1
               }
             }
           }

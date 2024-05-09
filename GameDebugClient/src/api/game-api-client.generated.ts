@@ -4644,6 +4644,11 @@ export class CombatHistoryEntry implements ICombatHistoryEntry {
             result.init(data);
             return result;
         }
+        if (data["$type"] === "entity-died") {
+            let result = new CombatEntityDiedHistoryEntry();
+            result.init(data);
+            return result;
+        }
         if (data["$type"] === "ended") {
             let result = new CombatEndedHistoryEntry();
             result.init(data);
@@ -4915,6 +4920,70 @@ export interface ICombatEntityAttackedHistoryEntry extends ICombatHistoryEntry {
     /** The damages dealt by the attacker to the target
              */
     damage: number;
+}
+
+/** Combat entity died history entry */
+export class CombatEntityDiedHistoryEntry extends CombatHistoryEntry implements ICombatEntityDiedHistoryEntry {
+    /** The unique ID of the entity that died
+             */
+    entityId!: string;
+    /** The name of the entity that died
+             */
+    entityName!: string;
+    /** The unique ID of the entity that attacked
+             */
+    attackerId!: string;
+    /** The name of the entity that attacked
+             */
+    attackerName!: string;
+
+    constructor(data?: ICombatEntityDiedHistoryEntry) {
+        super(data);
+        this._discriminator = "entity-died";
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.entityId = _data["entityId"];
+            this.entityName = _data["entityName"];
+            this.attackerId = _data["attackerId"];
+            this.attackerName = _data["attackerName"];
+        }
+    }
+
+    static override fromJS(data: any): CombatEntityDiedHistoryEntry {
+        data = typeof data === 'object' ? data : {};
+        let result = new CombatEntityDiedHistoryEntry();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["entityId"] = this.entityId;
+        data["entityName"] = this.entityName;
+        data["attackerId"] = this.attackerId;
+        data["attackerName"] = this.attackerName;
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Combat entity died history entry */
+export interface ICombatEntityDiedHistoryEntry extends ICombatHistoryEntry {
+    /** The unique ID of the entity that died
+             */
+    entityId: string;
+    /** The name of the entity that died
+             */
+    entityName: string;
+    /** The unique ID of the entity that attacked
+             */
+    attackerId: string;
+    /** The name of the entity that attacked
+             */
+    attackerName: string;
 }
 
 /** Combat ended history entry */

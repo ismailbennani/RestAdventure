@@ -4,6 +4,7 @@ import { ReplaySubject, combineLatest, debounceTime, map, switchMap, tap } from 
 import {
   CombatEndedHistoryEntry,
   CombatEntityAttackedHistoryEntry,
+  CombatEntityDiedHistoryEntry,
   CombatEntityJoinedHistoryEntry,
   CombatEntityLeftHistoryEntry,
   CombatHistoryEntry,
@@ -112,6 +113,10 @@ export class CombatHistoryComponent implements OnInit {
 
     if (entry instanceof CombatEntityAttackedHistoryEntry) {
       return `${entry.attackerName} attacked ${entry.targetName}: -${entry.damage} HP`;
+    }
+
+    if (entry instanceof CombatEntityDiedHistoryEntry) {
+      return `${entry.entityName} killed by ${entry.attackerName}`;
     }
 
     if (entry instanceof CombatEndedHistoryEntry) {

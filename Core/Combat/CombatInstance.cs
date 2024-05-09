@@ -59,6 +59,7 @@ public class CombatInstance : IDisposable
     public CombatSide? Winner { get; private set; }
 
     public event EventHandler<CombatEntityAttackedEvent>? Attacked;
+    public event EventHandler<CombatEntityDiedEvent>? Died;
 
     IEnumerable<EntityState> Alive => _states.Values.Where(s => s.Entity.CombatStatistics.Health > 0);
 
@@ -66,7 +67,9 @@ public class CombatInstance : IDisposable
     {
         Turn++;
 
-        foreach (EntityState entityState in Alive)
+        List<EntityState> alive = Alive.ToList();
+
+        foreach (EntityState entityState in alive)
         {
             entityState.Lead += entityState.Entity.CombatStatistics.Speed;
         }
@@ -84,6 +87,17 @@ public class CombatInstance : IDisposable
             IGameEntityWithCombatStatistics target = otherFormation.Entities[0];
 
             await ResolveAttackAsync(subTurn, next.Entity, target);
+
+            foreach (EntityState entity in alive.ToArray())
+            {
+                if (entity.Entity.CombatStatistics.Health > 0)
+                {
+                    continue;
+                }
+
+                Died?.Invoke(this, new CombatEntityDiedEvent { SubTurn = subTurn, Attacker = next.Entity, Entity = entity.Entity });
+                alive.Remove(entity);
+            }
 
             if (EvaluateWinCondition())
             {
@@ -166,4 +180,11 @@ public class CombatEntityAttackedEvent
     public required IGameEntityWithCombatStatistics Target { get; init; }
     public required EntityAttack AttackDealt { get; init; }
     public required EntityAttack AttackReceived { get; init; }
+}
+
+public class CombatEntityDiedEvent
+{
+    public required int SubTurn { get; init; }
+    public required IGameEntityWithCombatStatistics Attacker { get; init; }
+    public required IGameEntityWithCombatStatistics Entity { get; init; }
 }
