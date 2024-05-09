@@ -10,6 +10,8 @@ namespace RestAdventure.Core.Content;
 
 public class GameContent
 {
+    public string Title { get; init; } = "Game";
+
     /// <summary>
     ///     The maps of the game
     /// </summary>

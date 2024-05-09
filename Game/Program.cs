@@ -6,12 +6,12 @@ using ExampleGame;
 using NSwag;
 using NSwag.Generation.Processors.Security;
 using RestAdventure.Core;
-using RestAdventure.Core.Content;
 using RestAdventure.Core.Entities.Characters;
 using RestAdventure.Core.Entities.Monsters;
 using RestAdventure.Core.Entities.StaticObjects;
 using RestAdventure.Core.Hosting;
 using RestAdventure.Core.Players;
+using RestAdventure.Core.Plugins;
 using RestAdventure.Game.Apis.AdminApi;
 using RestAdventure.Game.Apis.GameApi;
 using RestAdventure.Game.Authentication;
@@ -149,32 +149,30 @@ void SetupOpenApiDocuments(WebApplicationBuilder builder)
 
 async Task<GameState> LoadGameAsync(WebApplication app)
 {
-    GameContent content = new();
-
-    ExampleGameContent exampleGameContent = new();
-    await exampleGameContent.AddContentAsync(content);
+    ExampleGameScenarioBuilder exampleGameScenarioBuilder = new();
+    Scenario scenario = exampleGameScenarioBuilder.Build();
 
     GameService gameService = app.Services.GetRequiredService<GameService>();
-    GameState state = gameService.NewGame(content, new GameSettings());
+    GameState state = gameService.NewGame(scenario, new GameSettings());
 
-    StaticObjectInstance appleTree1 = new(exampleGameContent.Gatherer.AppleTree, exampleGameContent.GeneratedMaps.Locations.First());
+    StaticObjectInstance appleTree1 = new(exampleGameScenarioBuilder.Gatherer.AppleTree, exampleGameScenarioBuilder.GeneratedMaps.Locations.First());
     await state.Entities.AddAsync(appleTree1);
 
-    StaticObjectInstance appleTree2 = new(exampleGameContent.Gatherer.AppleTree, exampleGameContent.GeneratedMaps.Locations.First());
+    StaticObjectInstance appleTree2 = new(exampleGameScenarioBuilder.Gatherer.AppleTree, exampleGameScenarioBuilder.GeneratedMaps.Locations.First());
     await state.Entities.AddAsync(appleTree2);
 
-    StaticObjectInstance pearTree = new(exampleGameContent.Gatherer.PearTree, exampleGameContent.GeneratedMaps.Locations.First());
+    StaticObjectInstance pearTree = new(exampleGameScenarioBuilder.Gatherer.PearTree, exampleGameScenarioBuilder.GeneratedMaps.Locations.First());
     await state.Entities.AddAsync(pearTree);
 
-    MonsterInstance petitPaw = new(exampleGameContent.Rattlings.PetitPaw, 1, exampleGameContent.GeneratedMaps.Locations.First());
+    MonsterInstance petitPaw = new(exampleGameScenarioBuilder.Rattlings.PetitPaw, 1, exampleGameScenarioBuilder.GeneratedMaps.Locations.First());
     await state.Entities.AddAsync(petitPaw);
 
-    MonsterInstance biggaud = new(exampleGameContent.Rattlings.Biggaud, 1, exampleGameContent.GeneratedMaps.Locations.First());
+    MonsterInstance biggaud = new(exampleGameScenarioBuilder.Rattlings.Biggaud, 1, exampleGameScenarioBuilder.GeneratedMaps.Locations.First());
     await state.Entities.AddAsync(biggaud);
 
     Player player = await state.Players.RegisterPlayerAsync(new User(new UserId(Guid.NewGuid()), "PLAYER"));
-    await state.Entities.AddAsync(new Character(player, exampleGameContent.CharacterClasses.Dealer, "Deadea"));
-    await state.Entities.AddAsync(new Character(player, exampleGameContent.CharacterClasses.Knight, "Knikni"));
+    await state.Entities.AddAsync(new Character(player, exampleGameScenarioBuilder.CharacterClasses.Dealer, "Deadea"));
+    await state.Entities.AddAsync(new Character(player, exampleGameScenarioBuilder.CharacterClasses.Knight, "Knikni"));
 
     return state;
 }

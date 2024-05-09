@@ -2,6 +2,7 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
 using RestAdventure.Core.Content;
+using RestAdventure.Core.Plugins;
 using RestAdventure.Core.Simulation.Notifications;
 
 namespace RestAdventure.Core;
@@ -22,10 +23,10 @@ public class GameService
         _logger = loggerFactory.CreateLogger<GameService>();
     }
 
-    public GameState NewGame(GameContent content, GameSettings settings)
+    public GameState NewGame(Scenario scenario, GameSettings settings)
     {
-        _gameContent = content;
-        _gameState = new GameState(settings, content, _publisher, _loggerFactory);
+        _gameContent = scenario.ToGameContent();
+        _gameState = new GameState(settings, _gameContent, _publisher, _loggerFactory);
 
         _logger.LogInformation("Game state has been initialized with settings: {settingsJson}.", JsonSerializer.Serialize(settings));
 

@@ -6,7 +6,7 @@ public class GameLocations : GameResourcesStore<LocationId, Location>
 {
     readonly List<(LocationId, LocationId)> _connections = [];
 
-    public void Connect(Location location1, Location location2)
+    public void Register(Location location1, Location location2)
     {
         if (!Resources.ContainsKey(location1.Id))
         {
@@ -21,11 +21,11 @@ public class GameLocations : GameResourcesStore<LocationId, Location>
         _connections.Add((location1.Id, location2.Id));
     }
 
-    public void Connect(IEnumerable<(Location, Location)> connections)
+    public void Register(IEnumerable<(Location, Location)> connections)
     {
         foreach ((Location location1, Location location2) in connections)
         {
-            Connect(location1, location2);
+            Register(location1, location2);
         }
     }
 
