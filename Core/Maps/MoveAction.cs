@@ -16,4 +16,6 @@ public class MoveAction : ImmediateAction
 
     protected override Maybe CanPerformInternal(GameState state, Character character) => character.Movement.CanMoveTo(state, Location);
     protected override async Task PerformAsync(GameState state, Character character) => await character.Movement.MoveToAsync(state, Location);
+
+    public override string ToString() => $"Move to ${Location}";
 }
