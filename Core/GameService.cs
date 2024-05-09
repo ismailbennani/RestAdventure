@@ -3,12 +3,13 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using RestAdventure.Core.Content;
 using RestAdventure.Core.Plugins;
-using RestAdventure.Core.Simulation.Notifications;
+using RestAdventure.Core.Simulation;
 
 namespace RestAdventure.Core;
 
 public class GameService
 {
+    readonly GameSimulation _simulation;
     readonly IPublisher _publisher;
     readonly ILoggerFactory _loggerFactory;
     readonly ILogger<GameService> _logger;
@@ -18,6 +19,7 @@ public class GameService
 
     public GameService(IPublisher publisher, ILoggerFactory loggerFactory)
     {
+        _simulation = new GameSimulation(publisher);
         _publisher = publisher;
         _loggerFactory = loggerFactory;
         _logger = loggerFactory.CreateLogger<GameService>();
@@ -59,17 +61,7 @@ public class GameService
     {
         GameState state = RequireGameState();
 
-        state.Tick++;
-
-        await state.Actions.StartQueuedActionsAsync(state);
-
-        await state.Combats.ResolveCombatsAsync(state);
-
-        await state.Actions.TickOngoingActionsAsync(state);
-        await state.Actions.RemoveFinishedActionsAsync(state);
-        state.Actions.OnTickEnd(state);
-
-        await _publisher.Publish(new GameTick { GameState = state });
+        await _simulation.TickAsync(state);
 
         return state.Tick;
     }
