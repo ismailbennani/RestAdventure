@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0-alpha.0.144+01ce5875315197eafb0a4c1cedd0fc53ac2dfb5a"
+    "version": "0.0.0-alpha.0.156+772719e5e07249efc60eca7e46a17fb029d1107f"
   },
   "servers": [
     {
@@ -1621,11 +1621,17 @@
         "description": "Game state\n            ",
         "additionalProperties": false,
         "required": [
+          "title",
           "tick",
           "isComputingNextTick",
           "paused"
         ],
         "properties": {
+          "title": {
+            "type": "string",
+            "description": "The title of the game\n            ",
+            "minLength": 1
+          },
           "tick": {
             "type": "integer",
             "description": "The current game tick\n            ",

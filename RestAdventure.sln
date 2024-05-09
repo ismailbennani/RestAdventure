@@ -10,6 +10,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Apps", "Apps", "{97A732DC-5
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExampleGame", "ExampleGame\ExampleGame.csproj", "{824D8FB7-B803-4B41-9AF2-F1652CBC76FC}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Content", "Content", "{D31F2461-6ED2-42D7-BE93-25FAA3D365EE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,5 +37,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{44BFFE5E-C024-4C02-9FEF-6EAEB26E9280} = {97A732DC-539D-4E1F-841F-94054AD7EBED}
+		{824D8FB7-B803-4B41-9AF2-F1652CBC76FC} = {D31F2461-6ED2-42D7-BE93-25FAA3D365EE}
 	EndGlobalSection
 EndGlobal

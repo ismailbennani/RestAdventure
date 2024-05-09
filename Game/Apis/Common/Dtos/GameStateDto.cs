@@ -10,6 +10,12 @@ namespace RestAdventure.Game.Apis.Common.Dtos;
 public class GameStateDto
 {
     /// <summary>
+    ///     The title of the game
+    /// </summary>
+    [Required]
+    public required string Title { get; init; }
+
+    /// <summary>
     ///     The current game tick
     /// </summary>
     [Required]
@@ -44,6 +50,7 @@ static class GameStateMappingExtensions
     public static GameStateDto ToDto(this GameState state, GameSimulation simulation) =>
         new()
         {
+            Title = state.Content.Title,
             Tick = state.Tick,
             IsComputingNextTick = simulation.IsComputingNextTick,
             Paused = simulation.Paused,

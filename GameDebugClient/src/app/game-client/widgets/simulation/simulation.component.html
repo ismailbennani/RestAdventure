@@ -1,3 +1,10 @@
+<hr class="my-1" />
+<h4 class="pt-1 text-center">
+  <i class="bi bi-globe"></i>
+  {{ gameService.state?.title ?? 'Game' }}
+</h4>
+<hr class="m-0" />
+
 @if (gameService.state) {
   @if (gameService.connected) {
     <div class="d-flex">

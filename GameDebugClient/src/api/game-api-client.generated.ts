@@ -2545,6 +2545,9 @@ export interface IGameSettings {
 
 /** Game state */
 export class GameState implements IGameState {
+    /** The title of the game
+             */
+    title!: string;
     /** The current game tick
              */
     tick!: number;
@@ -2573,6 +2576,7 @@ In that case NextTickDate refers to the old tick's next tick date, which means t
 
     init(_data?: any) {
         if (_data) {
+            this.title = _data["title"];
             this.tick = _data["tick"];
             this.isComputingNextTick = _data["isComputingNextTick"];
             this.paused = _data["paused"];
@@ -2590,6 +2594,7 @@ In that case NextTickDate refers to the old tick's next tick date, which means t
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
+        data["title"] = this.title;
         data["tick"] = this.tick;
         data["isComputingNextTick"] = this.isComputingNextTick;
         data["paused"] = this.paused;
@@ -2601,6 +2606,9 @@ In that case NextTickDate refers to the old tick's next tick date, which means t
 
 /** Game state */
 export interface IGameState {
+    /** The title of the game
+             */
+    title: string;
     /** The current game tick
              */
     tick: number;

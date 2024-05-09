@@ -32,7 +32,7 @@ public class ExampleGameScenarioBuilder
 
     public Scenario Build()
     {
-        Scenario scenario = new();
+        Scenario scenario = new() { Name = "Rat Attack" };
 
         ExtractContent(scenario, CharacterClasses);
         ExtractContent(scenario, Rattlings);
