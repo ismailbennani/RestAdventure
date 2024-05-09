@@ -170,23 +170,22 @@ public class CombatsController : GameApiController
 
         CombatInstanceId combatId = new(combatGuid);
         CombatInPreparation? combatInPreparation = state.Combats.GetCombatInPreparation(combatId);
-        if (combatInPreparation != null)
-        {
-            if (!combatInPreparation.Attackers.Entities.Contains(character) && !combatInPreparation.Defenders.Entities.Contains(character))
-            {
-                return NotFound();
-            }
-        }
-
         CombatInstance? combat = state.Combats.GetCombat(combatId);
-        if (combat != null)
+
+        if (combatInPreparation == null && combat == null)
         {
-            if (!combat.Attackers.Entities.Contains(character) && !combat.Defenders.Entities.Contains(character))
-            {
-                return NotFound();
-            }
+            return NotFound();
         }
 
+        if (combatInPreparation != null && combatInPreparation.Location != character.Location)
+        {
+            return NotFound();
+        }
+
+        if (combat != null && combat.Location != character.Location)
+        {
+            return NotFound();
+        }
 
         IOrderedEnumerable<CombatHistoryEntry> allEntries = state.History.Combat(combatId).OrderByDescending(he => he.Tick);
 
