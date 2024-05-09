@@ -41,6 +41,15 @@ public class ExampleGameScenarioBuilder
         ExtractContent(scenario, GeneratedMaps);
 
         scenario.Spawners.Add(new StaticObjectRandomAreaSpawner(Gatherer.AppleTree, GeneratedMaps.Areas.First(), 5));
+        scenario.Spawners.Add(
+            new AreaMonstersSpawner(GeneratedMaps.Areas.First(), [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Sorcerat], (1, 3), (1, 9))
+        );
+        scenario.Spawners.Add(
+            new AreaMonstersSpawner(GeneratedMaps.Areas.First(), [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Sorcerat], (4, 6), (1, 9))
+        );
+        scenario.Spawners.Add(
+            new AreaMonstersSpawner(GeneratedMaps.Areas.First(), [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Sorcerat], (7, 8), (1, 9))
+        );
 
         return scenario;
     }

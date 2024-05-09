@@ -43,6 +43,8 @@ export class CharacterCombatsComponent implements OnInit {
   protected selectedCombatInPreparation: CombatInPreparation | undefined;
   protected selectedArchivedCombat: ArchivedCombat | undefined;
 
+  protected cachedValues: { [combatId: string]: { attackersDisplay: string; defendersDisplay: string } } = {};
+
   private _character: TeamCharacter = null!;
   private characterSubject: ReplaySubject<TeamCharacter> = new ReplaySubject<TeamCharacter>(1);
 
@@ -67,6 +69,11 @@ export class CharacterCombatsComponent implements OnInit {
           this.combats = result?.combats ?? [];
           this.combatsInPreparation = result?.combatsInPreparation ?? [];
           this.archivedCombats = result?.archivedCombats.items ?? [];
+
+          this.cachedValues = {};
+          this.updateCachedValues(this.combats.map(c => ({ id: c.id, attackers: c.attackers, defenders: c.defenders })));
+          this.updateCachedValues(this.combatsInPreparation.map(c => ({ id: c.id, attackers: c.attackers.entities, defenders: c.defenders.entities })));
+          this.updateCachedValues(this.archivedCombats.map(c => ({ id: c.id, attackers: c.attackers, defenders: c.defenders })));
 
           this.autoSelectCombatAfterRefresh();
         }),
@@ -185,5 +192,31 @@ export class CharacterCombatsComponent implements OnInit {
     }
 
     this.unselectCombat();
+  }
+
+  private updateCachedValues(combats: { id: string; attackers: { name: string }[]; defenders: { name: string }[] }[]) {
+    for (const combat of combats) {
+      this.cachedValues[combat.id] = {
+        attackersDisplay: this.computeEntitiesDisplay(combat.attackers),
+        defendersDisplay: this.computeEntitiesDisplay(combat.defenders),
+      };
+    }
+  }
+
+  private computeEntitiesDisplay(entities: { name: string }[]) {
+    const entitiesWithCount: { [entityName: string]: { name: string; count: number } } = {};
+    for (const entity of entities) {
+      const existing = entitiesWithCount[entity.name];
+      if (existing) {
+        existing.count++;
+      } else {
+        entitiesWithCount[entity.name] = { ...entity, count: 1 };
+      }
+    }
+
+    return Object.values(entitiesWithCount)
+      .sort((e1, e2) => e2.count - e1.count)
+      .map(e => (e.count == 1 ? e.name : `${e.count}x ${e.name}`))
+      .join(', ');
   }
 }

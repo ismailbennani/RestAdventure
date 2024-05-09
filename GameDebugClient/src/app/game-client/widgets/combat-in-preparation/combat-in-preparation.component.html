@@ -19,19 +19,18 @@
     </div>
   </div>
   <hr />
-  <div class="row pb-4">
-    <div class="col-lg-5">
+  <div class="pb-4">
+    <div>
       <h6 class="text-center">Attackers</h6>
-      <div class="d-flex gap-2">
+      <div class="row gx-2">
         @for (entity of attackers; track entity.id) {
           <ng-container [ngTemplateOutlet]="entityTpl" [ngTemplateOutletContext]="{ entity }"></ng-container>
         }
       </div>
     </div>
-    <div class="col"></div>
-    <div class="col-lg-5">
+    <div>
       <h6 class="text-center">Defenders</h6>
-      <div class="d-flex gap-2">
+      <div class="row gx-4 justify-content-end">
         @for (entity of defenders; track entity.id) {
           <ng-container [ngTemplateOutlet]="entityTpl" [ngTemplateOutletContext]="{ entity }"></ng-container>
         }
@@ -41,7 +40,7 @@
 </div>
 
 <ng-template #entityTpl let-entity="entity">
-  <div class="flex-grow-1 text-center">
+  <div class="col-sm-1 text-center">
     <div>{{ entity.name }}</div>
   </div>
 </ng-template>

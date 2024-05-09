@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { ReplaySubject, switchMap, tap } from 'rxjs';
-import { Action, MonsterGroup, PveApiClient, PveCombatAction, TeamCharacter } from '../../../../api/game-api-client.generated';
+import { Action, IMonsterGroup, PveApiClient, PveCombatAction, TeamCharacter } from '../../../../api/game-api-client.generated';
 import { GameService } from '../../services/game.service';
 
 @Component({
@@ -20,7 +20,7 @@ export class CharacterMonstersComponent implements OnInit {
     this.characterSubject.next(value);
   }
 
-  protected monsterGroups: MonsterGroup[] = [];
+  protected monsterGroups: (IMonsterGroup & { display: string; totalLevel: number })[] = [];
 
   private _character: TeamCharacter = null!;
   private characterSubject: ReplaySubject<TeamCharacter> = new ReplaySubject<TeamCharacter>(1);
@@ -34,12 +34,18 @@ export class CharacterMonstersComponent implements OnInit {
     this.characterSubject
       .pipe(
         switchMap(character => this.pveApiClient.getMonsters(character.id)),
-        tap(monsterGroups => (this.monsterGroups = monsterGroups)),
+        tap(monsterGroups => {
+          this.monsterGroups = monsterGroups.map(g => ({
+            ...g,
+            display: g.monsters.map(m => `${m.name} lv. ${m.level}`).join(', '),
+            totalLevel: g.monsters.reduce((level, m) => level + m.level, 0),
+          }));
+        }),
       )
       .subscribe();
   }
 
-  attack(monsterGroup: MonsterGroup) {
+  attack(monsterGroup: IMonsterGroup) {
     if (!this.character || !monsterGroup.canAttack) {
       return;
     }
@@ -50,15 +56,15 @@ export class CharacterMonstersComponent implements OnInit {
       .subscribe();
   }
 
-  plansToAttack(monsterGroup?: MonsterGroup) {
+  plansToAttack(monsterGroup?: IMonsterGroup) {
     return this.character?.plannedAction && this.isCombatAction(this.character.plannedAction, monsterGroup);
   }
 
-  isAttacking(monsterGroup: MonsterGroup) {
+  isAttacking(monsterGroup: IMonsterGroup) {
     return this.character?.ongoingAction && this.isCombatAction(this.character.ongoingAction, monsterGroup);
   }
 
-  private isCombatAction(action: Action, monsterGroup?: MonsterGroup) {
+  private isCombatAction(action: Action, monsterGroup?: IMonsterGroup) {
     if (!(action instanceof PveCombatAction)) {
       return false;
     }

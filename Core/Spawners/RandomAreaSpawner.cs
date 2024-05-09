@@ -37,8 +37,7 @@ public abstract class RandomAreaSpawner<TEntity> : Spawner where TEntity: GameEn
             yield break;
         }
 
-        Dictionary<Location, int> suitableLocationsWithCounts =
-            state.Content.Maps.Locations.Where(l => l.Area == Area).ToDictionary(l => l, l => Count(state.Entities.AtLocation<TEntity>(l)));
+        Dictionary<Location, int> suitableLocationsWithCounts = state.Content.Maps.Locations.InArea(Area).ToDictionary(l => l, l => Count(state.Entities.AtLocation<TEntity>(l)));
 
         int currentCount = suitableLocationsWithCounts.Values.Sum();
         if (currentCount >= MaxCount)

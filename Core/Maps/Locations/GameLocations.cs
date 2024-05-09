@@ -1,4 +1,5 @@
-﻿using RestAdventure.Core.Resources;
+﻿using RestAdventure.Core.Maps.Areas;
+using RestAdventure.Core.Resources;
 
 namespace RestAdventure.Core.Maps.Locations;
 
@@ -34,6 +35,8 @@ public class GameLocations : GameResourcesStore<LocationId, Location>
             .Select(connection => connection.Item1 == location.Id ? Resources[connection.Item2] : Resources[connection.Item1]);
 
     public bool AreConnected(Location location1, Location location2) => _connections.Contains((location1.Id, location2.Id)) || _connections.Contains((location2.Id, location1.Id));
+
+    public IEnumerable<Location> InArea(MapArea area) => this.Where(l => l.Area == area);
 }
 
 public static class GameMapLocationsExtensions

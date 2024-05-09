@@ -25,6 +25,9 @@ public abstract class GameEntity : IEquatable<GameEntity>, IGameEntity
     public GameEntityId Id { get; }
 
     /// <inheritdoc />
+    public IGameEntitySource? Source { get; set; }
+
+    /// <inheritdoc />
     public Team? Team { get; }
 
     /// <inheritdoc />

@@ -11,10 +11,11 @@ public class Player : IDisposable
     public Player(User user)
     {
         User = user;
+        Team = new Team();
     }
 
     public User User { get; }
-    public Team Team { get; } = new();
+    public Team Team { get; }
     public PlayerKnowledge Knowledge { get; } = new();
 
     public override string ToString() => User.Name;

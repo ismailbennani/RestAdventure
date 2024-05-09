@@ -1,16 +1,15 @@
-<div class="w-100 h-100 row py-2 px-4">
-  <div class="col-lg-5">
+<div class="w-100 h-100 py-2 px-4">
+  <div>
     <h6 class="text-center">Attackers</h6>
-    <div class="d-flex gap-2">
+    <div class="row g-2">
       @for (entity of attackers; track entity.id) {
         <ng-container [ngTemplateOutlet]="entityTpl" [ngTemplateOutletContext]="{ entity }"></ng-container>
       }
     </div>
   </div>
-  <div class="col"></div>
-  <div class="col-lg-5">
+  <div>
     <h6 class="text-center">Defenders</h6>
-    <div class="d-flex gap-2">
+    <div class="row g-2">
       @for (entity of defenders; track entity.id) {
         <ng-container [ngTemplateOutlet]="entityTpl" [ngTemplateOutletContext]="{ entity }"></ng-container>
       }
@@ -19,7 +18,7 @@
 </div>
 
 <ng-template #entityTpl let-entity="entity">
-  <div class="flex-grow-1 text-center">
+  <div class="col-sm-1 text-center">
     <div>{{ entity.name }} lv. {{ entity.level }}</div>
     <app-progression-bar color="danger" label="HP" [value]="entity.combat.health" [maxValue]="entity.combat.maxHealth" displayValue="absolute"></app-progression-bar>
   </div>

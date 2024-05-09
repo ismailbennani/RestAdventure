@@ -6,9 +6,7 @@ using ExampleGame;
 using NSwag;
 using NSwag.Generation.Processors.Security;
 using RestAdventure.Core;
-using RestAdventure.Core.Entities;
 using RestAdventure.Core.Entities.Characters;
-using RestAdventure.Core.Entities.Monsters;
 using RestAdventure.Core.Entities.StaticObjects;
 using RestAdventure.Core.Hosting;
 using RestAdventure.Core.Players;
@@ -158,14 +156,6 @@ async Task<GameState> LoadGameAsync(WebApplication app)
 
     StaticObjectInstance pearTree = new(exampleGameScenarioBuilder.Gatherer.PearTree, exampleGameScenarioBuilder.GeneratedMaps.Locations.First());
     await state.Entities.AddAsync(pearTree);
-
-    Team monstersTeam = new Team();
-
-    MonsterInstance petitPaw = new(monstersTeam, exampleGameScenarioBuilder.Rattlings.PetitPaw, 1, exampleGameScenarioBuilder.GeneratedMaps.Locations.First());
-    await state.Entities.AddAsync(petitPaw);
-
-    MonsterInstance biggaud = new(monstersTeam, exampleGameScenarioBuilder.Rattlings.Biggaud, 1, exampleGameScenarioBuilder.GeneratedMaps.Locations.First());
-    await state.Entities.AddAsync(biggaud);
 
     Player player = await state.Players.RegisterPlayerAsync(new User(new UserId(Guid.NewGuid()), "PLAYER"));
     await state.Entities.AddAsync(new Character(player, exampleGameScenarioBuilder.CharacterClasses.Dealer, "Deadea"));

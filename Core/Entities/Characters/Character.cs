@@ -16,9 +16,9 @@ public class Character : GameEntity<CharacterId>, IGameEntityWithInventory, IGam
         Player = player;
         Class = characterClass;
         Progression = new ProgressionBar(characterClass.LevelCaps);
+        CombatStatistics = new EntityCombatStatistics(characterClass.Health, characterClass.Speed, characterClass.Attack);
         Inventory = new Inventory();
         Jobs = new EntityJobs();
-        CombatStatistics = new EntityCombatStatistics(10, 100, 1);
         Movement = new EntityMovement(this);
     }
 

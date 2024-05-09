@@ -10,6 +10,11 @@ public interface IGameEntity : IDisposable
     GameEntityId Id { get; }
 
     /// <summary>
+    ///     The creator of the entity
+    /// </summary>
+    IGameEntitySource? Source { get; }
+
+    /// <summary>
     ///     The team of the character
     /// </summary>
     Team? Team { get; }
