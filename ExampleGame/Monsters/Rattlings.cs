@@ -98,8 +98,8 @@ public class Rattlings
                           + "With their trusty rapier in hand, they move with elegance and grace, striking swiftly and decisively in battle.",
             Items = [new ItemStack(Handkerchief, 1), new ItemStack(SwordBlade, 1)],
             Experience = 2,
-            Health = 5,
-            Speed = 100,
+            Health = 10,
+            Speed = 140,
             Attack = 6
         };
 
@@ -111,8 +111,8 @@ public class Rattlings
                           + "With their immense strength and sturdy build, they serve as formidable defenders, capable of enduring even the fiercest of attacks.",
             Items = [new ItemStack(DirtyShirt, 1), new ItemStack(BellyFat, 1)],
             Experience = 2,
-            Health = 10,
-            Speed = 100,
+            Health = 20,
+            Speed = 120,
             Attack = 2
         };
 
@@ -124,7 +124,7 @@ public class Rattlings
                           + "Though physically frail, their mastery of spells and enchantments makes them invaluable allies in times of need, wielding arcane forces to protect their kin.",
             Items = [new ItemStack(SparklingWand, 1), new ItemStack(AncientTomeOfMagic, 1)],
             Experience = 3,
-            Health = 10,
+            Health = 6,
             Speed = 100,
             Attack = 2
         };
