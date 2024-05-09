@@ -1,7 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using RestAdventure.Core.History.Characters;
+using RestAdventure.Game.Apis.Common.Dtos.History.Common;
 
-namespace RestAdventure.Game.Apis.Common.Dtos.History;
+namespace RestAdventure.Game.Apis.Common.Dtos.History.Characters;
 
 /// <summary>
 ///     Character combat in preparation canceled

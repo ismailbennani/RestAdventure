@@ -4,6 +4,8 @@ import { AdminApiStatusApiClient, AdminGameApiClient, AdminGameContentApiClient,
 import {
   CharactersApiClient,
   CombatsApiClient,
+  CombatsHistoryApiClient,
+  CombatsInPreparationApiClient,
   GameApiClient,
   GameApiStatusApiClient,
   JobsHarvestApiClient,
@@ -30,6 +32,8 @@ const API_BASE_URL: InjectionToken<string> = new InjectionToken<string>('BASE_UR
     JobsHarvestApiClient,
     PveApiClient,
     CombatsApiClient,
+    CombatsInPreparationApiClient,
+    CombatsHistoryApiClient,
   ],
 })
 export class ApiModule {

@@ -1,6 +1,6 @@
 ﻿using RestAdventure.Core.History.Entities;
 
-namespace RestAdventure.Game.Apis.Common.Dtos.History;
+namespace RestAdventure.Game.Apis.Common.Dtos.History.Characters;
 
 /// <summary>
 ///     Character created history entry

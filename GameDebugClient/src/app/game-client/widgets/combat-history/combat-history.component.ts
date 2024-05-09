@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, numberAttribute } from '@angular/core';
 import { ReplaySubject, combineLatest, debounceTime, map, switchMap, tap } from 'rxjs';
 import {
+  ArchivedCombat,
   CombatEndedHistoryEntry,
   CombatEntityAttackedHistoryEntry,
   CombatEntityDiedHistoryEntry,
@@ -12,7 +13,7 @@ import {
   CombatInstance,
   CombatPreparationStartedHistoryEntry,
   CombatStartedHistoryEntry,
-  CombatsApiClient,
+  CombatsHistoryApiClient,
   TeamCharacter,
 } from '../../../../api/game-api-client.generated';
 import { GameService } from '../../services/game.service';
@@ -30,21 +31,21 @@ export class CombatHistoryComponent implements OnInit {
   }
 
   @Input({ required: true })
-  public set combat(value: CombatInPreparation | CombatInstance) {
+  public set combat(value: CombatInPreparation | CombatInstance | ArchivedCombat) {
     this.combatSubject.next(value);
   }
 
-  @Input() nEntries: number = 20;
+  @Input({ transform: numberAttribute }) nEntries: number = 20;
 
   protected loading: boolean = false;
   protected history: { turn: number; preparation: boolean; entries: CombatHistoryEntry[] }[] = [];
 
   private characterSubject: ReplaySubject<TeamCharacter> = new ReplaySubject<TeamCharacter>(1);
-  private combatSubject: ReplaySubject<CombatInPreparation | CombatInstance> = new ReplaySubject<CombatInPreparation | CombatInstance>(1);
+  private combatSubject: ReplaySubject<CombatInPreparation | CombatInstance | ArchivedCombat> = new ReplaySubject<CombatInPreparation | CombatInstance | ArchivedCombat>(1);
 
   constructor(
     private gameService: GameService,
-    private combatsApiClient: CombatsApiClient,
+    private combatsHistoryApiClient: CombatsHistoryApiClient,
   ) {}
 
   ngOnInit(): void {
@@ -56,7 +57,13 @@ export class CombatHistoryComponent implements OnInit {
     })
       .pipe(
         debounceTime(10),
-        switchMap(({ character, combat }) => this.combatsApiClient.searchCombatHistory(character.id, combat.id, 1, this.nEntries)),
+        switchMap(({ character, combat }) => {
+          if (combat instanceof ArchivedCombat) {
+            return this.combatsHistoryApiClient.searchArchivedCombatHistory(character.id, combat.id, 1, this.nEntries);
+          } else {
+            return this.combatsHistoryApiClient.searchCombatHistory(character.id, combat.id, 1, this.nEntries);
+          }
+        }),
         map(history => {
           const historyObj: { [turn: number]: CombatHistoryEntry[] } = {};
           for (const entry of history.items) {

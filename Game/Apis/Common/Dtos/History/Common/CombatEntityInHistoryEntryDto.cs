@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using RestAdventure.Core.Entities;
 
-namespace RestAdventure.Game.Apis.Common.Dtos.History;
+namespace RestAdventure.Game.Apis.Common.Dtos.History.Common;
 
 /// <summary>
 ///     Combat entity in history entry

@@ -1,14 +1,20 @@
-<div class="w-100 h-100 row">
-  <div class="col-lg-5 d-flex gap-2">
-    @for (entity of attackers; track entity.id) {
-      <ng-container [ngTemplateOutlet]="entityTpl" [ngTemplateOutletContext]="{ entity }"></ng-container>
-    }
+<div class="w-100 h-100 row py-2 px-4">
+  <div class="col-lg-5">
+    <h6 class="text-center">Attackers</h6>
+    <div class="d-flex gap-2">
+      @for (entity of attackers; track entity.id) {
+        <ng-container [ngTemplateOutlet]="entityTpl" [ngTemplateOutletContext]="{ entity }"></ng-container>
+      }
+    </div>
   </div>
   <div class="col"></div>
-  <div class="col-lg-5 d-flex gap-2">
-    @for (entity of defenders; track entity.id) {
-      <ng-container [ngTemplateOutlet]="entityTpl" [ngTemplateOutletContext]="{ entity }"></ng-container>
-    }
+  <div class="col-lg-5">
+    <h6 class="text-center">Defenders</h6>
+    <div class="d-flex gap-2">
+      @for (entity of defenders; track entity.id) {
+        <ng-container [ngTemplateOutlet]="entityTpl" [ngTemplateOutletContext]="{ entity }"></ng-container>
+      }
+    </div>
   </div>
 </div>
 

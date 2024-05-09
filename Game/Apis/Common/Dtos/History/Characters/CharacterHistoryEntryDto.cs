@@ -4,7 +4,7 @@ using RestAdventure.Core.History.Actions;
 using RestAdventure.Core.History.Characters;
 using RestAdventure.Core.History.Entities;
 
-namespace RestAdventure.Game.Apis.Common.Dtos.History;
+namespace RestAdventure.Game.Apis.Common.Dtos.History.Characters;
 
 /// <summary>
 ///     Character history entry

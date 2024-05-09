@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0-alpha.0.166+8f47877bbceac5c028489e18f983ebf0efa154e7"
+    "version": "0.0.0-alpha.0.167+3b9592f2ea37dd80e07b8720cea1d85d70d9eb7d"
   },
   "servers": [
     {
@@ -214,13 +214,298 @@
         ]
       }
     },
+    "/game/team/characters/{characterGuid}/combats": {
+      "get": {
+        "tags": [
+          "Combats"
+        ],
+        "summary": "Get combats",
+        "operationId": "Combats_GetCombats",
+        "parameters": [
+          {
+            "name": "characterGuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CombatInstance"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ]
+      }
+    },
+    "/game/team/characters/{characterGuid}/combats/{combatGuid}/history": {
+      "get": {
+        "tags": [
+          "Combats"
+        ],
+        "summary": "Search combat history",
+        "operationId": "CombatsHistory_SearchCombatHistory",
+        "parameters": [
+          {
+            "name": "characterGuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "combatGuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 2
+          },
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "description": "The page number\n            ",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 3
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "description": "The page size\n            ",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 4
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResultOfCombatHistoryEntry"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ]
+      }
+    },
+    "/game/team/characters/{characterGuid}/combats/archived": {
+      "get": {
+        "tags": [
+          "Combats"
+        ],
+        "summary": "Search archived combats",
+        "operationId": "CombatsHistory_SearchArchivedCombats",
+        "parameters": [
+          {
+            "name": "characterGuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "description": "The page number\n            ",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "description": "The page size\n            ",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResultOfArchivedCombat"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ]
+      }
+    },
+    "/game/team/characters/{characterGuid}/combats/archived/{combatGuid}/history": {
+      "get": {
+        "tags": [
+          "Combats"
+        ],
+        "summary": "Search archived combats history",
+        "operationId": "CombatsHistory_SearchArchivedCombatHistory",
+        "parameters": [
+          {
+            "name": "characterGuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "combatGuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 2
+          },
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "description": "The page number\n            ",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 3
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "description": "The page size\n            ",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 4
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResultOfCombatHistoryEntry"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ]
+      }
+    },
     "/game/team/characters/{characterGuid}/combats/in-preparation": {
       "get": {
         "tags": [
           "Combats"
         ],
         "summary": "Get combats in preparation",
-        "operationId": "Combats_GetCombatsInPreparation",
+        "operationId": "CombatsInPreparation_GetCombatsInPreparation",
         "parameters": [
           {
             "name": "characterGuid",
@@ -281,7 +566,7 @@
           "Combats"
         ],
         "summary": "Join combat in preparation",
-        "operationId": "Combats_JoinCombatInPreparation",
+        "operationId": "CombatsInPreparation_JoinCombatInPreparation",
         "parameters": [
           {
             "name": "characterGuid",
@@ -351,7 +636,7 @@
           "Combats"
         ],
         "summary": "Set combat in preparation options",
-        "operationId": "Combats_SetCombatInPreparationOptions",
+        "operationId": "CombatsInPreparation_SetCombatInPreparationOptions",
         "parameters": [
           {
             "name": "characterGuid",
@@ -405,145 +690,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "api-key": []
-          }
-        ]
-      }
-    },
-    "/game/team/characters/{characterGuid}/combats": {
-      "get": {
-        "tags": [
-          "Combats"
-        ],
-        "summary": "Get combats",
-        "operationId": "Combats_GetCombats",
-        "parameters": [
-          {
-            "name": "characterGuid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CombatInstance"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "api-key": []
-          }
-        ]
-      }
-    },
-    "/game/team/characters/{characterGuid}/combats/{combatGuid}/history": {
-      "get": {
-        "tags": [
-          "Combats"
-        ],
-        "summary": "Get combat history",
-        "operationId": "Combats_SearchCombatHistory",
-        "parameters": [
-          {
-            "name": "characterGuid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid"
-            },
-            "x-position": 1
-          },
-          {
-            "name": "combatGuid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid"
-            },
-            "x-position": 2
-          },
-          {
-            "name": "PageNumber",
-            "in": "query",
-            "description": "The page number\n            ",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 3
-          },
-          {
-            "name": "PageSize",
-            "in": "query",
-            "description": "The page size\n            ",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 4
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SearchResultOfCombatHistoryEntry"
                 }
               }
             }
@@ -2633,107 +2779,6 @@
           "defenders"
         ]
       },
-      "CombatInPreparation": {
-        "type": "object",
-        "description": "Combat instance\n            ",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "attackers",
-          "defenders",
-          "canJoin",
-          "whyCannotJoin"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "The unique ID of the combat instance\n            ",
-            "format": "guid",
-            "minLength": 1
-          },
-          "attackers": {
-            "description": "The attackers in the combat instance\n            ",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/CombatFormationInPreparation"
-              }
-            ]
-          },
-          "defenders": {
-            "description": "The defenders in the combat instance\n            ",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/CombatFormationInPreparation"
-              }
-            ]
-          },
-          "canJoin": {
-            "type": "boolean",
-            "description": "Can the character join the combat\n            "
-          },
-          "whyCannotJoin": {
-            "type": "string",
-            "description": "Why cannot the character join the combat\n            ",
-            "minLength": 1
-          }
-        }
-      },
-      "CombatFormationInPreparation": {
-        "type": "object",
-        "description": "Combat formation\n            ",
-        "additionalProperties": false,
-        "required": [
-          "entities",
-          "options"
-        ],
-        "properties": {
-          "entities": {
-            "type": "array",
-            "description": "The entities in the formation\n            ",
-            "items": {
-              "$ref": "#/components/schemas/EntityMinimal"
-            }
-          },
-          "options": {
-            "description": "The options of the formation\n            ",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/CombatFormationOptions"
-              }
-            ]
-          }
-        }
-      },
-      "CombatFormationOptions": {
-        "type": "object",
-        "description": "Combat formation options\n            ",
-        "additionalProperties": false,
-        "required": [
-          "accessibility"
-        ],
-        "properties": {
-          "accessibility": {
-            "description": "The accessibility of the formation\n            ",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/CombatFormationAccessibility"
-              }
-            ]
-          }
-        }
-      },
-      "CombatFormationAccessibility": {
-        "type": "string",
-        "description": "",
-        "x-enumNames": [
-          "Everyone",
-          "TeamOnly"
-        ],
-        "enum": [
-          "everyone",
-          "teamOnly"
-        ]
-      },
       "CombatInstance": {
         "type": "object",
         "description": "Combat instance\n            ",
@@ -3094,6 +3139,195 @@
               }
             }
           }
+        ]
+      },
+      "SearchResultOfArchivedCombat": {
+        "type": "object",
+        "description": "Search result\n            ",
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "pageNumber",
+          "pageSize",
+          "totalItemsCount",
+          "totalPagesCount"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "description": "The items found by the query\n            ",
+            "items": {
+              "$ref": "#/components/schemas/ArchivedCombat"
+            }
+          },
+          "pageNumber": {
+            "type": "integer",
+            "description": "The page number corresponding to the results that have been selected\n            ",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "The page size used by the search\n            ",
+            "format": "int32"
+          },
+          "totalItemsCount": {
+            "type": "integer",
+            "description": "The total number of items matching the query\n            ",
+            "format": "int32"
+          },
+          "totalPagesCount": {
+            "type": "integer",
+            "description": "The total number of pages\n            ",
+            "format": "int32"
+          }
+        }
+      },
+      "ArchivedCombat": {
+        "type": "object",
+        "description": "Archived combat\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "attackers",
+          "defenders",
+          "winner",
+          "duration"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the combat\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "attackers": {
+            "type": "array",
+            "description": "The attackers in the combat\n            ",
+            "items": {
+              "$ref": "#/components/schemas/EntityMinimal"
+            }
+          },
+          "defenders": {
+            "type": "array",
+            "description": "The defenders in the combat\n            ",
+            "items": {
+              "$ref": "#/components/schemas/EntityMinimal"
+            }
+          },
+          "winner": {
+            "description": "The winner of the combat\n            ",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CombatSide"
+              }
+            ]
+          },
+          "duration": {
+            "type": "integer",
+            "description": "The duration of the combat\n            ",
+            "format": "int32"
+          }
+        }
+      },
+      "CombatInPreparation": {
+        "type": "object",
+        "description": "Combat instance\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "attackers",
+          "defenders",
+          "canJoin",
+          "whyCannotJoin"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the combat instance\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "attackers": {
+            "description": "The attackers in the combat instance\n            ",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CombatFormationInPreparation"
+              }
+            ]
+          },
+          "defenders": {
+            "description": "The defenders in the combat instance\n            ",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CombatFormationInPreparation"
+              }
+            ]
+          },
+          "canJoin": {
+            "type": "boolean",
+            "description": "Can the character join the combat\n            "
+          },
+          "whyCannotJoin": {
+            "type": "string",
+            "description": "Why cannot the character join the combat\n            ",
+            "minLength": 1
+          }
+        }
+      },
+      "CombatFormationInPreparation": {
+        "type": "object",
+        "description": "Combat formation\n            ",
+        "additionalProperties": false,
+        "required": [
+          "entities",
+          "options"
+        ],
+        "properties": {
+          "entities": {
+            "type": "array",
+            "description": "The entities in the formation\n            ",
+            "items": {
+              "$ref": "#/components/schemas/EntityMinimal"
+            }
+          },
+          "options": {
+            "description": "The options of the formation\n            ",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CombatFormationOptions"
+              }
+            ]
+          }
+        }
+      },
+      "CombatFormationOptions": {
+        "type": "object",
+        "description": "Combat formation options\n            ",
+        "additionalProperties": false,
+        "required": [
+          "accessibility"
+        ],
+        "properties": {
+          "accessibility": {
+            "description": "The accessibility of the formation\n            ",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CombatFormationAccessibility"
+              }
+            ]
+          }
+        }
+      },
+      "CombatFormationAccessibility": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "Everyone",
+          "TeamOnly"
+        ],
+        "enum": [
+          "everyone",
+          "teamOnly"
         ]
       },
       "CharacterClass": {

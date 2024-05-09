@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using RestAdventure.Core.History.Actions;
 
-namespace RestAdventure.Game.Apis.Common.Dtos.History;
+namespace RestAdventure.Game.Apis.Common.Dtos.History.Characters;
 
 /// <summary>
 ///     Action started history entry

@@ -290,6 +290,324 @@ export class CombatsApiClient {
     }
 
     /**
+     * Get combats
+     */
+    getCombats(characterGuid: string): Observable<CombatInstance[]> {
+        let url_ = this.baseUrl + "/game/team/characters/{characterGuid}/combats";
+        if (characterGuid === undefined || characterGuid === null)
+            throw new Error("The parameter 'characterGuid' must be defined.");
+        url_ = url_.replace("{characterGuid}", encodeURIComponent("" + characterGuid));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetCombats(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetCombats(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<CombatInstance[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<CombatInstance[]>;
+        }));
+    }
+
+    protected processGetCombats(response: HttpResponseBase): Observable<CombatInstance[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(CombatInstance.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+            }));
+        } else if (status === 404) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ProblemDetails.fromJS(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
+export class CombatsHistoryApiClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "https://localhost:7056";
+    }
+
+    /**
+     * Search combat history
+     * @param pageNumber (optional) The page number
+     * @param pageSize (optional) The page size
+     */
+    searchCombatHistory(characterGuid: string, combatGuid: string, pageNumber?: number | undefined, pageSize?: number | undefined): Observable<SearchResultOfCombatHistoryEntry> {
+        let url_ = this.baseUrl + "/game/team/characters/{characterGuid}/combats/{combatGuid}/history?";
+        if (characterGuid === undefined || characterGuid === null)
+            throw new Error("The parameter 'characterGuid' must be defined.");
+        url_ = url_.replace("{characterGuid}", encodeURIComponent("" + characterGuid));
+        if (combatGuid === undefined || combatGuid === null)
+            throw new Error("The parameter 'combatGuid' must be defined.");
+        url_ = url_.replace("{combatGuid}", encodeURIComponent("" + combatGuid));
+        if (pageNumber === null)
+            throw new Error("The parameter 'pageNumber' cannot be null.");
+        else if (pageNumber !== undefined)
+            url_ += "PageNumber=" + encodeURIComponent("" + pageNumber) + "&";
+        if (pageSize === null)
+            throw new Error("The parameter 'pageSize' cannot be null.");
+        else if (pageSize !== undefined)
+            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSearchCombatHistory(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSearchCombatHistory(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<SearchResultOfCombatHistoryEntry>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<SearchResultOfCombatHistoryEntry>;
+        }));
+    }
+
+    protected processSearchCombatHistory(response: HttpResponseBase): Observable<SearchResultOfCombatHistoryEntry> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = SearchResultOfCombatHistoryEntry.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 404) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ProblemDetails.fromJS(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * Search archived combats
+     * @param pageNumber (optional) The page number
+     * @param pageSize (optional) The page size
+     */
+    searchArchivedCombats(characterGuid: string, pageNumber?: number | undefined, pageSize?: number | undefined): Observable<SearchResultOfArchivedCombat> {
+        let url_ = this.baseUrl + "/game/team/characters/{characterGuid}/combats/archived?";
+        if (characterGuid === undefined || characterGuid === null)
+            throw new Error("The parameter 'characterGuid' must be defined.");
+        url_ = url_.replace("{characterGuid}", encodeURIComponent("" + characterGuid));
+        if (pageNumber === null)
+            throw new Error("The parameter 'pageNumber' cannot be null.");
+        else if (pageNumber !== undefined)
+            url_ += "PageNumber=" + encodeURIComponent("" + pageNumber) + "&";
+        if (pageSize === null)
+            throw new Error("The parameter 'pageSize' cannot be null.");
+        else if (pageSize !== undefined)
+            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSearchArchivedCombats(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSearchArchivedCombats(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<SearchResultOfArchivedCombat>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<SearchResultOfArchivedCombat>;
+        }));
+    }
+
+    protected processSearchArchivedCombats(response: HttpResponseBase): Observable<SearchResultOfArchivedCombat> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = SearchResultOfArchivedCombat.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 404) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ProblemDetails.fromJS(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * Search archived combats history
+     * @param pageNumber (optional) The page number
+     * @param pageSize (optional) The page size
+     */
+    searchArchivedCombatHistory(characterGuid: string, combatGuid: string, pageNumber?: number | undefined, pageSize?: number | undefined): Observable<SearchResultOfCombatHistoryEntry> {
+        let url_ = this.baseUrl + "/game/team/characters/{characterGuid}/combats/archived/{combatGuid}/history?";
+        if (characterGuid === undefined || characterGuid === null)
+            throw new Error("The parameter 'characterGuid' must be defined.");
+        url_ = url_.replace("{characterGuid}", encodeURIComponent("" + characterGuid));
+        if (combatGuid === undefined || combatGuid === null)
+            throw new Error("The parameter 'combatGuid' must be defined.");
+        url_ = url_.replace("{combatGuid}", encodeURIComponent("" + combatGuid));
+        if (pageNumber === null)
+            throw new Error("The parameter 'pageNumber' cannot be null.");
+        else if (pageNumber !== undefined)
+            url_ += "PageNumber=" + encodeURIComponent("" + pageNumber) + "&";
+        if (pageSize === null)
+            throw new Error("The parameter 'pageSize' cannot be null.");
+        else if (pageSize !== undefined)
+            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSearchArchivedCombatHistory(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSearchArchivedCombatHistory(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<SearchResultOfCombatHistoryEntry>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<SearchResultOfCombatHistoryEntry>;
+        }));
+    }
+
+    protected processSearchArchivedCombatHistory(response: HttpResponseBase): Observable<SearchResultOfCombatHistoryEntry> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = SearchResultOfCombatHistoryEntry.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 404) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ProblemDetails.fromJS(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
+export class CombatsInPreparationApiClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "https://localhost:7056";
+    }
+
+    /**
      * Get combats in preparation
      */
     getCombatsInPreparation(characterGuid: string): Observable<CombatInPreparation[]> {
@@ -492,155 +810,6 @@ export class CombatsApiClient {
             let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result400 = ProblemDetails.fromJS(resultData400);
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
-            }));
-        } else if (status === 404) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result404: any = null;
-            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result404 = ProblemDetails.fromJS(resultData404);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    /**
-     * Get combats
-     */
-    getCombats(characterGuid: string): Observable<CombatInstance[]> {
-        let url_ = this.baseUrl + "/game/team/characters/{characterGuid}/combats";
-        if (characterGuid === undefined || characterGuid === null)
-            throw new Error("The parameter 'characterGuid' must be defined.");
-        url_ = url_.replace("{characterGuid}", encodeURIComponent("" + characterGuid));
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "application/json"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetCombats(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetCombats(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<CombatInstance[]>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<CombatInstance[]>;
-        }));
-    }
-
-    protected processGetCombats(response: HttpResponseBase): Observable<CombatInstance[]> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            if (Array.isArray(resultData200)) {
-                result200 = [] as any;
-                for (let item of resultData200)
-                    result200!.push(CombatInstance.fromJS(item));
-            }
-            else {
-                result200 = <any>null;
-            }
-            return _observableOf(result200);
-            }));
-        } else if (status === 400) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result400: any = null;
-            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result400 = ProblemDetails.fromJS(resultData400);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
-            }));
-        } else if (status === 404) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result404: any = null;
-            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result404 = ProblemDetails.fromJS(resultData404);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    /**
-     * Get combat history
-     * @param pageNumber (optional) The page number
-     * @param pageSize (optional) The page size
-     */
-    searchCombatHistory(characterGuid: string, combatGuid: string, pageNumber?: number | undefined, pageSize?: number | undefined): Observable<SearchResultOfCombatHistoryEntry> {
-        let url_ = this.baseUrl + "/game/team/characters/{characterGuid}/combats/{combatGuid}/history?";
-        if (characterGuid === undefined || characterGuid === null)
-            throw new Error("The parameter 'characterGuid' must be defined.");
-        url_ = url_.replace("{characterGuid}", encodeURIComponent("" + characterGuid));
-        if (combatGuid === undefined || combatGuid === null)
-            throw new Error("The parameter 'combatGuid' must be defined.");
-        url_ = url_.replace("{combatGuid}", encodeURIComponent("" + combatGuid));
-        if (pageNumber === null)
-            throw new Error("The parameter 'pageNumber' cannot be null.");
-        else if (pageNumber !== undefined)
-            url_ += "PageNumber=" + encodeURIComponent("" + pageNumber) + "&";
-        if (pageSize === null)
-            throw new Error("The parameter 'pageSize' cannot be null.");
-        else if (pageSize !== undefined)
-            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "application/json"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processSearchCombatHistory(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processSearchCombatHistory(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<SearchResultOfCombatHistoryEntry>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<SearchResultOfCombatHistoryEntry>;
-        }));
-    }
-
-    protected processSearchCombatHistory(response: HttpResponseBase): Observable<SearchResultOfCombatHistoryEntry> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = SearchResultOfCombatHistoryEntry.fromJS(resultData200);
-            return _observableOf(result200);
             }));
         } else if (status === 404) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -4182,193 +4351,6 @@ export enum CombatSide {
 }
 
 /** Combat instance */
-export class CombatInPreparation implements ICombatInPreparation {
-    /** The unique ID of the combat instance
-             */
-    id!: string;
-    /** The attackers in the combat instance
-             */
-    attackers!: CombatFormationInPreparation;
-    /** The defenders in the combat instance
-             */
-    defenders!: CombatFormationInPreparation;
-    /** Can the character join the combat
-             */
-    canJoin!: boolean;
-    /** Why cannot the character join the combat
-             */
-    whyCannotJoin!: string;
-
-    constructor(data?: ICombatInPreparation) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-        if (!data) {
-            this.attackers = new CombatFormationInPreparation();
-            this.defenders = new CombatFormationInPreparation();
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.attackers = _data["attackers"] ? CombatFormationInPreparation.fromJS(_data["attackers"]) : new CombatFormationInPreparation();
-            this.defenders = _data["defenders"] ? CombatFormationInPreparation.fromJS(_data["defenders"]) : new CombatFormationInPreparation();
-            this.canJoin = _data["canJoin"];
-            this.whyCannotJoin = _data["whyCannotJoin"];
-        }
-    }
-
-    static fromJS(data: any): CombatInPreparation {
-        data = typeof data === 'object' ? data : {};
-        let result = new CombatInPreparation();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["attackers"] = this.attackers ? this.attackers.toJSON() : <any>undefined;
-        data["defenders"] = this.defenders ? this.defenders.toJSON() : <any>undefined;
-        data["canJoin"] = this.canJoin;
-        data["whyCannotJoin"] = this.whyCannotJoin;
-        return data;
-    }
-}
-
-/** Combat instance */
-export interface ICombatInPreparation {
-    /** The unique ID of the combat instance
-             */
-    id: string;
-    /** The attackers in the combat instance
-             */
-    attackers: CombatFormationInPreparation;
-    /** The defenders in the combat instance
-             */
-    defenders: CombatFormationInPreparation;
-    /** Can the character join the combat
-             */
-    canJoin: boolean;
-    /** Why cannot the character join the combat
-             */
-    whyCannotJoin: string;
-}
-
-/** Combat formation */
-export class CombatFormationInPreparation implements ICombatFormationInPreparation {
-    /** The entities in the formation
-             */
-    entities!: EntityMinimal[];
-    /** The options of the formation
-             */
-    options!: CombatFormationOptions;
-
-    constructor(data?: ICombatFormationInPreparation) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-        if (!data) {
-            this.entities = [];
-            this.options = new CombatFormationOptions();
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            if (Array.isArray(_data["entities"])) {
-                this.entities = [] as any;
-                for (let item of _data["entities"])
-                    this.entities!.push(EntityMinimal.fromJS(item));
-            }
-            this.options = _data["options"] ? CombatFormationOptions.fromJS(_data["options"]) : new CombatFormationOptions();
-        }
-    }
-
-    static fromJS(data: any): CombatFormationInPreparation {
-        data = typeof data === 'object' ? data : {};
-        let result = new CombatFormationInPreparation();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        if (Array.isArray(this.entities)) {
-            data["entities"] = [];
-            for (let item of this.entities)
-                data["entities"].push(item.toJSON());
-        }
-        data["options"] = this.options ? this.options.toJSON() : <any>undefined;
-        return data;
-    }
-}
-
-/** Combat formation */
-export interface ICombatFormationInPreparation {
-    /** The entities in the formation
-             */
-    entities: EntityMinimal[];
-    /** The options of the formation
-             */
-    options: CombatFormationOptions;
-}
-
-/** Combat formation options */
-export class CombatFormationOptions implements ICombatFormationOptions {
-    /** The accessibility of the formation
-             */
-    accessibility!: CombatFormationAccessibility;
-
-    constructor(data?: ICombatFormationOptions) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.accessibility = _data["accessibility"];
-        }
-    }
-
-    static fromJS(data: any): CombatFormationOptions {
-        data = typeof data === 'object' ? data : {};
-        let result = new CombatFormationOptions();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["accessibility"] = this.accessibility;
-        return data;
-    }
-}
-
-/** Combat formation options */
-export interface ICombatFormationOptions {
-    /** The accessibility of the formation
-             */
-    accessibility: CombatFormationAccessibility;
-}
-
-export enum CombatFormationAccessibility {
-    Everyone = "everyone",
-    TeamOnly = "teamOnly",
-}
-
-/** Combat instance */
 export class CombatInstance implements ICombatInstance {
     /** The unique ID of the combat instance
              */
@@ -5024,6 +5006,372 @@ export interface ICombatEndedHistoryEntry extends ICombatHistoryEntry {
     /** The winner of the combat
              */
     winner: CombatSide;
+}
+
+/** Search result */
+export class SearchResultOfArchivedCombat implements ISearchResultOfArchivedCombat {
+    /** The items found by the query
+             */
+    items!: ArchivedCombat[];
+    /** The page number corresponding to the results that have been selected
+             */
+    pageNumber!: number;
+    /** The page size used by the search
+             */
+    pageSize!: number;
+    /** The total number of items matching the query
+             */
+    totalItemsCount!: number;
+    /** The total number of pages
+             */
+    totalPagesCount!: number;
+
+    constructor(data?: ISearchResultOfArchivedCombat) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.items = [];
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(ArchivedCombat.fromJS(item));
+            }
+            this.pageNumber = _data["pageNumber"];
+            this.pageSize = _data["pageSize"];
+            this.totalItemsCount = _data["totalItemsCount"];
+            this.totalPagesCount = _data["totalPagesCount"];
+        }
+    }
+
+    static fromJS(data: any): SearchResultOfArchivedCombat {
+        data = typeof data === 'object' ? data : {};
+        let result = new SearchResultOfArchivedCombat();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        data["pageNumber"] = this.pageNumber;
+        data["pageSize"] = this.pageSize;
+        data["totalItemsCount"] = this.totalItemsCount;
+        data["totalPagesCount"] = this.totalPagesCount;
+        return data;
+    }
+}
+
+/** Search result */
+export interface ISearchResultOfArchivedCombat {
+    /** The items found by the query
+             */
+    items: ArchivedCombat[];
+    /** The page number corresponding to the results that have been selected
+             */
+    pageNumber: number;
+    /** The page size used by the search
+             */
+    pageSize: number;
+    /** The total number of items matching the query
+             */
+    totalItemsCount: number;
+    /** The total number of pages
+             */
+    totalPagesCount: number;
+}
+
+/** Archived combat */
+export class ArchivedCombat implements IArchivedCombat {
+    /** The unique ID of the combat
+             */
+    id!: string;
+    /** The attackers in the combat
+             */
+    attackers!: EntityMinimal[];
+    /** The defenders in the combat
+             */
+    defenders!: EntityMinimal[];
+    /** The winner of the combat
+             */
+    winner!: CombatSide;
+    /** The duration of the combat
+             */
+    duration!: number;
+
+    constructor(data?: IArchivedCombat) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.attackers = [];
+            this.defenders = [];
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            if (Array.isArray(_data["attackers"])) {
+                this.attackers = [] as any;
+                for (let item of _data["attackers"])
+                    this.attackers!.push(EntityMinimal.fromJS(item));
+            }
+            if (Array.isArray(_data["defenders"])) {
+                this.defenders = [] as any;
+                for (let item of _data["defenders"])
+                    this.defenders!.push(EntityMinimal.fromJS(item));
+            }
+            this.winner = _data["winner"];
+            this.duration = _data["duration"];
+        }
+    }
+
+    static fromJS(data: any): ArchivedCombat {
+        data = typeof data === 'object' ? data : {};
+        let result = new ArchivedCombat();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        if (Array.isArray(this.attackers)) {
+            data["attackers"] = [];
+            for (let item of this.attackers)
+                data["attackers"].push(item.toJSON());
+        }
+        if (Array.isArray(this.defenders)) {
+            data["defenders"] = [];
+            for (let item of this.defenders)
+                data["defenders"].push(item.toJSON());
+        }
+        data["winner"] = this.winner;
+        data["duration"] = this.duration;
+        return data;
+    }
+}
+
+/** Archived combat */
+export interface IArchivedCombat {
+    /** The unique ID of the combat
+             */
+    id: string;
+    /** The attackers in the combat
+             */
+    attackers: EntityMinimal[];
+    /** The defenders in the combat
+             */
+    defenders: EntityMinimal[];
+    /** The winner of the combat
+             */
+    winner: CombatSide;
+    /** The duration of the combat
+             */
+    duration: number;
+}
+
+/** Combat instance */
+export class CombatInPreparation implements ICombatInPreparation {
+    /** The unique ID of the combat instance
+             */
+    id!: string;
+    /** The attackers in the combat instance
+             */
+    attackers!: CombatFormationInPreparation;
+    /** The defenders in the combat instance
+             */
+    defenders!: CombatFormationInPreparation;
+    /** Can the character join the combat
+             */
+    canJoin!: boolean;
+    /** Why cannot the character join the combat
+             */
+    whyCannotJoin!: string;
+
+    constructor(data?: ICombatInPreparation) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.attackers = new CombatFormationInPreparation();
+            this.defenders = new CombatFormationInPreparation();
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.attackers = _data["attackers"] ? CombatFormationInPreparation.fromJS(_data["attackers"]) : new CombatFormationInPreparation();
+            this.defenders = _data["defenders"] ? CombatFormationInPreparation.fromJS(_data["defenders"]) : new CombatFormationInPreparation();
+            this.canJoin = _data["canJoin"];
+            this.whyCannotJoin = _data["whyCannotJoin"];
+        }
+    }
+
+    static fromJS(data: any): CombatInPreparation {
+        data = typeof data === 'object' ? data : {};
+        let result = new CombatInPreparation();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["attackers"] = this.attackers ? this.attackers.toJSON() : <any>undefined;
+        data["defenders"] = this.defenders ? this.defenders.toJSON() : <any>undefined;
+        data["canJoin"] = this.canJoin;
+        data["whyCannotJoin"] = this.whyCannotJoin;
+        return data;
+    }
+}
+
+/** Combat instance */
+export interface ICombatInPreparation {
+    /** The unique ID of the combat instance
+             */
+    id: string;
+    /** The attackers in the combat instance
+             */
+    attackers: CombatFormationInPreparation;
+    /** The defenders in the combat instance
+             */
+    defenders: CombatFormationInPreparation;
+    /** Can the character join the combat
+             */
+    canJoin: boolean;
+    /** Why cannot the character join the combat
+             */
+    whyCannotJoin: string;
+}
+
+/** Combat formation */
+export class CombatFormationInPreparation implements ICombatFormationInPreparation {
+    /** The entities in the formation
+             */
+    entities!: EntityMinimal[];
+    /** The options of the formation
+             */
+    options!: CombatFormationOptions;
+
+    constructor(data?: ICombatFormationInPreparation) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.entities = [];
+            this.options = new CombatFormationOptions();
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["entities"])) {
+                this.entities = [] as any;
+                for (let item of _data["entities"])
+                    this.entities!.push(EntityMinimal.fromJS(item));
+            }
+            this.options = _data["options"] ? CombatFormationOptions.fromJS(_data["options"]) : new CombatFormationOptions();
+        }
+    }
+
+    static fromJS(data: any): CombatFormationInPreparation {
+        data = typeof data === 'object' ? data : {};
+        let result = new CombatFormationInPreparation();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.entities)) {
+            data["entities"] = [];
+            for (let item of this.entities)
+                data["entities"].push(item.toJSON());
+        }
+        data["options"] = this.options ? this.options.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+/** Combat formation */
+export interface ICombatFormationInPreparation {
+    /** The entities in the formation
+             */
+    entities: EntityMinimal[];
+    /** The options of the formation
+             */
+    options: CombatFormationOptions;
+}
+
+/** Combat formation options */
+export class CombatFormationOptions implements ICombatFormationOptions {
+    /** The accessibility of the formation
+             */
+    accessibility!: CombatFormationAccessibility;
+
+    constructor(data?: ICombatFormationOptions) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.accessibility = _data["accessibility"];
+        }
+    }
+
+    static fromJS(data: any): CombatFormationOptions {
+        data = typeof data === 'object' ? data : {};
+        let result = new CombatFormationOptions();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["accessibility"] = this.accessibility;
+        return data;
+    }
+}
+
+/** Combat formation options */
+export interface ICombatFormationOptions {
+    /** The accessibility of the formation
+             */
+    accessibility: CombatFormationAccessibility;
+}
+
+export enum CombatFormationAccessibility {
+    Everyone = "everyone",
+    TeamOnly = "teamOnly",
 }
 
 /** Character class */

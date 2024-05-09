@@ -7,7 +7,7 @@ using RestAdventure.Core.Entities.Characters.Services;
 using RestAdventure.Core.History.Entities;
 using RestAdventure.Core.Players;
 using RestAdventure.Game.Apis.Common.Dtos.Characters;
-using RestAdventure.Game.Apis.Common.Dtos.History;
+using RestAdventure.Game.Apis.Common.Dtos.History.Characters;
 using RestAdventure.Game.Apis.Common.Dtos.Queries;
 using RestAdventure.Game.Apis.GameApi.Controllers.Requests;
 using RestAdventure.Game.Authentication;

@@ -1,0 +1,143 @@
+<div class="w-100 h-100 border d-flex">
+  <div style="width: 20%">
+    <div class="p-2">
+      <h6 class="m-0">Combats</h6>
+    </div>
+    <hr class="m-0" />
+    <div class="list-group list-group-flush">
+      @if (combats.length === 0 && combatsInPreparation.length == 0 && archivedCombats.length == 0) {
+        <div class="text-secondary text-center py-2">None</div>
+      } @else {
+        @for (combat of combatsInPreparation; track combat.id) {
+          <ng-container
+            [ngTemplateOutlet]="combatInPreparationListItem"
+            [ngTemplateOutletContext]="{ combat, plansToJoinCombat: plansToJoinCombat(combat), isInCombat: isInCombat(combat) }"
+          ></ng-container>
+        }
+
+        @for (combat of combats; track combat.id) {
+          <ng-container [ngTemplateOutlet]="combatListItem" [ngTemplateOutletContext]="{ combat }"></ng-container>
+        }
+
+        @if (archivedCombats.length > 0) {
+          <div class="text-bg-secondary px-2">
+            <h6 class="m-0">Archived</h6>
+          </div>
+
+          @for (combat of archivedCombats; track combat.id) {
+            <ng-container [ngTemplateOutlet]="archivedCombatListItem" [ngTemplateOutletContext]="{ combat }"></ng-container>
+          }
+        }
+      }
+    </div>
+  </div>
+  <div class="vr"></div>
+  <div class="flex-grow-1">
+    @if (selectedCombat) {
+      <app-combat [combat]="selectedCombat"></app-combat>
+    } @else if (selectedCombatInPreparation) {
+      <app-combat-in-preparation
+        [combat]="selectedCombatInPreparation"
+        (changeAccessibility)="changeAccessibility(selectedCombatInPreparation, $event)"
+      ></app-combat-in-preparation>
+    } @else if (selectedArchivedCombat) {
+      <app-combat-history [character]="character" [combat]="selectedArchivedCombat" nEntries="40"></app-combat-history>
+    } @else {
+      <div class="w-100 h-100 d-flex align-items-center justify-content-center">
+        <h6 class="text-secondary text-center">Select combat</h6>
+      </div>
+    }
+  </div>
+  @if (selectedCombat || selectedCombatInPreparation) {
+    <div class="vr"></div>
+    <div style="width: 360px">
+      <app-combat-history [character]="character" [combat]="selectedCombat ?? selectedCombatInPreparation!"></app-combat-history>
+    </div>
+  }
+</div>
+
+<ng-template #combatListItem let-combat="combat">
+  <a role="button" class="list-group-item list-group-item-action" [class.active]="combat.id === selectedCombat?.id" (click)="selectCombat(combat)">
+    <div class="text-truncate">
+      @for (entity of combat.attackers; track entity.id) {
+        {{ entity.name }},
+      }
+    </div>
+    <div class="text-truncate">
+      @for (entity of combat.defenders; track entity.id) {
+        {{ entity.name }},
+      }
+    </div>
+  </a>
+</ng-template>
+
+<ng-template #combatInPreparationListItem let-combat="combat" let-plansToJoinCombat="plansToJoinCombat" let-isInCombat="isInCombat">
+  <a
+    role="button"
+    class="list-group-item list-group-item-action text-secondary"
+    [ngClass]="combat.id === selectedCombatInPreparation?.id ? 'active text-light' : undefined"
+    (click)="selectCombatInPreparation(combat)"
+  >
+    <div class="d-flex">
+      <div class="flex-grow-1">
+        <div class="text-truncate">
+          @for (entity of combat.attackers.entities; track entity.id) {
+            {{ entity.name }},
+          }
+        </div>
+        <div class="text-truncate">
+          @for (entity of combat.defenders.entities; track entity.id) {
+            {{ entity.name }},
+          }
+        </div>
+      </div>
+      <div>
+        @if (plansToJoinCombat || isInCombat) {
+          <button class="btn btn-outline-light disabled">Joined</button>
+        } @else {
+          <button
+            class="btn"
+            [ngClass]="combat.id === selectedCombatInPreparation?.id ? 'btn-light' : 'btn-outline-secondary'"
+            [class.disabled]="!combat.canJoin"
+            (click)="joinCombat(combat)"
+          >
+            Join
+          </button>
+        }
+      </div>
+    </div>
+    @if (!plansToJoinCombat && !isInCombat && !combat.canJoin) {
+      <div class="text-danger">{{ combat.whyCannotJoin }}</div>
+    }
+  </a>
+</ng-template>
+
+<ng-template #archivedCombatListItem let-combat="combat">
+  <a
+    role="button"
+    class="list-group-item list-group-item-action"
+    [ngClass]="combat.id === selectedArchivedCombat?.id ? 'active text-light' : 'list-group-item-secondary'"
+    (click)="selectArchivedCombat(combat)"
+  >
+    <div class="d-flex">
+      <div class="flex-grow-1">
+        <div class="text-truncate">
+          @if (combat.winner === 'attackers') {
+            <i class="bi bi-award-fill"></i>
+          }
+          @for (entity of combat.attackers; track entity.id) {
+            {{ entity.name }},
+          }
+        </div>
+        <div class="text-truncate">
+          @if (combat.winner === 'defenders') {
+            <i class="bi bi-award-fill"></i>
+          }
+          @for (entity of combat.defenders; track entity.id) {
+            {{ entity.name }},
+          }
+        </div>
+      </div>
+    </div>
+  </a>
+</ng-template>
