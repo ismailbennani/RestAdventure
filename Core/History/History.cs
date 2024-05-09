@@ -1,4 +1,6 @@
-﻿using RestAdventure.Core.Entities.Characters;
+﻿using RestAdventure.Core.Combat;
+using RestAdventure.Core.Entities.Characters;
+using RestAdventure.Core.History.Combats;
 using RestAdventure.Core.History.Entities;
 
 namespace RestAdventure.Core.History;
@@ -11,5 +13,7 @@ public class GameHistory
 
     public void Record(HistoryEntry entry) => _entries.Add(entry);
 
-    public IEnumerable<EntityHistoryEntry> Character(Character character) => _entries.OfType<EntityHistoryEntry>().Where(c => c.EntityId == character.Id);
+    public IEnumerable<EntityHistoryEntry> Character(CharacterId characterId) => _entries.OfType<EntityHistoryEntry>().Where(c => c.EntityId == characterId);
+
+    public IEnumerable<CombatHistoryEntry> Combat(CombatInstanceId combatId) => _entries.OfType<CombatHistoryEntry>().Where(c => c.CombatInstanceId == combatId);
 }

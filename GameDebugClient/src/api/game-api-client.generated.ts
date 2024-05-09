@@ -582,6 +582,80 @@ export class CombatsApiClient {
         }
         return _observableOf(null as any);
     }
+
+    /**
+     * Get combat history
+     * @param pageNumber (optional) The page number
+     * @param pageSize (optional) The page size
+     */
+    searchCombatHistory(characterGuid: string, combatGuid: string, pageNumber?: number | undefined, pageSize?: number | undefined): Observable<SearchResultOfCombatHistoryEntry> {
+        let url_ = this.baseUrl + "/game/team/characters/{characterGuid}/combats/{combatGuid}/history?";
+        if (characterGuid === undefined || characterGuid === null)
+            throw new Error("The parameter 'characterGuid' must be defined.");
+        url_ = url_.replace("{characterGuid}", encodeURIComponent("" + characterGuid));
+        if (combatGuid === undefined || combatGuid === null)
+            throw new Error("The parameter 'combatGuid' must be defined.");
+        url_ = url_.replace("{combatGuid}", encodeURIComponent("" + combatGuid));
+        if (pageNumber === null)
+            throw new Error("The parameter 'pageNumber' cannot be null.");
+        else if (pageNumber !== undefined)
+            url_ += "PageNumber=" + encodeURIComponent("" + pageNumber) + "&";
+        if (pageSize === null)
+            throw new Error("The parameter 'pageSize' cannot be null.");
+        else if (pageSize !== undefined)
+            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSearchCombatHistory(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSearchCombatHistory(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<SearchResultOfCombatHistoryEntry>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<SearchResultOfCombatHistoryEntry>;
+        }));
+    }
+
+    protected processSearchCombatHistory(response: HttpResponseBase): Observable<SearchResultOfCombatHistoryEntry> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = SearchResultOfCombatHistoryEntry.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 404) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ProblemDetails.fromJS(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
 }
 
 @Injectable()
@@ -4737,6 +4811,382 @@ export interface IEntityInCombat extends IEntityMinimal {
     /** The combat statistics of the character
              */
     combat: EntityCombatStatistics;
+}
+
+/** Search result */
+export class SearchResultOfCombatHistoryEntry implements ISearchResultOfCombatHistoryEntry {
+    /** The items found by the query
+             */
+    items!: CombatHistoryEntry[];
+    /** The page number corresponding to the results that have been selected
+             */
+    pageNumber!: number;
+    /** The page size used by the search
+             */
+    pageSize!: number;
+    /** The total number of items matching the query
+             */
+    totalItemsCount!: number;
+    /** The total number of pages
+             */
+    totalPagesCount!: number;
+
+    constructor(data?: ISearchResultOfCombatHistoryEntry) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.items = [];
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(CombatHistoryEntry.fromJS(item));
+            }
+            this.pageNumber = _data["pageNumber"];
+            this.pageSize = _data["pageSize"];
+            this.totalItemsCount = _data["totalItemsCount"];
+            this.totalPagesCount = _data["totalPagesCount"];
+        }
+    }
+
+    static fromJS(data: any): SearchResultOfCombatHistoryEntry {
+        data = typeof data === 'object' ? data : {};
+        let result = new SearchResultOfCombatHistoryEntry();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        data["pageNumber"] = this.pageNumber;
+        data["pageSize"] = this.pageSize;
+        data["totalItemsCount"] = this.totalItemsCount;
+        data["totalPagesCount"] = this.totalPagesCount;
+        return data;
+    }
+}
+
+/** Search result */
+export interface ISearchResultOfCombatHistoryEntry {
+    /** The items found by the query
+             */
+    items: CombatHistoryEntry[];
+    /** The page number corresponding to the results that have been selected
+             */
+    pageNumber: number;
+    /** The page size used by the search
+             */
+    pageSize: number;
+    /** The total number of items matching the query
+             */
+    totalItemsCount: number;
+    /** The total number of pages
+             */
+    totalPagesCount: number;
+}
+
+/** Combat history entry */
+export class CombatHistoryEntry implements ICombatHistoryEntry {
+    /** The tick at which the event happened
+             */
+    tick!: number;
+    /** The turn at which the event happened
+             */
+    turn!: number;
+
+    protected _discriminator: string;
+
+    constructor(data?: ICombatHistoryEntry) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        this._discriminator = "CombatHistoryEntry";
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.tick = _data["tick"];
+            this.turn = _data["turn"];
+        }
+    }
+
+    static fromJS(data: any): CombatHistoryEntry {
+        data = typeof data === 'object' ? data : {};
+        if (data["$type"] === "preparation-started") {
+            let result = new CombatPreparationStartedHistoryEntry();
+            result.init(data);
+            return result;
+        }
+        if (data["$type"] === "started") {
+            let result = new CombatStartedHistoryEntry();
+            result.init(data);
+            return result;
+        }
+        if (data["$type"] === "entity-joined") {
+            let result = new CombatEntityJoinedHistoryEntry();
+            result.init(data);
+            return result;
+        }
+        if (data["$type"] === "entity-left") {
+            let result = new CombatEntityLeftHistoryEntry();
+            result.init(data);
+            return result;
+        }
+        if (data["$type"] === "ended") {
+            let result = new CombatEndedHistoryEntry();
+            result.init(data);
+            return result;
+        }
+        let result = new CombatHistoryEntry();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["$type"] = this._discriminator;
+        data["tick"] = this.tick;
+        data["turn"] = this.turn;
+        return data;
+    }
+}
+
+/** Combat history entry */
+export interface ICombatHistoryEntry {
+    /** The tick at which the event happened
+             */
+    tick: number;
+    /** The turn at which the event happened
+             */
+    turn: number;
+}
+
+/** Combat preparation started history entry */
+export class CombatPreparationStartedHistoryEntry extends CombatHistoryEntry implements ICombatPreparationStartedHistoryEntry {
+
+    constructor(data?: ICombatPreparationStartedHistoryEntry) {
+        super(data);
+        this._discriminator = "preparation-started";
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+    }
+
+    static override fromJS(data: any): CombatPreparationStartedHistoryEntry {
+        data = typeof data === 'object' ? data : {};
+        let result = new CombatPreparationStartedHistoryEntry();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Combat preparation started history entry */
+export interface ICombatPreparationStartedHistoryEntry extends ICombatHistoryEntry {
+}
+
+/** Combat started history entry */
+export class CombatStartedHistoryEntry extends CombatHistoryEntry implements ICombatStartedHistoryEntry {
+
+    constructor(data?: ICombatStartedHistoryEntry) {
+        super(data);
+        this._discriminator = "started";
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+    }
+
+    static override fromJS(data: any): CombatStartedHistoryEntry {
+        data = typeof data === 'object' ? data : {};
+        let result = new CombatStartedHistoryEntry();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Combat started history entry */
+export interface ICombatStartedHistoryEntry extends ICombatHistoryEntry {
+}
+
+/** Combat entity joined history entry */
+export class CombatEntityJoinedHistoryEntry extends CombatHistoryEntry implements ICombatEntityJoinedHistoryEntry {
+    /** The unique ID of the entity that joined the combat
+             */
+    entityId!: string;
+    /** The name of the entity that joined the combat
+             */
+    entityName!: string;
+    /** The side of the combat joined by the entity
+             */
+    side!: CombatSide;
+
+    constructor(data?: ICombatEntityJoinedHistoryEntry) {
+        super(data);
+        this._discriminator = "entity-joined";
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.entityId = _data["entityId"];
+            this.entityName = _data["entityName"];
+            this.side = _data["side"];
+        }
+    }
+
+    static override fromJS(data: any): CombatEntityJoinedHistoryEntry {
+        data = typeof data === 'object' ? data : {};
+        let result = new CombatEntityJoinedHistoryEntry();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["entityId"] = this.entityId;
+        data["entityName"] = this.entityName;
+        data["side"] = this.side;
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Combat entity joined history entry */
+export interface ICombatEntityJoinedHistoryEntry extends ICombatHistoryEntry {
+    /** The unique ID of the entity that joined the combat
+             */
+    entityId: string;
+    /** The name of the entity that joined the combat
+             */
+    entityName: string;
+    /** The side of the combat joined by the entity
+             */
+    side: CombatSide;
+}
+
+/** Combat entity left history entry */
+export class CombatEntityLeftHistoryEntry extends CombatHistoryEntry implements ICombatEntityLeftHistoryEntry {
+    /** The unique ID of the entity that joined the combat
+             */
+    entityId!: string;
+    /** The name of the entity that joined the combat
+             */
+    entityName!: string;
+    /** The side of the combat joined by the entity
+             */
+    side!: CombatSide;
+
+    constructor(data?: ICombatEntityLeftHistoryEntry) {
+        super(data);
+        this._discriminator = "entity-left";
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.entityId = _data["entityId"];
+            this.entityName = _data["entityName"];
+            this.side = _data["side"];
+        }
+    }
+
+    static override fromJS(data: any): CombatEntityLeftHistoryEntry {
+        data = typeof data === 'object' ? data : {};
+        let result = new CombatEntityLeftHistoryEntry();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["entityId"] = this.entityId;
+        data["entityName"] = this.entityName;
+        data["side"] = this.side;
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Combat entity left history entry */
+export interface ICombatEntityLeftHistoryEntry extends ICombatHistoryEntry {
+    /** The unique ID of the entity that joined the combat
+             */
+    entityId: string;
+    /** The name of the entity that joined the combat
+             */
+    entityName: string;
+    /** The side of the combat joined by the entity
+             */
+    side: CombatSide;
+}
+
+/** Combat ended history entry */
+export class CombatEndedHistoryEntry extends CombatHistoryEntry implements ICombatEndedHistoryEntry {
+    /** The winner of the combat
+             */
+    winner!: CombatSide;
+
+    constructor(data?: ICombatEndedHistoryEntry) {
+        super(data);
+        this._discriminator = "ended";
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.winner = _data["winner"];
+        }
+    }
+
+    static override fromJS(data: any): CombatEndedHistoryEntry {
+        data = typeof data === 'object' ? data : {};
+        let result = new CombatEndedHistoryEntry();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["winner"] = this.winner;
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Combat ended history entry */
+export interface ICombatEndedHistoryEntry extends ICombatHistoryEntry {
+    /** The winner of the combat
+             */
+    winner: CombatSide;
 }
 
 /** Character class */

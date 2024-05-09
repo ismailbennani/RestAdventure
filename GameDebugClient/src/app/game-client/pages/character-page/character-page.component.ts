@@ -27,6 +27,7 @@ import { CharacterHistoryComponent } from '../../widgets/character-history/chara
 import { CharacterMonstersComponent } from '../../widgets/character-monsters/character-monsters.component';
 import { CharacterMovementsComponent } from '../../widgets/character-movements/character-movements.component';
 import { CharacterComponent } from '../../widgets/character/character.component';
+import { CombatHistoryComponent } from '../../widgets/combat-history/combat-history.component';
 import { CombatInPreparationComponent } from '../../widgets/combat-in-preparation/combat-in-preparation.component';
 import { CombatComponent } from '../../widgets/combat/combat.component';
 import { InventoryComponent } from '../../widgets/inventory/inventory.component';
@@ -48,6 +49,7 @@ import { JobsComponent } from '../../widgets/jobs/jobs.component';
     CharacterMovementsComponent,
     CharacterHarvestsComponent,
     CharacterMonstersComponent,
+    CombatHistoryComponent,
   ],
 })
 export class CharacterPageComponent implements OnInit {

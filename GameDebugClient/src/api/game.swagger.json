@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0-alpha.0.161+8a50afdd5717428ae0de95f24e4be3ebdd9edff6"
+    "version": "0.0.0-alpha.0.162+abf6e112866cea5b30dac5f91f3ea843cb316bbc"
   },
   "servers": [
     {
@@ -466,6 +466,84 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ]
+      }
+    },
+    "/game/team/characters/{characterGuid}/combats/{combatGuid}/history": {
+      "get": {
+        "tags": [
+          "Combats"
+        ],
+        "summary": "Get combat history",
+        "operationId": "Combats_SearchCombatHistory",
+        "parameters": [
+          {
+            "name": "characterGuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "combatGuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 2
+          },
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "description": "The page number\n            ",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 3
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "description": "The page size\n            ",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 4
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResultOfCombatHistoryEntry"
                 }
               }
             }
@@ -2901,6 +2979,207 @@
                 "oneOf": [
                   {
                     "$ref": "#/components/schemas/EntityCombatStatistics"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "SearchResultOfCombatHistoryEntry": {
+        "type": "object",
+        "description": "Search result\n            ",
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "pageNumber",
+          "pageSize",
+          "totalItemsCount",
+          "totalPagesCount"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "description": "The items found by the query\n            ",
+            "items": {
+              "$ref": "#/components/schemas/CombatHistoryEntry"
+            }
+          },
+          "pageNumber": {
+            "type": "integer",
+            "description": "The page number corresponding to the results that have been selected\n            ",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "The page size used by the search\n            ",
+            "format": "int32"
+          },
+          "totalItemsCount": {
+            "type": "integer",
+            "description": "The total number of items matching the query\n            ",
+            "format": "int32"
+          },
+          "totalPagesCount": {
+            "type": "integer",
+            "description": "The total number of pages\n            ",
+            "format": "int32"
+          }
+        }
+      },
+      "CombatHistoryEntry": {
+        "type": "object",
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "preparation-started": "#/components/schemas/CombatPreparationStartedHistoryEntry",
+            "started": "#/components/schemas/CombatStartedHistoryEntry",
+            "entity-joined": "#/components/schemas/CombatEntityJoinedHistoryEntry",
+            "entity-left": "#/components/schemas/CombatEntityLeftHistoryEntry",
+            "ended": "#/components/schemas/CombatEndedHistoryEntry"
+          }
+        },
+        "description": "Combat history entry\n            ",
+        "additionalProperties": false,
+        "required": [
+          "tick",
+          "turn",
+          "$type"
+        ],
+        "properties": {
+          "tick": {
+            "type": "integer",
+            "description": "The tick at which the event happened\n            ",
+            "format": "int64"
+          },
+          "turn": {
+            "type": "integer",
+            "description": "The turn at which the event happened\n            ",
+            "format": "int64"
+          },
+          "$type": {
+            "type": "string"
+          }
+        }
+      },
+      "CombatPreparationStartedHistoryEntry": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CombatHistoryEntry"
+          },
+          {
+            "type": "object",
+            "description": "Combat preparation started history entry\n            ",
+            "additionalProperties": false
+          }
+        ]
+      },
+      "CombatStartedHistoryEntry": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CombatHistoryEntry"
+          },
+          {
+            "type": "object",
+            "description": "Combat started history entry\n            ",
+            "additionalProperties": false
+          }
+        ]
+      },
+      "CombatEntityJoinedHistoryEntry": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CombatHistoryEntry"
+          },
+          {
+            "type": "object",
+            "description": "Combat entity joined history entry\n            ",
+            "additionalProperties": false,
+            "required": [
+              "entityId",
+              "entityName",
+              "side"
+            ],
+            "properties": {
+              "entityId": {
+                "type": "string",
+                "description": "The unique ID of the entity that joined the combat\n            ",
+                "format": "guid",
+                "minLength": 1
+              },
+              "entityName": {
+                "type": "string",
+                "description": "The name of the entity that joined the combat\n            ",
+                "minLength": 1
+              },
+              "side": {
+                "description": "The side of the combat joined by the entity\n            ",
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/CombatSide"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "CombatEntityLeftHistoryEntry": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CombatHistoryEntry"
+          },
+          {
+            "type": "object",
+            "description": "Combat entity left history entry\n            ",
+            "additionalProperties": false,
+            "required": [
+              "entityId",
+              "entityName",
+              "side"
+            ],
+            "properties": {
+              "entityId": {
+                "type": "string",
+                "description": "The unique ID of the entity that joined the combat\n            ",
+                "format": "guid",
+                "minLength": 1
+              },
+              "entityName": {
+                "type": "string",
+                "description": "The name of the entity that joined the combat\n            ",
+                "minLength": 1
+              },
+              "side": {
+                "description": "The side of the combat joined by the entity\n            ",
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/CombatSide"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "CombatEndedHistoryEntry": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CombatHistoryEntry"
+          },
+          {
+            "type": "object",
+            "description": "Combat ended history entry\n            ",
+            "additionalProperties": false,
+            "required": [
+              "winner"
+            ],
+            "properties": {
+              "winner": {
+                "description": "The winner of the combat\n            ",
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/CombatSide"
                   }
                 ]
               }

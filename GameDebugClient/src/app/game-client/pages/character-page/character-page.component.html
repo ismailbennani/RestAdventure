@@ -121,6 +121,12 @@
                     </div>
                   }
                 </div>
+                @if (selectedCombat || selectedCombatInPreparation) {
+                  <div class="vr"></div>
+                  <div style="width: 360px">
+                    <app-combat-history [character]="character" [combat]="selectedCombat ?? selectedCombatInPreparation!"></app-combat-history>
+                  </div>
+                }
               </div>
             </div>
           </div>

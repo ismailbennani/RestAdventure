@@ -105,7 +105,7 @@ public class CharactersController : GameApiController
             return NotFound();
         }
 
-        IEnumerable<EntityHistoryEntry> allEntries = state.History.Character(character).OrderByDescending(he => he.Tick);
+        IEnumerable<EntityHistoryEntry> allEntries = state.History.Character(character.Id).OrderByDescending(he => he.Tick);
 
         return Search.Paginate(allEntries, request.ToPaginationParameters()).ToDto(c => c.ToDto());
     }

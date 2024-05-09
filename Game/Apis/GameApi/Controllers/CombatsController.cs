@@ -4,10 +4,14 @@ using RestAdventure.Core;
 using RestAdventure.Core.Combat;
 using RestAdventure.Core.Combat.Pve;
 using RestAdventure.Core.Entities.Characters;
+using RestAdventure.Core.History.Combats;
 using RestAdventure.Core.Players;
 using RestAdventure.Game.Apis.Common.Dtos.Combats;
+using RestAdventure.Game.Apis.Common.Dtos.History.Combats;
+using RestAdventure.Game.Apis.Common.Dtos.Queries;
 using RestAdventure.Game.Authentication;
 using RestAdventure.Kernel.Errors;
+using RestAdventure.Kernel.Queries;
 
 namespace RestAdventure.Game.Apis.GameApi.Controllers;
 
@@ -136,7 +140,6 @@ public class CombatsController : GameApiController
 
         CharacterId characterId = new(characterGuid);
         Character? character = state.Entities.Get<Character>(characterId);
-
         if (character == null || character.Player != player)
         {
             return BadRequest();
@@ -144,5 +147,49 @@ public class CombatsController : GameApiController
 
         IEnumerable<CombatInstance> combats = state.Combats.GetCombatAtLocation(character.Location);
         return combats.Select(c => c.ToDto()).ToArray();
+    }
+
+    /// <summary>
+    ///     Get combat history
+    /// </summary>
+    [HttpGet("{combatGuid:guid}/history")]
+    [ProducesResponseType<SearchResultDto<CombatHistoryEntryDto>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    public ActionResult<SearchResultDto<CombatHistoryEntryDto>> SearchCombatHistory(Guid characterGuid, Guid combatGuid, [FromQuery] SearchRequestDto request)
+    {
+        GameState state = _gameService.RequireGameState();
+
+        Player player = ControllerContext.RequirePlayer(state);
+
+        CharacterId characterId = new(characterGuid);
+        Character? character = state.Entities.Get<Character>(characterId);
+        if (character == null || character.Player != player)
+        {
+            return BadRequest();
+        }
+
+        CombatInstanceId combatId = new(combatGuid);
+        CombatInPreparation? combatInPreparation = state.Combats.GetCombatInPreparation(combatId);
+        if (combatInPreparation != null)
+        {
+            if (!combatInPreparation.Attackers.Entities.Contains(character) && !combatInPreparation.Defenders.Entities.Contains(character))
+            {
+                return NotFound();
+            }
+        }
+
+        CombatInstance? combat = state.Combats.GetCombat(combatId);
+        if (combat != null)
+        {
+            if (!combat.Attackers.Entities.Contains(character) && !combat.Defenders.Entities.Contains(character))
+            {
+                return NotFound();
+            }
+        }
+
+
+        IOrderedEnumerable<CombatHistoryEntry> allEntries = state.History.Combat(combatId).OrderByDescending(he => he.Tick);
+
+        return Search.Paginate(allEntries, request.ToPaginationParameters()).ToDto(c => c.ToDto());
     }
 }

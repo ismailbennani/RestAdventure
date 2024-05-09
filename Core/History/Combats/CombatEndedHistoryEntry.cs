@@ -6,14 +6,12 @@ namespace RestAdventure.Core.History.Combats;
 
 public class CombatEndedHistoryEntry : CombatHistoryEntry
 {
-    public CombatEndedHistoryEntry(CombatInstance combatInstance, long tick) : base(combatInstance, tick)
+    public CombatEndedHistoryEntry(CombatInstance combat, long tick) : base(combat, tick)
     {
-        Winner = combatInstance.Winner ?? throw new ArgumentNullException(nameof(combatInstance.Winner));
-        Duration = combatInstance.Turn;
+        Winner = combat.Winner ?? throw new ArgumentNullException(nameof(combat.Winner));
     }
 
     public CombatSide Winner { get; }
-    public int Duration { get; }
 }
 
 public class CreateCharacterEndedMonsterCombatHistoryEntry : INotificationHandler<CombatEnded>

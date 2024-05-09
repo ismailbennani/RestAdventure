@@ -7,16 +7,29 @@ namespace RestAdventure.Core.History.Combats;
 
 public abstract class CombatHistoryEntry : HistoryEntry
 {
-    public CombatHistoryEntry(CombatInstance combatInstance, long tick) : base(tick)
+    public CombatHistoryEntry(CombatInPreparation combat, long tick) : base(tick)
     {
-        CombatInstanceId = combatInstance.Id;
-        LocationId = combatInstance.Location.Id;
-        LocationAreaId = combatInstance.Location.Area.Id;
-        LocationAreaName = combatInstance.Location.Area.Name;
-        LocationPositionX = combatInstance.Location.PositionX;
-        LocationPositionY = combatInstance.Location.PositionY;
-        Attackers = combatInstance.Attackers.Entities.Select(e => (e.Id, e.Name)).ToArray();
-        Defenders = combatInstance.Defenders.Entities.Select(e => (e.Id, e.Name)).ToArray();
+        CombatInstanceId = combat.Id;
+        LocationId = combat.Location.Id;
+        LocationAreaId = combat.Location.Area.Id;
+        LocationAreaName = combat.Location.Area.Name;
+        LocationPositionX = combat.Location.PositionX;
+        LocationPositionY = combat.Location.PositionY;
+        Attackers = combat.Attackers.Entities.Select(e => (e.Id, e.Name)).ToArray();
+        Defenders = combat.Defenders.Entities.Select(e => (e.Id, e.Name)).ToArray();
+        Turn = combat.Turn;
+    }
+
+    public CombatHistoryEntry(CombatInstance combat, long tick) : base(tick)
+    {
+        CombatInstanceId = combat.Id;
+        LocationId = combat.Location.Id;
+        LocationAreaId = combat.Location.Area.Id;
+        LocationAreaName = combat.Location.Area.Name;
+        LocationPositionX = combat.Location.PositionX;
+        LocationPositionY = combat.Location.PositionY;
+        Attackers = combat.Attackers.Entities.Select(e => (e.Id, e.Name)).ToArray();
+        Defenders = combat.Defenders.Entities.Select(e => (e.Id, e.Name)).ToArray();
     }
 
     public CombatInstanceId CombatInstanceId { get; }
@@ -27,4 +40,5 @@ public abstract class CombatHistoryEntry : HistoryEntry
     public int LocationPositionY { get; }
     public IReadOnlyList<(GameEntityId Id, string Name)> Attackers { get; }
     public IReadOnlyList<(GameEntityId Id, string Name)> Defenders { get; }
+    public int Turn { get; }
 }
