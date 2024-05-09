@@ -84,7 +84,7 @@ public class CombatInstance : IDisposable
             }
 
             CombatFormation otherFormation = GetTeam(next.Team.OtherSide());
-            IGameEntityWithCombatStatistics target = otherFormation.Entities[0];
+            IGameEntityWithCombatStatistics target = otherFormation.Entities.First(e => e.CombatStatistics.Health > 0);
 
             await ResolveAttackAsync(subTurn, next.Entity, target);
 

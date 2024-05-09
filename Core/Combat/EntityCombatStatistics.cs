@@ -22,7 +22,7 @@ public class EntityCombatStatistics
     public EntityAttack ReceiveAttack(EntityAttack attack)
     {
         int oldHealth = Health;
-        Health -= attack.Damage;
+        Health = Math.Max(0, Health - attack.Damage);
 
         Damaged?.Invoke(this, new EntityDamagedEvent { AttackDealt = attack, AttackReceived = attack, OldHealth = oldHealth, NewHealth = Health });
 
