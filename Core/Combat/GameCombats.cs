@@ -106,7 +106,7 @@ public class GameCombats : IDisposable
 
             if (combatInPreparation.Turn >= _settings.Combat.PreparationPhaseDuration)
             {
-                CombatInstance combat = new(combatInPreparation);
+                CombatInstance combat = combatInPreparation.Start();
                 _combats[combat.Id] = combat;
                 await _publisher.Publish(new CombatStarted { Combat = combat });
 
@@ -139,7 +139,7 @@ public class GameCombats : IDisposable
         {
             await combat.PlayTurnAsync();
 
-            if (combat.IsOver)
+            if (combat.Over)
             {
                 toRemove.Add(combat.Id);
             }

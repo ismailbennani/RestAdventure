@@ -34,7 +34,7 @@ public class PveCombatAction : Action
 
     public CombatInPreparation? CombatInPreparation { get; private set; }
     public CombatInstance? Combat { get; private set; }
-    public bool Failed { get; private set; }
+    public bool Over { get; private set; }
 
     protected override Maybe CanPerformInternal(GameState state, Character character)
     {
@@ -51,7 +51,7 @@ public class PveCombatAction : Action
         return "Internal error";
     }
 
-    public override bool IsOver(GameState state, Character character) => Failed || CombatInPreparation is { Canceled: true } || Combat is { IsOver: true };
+    public override bool IsOver(GameState state, Character character) => Over;
 
     protected override async Task OnStartAsync(GameState state, Character character)
     {
@@ -60,7 +60,7 @@ public class PveCombatAction : Action
             if (_defenders == null)
             {
                 _logger.LogError("Combat creation failed: no defenders");
-                Failed = true;
+                Over = true;
                 return;
             }
 
@@ -68,7 +68,7 @@ public class PveCombatAction : Action
             if (!combat.Success)
             {
                 _logger.LogError("Combat creation failed: {reason}", combat.WhyNot);
-                Failed = true;
+                Over = true;
                 return;
             }
 
@@ -85,7 +85,7 @@ public class PveCombatAction : Action
             Maybe added = CombatInPreparation.Attackers.Add(character);
             if (!added.Success)
             {
-                Failed = true;
+                Over = true;
                 _logger.LogError("Join combat failed: {reason}", added.WhyNot);
             }
         }
@@ -93,14 +93,28 @@ public class PveCombatAction : Action
 
     protected override Task OnTickAsync(GameState state, Character character)
     {
-        if (CombatInPreparation != null)
+        if (CombatInPreparation is { Canceled: true })
+        {
+            Over = true;
+            return Task.CompletedTask;
+        }
+
+        if (CombatInPreparation is { Started: true })
         {
             CombatInstance? combat = state.Combats.Get(CombatInPreparation.Id);
             if (combat != null)
             {
                 Combat = combat;
-                CombatInPreparation = null;
             }
+            else
+            {
+                Over = true;
+            }
+        }
+
+        if (Combat is { Over: true })
+        {
+            Over = true;
         }
 
         return Task.CompletedTask;

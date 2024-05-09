@@ -54,7 +54,7 @@ public class CombatInstance : IDisposable
     public int Turn { get; private set; }
 
     [MemberNotNullWhen(true, nameof(Winner))]
-    public bool IsOver { get; private set; }
+    public bool Over { get; private set; }
 
     public CombatSide? Winner { get; private set; }
 
@@ -123,14 +123,14 @@ public class CombatInstance : IDisposable
         if (HasLost(Attackers))
         {
             Winner = CombatSide.Defenders;
-            IsOver = true;
+            Over = true;
             return true;
         }
 
         if (HasLost(Defenders))
         {
             Winner = CombatSide.Attackers;
-            IsOver = true;
+            Over = true;
             return true;
         }
 
