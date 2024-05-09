@@ -1,7 +1,7 @@
 ﻿using RestAdventure.Core.Maps.Areas;
 using RestAdventure.Core.Maps.Locations;
 
-namespace BaseGame.Maps;
+namespace ExampleGame.Maps;
 
 public class MapGenerator
 {

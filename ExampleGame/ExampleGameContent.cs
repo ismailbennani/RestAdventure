@@ -1,6 +1,7 @@
-﻿using BaseGame.Jobs;
-using BaseGame.Maps;
-using BaseGame.Monsters;
+﻿using ExampleGame.Characters;
+using ExampleGame.Jobs;
+using ExampleGame.Maps;
+using ExampleGame.Monsters;
 using RestAdventure.Core.Content;
 using RestAdventure.Core.Entities.Characters;
 using RestAdventure.Core.Entities.Monsters;
@@ -11,9 +12,9 @@ using RestAdventure.Core.Maps.Areas;
 using RestAdventure.Core.Maps.Locations;
 using RestAdventure.Core.Plugins;
 
-namespace BaseGame;
+namespace ExampleGame;
 
-public class BaseGameContent : ContentPlugin
+public class ExampleGameContent : ContentPlugin
 {
     public MapGenerator MapGenerator { get; }
     public GeneratedMaps GeneratedMaps { get; }
@@ -21,7 +22,7 @@ public class BaseGameContent : ContentPlugin
     public Rattlings Rattlings { get; }
     public Gatherer Gatherer { get; }
 
-    public BaseGameContent()
+    public ExampleGameContent()
     {
         MapGenerator = new MapGenerator();
         GeneratedMaps = MapGenerator.GenerateMaps();

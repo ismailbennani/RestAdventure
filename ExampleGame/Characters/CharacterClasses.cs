@@ -1,7 +1,7 @@
-﻿using BaseGame.Maps;
+﻿using ExampleGame.Maps;
 using RestAdventure.Core.Entities.Characters;
 
-namespace BaseGame;
+namespace ExampleGame.Characters;
 
 public class CharacterClasses
 {
