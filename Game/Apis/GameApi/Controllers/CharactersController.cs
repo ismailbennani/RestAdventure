@@ -17,18 +17,18 @@ using RestAdventure.Kernel.Queries;
 namespace RestAdventure.Game.Apis.GameApi.Controllers;
 
 /// <summary>
-///     Team characters operations
+///     Characters operations
 /// </summary>
 [Route("game/team/characters")]
 [OpenApiTag("Team")]
-public class TeamCharactersController : GameApiController
+public class CharactersController : GameApiController
 {
     readonly GameService _gameService;
     readonly CharactersService _charactersService;
 
     /// <summary>
     /// </summary>
-    public TeamCharactersController(GameService gameService, CharactersService charactersService)
+    public CharactersController(GameService gameService, CharactersService charactersService)
     {
         _gameService = gameService;
         _charactersService = charactersService;

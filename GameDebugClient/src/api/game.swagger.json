@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0-alpha.0.160+b48117b22855c5db219ae45f9d091ddc66acb8e4"
+    "version": "0.0.0-alpha.0.161+8a50afdd5717428ae0de95f24e4be3ebdd9edff6"
   },
   "servers": [
     {
@@ -11,6 +11,209 @@
     }
   ],
   "paths": {
+    "/game/team/characters": {
+      "post": {
+        "tags": [
+          "Team"
+        ],
+        "summary": "Create character",
+        "operationId": "Characters_CreateCharacter",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCharacterRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeamCharacter"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ]
+      }
+    },
+    "/game/team/characters/{characterGuid}": {
+      "get": {
+        "tags": [
+          "Team"
+        ],
+        "summary": "Get character",
+        "operationId": "Characters_GetCharacter",
+        "parameters": [
+          {
+            "name": "characterGuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeamCharacter"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Team"
+        ],
+        "summary": "Delete character",
+        "operationId": "Characters_DeleteCharacter",
+        "parameters": [
+          {
+            "name": "characterGuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ]
+      }
+    },
+    "/game/team/characters/{characterGuid}/history": {
+      "get": {
+        "tags": [
+          "Team"
+        ],
+        "summary": "Get character history",
+        "operationId": "Characters_SearchCharacterHistory",
+        "parameters": [
+          {
+            "name": "characterGuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "description": "The page number\n            ",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "description": "The page size\n            ",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResultOfCharacterHistoryEntry"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ]
+      }
+    },
     "/game/team/characters/{characterGuid}/combats/in-preparation": {
       "get": {
         "tags": [
@@ -982,209 +1185,6 @@
         ]
       }
     },
-    "/game/team/characters": {
-      "post": {
-        "tags": [
-          "Team"
-        ],
-        "summary": "Create character",
-        "operationId": "TeamCharacters_CreateCharacter",
-        "requestBody": {
-          "x-name": "request",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateCharacterRequest"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 1
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TeamCharacter"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "api-key": []
-          }
-        ]
-      }
-    },
-    "/game/team/characters/{characterGuid}": {
-      "get": {
-        "tags": [
-          "Team"
-        ],
-        "summary": "Get character",
-        "operationId": "TeamCharacters_GetCharacter",
-        "parameters": [
-          {
-            "name": "characterGuid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TeamCharacter"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "api-key": []
-          }
-        ]
-      },
-      "delete": {
-        "tags": [
-          "Team"
-        ],
-        "summary": "Delete character",
-        "operationId": "TeamCharacters_DeleteCharacter",
-        "parameters": [
-          {
-            "name": "characterGuid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": ""
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "api-key": []
-          }
-        ]
-      }
-    },
-    "/game/team/characters/{characterGuid}/history": {
-      "get": {
-        "tags": [
-          "Team"
-        ],
-        "summary": "Get character history",
-        "operationId": "TeamCharacters_SearchCharacterHistory",
-        "parameters": [
-          {
-            "name": "characterGuid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid"
-            },
-            "x-position": 1
-          },
-          {
-            "name": "PageNumber",
-            "in": "query",
-            "description": "The page number\n            ",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 2
-          },
-          {
-            "name": "PageSize",
-            "in": "query",
-            "description": "The page size\n            ",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 3
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SearchResultOfCharacterHistoryEntry"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "api-key": []
-          }
-        ]
-      }
-    },
     "/game/team": {
       "get": {
         "tags": [
@@ -1214,804 +1214,6 @@
   },
   "components": {
     "schemas": {
-      "CombatInPreparation": {
-        "type": "object",
-        "description": "Combat instance\n            ",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "attackers",
-          "defenders",
-          "canJoin",
-          "whyCannotJoin"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "The unique ID of the combat instance\n            ",
-            "format": "guid",
-            "minLength": 1
-          },
-          "attackers": {
-            "description": "The attackers in the combat instance\n            ",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/CombatFormationInPreparation"
-              }
-            ]
-          },
-          "defenders": {
-            "description": "The defenders in the combat instance\n            ",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/CombatFormationInPreparation"
-              }
-            ]
-          },
-          "canJoin": {
-            "type": "boolean",
-            "description": "Can the character join the combat\n            "
-          },
-          "whyCannotJoin": {
-            "type": "string",
-            "description": "Why cannot the character join the combat\n            ",
-            "minLength": 1
-          }
-        }
-      },
-      "CombatFormationInPreparation": {
-        "type": "object",
-        "description": "Combat formation\n            ",
-        "additionalProperties": false,
-        "required": [
-          "entities",
-          "options"
-        ],
-        "properties": {
-          "entities": {
-            "type": "array",
-            "description": "The entities in the formation\n            ",
-            "items": {
-              "$ref": "#/components/schemas/EntityMinimal"
-            }
-          },
-          "options": {
-            "description": "The options of the formation\n            ",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/CombatFormationOptions"
-              }
-            ]
-          }
-        }
-      },
-      "EntityMinimal": {
-        "type": "object",
-        "description": "Entity (minimal)\n            ",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "name"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "The unique ID of the entity\n            ",
-            "format": "guid",
-            "minLength": 1
-          },
-          "name": {
-            "type": "string",
-            "description": "The name of the entity\n            ",
-            "minLength": 1
-          }
-        }
-      },
-      "CombatFormationOptions": {
-        "type": "object",
-        "description": "Combat formation options\n            ",
-        "additionalProperties": false,
-        "required": [
-          "accessibility"
-        ],
-        "properties": {
-          "accessibility": {
-            "description": "The accessibility of the formation\n            ",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/CombatFormationAccessibility"
-              }
-            ]
-          }
-        }
-      },
-      "CombatFormationAccessibility": {
-        "type": "string",
-        "description": "",
-        "x-enumNames": [
-          "Everyone",
-          "TeamOnly"
-        ],
-        "enum": [
-          "everyone",
-          "teamOnly"
-        ]
-      },
-      "ProblemDetails": {
-        "type": "object",
-        "additionalProperties": {
-          "nullable": true
-        },
-        "properties": {
-          "type": {
-            "type": "string",
-            "nullable": true
-          },
-          "title": {
-            "type": "string",
-            "nullable": true
-          },
-          "status": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "detail": {
-            "type": "string",
-            "nullable": true
-          },
-          "instance": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "CombatSide": {
-        "type": "string",
-        "description": "",
-        "x-enumNames": [
-          "Attackers",
-          "Defenders"
-        ],
-        "enum": [
-          "attackers",
-          "defenders"
-        ]
-      },
-      "CombatInstance": {
-        "type": "object",
-        "description": "Combat instance\n            ",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "attackers",
-          "defenders",
-          "turn"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "The unique ID of the combat instance\n            ",
-            "format": "guid",
-            "minLength": 1
-          },
-          "attackers": {
-            "type": "array",
-            "description": "The attackers in the combat instance\n            ",
-            "items": {
-              "$ref": "#/components/schemas/EntityInCombat"
-            }
-          },
-          "defenders": {
-            "type": "array",
-            "description": "The defenders in the combat instance\n            ",
-            "items": {
-              "$ref": "#/components/schemas/EntityInCombat"
-            }
-          },
-          "turn": {
-            "type": "integer",
-            "description": "The current turn of the combat instance\n            ",
-            "format": "int32"
-          }
-        }
-      },
-      "EntityInCombat": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/EntityMinimal"
-          },
-          {
-            "type": "object",
-            "description": "Entity in combat\n            ",
-            "additionalProperties": false,
-            "required": [
-              "level",
-              "combat"
-            ],
-            "properties": {
-              "level": {
-                "type": "integer",
-                "description": "The level of the character\n            ",
-                "format": "int32"
-              },
-              "combat": {
-                "description": "The combat statistics of the character\n            ",
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/EntityCombatStatistics"
-                  }
-                ]
-              }
-            }
-          }
-        ]
-      },
-      "EntityCombatStatistics": {
-        "type": "object",
-        "description": "Entity combat statistics\n            ",
-        "additionalProperties": false,
-        "required": [
-          "health",
-          "maxHealth",
-          "speed",
-          "attack"
-        ],
-        "properties": {
-          "health": {
-            "type": "integer",
-            "description": "The health of the entity\n            ",
-            "format": "int32"
-          },
-          "maxHealth": {
-            "type": "integer",
-            "description": "The max health of the entity\n            ",
-            "format": "int32"
-          },
-          "speed": {
-            "type": "integer",
-            "description": "The speed of the entity\n            ",
-            "format": "int32"
-          },
-          "attack": {
-            "type": "integer",
-            "description": "The attack of the entity\n            ",
-            "format": "int32"
-          }
-        }
-      },
-      "CharacterClass": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/CharacterClassMinimal"
-          },
-          {
-            "type": "object",
-            "description": "Character class\n            ",
-            "additionalProperties": false,
-            "required": [
-              "description",
-              "levelCaps"
-            ],
-            "properties": {
-              "description": {
-                "type": "string",
-                "description": "The description of the character class\n            ",
-                "minLength": 1
-              },
-              "levelCaps": {
-                "type": "array",
-                "description": "The level caps of the character class\n            ",
-                "items": {
-                  "type": "integer",
-                  "format": "int32"
-                }
-              }
-            }
-          }
-        ]
-      },
-      "CharacterClassMinimal": {
-        "type": "object",
-        "description": "Character class (minimal)\n            ",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "name"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "The unique ID of the character class\n            ",
-            "format": "guid",
-            "minLength": 1
-          },
-          "name": {
-            "type": "string",
-            "description": "The name of the character class\n            ",
-            "minLength": 1
-          }
-        }
-      },
-      "Item": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/ItemMinimal"
-          },
-          {
-            "type": "object",
-            "description": "Item\n            ",
-            "additionalProperties": false,
-            "properties": {
-              "description": {
-                "type": "string",
-                "description": "The description of the item\n            ",
-                "nullable": true
-              }
-            }
-          }
-        ]
-      },
-      "ItemMinimal": {
-        "type": "object",
-        "description": "Item (minimal)\n            ",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "name",
-          "weight"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "The unique ID of the item\n            ",
-            "format": "guid",
-            "minLength": 1
-          },
-          "name": {
-            "type": "string",
-            "description": "The name of the item\n            ",
-            "minLength": 1
-          },
-          "weight": {
-            "type": "integer",
-            "description": "The weight of the item\n            ",
-            "format": "int32"
-          }
-        }
-      },
-      "Location": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/LocationMinimal"
-          },
-          {
-            "type": "object",
-            "description": "Map location\n            ",
-            "additionalProperties": false,
-            "required": [
-              "discovered",
-              "connectedLocations"
-            ],
-            "properties": {
-              "discovered": {
-                "type": "boolean",
-                "description": "Has this location been discovered by the player.\nIf false, the connected locations will be hidden.\n            "
-              },
-              "connectedLocations": {
-                "type": "array",
-                "description": "The locations connected to this one\n            ",
-                "items": {
-                  "$ref": "#/components/schemas/LocationMinimal"
-                }
-              }
-            }
-          }
-        ]
-      },
-      "LocationMinimal": {
-        "type": "object",
-        "description": "Map location minimal information\n            ",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "area",
-          "positionX",
-          "positionY"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "The unique ID of the location\n            ",
-            "format": "guid",
-            "minLength": 1
-          },
-          "area": {
-            "description": "The area associated with the location\n            ",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/MapArea"
-              }
-            ]
-          },
-          "positionX": {
-            "type": "integer",
-            "description": "The X coordinate associated with the location\n            ",
-            "format": "int32"
-          },
-          "positionY": {
-            "type": "integer",
-            "description": "The Y coordinate associated with the location\n            ",
-            "format": "int32"
-          }
-        }
-      },
-      "MapArea": {
-        "type": "object",
-        "description": "Map area\n            ",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "name"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "The unique ID of the area\n            ",
-            "format": "guid",
-            "minLength": 1
-          },
-          "name": {
-            "type": "string",
-            "description": "The name of the area\n            ",
-            "minLength": 1
-          }
-        }
-      },
-      "Job": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/JobMinimal"
-          },
-          {
-            "type": "object",
-            "description": "Job\n            ",
-            "additionalProperties": false,
-            "required": [
-              "innate",
-              "levelCaps"
-            ],
-            "properties": {
-              "description": {
-                "type": "string",
-                "description": "The description of the job\n            ",
-                "nullable": true
-              },
-              "innate": {
-                "type": "boolean",
-                "description": "Is the job innate?\n            "
-              },
-              "levelCaps": {
-                "type": "array",
-                "description": "The experience to reach each level of the job.\n            ",
-                "items": {
-                  "type": "integer",
-                  "format": "int32"
-                }
-              }
-            }
-          }
-        ]
-      },
-      "JobMinimal": {
-        "type": "object",
-        "description": "Job (minimal)\n            ",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "name"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "The unique ID of the job\n            ",
-            "format": "guid",
-            "minLength": 1
-          },
-          "name": {
-            "type": "string",
-            "description": "The name of the job\n            ",
-            "minLength": 1
-          }
-        }
-      },
-      "StaticObject": {
-        "type": "object",
-        "description": "Static object\n            ",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "name"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "The unique ID of the static object\n            ",
-            "format": "guid",
-            "minLength": 1
-          },
-          "name": {
-            "type": "string",
-            "description": "The name of the static object\n            ",
-            "minLength": 1
-          },
-          "description": {
-            "type": "string",
-            "description": "The description of the static object\n            ",
-            "nullable": true
-          }
-        }
-      },
-      "GameSettings": {
-        "type": "object",
-        "description": "Game settings\n            ",
-        "additionalProperties": false,
-        "required": [
-          "maxTeamSize"
-        ],
-        "properties": {
-          "maxTeamSize": {
-            "type": "integer",
-            "description": "The max number of characters in a team\n            ",
-            "format": "int32"
-          }
-        }
-      },
-      "GameState": {
-        "type": "object",
-        "description": "Game state\n            ",
-        "additionalProperties": false,
-        "required": [
-          "title",
-          "tick",
-          "isComputingNextTick",
-          "paused"
-        ],
-        "properties": {
-          "title": {
-            "type": "string",
-            "description": "The title of the game\n            ",
-            "minLength": 1
-          },
-          "tick": {
-            "type": "integer",
-            "description": "The current game tick\n            ",
-            "format": "int64"
-          },
-          "isComputingNextTick": {
-            "type": "boolean",
-            "description": "Is the next tick being computed.\nIn that case NextTickDate refers to the old tick's next tick date, which means that it is probably in the past.\n            "
-          },
-          "paused": {
-            "type": "boolean",
-            "description": "Is the game paused?\n            "
-          },
-          "lastTickDate": {
-            "type": "string",
-            "description": "If the game is started, the date at which last tick has been computed\n            ",
-            "format": "date-time",
-            "nullable": true
-          },
-          "nextTickDate": {
-            "type": "string",
-            "description": "If the game is not paused, the date at which next tick will be computed\n            ",
-            "format": "date-time",
-            "nullable": true
-          }
-        }
-      },
-      "HarvestableEntity": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/EntityMinimal"
-          },
-          {
-            "type": "object",
-            "description": "Harvestable entity\n            ",
-            "additionalProperties": false,
-            "required": [
-              "harvests"
-            ],
-            "properties": {
-              "harvests": {
-                "type": "array",
-                "description": "The harvests available on the entity\n            ",
-                "items": {
-                  "$ref": "#/components/schemas/HarvestableEntityHarvest"
-                }
-              }
-            }
-          }
-        ]
-      },
-      "HarvestableEntityHarvest": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/HarvestableEntityHarvestMinimal"
-          },
-          {
-            "type": "object",
-            "description": "Harvestable entity harvest\n            ",
-            "additionalProperties": false,
-            "required": [
-              "canHarvest"
-            ],
-            "properties": {
-              "canHarvest": {
-                "type": "boolean",
-                "description": "Can the harvest be performed\n            "
-              },
-              "whyCannotHarvest": {
-                "type": "string",
-                "description": "Why cannot the harvest be performed\n            ",
-                "nullable": true
-              }
-            }
-          }
-        ]
-      },
-      "HarvestableEntityHarvestMinimal": {
-        "type": "object",
-        "description": "Harvestable entity harvest (minimal\n            ",
-        "additionalProperties": false,
-        "required": [
-          "job",
-          "name",
-          "expectedHarvest",
-          "expectedExperience"
-        ],
-        "properties": {
-          "job": {
-            "description": "The job providing the harvest\n            ",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/JobMinimal"
-              }
-            ]
-          },
-          "name": {
-            "type": "string",
-            "description": "The name of the harvest\n            ",
-            "minLength": 1
-          },
-          "expectedHarvest": {
-            "type": "array",
-            "description": "The expected result of the harvest\n            ",
-            "items": {
-              "$ref": "#/components/schemas/ItemStack"
-            }
-          },
-          "expectedExperience": {
-            "type": "integer",
-            "description": "The expected experience gain from the harvest\n            ",
-            "format": "int32"
-          }
-        }
-      },
-      "ItemStack": {
-        "type": "object",
-        "description": "Item stack\n            ",
-        "additionalProperties": false,
-        "required": [
-          "item",
-          "count"
-        ],
-        "properties": {
-          "item": {
-            "description": "The item instance representing this stack\n            ",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/ItemMinimal"
-              }
-            ]
-          },
-          "count": {
-            "type": "integer",
-            "description": "The number of instances in this stack\n            ",
-            "format": "int32"
-          }
-        }
-      },
-      "LocationWithAccess": {
-        "type": "object",
-        "description": "Location with access\n            ",
-        "additionalProperties": false,
-        "required": [
-          "location",
-          "isAccessible"
-        ],
-        "properties": {
-          "location": {
-            "description": "The location\n            ",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/LocationMinimal"
-              }
-            ]
-          },
-          "isAccessible": {
-            "type": "boolean",
-            "description": "Is the location accessible\n            "
-          },
-          "whyIsNotAccessible": {
-            "type": "string",
-            "description": "Why is the location not accessible\n            ",
-            "nullable": true
-          }
-        }
-      },
-      "MonsterGroup": {
-        "type": "object",
-        "description": "Monster group\n            ",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "monsters",
-          "canAttack",
-          "expectedExperience"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "The unique ID of the group\n            ",
-            "format": "guid",
-            "minLength": 1
-          },
-          "monsters": {
-            "type": "array",
-            "description": "The monsters in the group\n            ",
-            "items": {
-              "$ref": "#/components/schemas/MonsterInstanceMinimal"
-            }
-          },
-          "canAttack": {
-            "type": "boolean",
-            "description": "Can the character attack the monsters\n            "
-          },
-          "whyCannotAttack": {
-            "type": "string",
-            "description": "Why cannot the character attack the monsters\n            ",
-            "nullable": true
-          },
-          "expectedExperience": {
-            "type": "integer",
-            "description": "The expected experience gain if the character defeats the monster group\n            ",
-            "format": "int32"
-          }
-        }
-      },
-      "MonsterInstanceMinimal": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/EntityMinimal"
-          },
-          {
-            "type": "object",
-            "description": "Monster minimal\n            ",
-            "additionalProperties": false,
-            "required": [
-              "level"
-            ],
-            "properties": {
-              "level": {
-                "type": "integer",
-                "description": "The level of the monster\n            ",
-                "format": "int32"
-              }
-            }
-          }
-        ]
-      },
       "TeamCharacter": {
         "type": "object",
         "description": "Character\n            ",
@@ -2105,6 +1307,28 @@
           }
         }
       },
+      "CharacterClassMinimal": {
+        "type": "object",
+        "description": "Character class (minimal)\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the character class\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the character class\n            ",
+            "minLength": 1
+          }
+        }
+      },
       "ProgressionBarMinimal": {
         "type": "object",
         "description": "Progression bar (minimal)\n            ",
@@ -2129,6 +1353,65 @@
             "type": "integer",
             "description": "The experience required to reach next level. The value is null when Level is the max level.\n            ",
             "format": "int32"
+          }
+        }
+      },
+      "LocationMinimal": {
+        "type": "object",
+        "description": "Map location minimal information\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "area",
+          "positionX",
+          "positionY"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the location\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "area": {
+            "description": "The area associated with the location\n            ",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/MapArea"
+              }
+            ]
+          },
+          "positionX": {
+            "type": "integer",
+            "description": "The X coordinate associated with the location\n            ",
+            "format": "int32"
+          },
+          "positionY": {
+            "type": "integer",
+            "description": "The Y coordinate associated with the location\n            ",
+            "format": "int32"
+          }
+        }
+      },
+      "MapArea": {
+        "type": "object",
+        "description": "Map area\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the area\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the area\n            ",
+            "minLength": 1
           }
         }
       },
@@ -2204,6 +1487,34 @@
           }
         }
       },
+      "ItemMinimal": {
+        "type": "object",
+        "description": "Item (minimal)\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "weight"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the item\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the item\n            ",
+            "minLength": 1
+          },
+          "weight": {
+            "type": "integer",
+            "description": "The weight of the item\n            ",
+            "format": "int32"
+          }
+        }
+      },
       "JobInstance": {
         "type": "object",
         "description": "Job instance\n            ",
@@ -2228,6 +1539,61 @@
                 "$ref": "#/components/schemas/ProgressionBarMinimal"
               }
             ]
+          }
+        }
+      },
+      "JobMinimal": {
+        "type": "object",
+        "description": "Job (minimal)\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the job\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the job\n            ",
+            "minLength": 1
+          }
+        }
+      },
+      "EntityCombatStatistics": {
+        "type": "object",
+        "description": "Entity combat statistics\n            ",
+        "additionalProperties": false,
+        "required": [
+          "health",
+          "maxHealth",
+          "speed",
+          "attack"
+        ],
+        "properties": {
+          "health": {
+            "type": "integer",
+            "description": "The health of the entity\n            ",
+            "format": "int32"
+          },
+          "maxHealth": {
+            "type": "integer",
+            "description": "The max health of the entity\n            ",
+            "format": "int32"
+          },
+          "speed": {
+            "type": "integer",
+            "description": "The speed of the entity\n            ",
+            "format": "int32"
+          },
+          "attack": {
+            "type": "integer",
+            "description": "The attack of the entity\n            ",
+            "format": "int32"
           }
         }
       },
@@ -2317,6 +1683,68 @@
           }
         ]
       },
+      "HarvestableEntityHarvestMinimal": {
+        "type": "object",
+        "description": "Harvestable entity harvest (minimal\n            ",
+        "additionalProperties": false,
+        "required": [
+          "job",
+          "name",
+          "expectedHarvest",
+          "expectedExperience"
+        ],
+        "properties": {
+          "job": {
+            "description": "The job providing the harvest\n            ",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/JobMinimal"
+              }
+            ]
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the harvest\n            ",
+            "minLength": 1
+          },
+          "expectedHarvest": {
+            "type": "array",
+            "description": "The expected result of the harvest\n            ",
+            "items": {
+              "$ref": "#/components/schemas/ItemStack"
+            }
+          },
+          "expectedExperience": {
+            "type": "integer",
+            "description": "The expected experience gain from the harvest\n            ",
+            "format": "int32"
+          }
+        }
+      },
+      "ItemStack": {
+        "type": "object",
+        "description": "Item stack\n            ",
+        "additionalProperties": false,
+        "required": [
+          "item",
+          "count"
+        ],
+        "properties": {
+          "item": {
+            "description": "The item instance representing this stack\n            ",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ItemMinimal"
+              }
+            ]
+          },
+          "count": {
+            "type": "integer",
+            "description": "The number of instances in this stack\n            ",
+            "format": "int32"
+          }
+        }
+      },
       "StaticObjectInstance": {
         "type": "object",
         "description": "Static object instance\n            ",
@@ -2339,6 +1767,33 @@
                 "$ref": "#/components/schemas/StaticObject"
               }
             ]
+          }
+        }
+      },
+      "StaticObject": {
+        "type": "object",
+        "description": "Static object\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the static object\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the static object\n            ",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "description": "The description of the static object\n            ",
+            "nullable": true
           }
         }
       },
@@ -2380,6 +1835,57 @@
             }
           }
         ]
+      },
+      "EntityMinimal": {
+        "type": "object",
+        "description": "Entity (minimal)\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the entity\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the entity\n            ",
+            "minLength": 1
+          }
+        }
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "additionalProperties": {
+          "nullable": true
+        },
+        "properties": {
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "type": "string",
+            "nullable": true
+          }
+        }
       },
       "CreateCharacterRequest": {
         "type": "object",
@@ -3220,6 +2726,500 @@
           }
         ]
       },
+      "CombatSide": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "Attackers",
+          "Defenders"
+        ],
+        "enum": [
+          "attackers",
+          "defenders"
+        ]
+      },
+      "CombatInPreparation": {
+        "type": "object",
+        "description": "Combat instance\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "attackers",
+          "defenders",
+          "canJoin",
+          "whyCannotJoin"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the combat instance\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "attackers": {
+            "description": "The attackers in the combat instance\n            ",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CombatFormationInPreparation"
+              }
+            ]
+          },
+          "defenders": {
+            "description": "The defenders in the combat instance\n            ",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CombatFormationInPreparation"
+              }
+            ]
+          },
+          "canJoin": {
+            "type": "boolean",
+            "description": "Can the character join the combat\n            "
+          },
+          "whyCannotJoin": {
+            "type": "string",
+            "description": "Why cannot the character join the combat\n            ",
+            "minLength": 1
+          }
+        }
+      },
+      "CombatFormationInPreparation": {
+        "type": "object",
+        "description": "Combat formation\n            ",
+        "additionalProperties": false,
+        "required": [
+          "entities",
+          "options"
+        ],
+        "properties": {
+          "entities": {
+            "type": "array",
+            "description": "The entities in the formation\n            ",
+            "items": {
+              "$ref": "#/components/schemas/EntityMinimal"
+            }
+          },
+          "options": {
+            "description": "The options of the formation\n            ",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CombatFormationOptions"
+              }
+            ]
+          }
+        }
+      },
+      "CombatFormationOptions": {
+        "type": "object",
+        "description": "Combat formation options\n            ",
+        "additionalProperties": false,
+        "required": [
+          "accessibility"
+        ],
+        "properties": {
+          "accessibility": {
+            "description": "The accessibility of the formation\n            ",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CombatFormationAccessibility"
+              }
+            ]
+          }
+        }
+      },
+      "CombatFormationAccessibility": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "Everyone",
+          "TeamOnly"
+        ],
+        "enum": [
+          "everyone",
+          "teamOnly"
+        ]
+      },
+      "CombatInstance": {
+        "type": "object",
+        "description": "Combat instance\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "attackers",
+          "defenders",
+          "turn"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the combat instance\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "attackers": {
+            "type": "array",
+            "description": "The attackers in the combat instance\n            ",
+            "items": {
+              "$ref": "#/components/schemas/EntityInCombat"
+            }
+          },
+          "defenders": {
+            "type": "array",
+            "description": "The defenders in the combat instance\n            ",
+            "items": {
+              "$ref": "#/components/schemas/EntityInCombat"
+            }
+          },
+          "turn": {
+            "type": "integer",
+            "description": "The current turn of the combat instance\n            ",
+            "format": "int32"
+          }
+        }
+      },
+      "EntityInCombat": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/EntityMinimal"
+          },
+          {
+            "type": "object",
+            "description": "Entity in combat\n            ",
+            "additionalProperties": false,
+            "required": [
+              "level",
+              "combat"
+            ],
+            "properties": {
+              "level": {
+                "type": "integer",
+                "description": "The level of the character\n            ",
+                "format": "int32"
+              },
+              "combat": {
+                "description": "The combat statistics of the character\n            ",
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/EntityCombatStatistics"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "CharacterClass": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CharacterClassMinimal"
+          },
+          {
+            "type": "object",
+            "description": "Character class\n            ",
+            "additionalProperties": false,
+            "required": [
+              "description",
+              "levelCaps"
+            ],
+            "properties": {
+              "description": {
+                "type": "string",
+                "description": "The description of the character class\n            ",
+                "minLength": 1
+              },
+              "levelCaps": {
+                "type": "array",
+                "description": "The level caps of the character class\n            ",
+                "items": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Item": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ItemMinimal"
+          },
+          {
+            "type": "object",
+            "description": "Item\n            ",
+            "additionalProperties": false,
+            "properties": {
+              "description": {
+                "type": "string",
+                "description": "The description of the item\n            ",
+                "nullable": true
+              }
+            }
+          }
+        ]
+      },
+      "Location": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/LocationMinimal"
+          },
+          {
+            "type": "object",
+            "description": "Map location\n            ",
+            "additionalProperties": false,
+            "required": [
+              "discovered",
+              "connectedLocations"
+            ],
+            "properties": {
+              "discovered": {
+                "type": "boolean",
+                "description": "Has this location been discovered by the player.\nIf false, the connected locations will be hidden.\n            "
+              },
+              "connectedLocations": {
+                "type": "array",
+                "description": "The locations connected to this one\n            ",
+                "items": {
+                  "$ref": "#/components/schemas/LocationMinimal"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Job": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/JobMinimal"
+          },
+          {
+            "type": "object",
+            "description": "Job\n            ",
+            "additionalProperties": false,
+            "required": [
+              "innate",
+              "levelCaps"
+            ],
+            "properties": {
+              "description": {
+                "type": "string",
+                "description": "The description of the job\n            ",
+                "nullable": true
+              },
+              "innate": {
+                "type": "boolean",
+                "description": "Is the job innate?\n            "
+              },
+              "levelCaps": {
+                "type": "array",
+                "description": "The experience to reach each level of the job.\n            ",
+                "items": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "GameSettings": {
+        "type": "object",
+        "description": "Game settings\n            ",
+        "additionalProperties": false,
+        "required": [
+          "maxTeamSize"
+        ],
+        "properties": {
+          "maxTeamSize": {
+            "type": "integer",
+            "description": "The max number of characters in a team\n            ",
+            "format": "int32"
+          }
+        }
+      },
+      "GameState": {
+        "type": "object",
+        "description": "Game state\n            ",
+        "additionalProperties": false,
+        "required": [
+          "title",
+          "tick",
+          "isComputingNextTick",
+          "paused"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "The title of the game\n            ",
+            "minLength": 1
+          },
+          "tick": {
+            "type": "integer",
+            "description": "The current game tick\n            ",
+            "format": "int64"
+          },
+          "isComputingNextTick": {
+            "type": "boolean",
+            "description": "Is the next tick being computed.\nIn that case NextTickDate refers to the old tick's next tick date, which means that it is probably in the past.\n            "
+          },
+          "paused": {
+            "type": "boolean",
+            "description": "Is the game paused?\n            "
+          },
+          "lastTickDate": {
+            "type": "string",
+            "description": "If the game is started, the date at which last tick has been computed\n            ",
+            "format": "date-time",
+            "nullable": true
+          },
+          "nextTickDate": {
+            "type": "string",
+            "description": "If the game is not paused, the date at which next tick will be computed\n            ",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "HarvestableEntity": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/EntityMinimal"
+          },
+          {
+            "type": "object",
+            "description": "Harvestable entity\n            ",
+            "additionalProperties": false,
+            "required": [
+              "harvests"
+            ],
+            "properties": {
+              "harvests": {
+                "type": "array",
+                "description": "The harvests available on the entity\n            ",
+                "items": {
+                  "$ref": "#/components/schemas/HarvestableEntityHarvest"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "HarvestableEntityHarvest": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/HarvestableEntityHarvestMinimal"
+          },
+          {
+            "type": "object",
+            "description": "Harvestable entity harvest\n            ",
+            "additionalProperties": false,
+            "required": [
+              "canHarvest"
+            ],
+            "properties": {
+              "canHarvest": {
+                "type": "boolean",
+                "description": "Can the harvest be performed\n            "
+              },
+              "whyCannotHarvest": {
+                "type": "string",
+                "description": "Why cannot the harvest be performed\n            ",
+                "nullable": true
+              }
+            }
+          }
+        ]
+      },
+      "LocationWithAccess": {
+        "type": "object",
+        "description": "Location with access\n            ",
+        "additionalProperties": false,
+        "required": [
+          "location",
+          "isAccessible"
+        ],
+        "properties": {
+          "location": {
+            "description": "The location\n            ",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/LocationMinimal"
+              }
+            ]
+          },
+          "isAccessible": {
+            "type": "boolean",
+            "description": "Is the location accessible\n            "
+          },
+          "whyIsNotAccessible": {
+            "type": "string",
+            "description": "Why is the location not accessible\n            ",
+            "nullable": true
+          }
+        }
+      },
+      "MonsterGroup": {
+        "type": "object",
+        "description": "Monster group\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "monsters",
+          "canAttack",
+          "expectedExperience"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the group\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "monsters": {
+            "type": "array",
+            "description": "The monsters in the group\n            ",
+            "items": {
+              "$ref": "#/components/schemas/MonsterInstanceMinimal"
+            }
+          },
+          "canAttack": {
+            "type": "boolean",
+            "description": "Can the character attack the monsters\n            "
+          },
+          "whyCannotAttack": {
+            "type": "string",
+            "description": "Why cannot the character attack the monsters\n            ",
+            "nullable": true
+          },
+          "expectedExperience": {
+            "type": "integer",
+            "description": "The expected experience gain if the character defeats the monster group\n            ",
+            "format": "int32"
+          }
+        }
+      },
+      "MonsterInstanceMinimal": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/EntityMinimal"
+          },
+          {
+            "type": "object",
+            "description": "Monster minimal\n            ",
+            "additionalProperties": false,
+            "required": [
+              "level"
+            ],
+            "properties": {
+              "level": {
+                "type": "integer",
+                "description": "The level of the monster\n            ",
+                "format": "int32"
+              }
+            }
+          }
+        ]
+      },
       "Team": {
         "type": "object",
         "description": "Team of characters\n            ",
@@ -3248,6 +3248,9 @@
   },
   "tags": [
     {
+      "name": "Team"
+    },
+    {
       "name": "Combats"
     },
     {
@@ -3264,9 +3267,6 @@
     },
     {
       "name": "Pve"
-    },
-    {
-      "name": "Team"
     }
   ]
 }

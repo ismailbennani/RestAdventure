@@ -5,6 +5,7 @@ import { ReplaySubject, combineLatest, forkJoin, map, of, switchMap, tap } from 
 import { LocationMinimal } from '../../../../api/admin-api-client.generated';
 import {
   Action,
+  CharactersApiClient,
   CombatFormationAccessibility,
   CombatFormationOptions,
   CombatInPreparation,
@@ -15,7 +16,6 @@ import {
   PveCombatAction,
   Team,
   TeamCharacter,
-  TeamCharactersApiClient,
 } from '../../../../api/game-api-client.generated';
 import { SpinnerComponent } from '../../../common/spinner/spinner.component';
 import { CurrentPageService } from '../../services/current-page.service';
@@ -69,7 +69,7 @@ export class CharacterPageComponent implements OnInit {
     private currentPageService: CurrentPageService,
     private gameService: GameService,
     private teamService: TeamService,
-    private charactersApiClient: TeamCharactersApiClient,
+    private charactersApiClient: CharactersApiClient,
     private combatsApiClient: CombatsApiClient,
   ) {}
 

@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { catchError, finalize, map, of, switchMap, tap } from 'rxjs';
 import { AdminGameContentApiClient } from '../../../../api/admin-api-client.generated';
-import { CreateCharacterRequest, TeamCharactersApiClient } from '../../../../api/game-api-client.generated';
+import { CharactersApiClient, CreateCharacterRequest } from '../../../../api/game-api-client.generated';
 import { ProgressionBarComponent } from '../../../common/spinner/progression-bar/progression-bar.component';
 import { SpinnerComponent } from '../../../common/spinner/spinner.component';
 import { CurrentPageService } from '../../services/current-page.service';
@@ -29,7 +29,7 @@ export class TeamComponent implements OnInit {
     protected playersService: PlayersService,
     protected teamService: TeamService,
     protected adminGameContentApiClient: AdminGameContentApiClient,
-    protected teamCharactersApiClient: TeamCharactersApiClient,
+    protected charactersApiClient: CharactersApiClient,
   ) {}
 
   ngOnInit(): void {
@@ -42,7 +42,7 @@ export class TeamComponent implements OnInit {
 
   createCharacter(name: string, cls: string) {
     this.creating = true;
-    this.teamCharactersApiClient
+    this.charactersApiClient
       .createCharacter(new CreateCharacterRequest({ name, classId: cls }))
       .pipe(
         switchMap(character => this.gameService.refreshNow(true).pipe(map(_ => character))),

@@ -18,10 +18,10 @@ import {
   CharacterMoveLocationHistoryEntry,
   CharacterReceivedAttackHistoryEntry,
   CharacterStartedCombatPreparationHistoryEntry,
+  CharactersApiClient,
   CombatEntityInHistoryEntry,
   CombatSide,
   TeamCharacter,
-  TeamCharactersApiClient,
 } from '../../../../api/game-api-client.generated';
 import { GameService } from '../../services/game.service';
 
@@ -46,7 +46,7 @@ export class CharacterHistoryComponent implements OnInit {
 
   constructor(
     private gameService: GameService,
-    private charactersApiClient: TeamCharactersApiClient,
+    private charactersApiClient: CharactersApiClient,
   ) {}
 
   ngOnInit(): void {

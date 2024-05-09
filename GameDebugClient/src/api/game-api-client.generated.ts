@@ -16,6 +16,269 @@ import { HttpClient, HttpHeaders, HttpResponse, HttpResponseBase } from '@angula
 export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
 
 @Injectable()
+export class CharactersApiClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "https://localhost:7056";
+    }
+
+    /**
+     * Create character
+     */
+    createCharacter(request: CreateCharacterRequest): Observable<TeamCharacter> {
+        let url_ = this.baseUrl + "/game/team/characters";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateCharacter(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateCharacter(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<TeamCharacter>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<TeamCharacter>;
+        }));
+    }
+
+    protected processCreateCharacter(response: HttpResponseBase): Observable<TeamCharacter> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = TeamCharacter.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 404) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ProblemDetails.fromJS(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * Get character
+     */
+    getCharacter(characterGuid: string): Observable<TeamCharacter> {
+        let url_ = this.baseUrl + "/game/team/characters/{characterGuid}";
+        if (characterGuid === undefined || characterGuid === null)
+            throw new Error("The parameter 'characterGuid' must be defined.");
+        url_ = url_.replace("{characterGuid}", encodeURIComponent("" + characterGuid));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetCharacter(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetCharacter(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<TeamCharacter>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<TeamCharacter>;
+        }));
+    }
+
+    protected processGetCharacter(response: HttpResponseBase): Observable<TeamCharacter> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = TeamCharacter.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 404) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ProblemDetails.fromJS(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * Delete character
+     */
+    deleteCharacter(characterGuid: string): Observable<void> {
+        let url_ = this.baseUrl + "/game/team/characters/{characterGuid}";
+        if (characterGuid === undefined || characterGuid === null)
+            throw new Error("The parameter 'characterGuid' must be defined.");
+        url_ = url_.replace("{characterGuid}", encodeURIComponent("" + characterGuid));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDeleteCharacter(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDeleteCharacter(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processDeleteCharacter(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status === 404) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ProblemDetails.fromJS(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * Get character history
+     * @param pageNumber (optional) The page number
+     * @param pageSize (optional) The page size
+     */
+    searchCharacterHistory(characterGuid: string, pageNumber?: number | undefined, pageSize?: number | undefined): Observable<SearchResultOfCharacterHistoryEntry> {
+        let url_ = this.baseUrl + "/game/team/characters/{characterGuid}/history?";
+        if (characterGuid === undefined || characterGuid === null)
+            throw new Error("The parameter 'characterGuid' must be defined.");
+        url_ = url_.replace("{characterGuid}", encodeURIComponent("" + characterGuid));
+        if (pageNumber === null)
+            throw new Error("The parameter 'pageNumber' cannot be null.");
+        else if (pageNumber !== undefined)
+            url_ += "PageNumber=" + encodeURIComponent("" + pageNumber) + "&";
+        if (pageSize === null)
+            throw new Error("The parameter 'pageSize' cannot be null.");
+        else if (pageSize !== undefined)
+            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSearchCharacterHistory(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSearchCharacterHistory(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<SearchResultOfCharacterHistoryEntry>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<SearchResultOfCharacterHistoryEntry>;
+        }));
+    }
+
+    protected processSearchCharacterHistory(response: HttpResponseBase): Observable<SearchResultOfCharacterHistoryEntry> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = SearchResultOfCharacterHistoryEntry.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 404) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ProblemDetails.fromJS(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
 export class CombatsApiClient {
     private http: HttpClient;
     private baseUrl: string;
@@ -1282,269 +1545,6 @@ export class PveApiClient {
 }
 
 @Injectable()
-export class TeamCharactersApiClient {
-    private http: HttpClient;
-    private baseUrl: string;
-    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
-
-    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
-        this.http = http;
-        this.baseUrl = baseUrl ?? "https://localhost:7056";
-    }
-
-    /**
-     * Create character
-     */
-    createCharacter(request: CreateCharacterRequest): Observable<TeamCharacter> {
-        let url_ = this.baseUrl + "/game/team/characters";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(request);
-
-        let options_ : any = {
-            body: content_,
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            })
-        };
-
-        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processCreateCharacter(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processCreateCharacter(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<TeamCharacter>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<TeamCharacter>;
-        }));
-    }
-
-    protected processCreateCharacter(response: HttpResponseBase): Observable<TeamCharacter> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = TeamCharacter.fromJS(resultData200);
-            return _observableOf(result200);
-            }));
-        } else if (status === 404) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result404: any = null;
-            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result404 = ProblemDetails.fromJS(resultData404);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    /**
-     * Get character
-     */
-    getCharacter(characterGuid: string): Observable<TeamCharacter> {
-        let url_ = this.baseUrl + "/game/team/characters/{characterGuid}";
-        if (characterGuid === undefined || characterGuid === null)
-            throw new Error("The parameter 'characterGuid' must be defined.");
-        url_ = url_.replace("{characterGuid}", encodeURIComponent("" + characterGuid));
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "application/json"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetCharacter(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetCharacter(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<TeamCharacter>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<TeamCharacter>;
-        }));
-    }
-
-    protected processGetCharacter(response: HttpResponseBase): Observable<TeamCharacter> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = TeamCharacter.fromJS(resultData200);
-            return _observableOf(result200);
-            }));
-        } else if (status === 404) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result404: any = null;
-            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result404 = ProblemDetails.fromJS(resultData404);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    /**
-     * Delete character
-     */
-    deleteCharacter(characterGuid: string): Observable<void> {
-        let url_ = this.baseUrl + "/game/team/characters/{characterGuid}";
-        if (characterGuid === undefined || characterGuid === null)
-            throw new Error("The parameter 'characterGuid' must be defined.");
-        url_ = url_.replace("{characterGuid}", encodeURIComponent("" + characterGuid));
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-            })
-        };
-
-        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processDeleteCharacter(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processDeleteCharacter(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<void>;
-        }));
-    }
-
-    protected processDeleteCharacter(response: HttpResponseBase): Observable<void> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
-            }));
-        } else if (status === 404) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result404: any = null;
-            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result404 = ProblemDetails.fromJS(resultData404);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    /**
-     * Get character history
-     * @param pageNumber (optional) The page number
-     * @param pageSize (optional) The page size
-     */
-    searchCharacterHistory(characterGuid: string, pageNumber?: number | undefined, pageSize?: number | undefined): Observable<SearchResultOfCharacterHistoryEntry> {
-        let url_ = this.baseUrl + "/game/team/characters/{characterGuid}/history?";
-        if (characterGuid === undefined || characterGuid === null)
-            throw new Error("The parameter 'characterGuid' must be defined.");
-        url_ = url_.replace("{characterGuid}", encodeURIComponent("" + characterGuid));
-        if (pageNumber === null)
-            throw new Error("The parameter 'pageNumber' cannot be null.");
-        else if (pageNumber !== undefined)
-            url_ += "PageNumber=" + encodeURIComponent("" + pageNumber) + "&";
-        if (pageSize === null)
-            throw new Error("The parameter 'pageSize' cannot be null.");
-        else if (pageSize !== undefined)
-            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "application/json"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processSearchCharacterHistory(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processSearchCharacterHistory(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<SearchResultOfCharacterHistoryEntry>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<SearchResultOfCharacterHistoryEntry>;
-        }));
-    }
-
-    protected processSearchCharacterHistory(response: HttpResponseBase): Observable<SearchResultOfCharacterHistoryEntry> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = SearchResultOfCharacterHistoryEntry.fromJS(resultData200);
-            return _observableOf(result200);
-            }));
-        } else if (status === 404) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result404: any = null;
-            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result404 = ProblemDetails.fromJS(resultData404);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-}
-
-@Injectable()
 export class TeamApiClient {
     private http: HttpClient;
     private baseUrl: string;
@@ -1605,1611 +1605,6 @@ export class TeamApiClient {
         }
         return _observableOf(null as any);
     }
-}
-
-/** Combat instance */
-export class CombatInPreparation implements ICombatInPreparation {
-    /** The unique ID of the combat instance
-             */
-    id!: string;
-    /** The attackers in the combat instance
-             */
-    attackers!: CombatFormationInPreparation;
-    /** The defenders in the combat instance
-             */
-    defenders!: CombatFormationInPreparation;
-    /** Can the character join the combat
-             */
-    canJoin!: boolean;
-    /** Why cannot the character join the combat
-             */
-    whyCannotJoin!: string;
-
-    constructor(data?: ICombatInPreparation) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-        if (!data) {
-            this.attackers = new CombatFormationInPreparation();
-            this.defenders = new CombatFormationInPreparation();
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.attackers = _data["attackers"] ? CombatFormationInPreparation.fromJS(_data["attackers"]) : new CombatFormationInPreparation();
-            this.defenders = _data["defenders"] ? CombatFormationInPreparation.fromJS(_data["defenders"]) : new CombatFormationInPreparation();
-            this.canJoin = _data["canJoin"];
-            this.whyCannotJoin = _data["whyCannotJoin"];
-        }
-    }
-
-    static fromJS(data: any): CombatInPreparation {
-        data = typeof data === 'object' ? data : {};
-        let result = new CombatInPreparation();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["attackers"] = this.attackers ? this.attackers.toJSON() : <any>undefined;
-        data["defenders"] = this.defenders ? this.defenders.toJSON() : <any>undefined;
-        data["canJoin"] = this.canJoin;
-        data["whyCannotJoin"] = this.whyCannotJoin;
-        return data;
-    }
-}
-
-/** Combat instance */
-export interface ICombatInPreparation {
-    /** The unique ID of the combat instance
-             */
-    id: string;
-    /** The attackers in the combat instance
-             */
-    attackers: CombatFormationInPreparation;
-    /** The defenders in the combat instance
-             */
-    defenders: CombatFormationInPreparation;
-    /** Can the character join the combat
-             */
-    canJoin: boolean;
-    /** Why cannot the character join the combat
-             */
-    whyCannotJoin: string;
-}
-
-/** Combat formation */
-export class CombatFormationInPreparation implements ICombatFormationInPreparation {
-    /** The entities in the formation
-             */
-    entities!: EntityMinimal[];
-    /** The options of the formation
-             */
-    options!: CombatFormationOptions;
-
-    constructor(data?: ICombatFormationInPreparation) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-        if (!data) {
-            this.entities = [];
-            this.options = new CombatFormationOptions();
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            if (Array.isArray(_data["entities"])) {
-                this.entities = [] as any;
-                for (let item of _data["entities"])
-                    this.entities!.push(EntityMinimal.fromJS(item));
-            }
-            this.options = _data["options"] ? CombatFormationOptions.fromJS(_data["options"]) : new CombatFormationOptions();
-        }
-    }
-
-    static fromJS(data: any): CombatFormationInPreparation {
-        data = typeof data === 'object' ? data : {};
-        let result = new CombatFormationInPreparation();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        if (Array.isArray(this.entities)) {
-            data["entities"] = [];
-            for (let item of this.entities)
-                data["entities"].push(item.toJSON());
-        }
-        data["options"] = this.options ? this.options.toJSON() : <any>undefined;
-        return data;
-    }
-}
-
-/** Combat formation */
-export interface ICombatFormationInPreparation {
-    /** The entities in the formation
-             */
-    entities: EntityMinimal[];
-    /** The options of the formation
-             */
-    options: CombatFormationOptions;
-}
-
-/** Entity (minimal) */
-export class EntityMinimal implements IEntityMinimal {
-    /** The unique ID of the entity
-             */
-    id!: string;
-    /** The name of the entity
-             */
-    name!: string;
-
-    constructor(data?: IEntityMinimal) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.name = _data["name"];
-        }
-    }
-
-    static fromJS(data: any): EntityMinimal {
-        data = typeof data === 'object' ? data : {};
-        let result = new EntityMinimal();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["name"] = this.name;
-        return data;
-    }
-}
-
-/** Entity (minimal) */
-export interface IEntityMinimal {
-    /** The unique ID of the entity
-             */
-    id: string;
-    /** The name of the entity
-             */
-    name: string;
-}
-
-/** Combat formation options */
-export class CombatFormationOptions implements ICombatFormationOptions {
-    /** The accessibility of the formation
-             */
-    accessibility!: CombatFormationAccessibility;
-
-    constructor(data?: ICombatFormationOptions) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.accessibility = _data["accessibility"];
-        }
-    }
-
-    static fromJS(data: any): CombatFormationOptions {
-        data = typeof data === 'object' ? data : {};
-        let result = new CombatFormationOptions();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["accessibility"] = this.accessibility;
-        return data;
-    }
-}
-
-/** Combat formation options */
-export interface ICombatFormationOptions {
-    /** The accessibility of the formation
-             */
-    accessibility: CombatFormationAccessibility;
-}
-
-export enum CombatFormationAccessibility {
-    Everyone = "everyone",
-    TeamOnly = "teamOnly",
-}
-
-export class ProblemDetails implements IProblemDetails {
-    type?: string | undefined;
-    title?: string | undefined;
-    status?: number | undefined;
-    detail?: string | undefined;
-    instance?: string | undefined;
-
-    [key: string]: any;
-
-    constructor(data?: IProblemDetails) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.type = _data["type"];
-            this.title = _data["title"];
-            this.status = _data["status"];
-            this.detail = _data["detail"];
-            this.instance = _data["instance"];
-        }
-    }
-
-    static fromJS(data: any): ProblemDetails {
-        data = typeof data === 'object' ? data : {};
-        let result = new ProblemDetails();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["type"] = this.type;
-        data["title"] = this.title;
-        data["status"] = this.status;
-        data["detail"] = this.detail;
-        data["instance"] = this.instance;
-        return data;
-    }
-}
-
-export interface IProblemDetails {
-    type?: string | undefined;
-    title?: string | undefined;
-    status?: number | undefined;
-    detail?: string | undefined;
-    instance?: string | undefined;
-
-    [key: string]: any;
-}
-
-export enum CombatSide {
-    Attackers = "attackers",
-    Defenders = "defenders",
-}
-
-/** Combat instance */
-export class CombatInstance implements ICombatInstance {
-    /** The unique ID of the combat instance
-             */
-    id!: string;
-    /** The attackers in the combat instance
-             */
-    attackers!: EntityInCombat[];
-    /** The defenders in the combat instance
-             */
-    defenders!: EntityInCombat[];
-    /** The current turn of the combat instance
-             */
-    turn!: number;
-
-    constructor(data?: ICombatInstance) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-        if (!data) {
-            this.attackers = [];
-            this.defenders = [];
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            if (Array.isArray(_data["attackers"])) {
-                this.attackers = [] as any;
-                for (let item of _data["attackers"])
-                    this.attackers!.push(EntityInCombat.fromJS(item));
-            }
-            if (Array.isArray(_data["defenders"])) {
-                this.defenders = [] as any;
-                for (let item of _data["defenders"])
-                    this.defenders!.push(EntityInCombat.fromJS(item));
-            }
-            this.turn = _data["turn"];
-        }
-    }
-
-    static fromJS(data: any): CombatInstance {
-        data = typeof data === 'object' ? data : {};
-        let result = new CombatInstance();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        if (Array.isArray(this.attackers)) {
-            data["attackers"] = [];
-            for (let item of this.attackers)
-                data["attackers"].push(item.toJSON());
-        }
-        if (Array.isArray(this.defenders)) {
-            data["defenders"] = [];
-            for (let item of this.defenders)
-                data["defenders"].push(item.toJSON());
-        }
-        data["turn"] = this.turn;
-        return data;
-    }
-}
-
-/** Combat instance */
-export interface ICombatInstance {
-    /** The unique ID of the combat instance
-             */
-    id: string;
-    /** The attackers in the combat instance
-             */
-    attackers: EntityInCombat[];
-    /** The defenders in the combat instance
-             */
-    defenders: EntityInCombat[];
-    /** The current turn of the combat instance
-             */
-    turn: number;
-}
-
-/** Entity in combat */
-export class EntityInCombat extends EntityMinimal implements IEntityInCombat {
-    /** The level of the character
-             */
-    level!: number;
-    /** The combat statistics of the character
-             */
-    combat!: EntityCombatStatistics;
-
-    constructor(data?: IEntityInCombat) {
-        super(data);
-        if (!data) {
-            this.combat = new EntityCombatStatistics();
-        }
-    }
-
-    override init(_data?: any) {
-        super.init(_data);
-        if (_data) {
-            this.level = _data["level"];
-            this.combat = _data["combat"] ? EntityCombatStatistics.fromJS(_data["combat"]) : new EntityCombatStatistics();
-        }
-    }
-
-    static override fromJS(data: any): EntityInCombat {
-        data = typeof data === 'object' ? data : {};
-        let result = new EntityInCombat();
-        result.init(data);
-        return result;
-    }
-
-    override toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["level"] = this.level;
-        data["combat"] = this.combat ? this.combat.toJSON() : <any>undefined;
-        super.toJSON(data);
-        return data;
-    }
-}
-
-/** Entity in combat */
-export interface IEntityInCombat extends IEntityMinimal {
-    /** The level of the character
-             */
-    level: number;
-    /** The combat statistics of the character
-             */
-    combat: EntityCombatStatistics;
-}
-
-/** Entity combat statistics */
-export class EntityCombatStatistics implements IEntityCombatStatistics {
-    /** The health of the entity
-             */
-    health!: number;
-    /** The max health of the entity
-             */
-    maxHealth!: number;
-    /** The speed of the entity
-             */
-    speed!: number;
-    /** The attack of the entity
-             */
-    attack!: number;
-
-    constructor(data?: IEntityCombatStatistics) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.health = _data["health"];
-            this.maxHealth = _data["maxHealth"];
-            this.speed = _data["speed"];
-            this.attack = _data["attack"];
-        }
-    }
-
-    static fromJS(data: any): EntityCombatStatistics {
-        data = typeof data === 'object' ? data : {};
-        let result = new EntityCombatStatistics();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["health"] = this.health;
-        data["maxHealth"] = this.maxHealth;
-        data["speed"] = this.speed;
-        data["attack"] = this.attack;
-        return data;
-    }
-}
-
-/** Entity combat statistics */
-export interface IEntityCombatStatistics {
-    /** The health of the entity
-             */
-    health: number;
-    /** The max health of the entity
-             */
-    maxHealth: number;
-    /** The speed of the entity
-             */
-    speed: number;
-    /** The attack of the entity
-             */
-    attack: number;
-}
-
-/** Character class (minimal) */
-export class CharacterClassMinimal implements ICharacterClassMinimal {
-    /** The unique ID of the character class
-             */
-    id!: string;
-    /** The name of the character class
-             */
-    name!: string;
-
-    constructor(data?: ICharacterClassMinimal) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.name = _data["name"];
-        }
-    }
-
-    static fromJS(data: any): CharacterClassMinimal {
-        data = typeof data === 'object' ? data : {};
-        let result = new CharacterClassMinimal();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["name"] = this.name;
-        return data;
-    }
-}
-
-/** Character class (minimal) */
-export interface ICharacterClassMinimal {
-    /** The unique ID of the character class
-             */
-    id: string;
-    /** The name of the character class
-             */
-    name: string;
-}
-
-/** Character class */
-export class CharacterClass extends CharacterClassMinimal implements ICharacterClass {
-    /** The description of the character class
-             */
-    description!: string;
-    /** The level caps of the character class
-             */
-    levelCaps!: number[];
-
-    constructor(data?: ICharacterClass) {
-        super(data);
-        if (!data) {
-            this.levelCaps = [];
-        }
-    }
-
-    override init(_data?: any) {
-        super.init(_data);
-        if (_data) {
-            this.description = _data["description"];
-            if (Array.isArray(_data["levelCaps"])) {
-                this.levelCaps = [] as any;
-                for (let item of _data["levelCaps"])
-                    this.levelCaps!.push(item);
-            }
-        }
-    }
-
-    static override fromJS(data: any): CharacterClass {
-        data = typeof data === 'object' ? data : {};
-        let result = new CharacterClass();
-        result.init(data);
-        return result;
-    }
-
-    override toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["description"] = this.description;
-        if (Array.isArray(this.levelCaps)) {
-            data["levelCaps"] = [];
-            for (let item of this.levelCaps)
-                data["levelCaps"].push(item);
-        }
-        super.toJSON(data);
-        return data;
-    }
-}
-
-/** Character class */
-export interface ICharacterClass extends ICharacterClassMinimal {
-    /** The description of the character class
-             */
-    description: string;
-    /** The level caps of the character class
-             */
-    levelCaps: number[];
-}
-
-/** Item (minimal) */
-export class ItemMinimal implements IItemMinimal {
-    /** The unique ID of the item
-             */
-    id!: string;
-    /** The name of the item
-             */
-    name!: string;
-    /** The weight of the item
-             */
-    weight!: number;
-
-    constructor(data?: IItemMinimal) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.name = _data["name"];
-            this.weight = _data["weight"];
-        }
-    }
-
-    static fromJS(data: any): ItemMinimal {
-        data = typeof data === 'object' ? data : {};
-        let result = new ItemMinimal();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["name"] = this.name;
-        data["weight"] = this.weight;
-        return data;
-    }
-}
-
-/** Item (minimal) */
-export interface IItemMinimal {
-    /** The unique ID of the item
-             */
-    id: string;
-    /** The name of the item
-             */
-    name: string;
-    /** The weight of the item
-             */
-    weight: number;
-}
-
-/** Item */
-export class Item extends ItemMinimal implements IItem {
-    /** The description of the item
-             */
-    description?: string | undefined;
-
-    constructor(data?: IItem) {
-        super(data);
-    }
-
-    override init(_data?: any) {
-        super.init(_data);
-        if (_data) {
-            this.description = _data["description"];
-        }
-    }
-
-    static override fromJS(data: any): Item {
-        data = typeof data === 'object' ? data : {};
-        let result = new Item();
-        result.init(data);
-        return result;
-    }
-
-    override toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["description"] = this.description;
-        super.toJSON(data);
-        return data;
-    }
-}
-
-/** Item */
-export interface IItem extends IItemMinimal {
-    /** The description of the item
-             */
-    description?: string | undefined;
-}
-
-/** Map location minimal information */
-export class LocationMinimal implements ILocationMinimal {
-    /** The unique ID of the location
-             */
-    id!: string;
-    /** The area associated with the location
-             */
-    area!: MapArea;
-    /** The X coordinate associated with the location
-             */
-    positionX!: number;
-    /** The Y coordinate associated with the location
-             */
-    positionY!: number;
-
-    constructor(data?: ILocationMinimal) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-        if (!data) {
-            this.area = new MapArea();
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.area = _data["area"] ? MapArea.fromJS(_data["area"]) : new MapArea();
-            this.positionX = _data["positionX"];
-            this.positionY = _data["positionY"];
-        }
-    }
-
-    static fromJS(data: any): LocationMinimal {
-        data = typeof data === 'object' ? data : {};
-        let result = new LocationMinimal();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["area"] = this.area ? this.area.toJSON() : <any>undefined;
-        data["positionX"] = this.positionX;
-        data["positionY"] = this.positionY;
-        return data;
-    }
-}
-
-/** Map location minimal information */
-export interface ILocationMinimal {
-    /** The unique ID of the location
-             */
-    id: string;
-    /** The area associated with the location
-             */
-    area: MapArea;
-    /** The X coordinate associated with the location
-             */
-    positionX: number;
-    /** The Y coordinate associated with the location
-             */
-    positionY: number;
-}
-
-/** Map location */
-export class Location extends LocationMinimal implements ILocation {
-    /** Has this location been discovered by the player.
-If false, the connected locations will be hidden.
-             */
-    discovered!: boolean;
-    /** The locations connected to this one
-             */
-    connectedLocations!: LocationMinimal[];
-
-    constructor(data?: ILocation) {
-        super(data);
-        if (!data) {
-            this.connectedLocations = [];
-        }
-    }
-
-    override init(_data?: any) {
-        super.init(_data);
-        if (_data) {
-            this.discovered = _data["discovered"];
-            if (Array.isArray(_data["connectedLocations"])) {
-                this.connectedLocations = [] as any;
-                for (let item of _data["connectedLocations"])
-                    this.connectedLocations!.push(LocationMinimal.fromJS(item));
-            }
-        }
-    }
-
-    static override fromJS(data: any): Location {
-        data = typeof data === 'object' ? data : {};
-        let result = new Location();
-        result.init(data);
-        return result;
-    }
-
-    override toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["discovered"] = this.discovered;
-        if (Array.isArray(this.connectedLocations)) {
-            data["connectedLocations"] = [];
-            for (let item of this.connectedLocations)
-                data["connectedLocations"].push(item.toJSON());
-        }
-        super.toJSON(data);
-        return data;
-    }
-}
-
-/** Map location */
-export interface ILocation extends ILocationMinimal {
-    /** Has this location been discovered by the player.
-If false, the connected locations will be hidden.
-             */
-    discovered: boolean;
-    /** The locations connected to this one
-             */
-    connectedLocations: LocationMinimal[];
-}
-
-/** Map area */
-export class MapArea implements IMapArea {
-    /** The unique ID of the area
-             */
-    id!: string;
-    /** The name of the area
-             */
-    name!: string;
-
-    constructor(data?: IMapArea) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.name = _data["name"];
-        }
-    }
-
-    static fromJS(data: any): MapArea {
-        data = typeof data === 'object' ? data : {};
-        let result = new MapArea();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["name"] = this.name;
-        return data;
-    }
-}
-
-/** Map area */
-export interface IMapArea {
-    /** The unique ID of the area
-             */
-    id: string;
-    /** The name of the area
-             */
-    name: string;
-}
-
-/** Job (minimal) */
-export class JobMinimal implements IJobMinimal {
-    /** The unique ID of the job
-             */
-    id!: string;
-    /** The name of the job
-             */
-    name!: string;
-
-    constructor(data?: IJobMinimal) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.name = _data["name"];
-        }
-    }
-
-    static fromJS(data: any): JobMinimal {
-        data = typeof data === 'object' ? data : {};
-        let result = new JobMinimal();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["name"] = this.name;
-        return data;
-    }
-}
-
-/** Job (minimal) */
-export interface IJobMinimal {
-    /** The unique ID of the job
-             */
-    id: string;
-    /** The name of the job
-             */
-    name: string;
-}
-
-/** Job */
-export class Job extends JobMinimal implements IJob {
-    /** The description of the job
-             */
-    description?: string | undefined;
-    /** Is the job innate?
-             */
-    innate!: boolean;
-    /** The experience to reach each level of the job.
-             */
-    levelCaps!: number[];
-
-    constructor(data?: IJob) {
-        super(data);
-        if (!data) {
-            this.levelCaps = [];
-        }
-    }
-
-    override init(_data?: any) {
-        super.init(_data);
-        if (_data) {
-            this.description = _data["description"];
-            this.innate = _data["innate"];
-            if (Array.isArray(_data["levelCaps"])) {
-                this.levelCaps = [] as any;
-                for (let item of _data["levelCaps"])
-                    this.levelCaps!.push(item);
-            }
-        }
-    }
-
-    static override fromJS(data: any): Job {
-        data = typeof data === 'object' ? data : {};
-        let result = new Job();
-        result.init(data);
-        return result;
-    }
-
-    override toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["description"] = this.description;
-        data["innate"] = this.innate;
-        if (Array.isArray(this.levelCaps)) {
-            data["levelCaps"] = [];
-            for (let item of this.levelCaps)
-                data["levelCaps"].push(item);
-        }
-        super.toJSON(data);
-        return data;
-    }
-}
-
-/** Job */
-export interface IJob extends IJobMinimal {
-    /** The description of the job
-             */
-    description?: string | undefined;
-    /** Is the job innate?
-             */
-    innate: boolean;
-    /** The experience to reach each level of the job.
-             */
-    levelCaps: number[];
-}
-
-/** Static object */
-export class StaticObject implements IStaticObject {
-    /** The unique ID of the static object
-             */
-    id!: string;
-    /** The name of the static object
-             */
-    name!: string;
-    /** The description of the static object
-             */
-    description?: string | undefined;
-
-    constructor(data?: IStaticObject) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.name = _data["name"];
-            this.description = _data["description"];
-        }
-    }
-
-    static fromJS(data: any): StaticObject {
-        data = typeof data === 'object' ? data : {};
-        let result = new StaticObject();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["name"] = this.name;
-        data["description"] = this.description;
-        return data;
-    }
-}
-
-/** Static object */
-export interface IStaticObject {
-    /** The unique ID of the static object
-             */
-    id: string;
-    /** The name of the static object
-             */
-    name: string;
-    /** The description of the static object
-             */
-    description?: string | undefined;
-}
-
-/** Game settings */
-export class GameSettings implements IGameSettings {
-    /** The max number of characters in a team
-             */
-    maxTeamSize!: number;
-
-    constructor(data?: IGameSettings) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.maxTeamSize = _data["maxTeamSize"];
-        }
-    }
-
-    static fromJS(data: any): GameSettings {
-        data = typeof data === 'object' ? data : {};
-        let result = new GameSettings();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["maxTeamSize"] = this.maxTeamSize;
-        return data;
-    }
-}
-
-/** Game settings */
-export interface IGameSettings {
-    /** The max number of characters in a team
-             */
-    maxTeamSize: number;
-}
-
-/** Game state */
-export class GameState implements IGameState {
-    /** The title of the game
-             */
-    title!: string;
-    /** The current game tick
-             */
-    tick!: number;
-    /** Is the next tick being computed.
-In that case NextTickDate refers to the old tick's next tick date, which means that it is probably in the past.
-             */
-    isComputingNextTick!: boolean;
-    /** Is the game paused?
-             */
-    paused!: boolean;
-    /** If the game is started, the date at which last tick has been computed
-             */
-    lastTickDate?: Date | undefined;
-    /** If the game is not paused, the date at which next tick will be computed
-             */
-    nextTickDate?: Date | undefined;
-
-    constructor(data?: IGameState) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.title = _data["title"];
-            this.tick = _data["tick"];
-            this.isComputingNextTick = _data["isComputingNextTick"];
-            this.paused = _data["paused"];
-            this.lastTickDate = _data["lastTickDate"] ? new Date(_data["lastTickDate"].toString()) : <any>undefined;
-            this.nextTickDate = _data["nextTickDate"] ? new Date(_data["nextTickDate"].toString()) : <any>undefined;
-        }
-    }
-
-    static fromJS(data: any): GameState {
-        data = typeof data === 'object' ? data : {};
-        let result = new GameState();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["title"] = this.title;
-        data["tick"] = this.tick;
-        data["isComputingNextTick"] = this.isComputingNextTick;
-        data["paused"] = this.paused;
-        data["lastTickDate"] = this.lastTickDate ? this.lastTickDate.toISOString() : <any>undefined;
-        data["nextTickDate"] = this.nextTickDate ? this.nextTickDate.toISOString() : <any>undefined;
-        return data;
-    }
-}
-
-/** Game state */
-export interface IGameState {
-    /** The title of the game
-             */
-    title: string;
-    /** The current game tick
-             */
-    tick: number;
-    /** Is the next tick being computed.
-In that case NextTickDate refers to the old tick's next tick date, which means that it is probably in the past.
-             */
-    isComputingNextTick: boolean;
-    /** Is the game paused?
-             */
-    paused: boolean;
-    /** If the game is started, the date at which last tick has been computed
-             */
-    lastTickDate?: Date | undefined;
-    /** If the game is not paused, the date at which next tick will be computed
-             */
-    nextTickDate?: Date | undefined;
-}
-
-/** Harvestable entity */
-export class HarvestableEntity extends EntityMinimal implements IHarvestableEntity {
-    /** The harvests available on the entity
-             */
-    harvests!: HarvestableEntityHarvest[];
-
-    constructor(data?: IHarvestableEntity) {
-        super(data);
-        if (!data) {
-            this.harvests = [];
-        }
-    }
-
-    override init(_data?: any) {
-        super.init(_data);
-        if (_data) {
-            if (Array.isArray(_data["harvests"])) {
-                this.harvests = [] as any;
-                for (let item of _data["harvests"])
-                    this.harvests!.push(HarvestableEntityHarvest.fromJS(item));
-            }
-        }
-    }
-
-    static override fromJS(data: any): HarvestableEntity {
-        data = typeof data === 'object' ? data : {};
-        let result = new HarvestableEntity();
-        result.init(data);
-        return result;
-    }
-
-    override toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        if (Array.isArray(this.harvests)) {
-            data["harvests"] = [];
-            for (let item of this.harvests)
-                data["harvests"].push(item.toJSON());
-        }
-        super.toJSON(data);
-        return data;
-    }
-}
-
-/** Harvestable entity */
-export interface IHarvestableEntity extends IEntityMinimal {
-    /** The harvests available on the entity
-             */
-    harvests: HarvestableEntityHarvest[];
-}
-
-/** Harvestable entity harvest (minimal */
-export class HarvestableEntityHarvestMinimal implements IHarvestableEntityHarvestMinimal {
-    /** The job providing the harvest
-             */
-    job!: JobMinimal;
-    /** The name of the harvest
-             */
-    name!: string;
-    /** The expected result of the harvest
-             */
-    expectedHarvest!: ItemStack[];
-    /** The expected experience gain from the harvest
-             */
-    expectedExperience!: number;
-
-    constructor(data?: IHarvestableEntityHarvestMinimal) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-        if (!data) {
-            this.job = new JobMinimal();
-            this.expectedHarvest = [];
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.job = _data["job"] ? JobMinimal.fromJS(_data["job"]) : new JobMinimal();
-            this.name = _data["name"];
-            if (Array.isArray(_data["expectedHarvest"])) {
-                this.expectedHarvest = [] as any;
-                for (let item of _data["expectedHarvest"])
-                    this.expectedHarvest!.push(ItemStack.fromJS(item));
-            }
-            this.expectedExperience = _data["expectedExperience"];
-        }
-    }
-
-    static fromJS(data: any): HarvestableEntityHarvestMinimal {
-        data = typeof data === 'object' ? data : {};
-        let result = new HarvestableEntityHarvestMinimal();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["job"] = this.job ? this.job.toJSON() : <any>undefined;
-        data["name"] = this.name;
-        if (Array.isArray(this.expectedHarvest)) {
-            data["expectedHarvest"] = [];
-            for (let item of this.expectedHarvest)
-                data["expectedHarvest"].push(item.toJSON());
-        }
-        data["expectedExperience"] = this.expectedExperience;
-        return data;
-    }
-}
-
-/** Harvestable entity harvest (minimal */
-export interface IHarvestableEntityHarvestMinimal {
-    /** The job providing the harvest
-             */
-    job: JobMinimal;
-    /** The name of the harvest
-             */
-    name: string;
-    /** The expected result of the harvest
-             */
-    expectedHarvest: ItemStack[];
-    /** The expected experience gain from the harvest
-             */
-    expectedExperience: number;
-}
-
-/** Harvestable entity harvest */
-export class HarvestableEntityHarvest extends HarvestableEntityHarvestMinimal implements IHarvestableEntityHarvest {
-    /** Can the harvest be performed
-             */
-    canHarvest!: boolean;
-    /** Why cannot the harvest be performed
-             */
-    whyCannotHarvest?: string | undefined;
-
-    constructor(data?: IHarvestableEntityHarvest) {
-        super(data);
-    }
-
-    override init(_data?: any) {
-        super.init(_data);
-        if (_data) {
-            this.canHarvest = _data["canHarvest"];
-            this.whyCannotHarvest = _data["whyCannotHarvest"];
-        }
-    }
-
-    static override fromJS(data: any): HarvestableEntityHarvest {
-        data = typeof data === 'object' ? data : {};
-        let result = new HarvestableEntityHarvest();
-        result.init(data);
-        return result;
-    }
-
-    override toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["canHarvest"] = this.canHarvest;
-        data["whyCannotHarvest"] = this.whyCannotHarvest;
-        super.toJSON(data);
-        return data;
-    }
-}
-
-/** Harvestable entity harvest */
-export interface IHarvestableEntityHarvest extends IHarvestableEntityHarvestMinimal {
-    /** Can the harvest be performed
-             */
-    canHarvest: boolean;
-    /** Why cannot the harvest be performed
-             */
-    whyCannotHarvest?: string | undefined;
-}
-
-/** Item stack */
-export class ItemStack implements IItemStack {
-    /** The item instance representing this stack
-             */
-    item!: ItemMinimal;
-    /** The number of instances in this stack
-             */
-    count!: number;
-
-    constructor(data?: IItemStack) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-        if (!data) {
-            this.item = new ItemMinimal();
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.item = _data["item"] ? ItemMinimal.fromJS(_data["item"]) : new ItemMinimal();
-            this.count = _data["count"];
-        }
-    }
-
-    static fromJS(data: any): ItemStack {
-        data = typeof data === 'object' ? data : {};
-        let result = new ItemStack();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["item"] = this.item ? this.item.toJSON() : <any>undefined;
-        data["count"] = this.count;
-        return data;
-    }
-}
-
-/** Item stack */
-export interface IItemStack {
-    /** The item instance representing this stack
-             */
-    item: ItemMinimal;
-    /** The number of instances in this stack
-             */
-    count: number;
-}
-
-/** Location with access */
-export class LocationWithAccess implements ILocationWithAccess {
-    /** The location
-             */
-    location!: LocationMinimal;
-    /** Is the location accessible
-             */
-    isAccessible!: boolean;
-    /** Why is the location not accessible
-             */
-    whyIsNotAccessible?: string | undefined;
-
-    constructor(data?: ILocationWithAccess) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-        if (!data) {
-            this.location = new LocationMinimal();
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.location = _data["location"] ? LocationMinimal.fromJS(_data["location"]) : new LocationMinimal();
-            this.isAccessible = _data["isAccessible"];
-            this.whyIsNotAccessible = _data["whyIsNotAccessible"];
-        }
-    }
-
-    static fromJS(data: any): LocationWithAccess {
-        data = typeof data === 'object' ? data : {};
-        let result = new LocationWithAccess();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["location"] = this.location ? this.location.toJSON() : <any>undefined;
-        data["isAccessible"] = this.isAccessible;
-        data["whyIsNotAccessible"] = this.whyIsNotAccessible;
-        return data;
-    }
-}
-
-/** Location with access */
-export interface ILocationWithAccess {
-    /** The location
-             */
-    location: LocationMinimal;
-    /** Is the location accessible
-             */
-    isAccessible: boolean;
-    /** Why is the location not accessible
-             */
-    whyIsNotAccessible?: string | undefined;
-}
-
-/** Monster group */
-export class MonsterGroup implements IMonsterGroup {
-    /** The unique ID of the group
-             */
-    id!: string;
-    /** The monsters in the group
-             */
-    monsters!: MonsterInstanceMinimal[];
-    /** Can the character attack the monsters
-             */
-    canAttack!: boolean;
-    /** Why cannot the character attack the monsters
-             */
-    whyCannotAttack?: string | undefined;
-    /** The expected experience gain if the character defeats the monster group
-             */
-    expectedExperience!: number;
-
-    constructor(data?: IMonsterGroup) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-        if (!data) {
-            this.monsters = [];
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            if (Array.isArray(_data["monsters"])) {
-                this.monsters = [] as any;
-                for (let item of _data["monsters"])
-                    this.monsters!.push(MonsterInstanceMinimal.fromJS(item));
-            }
-            this.canAttack = _data["canAttack"];
-            this.whyCannotAttack = _data["whyCannotAttack"];
-            this.expectedExperience = _data["expectedExperience"];
-        }
-    }
-
-    static fromJS(data: any): MonsterGroup {
-        data = typeof data === 'object' ? data : {};
-        let result = new MonsterGroup();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        if (Array.isArray(this.monsters)) {
-            data["monsters"] = [];
-            for (let item of this.monsters)
-                data["monsters"].push(item.toJSON());
-        }
-        data["canAttack"] = this.canAttack;
-        data["whyCannotAttack"] = this.whyCannotAttack;
-        data["expectedExperience"] = this.expectedExperience;
-        return data;
-    }
-}
-
-/** Monster group */
-export interface IMonsterGroup {
-    /** The unique ID of the group
-             */
-    id: string;
-    /** The monsters in the group
-             */
-    monsters: MonsterInstanceMinimal[];
-    /** Can the character attack the monsters
-             */
-    canAttack: boolean;
-    /** Why cannot the character attack the monsters
-             */
-    whyCannotAttack?: string | undefined;
-    /** The expected experience gain if the character defeats the monster group
-             */
-    expectedExperience: number;
-}
-
-/** Monster minimal */
-export class MonsterInstanceMinimal extends EntityMinimal implements IMonsterInstanceMinimal {
-    /** The level of the monster
-             */
-    level!: number;
-
-    constructor(data?: IMonsterInstanceMinimal) {
-        super(data);
-    }
-
-    override init(_data?: any) {
-        super.init(_data);
-        if (_data) {
-            this.level = _data["level"];
-        }
-    }
-
-    static override fromJS(data: any): MonsterInstanceMinimal {
-        data = typeof data === 'object' ? data : {};
-        let result = new MonsterInstanceMinimal();
-        result.init(data);
-        return result;
-    }
-
-    override toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["level"] = this.level;
-        super.toJSON(data);
-        return data;
-    }
-}
-
-/** Monster minimal */
-export interface IMonsterInstanceMinimal extends IEntityMinimal {
-    /** The level of the monster
-             */
-    level: number;
 }
 
 /** Character */
@@ -3342,6 +1737,56 @@ export interface ITeamCharacter {
     plannedAction?: Action | undefined;
 }
 
+/** Character class (minimal) */
+export class CharacterClassMinimal implements ICharacterClassMinimal {
+    /** The unique ID of the character class
+             */
+    id!: string;
+    /** The name of the character class
+             */
+    name!: string;
+
+    constructor(data?: ICharacterClassMinimal) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): CharacterClassMinimal {
+        data = typeof data === 'object' ? data : {};
+        let result = new CharacterClassMinimal();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        return data;
+    }
+}
+
+/** Character class (minimal) */
+export interface ICharacterClassMinimal {
+    /** The unique ID of the character class
+             */
+    id: string;
+    /** The name of the character class
+             */
+    name: string;
+}
+
 /** Progression bar (minimal) */
 export class ProgressionBarMinimal implements IProgressionBarMinimal {
     /** The level of progression
@@ -3398,6 +1843,125 @@ export interface IProgressionBarMinimal {
     /** The experience required to reach next level. The value is null when Level is the max level.
              */
     nextLevelExperience: number;
+}
+
+/** Map location minimal information */
+export class LocationMinimal implements ILocationMinimal {
+    /** The unique ID of the location
+             */
+    id!: string;
+    /** The area associated with the location
+             */
+    area!: MapArea;
+    /** The X coordinate associated with the location
+             */
+    positionX!: number;
+    /** The Y coordinate associated with the location
+             */
+    positionY!: number;
+
+    constructor(data?: ILocationMinimal) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.area = new MapArea();
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.area = _data["area"] ? MapArea.fromJS(_data["area"]) : new MapArea();
+            this.positionX = _data["positionX"];
+            this.positionY = _data["positionY"];
+        }
+    }
+
+    static fromJS(data: any): LocationMinimal {
+        data = typeof data === 'object' ? data : {};
+        let result = new LocationMinimal();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["area"] = this.area ? this.area.toJSON() : <any>undefined;
+        data["positionX"] = this.positionX;
+        data["positionY"] = this.positionY;
+        return data;
+    }
+}
+
+/** Map location minimal information */
+export interface ILocationMinimal {
+    /** The unique ID of the location
+             */
+    id: string;
+    /** The area associated with the location
+             */
+    area: MapArea;
+    /** The X coordinate associated with the location
+             */
+    positionX: number;
+    /** The Y coordinate associated with the location
+             */
+    positionY: number;
+}
+
+/** Map area */
+export class MapArea implements IMapArea {
+    /** The unique ID of the area
+             */
+    id!: string;
+    /** The name of the area
+             */
+    name!: string;
+
+    constructor(data?: IMapArea) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): MapArea {
+        data = typeof data === 'object' ? data : {};
+        let result = new MapArea();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        return data;
+    }
+}
+
+/** Map area */
+export interface IMapArea {
+    /** The unique ID of the area
+             */
+    id: string;
+    /** The name of the area
+             */
+    name: string;
 }
 
 /** Inventory */
@@ -3567,6 +2131,64 @@ export interface IItemInstance {
     item: ItemMinimal;
 }
 
+/** Item (minimal) */
+export class ItemMinimal implements IItemMinimal {
+    /** The unique ID of the item
+             */
+    id!: string;
+    /** The name of the item
+             */
+    name!: string;
+    /** The weight of the item
+             */
+    weight!: number;
+
+    constructor(data?: IItemMinimal) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.weight = _data["weight"];
+        }
+    }
+
+    static fromJS(data: any): ItemMinimal {
+        data = typeof data === 'object' ? data : {};
+        let result = new ItemMinimal();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["weight"] = this.weight;
+        return data;
+    }
+}
+
+/** Item (minimal) */
+export interface IItemMinimal {
+    /** The unique ID of the item
+             */
+    id: string;
+    /** The name of the item
+             */
+    name: string;
+    /** The weight of the item
+             */
+    weight: number;
+}
+
 /** Job instance */
 export class JobInstance implements IJobInstance {
     /** The job that is instantiated
@@ -3619,6 +2241,122 @@ export interface IJobInstance {
     /** The progression of the job
              */
     progression: ProgressionBarMinimal;
+}
+
+/** Job (minimal) */
+export class JobMinimal implements IJobMinimal {
+    /** The unique ID of the job
+             */
+    id!: string;
+    /** The name of the job
+             */
+    name!: string;
+
+    constructor(data?: IJobMinimal) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): JobMinimal {
+        data = typeof data === 'object' ? data : {};
+        let result = new JobMinimal();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        return data;
+    }
+}
+
+/** Job (minimal) */
+export interface IJobMinimal {
+    /** The unique ID of the job
+             */
+    id: string;
+    /** The name of the job
+             */
+    name: string;
+}
+
+/** Entity combat statistics */
+export class EntityCombatStatistics implements IEntityCombatStatistics {
+    /** The health of the entity
+             */
+    health!: number;
+    /** The max health of the entity
+             */
+    maxHealth!: number;
+    /** The speed of the entity
+             */
+    speed!: number;
+    /** The attack of the entity
+             */
+    attack!: number;
+
+    constructor(data?: IEntityCombatStatistics) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.health = _data["health"];
+            this.maxHealth = _data["maxHealth"];
+            this.speed = _data["speed"];
+            this.attack = _data["attack"];
+        }
+    }
+
+    static fromJS(data: any): EntityCombatStatistics {
+        data = typeof data === 'object' ? data : {};
+        let result = new EntityCombatStatistics();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["health"] = this.health;
+        data["maxHealth"] = this.maxHealth;
+        data["speed"] = this.speed;
+        data["attack"] = this.attack;
+        return data;
+    }
+}
+
+/** Entity combat statistics */
+export interface IEntityCombatStatistics {
+    /** The health of the entity
+             */
+    health: number;
+    /** The max health of the entity
+             */
+    maxHealth: number;
+    /** The speed of the entity
+             */
+    speed: number;
+    /** The attack of the entity
+             */
+    attack: number;
 }
 
 /** An action performed by a character */
@@ -3777,6 +2515,137 @@ export interface IHarvestAction extends IAction {
     target: StaticObjectInstance;
 }
 
+/** Harvestable entity harvest (minimal */
+export class HarvestableEntityHarvestMinimal implements IHarvestableEntityHarvestMinimal {
+    /** The job providing the harvest
+             */
+    job!: JobMinimal;
+    /** The name of the harvest
+             */
+    name!: string;
+    /** The expected result of the harvest
+             */
+    expectedHarvest!: ItemStack[];
+    /** The expected experience gain from the harvest
+             */
+    expectedExperience!: number;
+
+    constructor(data?: IHarvestableEntityHarvestMinimal) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.job = new JobMinimal();
+            this.expectedHarvest = [];
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.job = _data["job"] ? JobMinimal.fromJS(_data["job"]) : new JobMinimal();
+            this.name = _data["name"];
+            if (Array.isArray(_data["expectedHarvest"])) {
+                this.expectedHarvest = [] as any;
+                for (let item of _data["expectedHarvest"])
+                    this.expectedHarvest!.push(ItemStack.fromJS(item));
+            }
+            this.expectedExperience = _data["expectedExperience"];
+        }
+    }
+
+    static fromJS(data: any): HarvestableEntityHarvestMinimal {
+        data = typeof data === 'object' ? data : {};
+        let result = new HarvestableEntityHarvestMinimal();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["job"] = this.job ? this.job.toJSON() : <any>undefined;
+        data["name"] = this.name;
+        if (Array.isArray(this.expectedHarvest)) {
+            data["expectedHarvest"] = [];
+            for (let item of this.expectedHarvest)
+                data["expectedHarvest"].push(item.toJSON());
+        }
+        data["expectedExperience"] = this.expectedExperience;
+        return data;
+    }
+}
+
+/** Harvestable entity harvest (minimal */
+export interface IHarvestableEntityHarvestMinimal {
+    /** The job providing the harvest
+             */
+    job: JobMinimal;
+    /** The name of the harvest
+             */
+    name: string;
+    /** The expected result of the harvest
+             */
+    expectedHarvest: ItemStack[];
+    /** The expected experience gain from the harvest
+             */
+    expectedExperience: number;
+}
+
+/** Item stack */
+export class ItemStack implements IItemStack {
+    /** The item instance representing this stack
+             */
+    item!: ItemMinimal;
+    /** The number of instances in this stack
+             */
+    count!: number;
+
+    constructor(data?: IItemStack) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.item = new ItemMinimal();
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.item = _data["item"] ? ItemMinimal.fromJS(_data["item"]) : new ItemMinimal();
+            this.count = _data["count"];
+        }
+    }
+
+    static fromJS(data: any): ItemStack {
+        data = typeof data === 'object' ? data : {};
+        let result = new ItemStack();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["item"] = this.item ? this.item.toJSON() : <any>undefined;
+        data["count"] = this.count;
+        return data;
+    }
+}
+
+/** Item stack */
+export interface IItemStack {
+    /** The item instance representing this stack
+             */
+    item: ItemMinimal;
+    /** The number of instances in this stack
+             */
+    count: number;
+}
+
 /** Static object instance */
 export class StaticObjectInstance implements IStaticObjectInstance {
     /** The unique ID of the entity
@@ -3828,6 +2697,64 @@ export interface IStaticObjectInstance {
     /** The name of the entity
              */
     staticObject: StaticObject;
+}
+
+/** Static object */
+export class StaticObject implements IStaticObject {
+    /** The unique ID of the static object
+             */
+    id!: string;
+    /** The name of the static object
+             */
+    name!: string;
+    /** The description of the static object
+             */
+    description?: string | undefined;
+
+    constructor(data?: IStaticObject) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.description = _data["description"];
+        }
+    }
+
+    static fromJS(data: any): StaticObject {
+        data = typeof data === 'object' ? data : {};
+        let result = new StaticObject();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["description"] = this.description;
+        return data;
+    }
+}
+
+/** Static object */
+export interface IStaticObject {
+    /** The unique ID of the static object
+             */
+    id: string;
+    /** The name of the static object
+             */
+    name: string;
+    /** The description of the static object
+             */
+    description?: string | undefined;
 }
 
 /** PVE combat action */
@@ -3904,6 +2831,120 @@ export interface IPveCombatAction extends IAction {
     /** The defenders in the combat instance
              */
     defenders: EntityMinimal[];
+}
+
+/** Entity (minimal) */
+export class EntityMinimal implements IEntityMinimal {
+    /** The unique ID of the entity
+             */
+    id!: string;
+    /** The name of the entity
+             */
+    name!: string;
+
+    constructor(data?: IEntityMinimal) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): EntityMinimal {
+        data = typeof data === 'object' ? data : {};
+        let result = new EntityMinimal();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        return data;
+    }
+}
+
+/** Entity (minimal) */
+export interface IEntityMinimal {
+    /** The unique ID of the entity
+             */
+    id: string;
+    /** The name of the entity
+             */
+    name: string;
+}
+
+export class ProblemDetails implements IProblemDetails {
+    type?: string | undefined;
+    title?: string | undefined;
+    status?: number | undefined;
+    detail?: string | undefined;
+    instance?: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IProblemDetails) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.type = _data["type"];
+            this.title = _data["title"];
+            this.status = _data["status"];
+            this.detail = _data["detail"];
+            this.instance = _data["instance"];
+        }
+    }
+
+    static fromJS(data: any): ProblemDetails {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProblemDetails();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["type"] = this.type;
+        data["title"] = this.title;
+        data["status"] = this.status;
+        data["detail"] = this.detail;
+        data["instance"] = this.instance;
+        return data;
+    }
+}
+
+export interface IProblemDetails {
+    type?: string | undefined;
+    title?: string | undefined;
+    status?: number | undefined;
+    detail?: string | undefined;
+    instance?: string | undefined;
+
+    [key: string]: any;
 }
 
 /** Character creation options */
@@ -5368,6 +4409,965 @@ export interface ICharacterCombatEndedHistoryEntry extends ICharacterHistoryEntr
     /** The number of ticks during which the combat was being played
              */
     duration: number;
+}
+
+export enum CombatSide {
+    Attackers = "attackers",
+    Defenders = "defenders",
+}
+
+/** Combat instance */
+export class CombatInPreparation implements ICombatInPreparation {
+    /** The unique ID of the combat instance
+             */
+    id!: string;
+    /** The attackers in the combat instance
+             */
+    attackers!: CombatFormationInPreparation;
+    /** The defenders in the combat instance
+             */
+    defenders!: CombatFormationInPreparation;
+    /** Can the character join the combat
+             */
+    canJoin!: boolean;
+    /** Why cannot the character join the combat
+             */
+    whyCannotJoin!: string;
+
+    constructor(data?: ICombatInPreparation) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.attackers = new CombatFormationInPreparation();
+            this.defenders = new CombatFormationInPreparation();
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.attackers = _data["attackers"] ? CombatFormationInPreparation.fromJS(_data["attackers"]) : new CombatFormationInPreparation();
+            this.defenders = _data["defenders"] ? CombatFormationInPreparation.fromJS(_data["defenders"]) : new CombatFormationInPreparation();
+            this.canJoin = _data["canJoin"];
+            this.whyCannotJoin = _data["whyCannotJoin"];
+        }
+    }
+
+    static fromJS(data: any): CombatInPreparation {
+        data = typeof data === 'object' ? data : {};
+        let result = new CombatInPreparation();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["attackers"] = this.attackers ? this.attackers.toJSON() : <any>undefined;
+        data["defenders"] = this.defenders ? this.defenders.toJSON() : <any>undefined;
+        data["canJoin"] = this.canJoin;
+        data["whyCannotJoin"] = this.whyCannotJoin;
+        return data;
+    }
+}
+
+/** Combat instance */
+export interface ICombatInPreparation {
+    /** The unique ID of the combat instance
+             */
+    id: string;
+    /** The attackers in the combat instance
+             */
+    attackers: CombatFormationInPreparation;
+    /** The defenders in the combat instance
+             */
+    defenders: CombatFormationInPreparation;
+    /** Can the character join the combat
+             */
+    canJoin: boolean;
+    /** Why cannot the character join the combat
+             */
+    whyCannotJoin: string;
+}
+
+/** Combat formation */
+export class CombatFormationInPreparation implements ICombatFormationInPreparation {
+    /** The entities in the formation
+             */
+    entities!: EntityMinimal[];
+    /** The options of the formation
+             */
+    options!: CombatFormationOptions;
+
+    constructor(data?: ICombatFormationInPreparation) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.entities = [];
+            this.options = new CombatFormationOptions();
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["entities"])) {
+                this.entities = [] as any;
+                for (let item of _data["entities"])
+                    this.entities!.push(EntityMinimal.fromJS(item));
+            }
+            this.options = _data["options"] ? CombatFormationOptions.fromJS(_data["options"]) : new CombatFormationOptions();
+        }
+    }
+
+    static fromJS(data: any): CombatFormationInPreparation {
+        data = typeof data === 'object' ? data : {};
+        let result = new CombatFormationInPreparation();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.entities)) {
+            data["entities"] = [];
+            for (let item of this.entities)
+                data["entities"].push(item.toJSON());
+        }
+        data["options"] = this.options ? this.options.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+/** Combat formation */
+export interface ICombatFormationInPreparation {
+    /** The entities in the formation
+             */
+    entities: EntityMinimal[];
+    /** The options of the formation
+             */
+    options: CombatFormationOptions;
+}
+
+/** Combat formation options */
+export class CombatFormationOptions implements ICombatFormationOptions {
+    /** The accessibility of the formation
+             */
+    accessibility!: CombatFormationAccessibility;
+
+    constructor(data?: ICombatFormationOptions) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.accessibility = _data["accessibility"];
+        }
+    }
+
+    static fromJS(data: any): CombatFormationOptions {
+        data = typeof data === 'object' ? data : {};
+        let result = new CombatFormationOptions();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["accessibility"] = this.accessibility;
+        return data;
+    }
+}
+
+/** Combat formation options */
+export interface ICombatFormationOptions {
+    /** The accessibility of the formation
+             */
+    accessibility: CombatFormationAccessibility;
+}
+
+export enum CombatFormationAccessibility {
+    Everyone = "everyone",
+    TeamOnly = "teamOnly",
+}
+
+/** Combat instance */
+export class CombatInstance implements ICombatInstance {
+    /** The unique ID of the combat instance
+             */
+    id!: string;
+    /** The attackers in the combat instance
+             */
+    attackers!: EntityInCombat[];
+    /** The defenders in the combat instance
+             */
+    defenders!: EntityInCombat[];
+    /** The current turn of the combat instance
+             */
+    turn!: number;
+
+    constructor(data?: ICombatInstance) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.attackers = [];
+            this.defenders = [];
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            if (Array.isArray(_data["attackers"])) {
+                this.attackers = [] as any;
+                for (let item of _data["attackers"])
+                    this.attackers!.push(EntityInCombat.fromJS(item));
+            }
+            if (Array.isArray(_data["defenders"])) {
+                this.defenders = [] as any;
+                for (let item of _data["defenders"])
+                    this.defenders!.push(EntityInCombat.fromJS(item));
+            }
+            this.turn = _data["turn"];
+        }
+    }
+
+    static fromJS(data: any): CombatInstance {
+        data = typeof data === 'object' ? data : {};
+        let result = new CombatInstance();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        if (Array.isArray(this.attackers)) {
+            data["attackers"] = [];
+            for (let item of this.attackers)
+                data["attackers"].push(item.toJSON());
+        }
+        if (Array.isArray(this.defenders)) {
+            data["defenders"] = [];
+            for (let item of this.defenders)
+                data["defenders"].push(item.toJSON());
+        }
+        data["turn"] = this.turn;
+        return data;
+    }
+}
+
+/** Combat instance */
+export interface ICombatInstance {
+    /** The unique ID of the combat instance
+             */
+    id: string;
+    /** The attackers in the combat instance
+             */
+    attackers: EntityInCombat[];
+    /** The defenders in the combat instance
+             */
+    defenders: EntityInCombat[];
+    /** The current turn of the combat instance
+             */
+    turn: number;
+}
+
+/** Entity in combat */
+export class EntityInCombat extends EntityMinimal implements IEntityInCombat {
+    /** The level of the character
+             */
+    level!: number;
+    /** The combat statistics of the character
+             */
+    combat!: EntityCombatStatistics;
+
+    constructor(data?: IEntityInCombat) {
+        super(data);
+        if (!data) {
+            this.combat = new EntityCombatStatistics();
+        }
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.level = _data["level"];
+            this.combat = _data["combat"] ? EntityCombatStatistics.fromJS(_data["combat"]) : new EntityCombatStatistics();
+        }
+    }
+
+    static override fromJS(data: any): EntityInCombat {
+        data = typeof data === 'object' ? data : {};
+        let result = new EntityInCombat();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["level"] = this.level;
+        data["combat"] = this.combat ? this.combat.toJSON() : <any>undefined;
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Entity in combat */
+export interface IEntityInCombat extends IEntityMinimal {
+    /** The level of the character
+             */
+    level: number;
+    /** The combat statistics of the character
+             */
+    combat: EntityCombatStatistics;
+}
+
+/** Character class */
+export class CharacterClass extends CharacterClassMinimal implements ICharacterClass {
+    /** The description of the character class
+             */
+    description!: string;
+    /** The level caps of the character class
+             */
+    levelCaps!: number[];
+
+    constructor(data?: ICharacterClass) {
+        super(data);
+        if (!data) {
+            this.levelCaps = [];
+        }
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.description = _data["description"];
+            if (Array.isArray(_data["levelCaps"])) {
+                this.levelCaps = [] as any;
+                for (let item of _data["levelCaps"])
+                    this.levelCaps!.push(item);
+            }
+        }
+    }
+
+    static override fromJS(data: any): CharacterClass {
+        data = typeof data === 'object' ? data : {};
+        let result = new CharacterClass();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["description"] = this.description;
+        if (Array.isArray(this.levelCaps)) {
+            data["levelCaps"] = [];
+            for (let item of this.levelCaps)
+                data["levelCaps"].push(item);
+        }
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Character class */
+export interface ICharacterClass extends ICharacterClassMinimal {
+    /** The description of the character class
+             */
+    description: string;
+    /** The level caps of the character class
+             */
+    levelCaps: number[];
+}
+
+/** Item */
+export class Item extends ItemMinimal implements IItem {
+    /** The description of the item
+             */
+    description?: string | undefined;
+
+    constructor(data?: IItem) {
+        super(data);
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.description = _data["description"];
+        }
+    }
+
+    static override fromJS(data: any): Item {
+        data = typeof data === 'object' ? data : {};
+        let result = new Item();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["description"] = this.description;
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Item */
+export interface IItem extends IItemMinimal {
+    /** The description of the item
+             */
+    description?: string | undefined;
+}
+
+/** Map location */
+export class Location extends LocationMinimal implements ILocation {
+    /** Has this location been discovered by the player.
+If false, the connected locations will be hidden.
+             */
+    discovered!: boolean;
+    /** The locations connected to this one
+             */
+    connectedLocations!: LocationMinimal[];
+
+    constructor(data?: ILocation) {
+        super(data);
+        if (!data) {
+            this.connectedLocations = [];
+        }
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.discovered = _data["discovered"];
+            if (Array.isArray(_data["connectedLocations"])) {
+                this.connectedLocations = [] as any;
+                for (let item of _data["connectedLocations"])
+                    this.connectedLocations!.push(LocationMinimal.fromJS(item));
+            }
+        }
+    }
+
+    static override fromJS(data: any): Location {
+        data = typeof data === 'object' ? data : {};
+        let result = new Location();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["discovered"] = this.discovered;
+        if (Array.isArray(this.connectedLocations)) {
+            data["connectedLocations"] = [];
+            for (let item of this.connectedLocations)
+                data["connectedLocations"].push(item.toJSON());
+        }
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Map location */
+export interface ILocation extends ILocationMinimal {
+    /** Has this location been discovered by the player.
+If false, the connected locations will be hidden.
+             */
+    discovered: boolean;
+    /** The locations connected to this one
+             */
+    connectedLocations: LocationMinimal[];
+}
+
+/** Job */
+export class Job extends JobMinimal implements IJob {
+    /** The description of the job
+             */
+    description?: string | undefined;
+    /** Is the job innate?
+             */
+    innate!: boolean;
+    /** The experience to reach each level of the job.
+             */
+    levelCaps!: number[];
+
+    constructor(data?: IJob) {
+        super(data);
+        if (!data) {
+            this.levelCaps = [];
+        }
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.description = _data["description"];
+            this.innate = _data["innate"];
+            if (Array.isArray(_data["levelCaps"])) {
+                this.levelCaps = [] as any;
+                for (let item of _data["levelCaps"])
+                    this.levelCaps!.push(item);
+            }
+        }
+    }
+
+    static override fromJS(data: any): Job {
+        data = typeof data === 'object' ? data : {};
+        let result = new Job();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["description"] = this.description;
+        data["innate"] = this.innate;
+        if (Array.isArray(this.levelCaps)) {
+            data["levelCaps"] = [];
+            for (let item of this.levelCaps)
+                data["levelCaps"].push(item);
+        }
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Job */
+export interface IJob extends IJobMinimal {
+    /** The description of the job
+             */
+    description?: string | undefined;
+    /** Is the job innate?
+             */
+    innate: boolean;
+    /** The experience to reach each level of the job.
+             */
+    levelCaps: number[];
+}
+
+/** Game settings */
+export class GameSettings implements IGameSettings {
+    /** The max number of characters in a team
+             */
+    maxTeamSize!: number;
+
+    constructor(data?: IGameSettings) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.maxTeamSize = _data["maxTeamSize"];
+        }
+    }
+
+    static fromJS(data: any): GameSettings {
+        data = typeof data === 'object' ? data : {};
+        let result = new GameSettings();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["maxTeamSize"] = this.maxTeamSize;
+        return data;
+    }
+}
+
+/** Game settings */
+export interface IGameSettings {
+    /** The max number of characters in a team
+             */
+    maxTeamSize: number;
+}
+
+/** Game state */
+export class GameState implements IGameState {
+    /** The title of the game
+             */
+    title!: string;
+    /** The current game tick
+             */
+    tick!: number;
+    /** Is the next tick being computed.
+In that case NextTickDate refers to the old tick's next tick date, which means that it is probably in the past.
+             */
+    isComputingNextTick!: boolean;
+    /** Is the game paused?
+             */
+    paused!: boolean;
+    /** If the game is started, the date at which last tick has been computed
+             */
+    lastTickDate?: Date | undefined;
+    /** If the game is not paused, the date at which next tick will be computed
+             */
+    nextTickDate?: Date | undefined;
+
+    constructor(data?: IGameState) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.title = _data["title"];
+            this.tick = _data["tick"];
+            this.isComputingNextTick = _data["isComputingNextTick"];
+            this.paused = _data["paused"];
+            this.lastTickDate = _data["lastTickDate"] ? new Date(_data["lastTickDate"].toString()) : <any>undefined;
+            this.nextTickDate = _data["nextTickDate"] ? new Date(_data["nextTickDate"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): GameState {
+        data = typeof data === 'object' ? data : {};
+        let result = new GameState();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["title"] = this.title;
+        data["tick"] = this.tick;
+        data["isComputingNextTick"] = this.isComputingNextTick;
+        data["paused"] = this.paused;
+        data["lastTickDate"] = this.lastTickDate ? this.lastTickDate.toISOString() : <any>undefined;
+        data["nextTickDate"] = this.nextTickDate ? this.nextTickDate.toISOString() : <any>undefined;
+        return data;
+    }
+}
+
+/** Game state */
+export interface IGameState {
+    /** The title of the game
+             */
+    title: string;
+    /** The current game tick
+             */
+    tick: number;
+    /** Is the next tick being computed.
+In that case NextTickDate refers to the old tick's next tick date, which means that it is probably in the past.
+             */
+    isComputingNextTick: boolean;
+    /** Is the game paused?
+             */
+    paused: boolean;
+    /** If the game is started, the date at which last tick has been computed
+             */
+    lastTickDate?: Date | undefined;
+    /** If the game is not paused, the date at which next tick will be computed
+             */
+    nextTickDate?: Date | undefined;
+}
+
+/** Harvestable entity */
+export class HarvestableEntity extends EntityMinimal implements IHarvestableEntity {
+    /** The harvests available on the entity
+             */
+    harvests!: HarvestableEntityHarvest[];
+
+    constructor(data?: IHarvestableEntity) {
+        super(data);
+        if (!data) {
+            this.harvests = [];
+        }
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            if (Array.isArray(_data["harvests"])) {
+                this.harvests = [] as any;
+                for (let item of _data["harvests"])
+                    this.harvests!.push(HarvestableEntityHarvest.fromJS(item));
+            }
+        }
+    }
+
+    static override fromJS(data: any): HarvestableEntity {
+        data = typeof data === 'object' ? data : {};
+        let result = new HarvestableEntity();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.harvests)) {
+            data["harvests"] = [];
+            for (let item of this.harvests)
+                data["harvests"].push(item.toJSON());
+        }
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Harvestable entity */
+export interface IHarvestableEntity extends IEntityMinimal {
+    /** The harvests available on the entity
+             */
+    harvests: HarvestableEntityHarvest[];
+}
+
+/** Harvestable entity harvest */
+export class HarvestableEntityHarvest extends HarvestableEntityHarvestMinimal implements IHarvestableEntityHarvest {
+    /** Can the harvest be performed
+             */
+    canHarvest!: boolean;
+    /** Why cannot the harvest be performed
+             */
+    whyCannotHarvest?: string | undefined;
+
+    constructor(data?: IHarvestableEntityHarvest) {
+        super(data);
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.canHarvest = _data["canHarvest"];
+            this.whyCannotHarvest = _data["whyCannotHarvest"];
+        }
+    }
+
+    static override fromJS(data: any): HarvestableEntityHarvest {
+        data = typeof data === 'object' ? data : {};
+        let result = new HarvestableEntityHarvest();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["canHarvest"] = this.canHarvest;
+        data["whyCannotHarvest"] = this.whyCannotHarvest;
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Harvestable entity harvest */
+export interface IHarvestableEntityHarvest extends IHarvestableEntityHarvestMinimal {
+    /** Can the harvest be performed
+             */
+    canHarvest: boolean;
+    /** Why cannot the harvest be performed
+             */
+    whyCannotHarvest?: string | undefined;
+}
+
+/** Location with access */
+export class LocationWithAccess implements ILocationWithAccess {
+    /** The location
+             */
+    location!: LocationMinimal;
+    /** Is the location accessible
+             */
+    isAccessible!: boolean;
+    /** Why is the location not accessible
+             */
+    whyIsNotAccessible?: string | undefined;
+
+    constructor(data?: ILocationWithAccess) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.location = new LocationMinimal();
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.location = _data["location"] ? LocationMinimal.fromJS(_data["location"]) : new LocationMinimal();
+            this.isAccessible = _data["isAccessible"];
+            this.whyIsNotAccessible = _data["whyIsNotAccessible"];
+        }
+    }
+
+    static fromJS(data: any): LocationWithAccess {
+        data = typeof data === 'object' ? data : {};
+        let result = new LocationWithAccess();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["location"] = this.location ? this.location.toJSON() : <any>undefined;
+        data["isAccessible"] = this.isAccessible;
+        data["whyIsNotAccessible"] = this.whyIsNotAccessible;
+        return data;
+    }
+}
+
+/** Location with access */
+export interface ILocationWithAccess {
+    /** The location
+             */
+    location: LocationMinimal;
+    /** Is the location accessible
+             */
+    isAccessible: boolean;
+    /** Why is the location not accessible
+             */
+    whyIsNotAccessible?: string | undefined;
+}
+
+/** Monster group */
+export class MonsterGroup implements IMonsterGroup {
+    /** The unique ID of the group
+             */
+    id!: string;
+    /** The monsters in the group
+             */
+    monsters!: MonsterInstanceMinimal[];
+    /** Can the character attack the monsters
+             */
+    canAttack!: boolean;
+    /** Why cannot the character attack the monsters
+             */
+    whyCannotAttack?: string | undefined;
+    /** The expected experience gain if the character defeats the monster group
+             */
+    expectedExperience!: number;
+
+    constructor(data?: IMonsterGroup) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.monsters = [];
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            if (Array.isArray(_data["monsters"])) {
+                this.monsters = [] as any;
+                for (let item of _data["monsters"])
+                    this.monsters!.push(MonsterInstanceMinimal.fromJS(item));
+            }
+            this.canAttack = _data["canAttack"];
+            this.whyCannotAttack = _data["whyCannotAttack"];
+            this.expectedExperience = _data["expectedExperience"];
+        }
+    }
+
+    static fromJS(data: any): MonsterGroup {
+        data = typeof data === 'object' ? data : {};
+        let result = new MonsterGroup();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        if (Array.isArray(this.monsters)) {
+            data["monsters"] = [];
+            for (let item of this.monsters)
+                data["monsters"].push(item.toJSON());
+        }
+        data["canAttack"] = this.canAttack;
+        data["whyCannotAttack"] = this.whyCannotAttack;
+        data["expectedExperience"] = this.expectedExperience;
+        return data;
+    }
+}
+
+/** Monster group */
+export interface IMonsterGroup {
+    /** The unique ID of the group
+             */
+    id: string;
+    /** The monsters in the group
+             */
+    monsters: MonsterInstanceMinimal[];
+    /** Can the character attack the monsters
+             */
+    canAttack: boolean;
+    /** Why cannot the character attack the monsters
+             */
+    whyCannotAttack?: string | undefined;
+    /** The expected experience gain if the character defeats the monster group
+             */
+    expectedExperience: number;
+}
+
+/** Monster minimal */
+export class MonsterInstanceMinimal extends EntityMinimal implements IMonsterInstanceMinimal {
+    /** The level of the monster
+             */
+    level!: number;
+
+    constructor(data?: IMonsterInstanceMinimal) {
+        super(data);
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.level = _data["level"];
+        }
+    }
+
+    static override fromJS(data: any): MonsterInstanceMinimal {
+        data = typeof data === 'object' ? data : {};
+        let result = new MonsterInstanceMinimal();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["level"] = this.level;
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Monster minimal */
+export interface IMonsterInstanceMinimal extends IEntityMinimal {
+    /** The level of the monster
+             */
+    level: number;
 }
 
 /** Team of characters */
