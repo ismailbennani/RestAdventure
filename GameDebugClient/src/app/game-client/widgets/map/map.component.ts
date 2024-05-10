@@ -18,7 +18,8 @@ export class MapComponent implements OnInit {
   private static readonly GRID_LINE_COLOR = 'lightgrey';
   private static readonly GRID_LINE_WIDTH = 1;
   private static readonly AREA_LINE_COLOR = 'grey';
-  private static readonly AREA_LINE_WIDTH = 4;
+  private static readonly AREA_LINE_WIDTH = 2;
+  private static readonly MARKER_SIZE = 8;
 
   @ViewChild('parent', { static: true }) parent: ElementRef<HTMLDivElement> | undefined;
   @ViewChild('canvas', { static: true }) canvas: ElementRef<HTMLCanvasElement> | undefined;
@@ -44,12 +45,24 @@ export class MapComponent implements OnInit {
   }
   private _centerAt: [number, number] | undefined = undefined;
 
+  @Input()
+  public get markers(): MapMarker[] {
+    return this._markers;
+  }
+  public set markers(value: MapMarker[]) {
+    this._markers = value;
+    this.updateMarkerCaches();
+    this.queueRedraw();
+  }
+  private _markers: MapMarker[] = [];
+
   protected center: [number, number] = [0, 0];
 
   private redrawSubject: ReplaySubject<void> = new ReplaySubject<void>(1);
   private locationsByArea: { [areaName: string]: Location[] } = {};
   private locationsByPosition: { [x: number]: { [y: number]: Location[] } } = {};
   private locationAreaAdjacency: { [locationId: string]: { sameAreaTop: boolean; sameAreaBottom: boolean; sameAreaLeft: boolean; sameAreaRight: boolean } } = {};
+  private markersByPosition: { [x: number]: { [y: number]: MapMarker[] } } = {};
 
   ngOnInit(): void {
     if (this.parent) {
@@ -133,12 +146,22 @@ export class MapComponent implements OnInit {
           continue;
         }
 
+        const cellXMin = startAtX + x * MapComponent.CELL_WIDTH;
+        const cellXMax = startAtX + (x + 1) * MapComponent.CELL_WIDTH;
+        const cellXCenter = startAtX + (x + 0.5) * MapComponent.CELL_WIDTH;
+        const cellYMin = startAtY + y * MapComponent.CELL_HEIGHT;
+        const cellYMax = startAtY + (y + 1) * MapComponent.CELL_HEIGHT;
+        const cellYCenter = startAtY + (y + 0.5) * MapComponent.CELL_HEIGHT;
+
+        ctx.fillStyle = MapComponent.GRID_LINE_COLOR;
+        ctx.fillRect(cellXMin, cellYMin, MapComponent.CELL_WIDTH, MapComponent.CELL_HEIGHT);
+
         const location = this.locationsByPosition[position[0]][position[1]];
         const adjacency = this.locationAreaAdjacency[location[0].id];
         if (!adjacency.sameAreaBottom) {
           ctx.beginPath();
-          ctx.moveTo(startAtX + x * MapComponent.CELL_WIDTH, startAtY + (y + 1) * MapComponent.CELL_HEIGHT);
-          ctx.lineTo(startAtX + (x + 1) * MapComponent.CELL_WIDTH, startAtY + (y + 1) * MapComponent.CELL_HEIGHT);
+          ctx.moveTo(cellXMin, cellYMax);
+          ctx.lineTo(cellXMax, cellYMax);
           ctx.lineWidth = MapComponent.AREA_LINE_WIDTH;
           ctx.strokeStyle = MapComponent.AREA_LINE_COLOR;
           ctx.stroke();
@@ -146,8 +169,8 @@ export class MapComponent implements OnInit {
 
         if (!adjacency.sameAreaTop) {
           ctx.beginPath();
-          ctx.moveTo(startAtX + x * MapComponent.CELL_WIDTH, startAtY + y * MapComponent.CELL_HEIGHT);
-          ctx.lineTo(startAtX + (x + 1) * MapComponent.CELL_WIDTH, startAtY + y * MapComponent.CELL_HEIGHT);
+          ctx.moveTo(cellXMin, cellYMin);
+          ctx.lineTo(cellXMax, cellYMin);
           ctx.lineWidth = MapComponent.AREA_LINE_WIDTH;
           ctx.strokeStyle = MapComponent.AREA_LINE_COLOR;
           ctx.stroke();
@@ -155,8 +178,8 @@ export class MapComponent implements OnInit {
 
         if (!adjacency.sameAreaLeft) {
           ctx.beginPath();
-          ctx.moveTo(startAtX + x * MapComponent.CELL_WIDTH, startAtY + y * MapComponent.CELL_HEIGHT);
-          ctx.lineTo(startAtX + x * MapComponent.CELL_WIDTH, startAtY + (y + 1) * MapComponent.CELL_HEIGHT);
+          ctx.moveTo(cellXMin, cellYMin);
+          ctx.lineTo(cellXMin, cellYMax);
           ctx.lineWidth = MapComponent.AREA_LINE_WIDTH;
           ctx.strokeStyle = MapComponent.AREA_LINE_COLOR;
           ctx.stroke();
@@ -164,15 +187,23 @@ export class MapComponent implements OnInit {
 
         if (!adjacency.sameAreaRight) {
           ctx.beginPath();
-          ctx.moveTo(startAtX + (x + 1) * MapComponent.CELL_WIDTH, startAtY + y * MapComponent.CELL_HEIGHT);
-          ctx.lineTo(startAtX + (x + 1) * MapComponent.CELL_WIDTH, startAtY + (y + 1) * MapComponent.CELL_HEIGHT);
+          ctx.moveTo(cellXMax, cellYMin);
+          ctx.lineTo(cellXMax, cellYMax);
           ctx.lineWidth = MapComponent.AREA_LINE_WIDTH;
           ctx.strokeStyle = MapComponent.AREA_LINE_COLOR;
           ctx.stroke();
         }
 
-        ctx.fillStyle = MapComponent.GRID_LINE_COLOR;
-        ctx.fillRect(startAtX + x * MapComponent.CELL_WIDTH, startAtY + y * MapComponent.CELL_HEIGHT, MapComponent.CELL_WIDTH, MapComponent.CELL_HEIGHT);
+        const markers = this.markersByPosition[position[0]] ? this.markersByPosition[position[0]][position[1]] ?? [] : [];
+        const step = MapComponent.CELL_WIDTH / (markers.length + 1);
+        for (let i = 0; i < markers.length; i++) {
+          const marker = markers[i];
+          const x = cellXMin + (i + 1) * step;
+          const y = cellYCenter;
+          this.drawMarker(ctx, marker, x, y);
+
+          console.log(marker, x, y, step);
+        }
       }
     }
 
@@ -215,6 +246,17 @@ export class MapComponent implements OnInit {
         MapComponent.MARGIN_SIZE / 2 - textSize.width / 2,
         startAtY + (y + 0.5) * MapComponent.CELL_HEIGHT + (textSize.actualBoundingBoxAscent + textSize.actualBoundingBoxDescent) / 2,
       );
+    }
+  }
+
+  private drawMarker(ctx: CanvasRenderingContext2D, marker: MapMarker, x: number, y: number) {
+    switch (marker.shape) {
+      case 'circle':
+        ctx.beginPath();
+        ctx.arc(x, y, MapComponent.MARKER_SIZE / 2, 0, 2 * Math.PI);
+        ctx.fillStyle = marker.color;
+        ctx.fill();
+        break;
     }
   }
 
@@ -268,4 +310,31 @@ export class MapComponent implements OnInit {
       };
     }
   }
+
+  private updateMarkerCaches() {
+    this.markersByPosition = {};
+    for (const marker of this._markers) {
+      let x = this.markersByPosition[marker.positionX];
+      if (!x) {
+        this.markersByPosition[marker.positionX] = {};
+        this.markersByPosition[marker.positionX][marker.positionY] = [marker];
+        continue;
+      }
+
+      let y = this.markersByPosition[marker.positionX][marker.positionY];
+      if (!y) {
+        this.markersByPosition[marker.positionX][marker.positionY] = [marker];
+        continue;
+      }
+
+      this.markersByPosition[marker.positionX][marker.positionY].push(marker);
+    }
+  }
+}
+
+export interface MapMarker {
+  shape: 'circle';
+  color: string;
+  positionX: number;
+  positionY: number;
 }
