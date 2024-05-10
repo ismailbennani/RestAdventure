@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using RestAdventure.Core.Maps.Areas;
 using RestAdventure.Core.Maps.Locations;
+using SandboxGame.Generation.Partitioning;
 using SandboxGame.Generation.Terraforming;
-using SandboxGame.Generation.Zoning;
 
 namespace SandboxGame.Generation;
 
@@ -10,15 +10,15 @@ public class MapGenerator
 {
     readonly ILogger<MapGenerator> _logger;
 
-    public MapGenerator(LandGenerator landGenerator, ZonesGenerator zonesGenerator, ILogger<MapGenerator> logger)
+    public MapGenerator(LandGenerator landGenerator, PartitionGenerator partitionGenerator, ILogger<MapGenerator> logger)
     {
         _logger = logger;
         LandGenerator = landGenerator;
-        ZonesGenerator = zonesGenerator;
+        PartitionGenerator = partitionGenerator;
     }
 
     public LandGenerator LandGenerator { get; }
-    public ZonesGenerator ZonesGenerator { get; }
+    public PartitionGenerator PartitionGenerator { get; }
 
     public GeneratedMaps Generate()
     {
@@ -26,18 +26,18 @@ public class MapGenerator
 
         _logger.LogDebug("Land generation complete: {n} locations, [{xMin}, {yMin}] to [{xMax}, {yMax}]", land.Locations.Count, land.XMin, land.YMin, land.XMax, land.YMax);
 
-        Zones zones = ZonesGenerator.Generate(land);
+        Partition partition = PartitionGenerator.Generate(land);
 
-        _logger.LogDebug("Zones generation complete: {n} zones", zones.Count);
+        _logger.LogDebug("Partition generation complete: {n} partition", partition.Count);
 
-        return Generate(zones, land);
+        return Generate(land, partition);
     }
 
-    GeneratedMaps Generate(Zones zones, Land land)
+    GeneratedMaps Generate(Land land, Partition partition)
     {
-        MapArea noArea = new() { Name = "Void" };
-        List<MapArea> areas = GenerateAreas(zones).ToList();
-        IReadOnlyCollection<Location> locations = GenerateLocations(zones, land, areas, noArea, out bool atLeastOneLocationInNoArea);
+        MapArea noArea = new() { Name = "Void", Level = 0 };
+        List<MapArea> areas = GenerateAreas(partition).ToList();
+        IReadOnlyCollection<Location> locations = GenerateLocations(partition, land, areas, noArea, out bool atLeastOneLocationInNoArea);
         IReadOnlyCollection<(Location, Location)> connections = GenerateConnections(locations).ToArray();
 
         if (atLeastOneLocationInNoArea)
@@ -55,15 +55,15 @@ public class MapGenerator
         };
     }
 
-    static IEnumerable<MapArea> GenerateAreas(Zones zones) => Enumerable.Range(0, zones.Count).Select(i => new MapArea { Name = "Zone " + i });
+    static IEnumerable<MapArea> GenerateAreas(Partition partition) => Enumerable.Range(0, partition.Count).Select(i => new MapArea { Name = "Zone " + i, Level = 0 });
 
-    public IReadOnlyCollection<Location> GenerateLocations(Zones zones, Land land, IReadOnlyList<MapArea> areas, MapArea noArea, out bool atLeastOneLocationInNoArea)
+    public IReadOnlyCollection<Location> GenerateLocations(Partition partition, Land land, IReadOnlyList<MapArea> areas, MapArea noArea, out bool atLeastOneLocationInNoArea)
     {
         atLeastOneLocationInNoArea = false;
         List<Location> locations = new();
         foreach ((int x, int y) in land.Locations)
         {
-            int? zone = zones.GetZone((x, y));
+            int? zone = partition.GetSubsetContaining((x, y));
             if (zone.HasValue)
             {
                 locations.Add(new Location { Area = areas[zone.Value], PositionX = x, PositionY = y });

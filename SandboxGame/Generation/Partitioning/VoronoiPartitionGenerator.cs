@@ -2,13 +2,13 @@
 using RestAdventure.Core.Extensions;
 using SandboxGame.Generation.Terraforming;
 
-namespace SandboxGame.Generation.Zoning;
+namespace SandboxGame.Generation.Partitioning;
 
-public class VoronoiZonesGenerator : ZonesGenerator
+public class VoronoiPartitionGenerator : PartitionGenerator
 {
-    readonly ILogger<VoronoiZonesGenerator> _logger;
+    readonly ILogger<VoronoiPartitionGenerator> _logger;
 
-    public VoronoiZonesGenerator(int zonesCount, ILogger<VoronoiZonesGenerator> logger)
+    public VoronoiPartitionGenerator(int zonesCount, ILogger<VoronoiPartitionGenerator> logger)
     {
         _logger = logger;
         ZonesCount = zonesCount;
@@ -16,11 +16,11 @@ public class VoronoiZonesGenerator : ZonesGenerator
 
     int ZonesCount { get; }
 
-    public override Zones Generate(Land land)
+    public override Partition Generate(Land land)
     {
         if (land.Locations.Count == 0)
         {
-            return Zones.Empty;
+            return Partition.Empty;
         }
 
         Random random = Random.Shared;
@@ -39,7 +39,7 @@ public class VoronoiZonesGenerator : ZonesGenerator
         }
 
         (int, int)[][] zoningArr = zoning.GroupBy(kv => kv.Value).Select(g => g.Select(kv => kv.Key).ToArray()).ToArray();
-        return new Zones(zoningArr);
+        return new Partition(zoningArr);
     }
 
     static IEnumerable<(int, int)> GenerateZoneCenters(Random random, Land land, int count)

@@ -11,8 +11,8 @@ using RestAdventure.Core.Plugins;
 using RestAdventure.Core.Spawners;
 using SandboxGame.Characters;
 using SandboxGame.Generation;
+using SandboxGame.Generation.Partitioning;
 using SandboxGame.Generation.Terraforming;
-using SandboxGame.Generation.Zoning;
 using SandboxGame.Jobs;
 using SandboxGame.Monsters;
 
@@ -30,7 +30,7 @@ public class SandboxGameBuilder
     {
         MapGenerator = new MapGenerator(
             new ErodedIslandGenerator(100, 100, 0.4),
-            new VoronoiZonesGenerator(40, loggerFactory.CreateLogger<VoronoiZonesGenerator>()),
+            new VoronoiPartitionGenerator(40, loggerFactory.CreateLogger<VoronoiPartitionGenerator>()),
             loggerFactory.CreateLogger<MapGenerator>()
         );
         GeneratedMaps = MapGenerator.Generate();
