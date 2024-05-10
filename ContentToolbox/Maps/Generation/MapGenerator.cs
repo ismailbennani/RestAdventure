@@ -1,4 +1,4 @@
-﻿using ContentToolbox.Maps.Generation.Land;
+﻿using ContentToolbox.Maps.Generation.LandGeneration;
 using Microsoft.Extensions.Logging;
 using RestAdventure.Core.Maps.Areas;
 using RestAdventure.Core.Maps.Locations;
@@ -19,7 +19,7 @@ public class MapGenerator
 
     public GeneratedMaps Generate()
     {
-        Land.Land land = LandGenerator.Generate();
+        Land land = LandGenerator.Generate();
 
         _logger.LogDebug("Land generation complete: {n} locations, [{xMin}, {yMin}] to [{xMax}, {yMax}]", land.Locations.Count, land.XMin, land.YMin, land.XMax, land.YMax);
 

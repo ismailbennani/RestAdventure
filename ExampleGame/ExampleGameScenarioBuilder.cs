@@ -1,5 +1,5 @@
 ﻿using ContentToolbox.Maps.Generation;
-using ContentToolbox.Maps.Generation.Land;
+using ContentToolbox.Maps.Generation.LandGeneration;
 using ContentToolbox.Spawners;
 using ExampleGame.Characters;
 using ExampleGame.Jobs;

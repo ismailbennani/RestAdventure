@@ -1,4 +1,4 @@
-﻿namespace ContentToolbox.Maps.Generation.Land;
+﻿namespace ContentToolbox.Maps.Generation.LandGeneration;
 
 public static class LandGraph
 {
