@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { ReplaySubject, combineLatest, map } from 'rxjs';
 import { AdminGameContentApiClient, Location } from '../../../../api/admin-api-client.generated';
 import { TeamCharacter } from '../../../../api/game-api-client.generated';
@@ -13,6 +13,11 @@ import { MapComponent, MapMarker } from '../map/map.component';
   imports: [CommonModule, MapComponent],
 })
 export class CharacterMapComponent implements OnInit {
+  @ViewChild('map')
+  public set map(value: MapComponent | undefined) {
+    value?.setZoom(0.8);
+  }
+
   @Input({ required: true })
   public get character(): TeamCharacter {
     return this._character;

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, HostListener, Input, OnInit, ViewChild } from '@angular/core';
 import { ReplaySubject, debounceTime } from 'rxjs';
 import { Location } from '../../../../api/game-api-client.generated';
 
@@ -20,6 +20,10 @@ export class MapComponent implements OnInit {
   private static readonly AREA_LINE_COLOR = 'grey';
   private static readonly AREA_LINE_WIDTH = 2;
   private static readonly MARKER_SIZE = 8;
+  private static readonly ZOOM_MIN = 0.1;
+  private static readonly ZOOM_MAX = 5;
+  private static readonly ZOOM_STEP = 0.01;
+  private static readonly MIN_REDRAW_DELAY_MS = 10;
 
   @ViewChild('parent', { static: true }) parent: ElementRef<HTMLDivElement> | undefined;
   @ViewChild('canvas', { static: true }) canvas: ElementRef<HTMLCanvasElement> | undefined;
@@ -57,6 +61,7 @@ export class MapComponent implements OnInit {
   private _markers: MapMarker[] = [];
 
   protected center: [number, number] = [0, 0];
+  protected zoom: number = 1;
 
   private redrawSubject: ReplaySubject<void> = new ReplaySubject<void>(1);
   private locationsByArea: { [areaName: string]: Location[] } = {};
@@ -69,7 +74,7 @@ export class MapComponent implements OnInit {
       new ResizeObserver(() => this.resize()).observe(this.parent.nativeElement);
     }
 
-    this.redrawSubject.pipe(debounceTime(100)).subscribe(() => this.redraw());
+    this.redrawSubject.pipe(debounceTime(MapComponent.MIN_REDRAW_DELAY_MS)).subscribe(() => this.redraw());
 
     this.resize();
   }
@@ -87,6 +92,30 @@ export class MapComponent implements OnInit {
     this.canvas.nativeElement.height = this.parent.nativeElement.offsetHeight;
 
     this.queueRedraw();
+  }
+
+  setZoom(zoom: number) {
+    this.zoom = zoom;
+
+    if (this.zoom < MapComponent.ZOOM_MIN) {
+      this.zoom = MapComponent.ZOOM_MIN;
+    }
+
+    if (this.zoom > MapComponent.ZOOM_MAX) {
+      this.zoom = MapComponent.ZOOM_MAX;
+    }
+
+    this.queueRedraw();
+  }
+
+  @HostListener('wheel', ['$event'])
+  onScroll(event: WheelEvent) {
+    if (event.deltaY == 0) {
+      return;
+    }
+
+    const step = event.deltaY > 0 ? -MapComponent.ZOOM_STEP : MapComponent.ZOOM_STEP;
+    this.setZoom(this.zoom + step);
   }
 
   private redraw() {
@@ -107,26 +136,29 @@ export class MapComponent implements OnInit {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    const cellsInViewX = (canvas.width - MapComponent.MARGIN_SIZE) / MapComponent.CELL_WIDTH;
-    const cellsInViewY = (canvas.height - MapComponent.MARGIN_SIZE) / MapComponent.CELL_HEIGHT;
+    const cellWidth = MapComponent.CELL_WIDTH * this.zoom;
+    const cellHeight = MapComponent.CELL_HEIGHT * this.zoom;
+
+    const cellsInViewX = (canvas.width - MapComponent.MARGIN_SIZE) / cellWidth;
+    const cellsInViewY = (canvas.height - MapComponent.MARGIN_SIZE) / cellHeight;
 
     const cellsInViewXCeiled = Math.ceil(cellsInViewX);
     const cellsInViewYCeiled = Math.ceil(cellsInViewY);
     const cellsInViewCeiled: [number, number] = [cellsInViewXCeiled, cellsInViewYCeiled];
 
-    const totalWidth = cellsInViewXCeiled * MapComponent.CELL_WIDTH;
-    const totalHeight = cellsInViewYCeiled * MapComponent.CELL_HEIGHT;
+    const totalWidth = cellsInViewXCeiled * cellWidth;
+    const totalHeight = cellsInViewYCeiled * cellHeight;
 
     const startAtX = Math.ceil((canvas.width - MapComponent.MARGIN_SIZE - totalWidth) / 2) + MapComponent.MARGIN_SIZE;
     const startAtY = Math.ceil((canvas.height - MapComponent.MARGIN_SIZE - totalHeight) / 2) + MapComponent.MARGIN_SIZE;
 
     const grid: Grid = {
-      cellWidth: MapComponent.CELL_WIDTH,
-      cellHeight: MapComponent.CELL_HEIGHT,
+      cellWidth: cellWidth,
+      cellHeight: cellHeight,
       lineWidth: Math.ceil(cellsInViewX),
       colHeight: Math.ceil(cellsInViewY),
-      width: cellsInViewXCeiled * MapComponent.CELL_WIDTH,
-      height: cellsInViewYCeiled * MapComponent.CELL_HEIGHT,
+      width: cellsInViewXCeiled * cellWidth,
+      height: cellsInViewYCeiled * cellHeight,
       xMin: startAtX,
       yMin: startAtY,
       xMax: startAtX + totalWidth,

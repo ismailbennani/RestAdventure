@@ -29,8 +29,8 @@ public class ExampleGameScenarioBuilder
     public ExampleGameScenarioBuilder(ILoggerFactory loggerFactory)
     {
         MapGenerator = new MapGenerator(
-            new ErodedIslandGenerator(50, 50, 0.4),
-            new VoronoiZonesGenerator(20, loggerFactory.CreateLogger<VoronoiZonesGenerator>()),
+            new ErodedIslandGenerator(100, 100, 0.4),
+            new VoronoiZonesGenerator(40, loggerFactory.CreateLogger<VoronoiZonesGenerator>()),
             loggerFactory.CreateLogger<MapGenerator>()
         );
         GeneratedMaps = MapGenerator.Generate();
