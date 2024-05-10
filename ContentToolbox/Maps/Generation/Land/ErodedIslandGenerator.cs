@@ -14,7 +14,6 @@ public class ErodedIslandGenerator : LandGenerator
     public int Width { get; }
     public int Height { get; }
     public double TargetErosionRatio { get; }
-    public bool DetachPeninsulas { get; init; } = true;
 
     public override Land Generate()
     {
@@ -69,46 +68,24 @@ public class ErodedIslandGenerator : LandGenerator
             Erode(erodedCells, canBeEroded, toErode, xMin, xMax, yMin, yMax);
         }
 
-        HashSet<(int x, int y)> locations = Enumerable.Range(xMin, Width)
+        HashSet<(int X, int Y)> locations = Enumerable.Range(xMin, Width)
             .SelectMany(x => Enumerable.Range(yMin, Height).Select(y => (x, y)))
             .Where(pos => !erodedCells.Contains(pos))
             .ToHashSet();
 
-        if (DetachPeninsulas)
-        {
-            DoDetachPeninsulas(locations);
-        }
+        IReadOnlyCollection<(int X, int Y)> biggestComponent = LandGraph.ComputeConnectedComponents(locations).MaxBy(c => c.Count) ?? Array.Empty<(int, int)>();
 
         return new Land
         {
-            Locations = locations,
-            XMin = locations.Min(l => l.x),
-            XMax = locations.Max(l => l.x),
-            YMin = locations.Min(l => l.y),
-            YMax = locations.Max(l => l.y)
+            Locations = biggestComponent,
+            XMin = biggestComponent.Min(l => l.X),
+            XMax = biggestComponent.Max(l => l.X),
+            YMin = biggestComponent.Min(l => l.Y),
+            YMax = biggestComponent.Max(l => l.Y)
         };
     }
 
-    static void DoDetachPeninsulas(HashSet<(int x, int y)> locations)
-    {
-        List<(int, int)> toRemove = new();
-        foreach ((int x, int y) in locations)
-        {
-            if (!locations.Contains((x + 1, y))
-                && !locations.Contains((x - 1, y))
-                && !locations.Contains((x, y + 1))
-                && !locations.Contains((x, y - 1))
-                && (locations.Contains((x + 1, y + 1)) || locations.Contains((x - 1, y + 1)) || locations.Contains((x + 1, y - 1)) || locations.Contains((x - 1, y - 1))))
-            {
-                toRemove.Add((x, y));
-            }
-        }
-
-        foreach ((int, int) position in toRemove)
-        {
-            locations.Remove(position);
-        }
-    }
+    void RemoveDisconnectedComponents(HashSet<(int x, int y)> locations) => throw new NotImplementedException();
 
     static void Erode(HashSet<(int X, int Y)> erodedCells, HashSet<(int X, int Y)> canBeEroded, (int X, int Y) toErode, int xMin, int xMax, int yMin, int yMax)
     {
