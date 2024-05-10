@@ -1,7 +1,8 @@
-﻿using ContentToolbox.Spawners;
+﻿using ContentToolbox.Maps.Generation;
+using ContentToolbox.Maps.Generation.Land;
+using ContentToolbox.Spawners;
 using ExampleGame.Characters;
 using ExampleGame.Jobs;
-using ExampleGame.Maps;
 using ExampleGame.Monsters;
 using RestAdventure.Core.Entities.Characters;
 using RestAdventure.Core.Entities.Monsters;
@@ -25,8 +26,8 @@ public class ExampleGameScenarioBuilder
 
     public ExampleGameScenarioBuilder()
     {
-        MapGenerator = new MapGenerator();
-        GeneratedMaps = MapGenerator.GenerateMaps();
+        MapGenerator = new MapGenerator(new ErodedIslandGenerator(10, 10, 0.4));
+        GeneratedMaps = MapGenerator.Generate();
         CharacterClasses = new CharacterClasses(GeneratedMaps);
         Rattlings = new Rattlings();
         Gatherer = new Gatherer();
@@ -44,12 +45,15 @@ public class ExampleGameScenarioBuilder
         scenario.Spawners.Add(new StaticObjectRandomAreaSpawner(Gatherer.AppleTree, GeneratedMaps.Areas.First(), 5));
         scenario.Spawners.Add(
             new AreaMonstersSpawner(GeneratedMaps.Areas.First(), [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Sorcerat], (1, 3), (1, 9))
+                { MaxGroupsSpawnedPerExecution = 1 }
         );
         scenario.Spawners.Add(
             new AreaMonstersSpawner(GeneratedMaps.Areas.First(), [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Sorcerat], (4, 6), (1, 9))
+                { MaxGroupsSpawnedPerExecution = 1 }
         );
         scenario.Spawners.Add(
             new AreaMonstersSpawner(GeneratedMaps.Areas.First(), [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Sorcerat], (7, 8), (1, 9))
+                { MaxGroupsSpawnedPerExecution = 1 }
         );
 
         return scenario;

@@ -61,7 +61,7 @@ export class MapComponent implements OnInit {
   private redrawSubject: ReplaySubject<void> = new ReplaySubject<void>(1);
   private locationsByArea: { [areaName: string]: Location[] } = {};
   private locationsByPosition: { [x: number]: { [y: number]: Location[] } } = {};
-  private locationAreaAdjacency: { [locationId: string]: { sameAreaTop: boolean; sameAreaBottom: boolean; sameAreaLeft: boolean; sameAreaRight: boolean } } = {};
+  private locationAreaAdjacency: { [locationId: string]: CellAdjacency } = {};
   private markersByPosition: { [x: number]: { [y: number]: MapMarker[] } } = {};
 
   ngOnInit(): void {
@@ -120,23 +120,20 @@ export class MapComponent implements OnInit {
     const startAtX = Math.ceil((canvas.width - MapComponent.MARGIN_SIZE - totalWidth) / 2) + MapComponent.MARGIN_SIZE;
     const startAtY = Math.ceil((canvas.height - MapComponent.MARGIN_SIZE - totalHeight) / 2) + MapComponent.MARGIN_SIZE;
 
-    for (let x = 1; x < cellsInViewXCeiled; x++) {
-      ctx.beginPath();
-      ctx.moveTo(startAtX + x * MapComponent.CELL_WIDTH, startAtY);
-      ctx.lineTo(startAtX + x * MapComponent.CELL_WIDTH, startAtY + totalHeight);
-      ctx.lineWidth = MapComponent.GRID_LINE_WIDTH;
-      ctx.strokeStyle = MapComponent.GRID_LINE_COLOR;
-      ctx.stroke();
-    }
+    const grid: Grid = {
+      cellWidth: MapComponent.CELL_WIDTH,
+      cellHeight: MapComponent.CELL_HEIGHT,
+      lineWidth: Math.ceil(cellsInViewX),
+      colHeight: Math.ceil(cellsInViewY),
+      width: cellsInViewXCeiled * MapComponent.CELL_WIDTH,
+      height: cellsInViewYCeiled * MapComponent.CELL_HEIGHT,
+      xMin: startAtX,
+      yMin: startAtY,
+      xMax: startAtX + totalWidth,
+      yMax: startAtY + totalHeight,
+    };
 
-    for (let y = 1; y < cellsInViewYCeiled; y++) {
-      ctx.beginPath();
-      ctx.moveTo(startAtX, startAtY + y * MapComponent.CELL_HEIGHT);
-      ctx.lineTo(startAtX + totalWidth, startAtY + y * MapComponent.CELL_HEIGHT);
-      ctx.lineWidth = MapComponent.GRID_LINE_WIDTH;
-      ctx.strokeStyle = MapComponent.GRID_LINE_COLOR;
-      ctx.stroke();
-    }
+    const cells: Cell[] = [];
 
     for (let x = 0; x < cellsInViewXCeiled; x++) {
       for (let y = 0; y < cellsInViewYCeiled; y++) {
@@ -146,83 +143,145 @@ export class MapComponent implements OnInit {
           continue;
         }
 
-        const cellXMin = startAtX + x * MapComponent.CELL_WIDTH;
-        const cellXMax = startAtX + (x + 1) * MapComponent.CELL_WIDTH;
-        const cellXCenter = startAtX + (x + 0.5) * MapComponent.CELL_WIDTH;
-        const cellYMin = startAtY + y * MapComponent.CELL_HEIGHT;
-        const cellYMax = startAtY + (y + 1) * MapComponent.CELL_HEIGHT;
-        const cellYCenter = startAtY + (y + 0.5) * MapComponent.CELL_HEIGHT;
+        const location = this.locationsByPosition[position[0]][position[1]][0];
 
-        ctx.fillStyle = MapComponent.GRID_LINE_COLOR;
-        ctx.fillRect(cellXMin, cellYMin, MapComponent.CELL_WIDTH, MapComponent.CELL_HEIGHT);
+        cells.push({
+          width: grid.cellWidth,
+          height: grid.cellHeight,
+          xMin: grid.xMin + x * grid.cellWidth,
+          xMax: grid.xMin + (x + 1) * grid.cellWidth,
+          yMin: grid.yMin + y * grid.cellHeight,
+          yMax: grid.yMin + (y + 1) * grid.cellHeight,
+          xCenter: grid.xMin + (x + 0.5) * grid.cellWidth,
+          yCenter: grid.yMin + (y + 0.5) * grid.cellHeight,
+          location,
+          adjacency: this.locationAreaAdjacency[location.id],
+        });
+      }
+    }
 
-        const location = this.locationsByPosition[position[0]][position[1]];
-        const adjacency = this.locationAreaAdjacency[location[0].id];
-        if (!adjacency.sameAreaBottom) {
-          ctx.beginPath();
-          ctx.moveTo(cellXMin, cellYMax);
-          ctx.lineTo(cellXMax, cellYMax);
-          ctx.lineWidth = MapComponent.AREA_LINE_WIDTH;
-          ctx.strokeStyle = MapComponent.AREA_LINE_COLOR;
-          ctx.stroke();
-        }
+    this.drawGrid(ctx, grid);
 
-        if (!adjacency.sameAreaTop) {
-          ctx.beginPath();
-          ctx.moveTo(cellXMin, cellYMin);
-          ctx.lineTo(cellXMax, cellYMin);
-          ctx.lineWidth = MapComponent.AREA_LINE_WIDTH;
-          ctx.strokeStyle = MapComponent.AREA_LINE_COLOR;
-          ctx.stroke();
-        }
+    // 1st pass
+    for (const cell of cells) {
+      this.drawCellBackground(ctx, cell);
+    }
 
-        if (!adjacency.sameAreaLeft) {
-          ctx.beginPath();
-          ctx.moveTo(cellXMin, cellYMin);
-          ctx.lineTo(cellXMin, cellYMax);
-          ctx.lineWidth = MapComponent.AREA_LINE_WIDTH;
-          ctx.strokeStyle = MapComponent.AREA_LINE_COLOR;
-          ctx.stroke();
-        }
+    // 2nd pass
+    for (const cell of cells) {
+      this.drawCellBorders(ctx, cell);
+    }
 
-        if (!adjacency.sameAreaRight) {
-          ctx.beginPath();
-          ctx.moveTo(cellXMax, cellYMin);
-          ctx.lineTo(cellXMax, cellYMax);
-          ctx.lineWidth = MapComponent.AREA_LINE_WIDTH;
-          ctx.strokeStyle = MapComponent.AREA_LINE_COLOR;
-          ctx.stroke();
-        }
+    // 3rd pass
+    for (const cell of cells) {
+      const markers = this.markersByPosition[cell.location.positionX] ? this.markersByPosition[cell.location.positionX][cell.location.positionY] ?? [] : [];
 
-        const markers = this.markersByPosition[position[0]] ? this.markersByPosition[position[0]][position[1]] ?? [] : [];
-        const step = MapComponent.CELL_WIDTH / (markers.length + 1);
+      if (markers.length > 0) {
+        const step = 1 / (markers.length + 1);
         for (let i = 0; i < markers.length; i++) {
-          const marker = markers[i];
-          const x = cellXMin + (i + 1) * step;
-          const y = cellYCenter;
-          this.drawMarker(ctx, marker, x, y);
+          this.drawMarker(ctx, cell, markers[i], (i + 1) * step);
         }
       }
     }
 
-    ctx.clearRect(0, 0, MapComponent.MARGIN_SIZE, totalHeight);
-    ctx.clearRect(0, 0, totalWidth, MapComponent.MARGIN_SIZE);
+    this.drawMargins(ctx, grid);
+  }
 
-    for (let x = 0; x < cellsInViewXCeiled; x++) {
-      const mapX = this.computeLocationCoords(this.center, cellsInViewCeiled, [x, 0])[0];
+  private drawGrid(ctx: CanvasRenderingContext2D, grid: Grid) {
+    for (let x = 1; x < grid.lineWidth; x++) {
+      ctx.beginPath();
+      ctx.moveTo(grid.xMin + x * grid.cellWidth, grid.yMin);
+      ctx.lineTo(grid.xMin + x * grid.cellWidth, grid.yMax);
+      ctx.lineWidth = MapComponent.GRID_LINE_WIDTH;
+      ctx.strokeStyle = MapComponent.GRID_LINE_COLOR;
+      ctx.stroke();
+    }
+
+    for (let y = 1; y < grid.colHeight; y++) {
+      ctx.beginPath();
+      ctx.moveTo(grid.xMin, grid.yMin + y * grid.cellHeight);
+      ctx.lineTo(grid.xMax, grid.yMin + y * grid.cellHeight);
+      ctx.lineWidth = MapComponent.GRID_LINE_WIDTH;
+      ctx.strokeStyle = MapComponent.GRID_LINE_COLOR;
+      ctx.stroke();
+    }
+  }
+
+  private drawCellBackground(ctx: CanvasRenderingContext2D, cell: Cell) {
+    ctx.fillStyle = MapComponent.GRID_LINE_COLOR;
+    ctx.fillRect(cell.xMin, cell.yMin, cell.width, cell.height);
+  }
+
+  private drawCellBorders(ctx: CanvasRenderingContext2D, cell: Cell) {
+    if (!cell.adjacency.sameAreaBottom) {
+      ctx.beginPath();
+      ctx.moveTo(cell.xMin, cell.yMax);
+      ctx.lineTo(cell.xMax, cell.yMax);
+      ctx.lineWidth = MapComponent.AREA_LINE_WIDTH;
+      ctx.strokeStyle = MapComponent.AREA_LINE_COLOR;
+      ctx.stroke();
+    }
+
+    if (!cell.adjacency.sameAreaTop) {
+      ctx.beginPath();
+      ctx.moveTo(cell.xMin, cell.yMin);
+      ctx.lineTo(cell.xMax, cell.yMin);
+      ctx.lineWidth = MapComponent.AREA_LINE_WIDTH;
+      ctx.strokeStyle = MapComponent.AREA_LINE_COLOR;
+      ctx.stroke();
+    }
+
+    if (!cell.adjacency.sameAreaLeft) {
+      ctx.beginPath();
+      ctx.moveTo(cell.xMin, cell.yMin);
+      ctx.lineTo(cell.xMin, cell.yMax);
+      ctx.lineWidth = MapComponent.AREA_LINE_WIDTH;
+      ctx.strokeStyle = MapComponent.AREA_LINE_COLOR;
+      ctx.stroke();
+    }
+
+    if (!cell.adjacency.sameAreaRight) {
+      ctx.beginPath();
+      ctx.moveTo(cell.xMax, cell.yMin);
+      ctx.lineTo(cell.xMax, cell.yMax);
+      ctx.lineWidth = MapComponent.AREA_LINE_WIDTH;
+      ctx.strokeStyle = MapComponent.AREA_LINE_COLOR;
+      ctx.stroke();
+    }
+  }
+
+  private drawMarker(ctx: CanvasRenderingContext2D, cell: Cell, marker: MapMarker, xRelativePos: number = 0.5) {
+    var x = cell.xMin + xRelativePos * cell.width;
+
+    switch (marker.shape) {
+      case 'circle':
+        ctx.beginPath();
+        ctx.arc(x, cell.yCenter, MapComponent.MARKER_SIZE / 2, 0, 2 * Math.PI);
+        ctx.fillStyle = marker.color;
+        ctx.fill();
+        break;
+    }
+  }
+
+  private drawMargins(ctx: CanvasRenderingContext2D, grid: Grid) {
+    ctx.clearRect(0, 0, MapComponent.MARGIN_SIZE, grid.height);
+    ctx.clearRect(0, 0, grid.width, MapComponent.MARGIN_SIZE);
+
+    for (let x = 0; x < grid.lineWidth; x++) {
+      const mapX = this.computeLocationCoords(this.center, [grid.lineWidth, grid.colHeight], [x, 0])[0];
       const text = `${mapX}`;
       const textSize = ctx.measureText(text);
       ctx.lineWidth = 1;
       ctx.strokeStyle = MapComponent.RULER_COLOR;
       ctx.strokeText(
         text,
-        startAtX + (x + 0.5) * MapComponent.CELL_WIDTH - textSize.width / 2,
+        grid.xMin + (x + 0.5) * grid.cellWidth - textSize.width / 2,
         MapComponent.MARGIN_SIZE / 2 + (textSize.actualBoundingBoxAscent + textSize.actualBoundingBoxDescent) / 2,
       );
     }
 
-    for (let y = 0; y < cellsInViewYCeiled; y++) {
-      const mapY = this.computeLocationCoords(this.center, cellsInViewCeiled, [0, y])[1];
+    for (let y = 0; y < grid.colHeight; y++) {
+      const mapY = this.computeLocationCoords(this.center, [grid.lineWidth, grid.colHeight], [0, y])[1];
       const text = `${mapY}`;
       const textSize = ctx.measureText(text);
       ctx.lineWidth = 1;
@@ -230,7 +289,7 @@ export class MapComponent implements OnInit {
       ctx.strokeText(
         text,
         MapComponent.MARGIN_SIZE / 2 - textSize.width / 2,
-        startAtY + (y + 0.5) * MapComponent.CELL_HEIGHT + (textSize.actualBoundingBoxAscent + textSize.actualBoundingBoxDescent) / 2,
+        grid.yMin + (y + 0.5) * grid.cellHeight + (textSize.actualBoundingBoxAscent + textSize.actualBoundingBoxDescent) / 2,
       );
     }
 
@@ -238,28 +297,17 @@ export class MapComponent implements OnInit {
 
     ctx.beginPath();
     ctx.moveTo(0, MapComponent.MARGIN_SIZE);
-    ctx.lineTo(canvas.width, MapComponent.MARGIN_SIZE);
+    ctx.lineTo(ctx.canvas.width, MapComponent.MARGIN_SIZE);
     ctx.lineWidth = MapComponent.GRID_LINE_WIDTH;
     ctx.strokeStyle = MapComponent.RULER_COLOR;
     ctx.stroke();
 
     ctx.beginPath();
     ctx.moveTo(MapComponent.MARGIN_SIZE, 0);
-    ctx.lineTo(MapComponent.MARGIN_SIZE, canvas.height);
+    ctx.lineTo(MapComponent.MARGIN_SIZE, ctx.canvas.height);
     ctx.lineWidth = MapComponent.GRID_LINE_WIDTH;
     ctx.strokeStyle = MapComponent.RULER_COLOR;
     ctx.stroke();
-  }
-
-  private drawMarker(ctx: CanvasRenderingContext2D, marker: MapMarker, x: number, y: number) {
-    switch (marker.shape) {
-      case 'circle':
-        ctx.beginPath();
-        ctx.arc(x, y, MapComponent.MARKER_SIZE / 2, 0, 2 * Math.PI);
-        ctx.fillStyle = marker.color;
-        ctx.fill();
-        break;
-    }
   }
 
   private computeLocationCoords(viewCenter: [number, number], viewSize: [number, number], viewCoords: [number, number]) {
@@ -301,8 +349,8 @@ export class MapComponent implements OnInit {
     for (const location of this._locations) {
       const locationsTop = this.locationsByPosition[location.positionX] ? this.locationsByPosition[location.positionX][location.positionY + 1] ?? [] : [];
       const locationsBottom = this.locationsByPosition[location.positionX] ? this.locationsByPosition[location.positionX][location.positionY - 1] ?? [] : [];
-      const locationsLeft = this.locationsByPosition[location.positionX + 1] ? this.locationsByPosition[location.positionX + 1][location.positionY] ?? [] : [];
-      const locationsRight = this.locationsByPosition[location.positionX - 1] ? this.locationsByPosition[location.positionX - 1][location.positionY] ?? [] : [];
+      const locationsLeft = this.locationsByPosition[location.positionX - 1] ? this.locationsByPosition[location.positionX - 1][location.positionY] ?? [] : [];
+      const locationsRight = this.locationsByPosition[location.positionX + 1] ? this.locationsByPosition[location.positionX + 1][location.positionY] ?? [] : [];
 
       this.locationAreaAdjacency[location.id] = {
         sameAreaTop: locationsTop.length > 0 && locationsTop.some(l => l.area.id === location.area.id),
@@ -339,4 +387,37 @@ export interface MapMarker {
   color: string;
   positionX: number;
   positionY: number;
+}
+
+interface Grid {
+  xMin: number;
+  xMax: number;
+  yMin: number;
+  yMax: number;
+  width: number;
+  height: number;
+  cellWidth: number;
+  cellHeight: number;
+  lineWidth: number;
+  colHeight: number;
+}
+
+interface Cell {
+  xMin: number;
+  xMax: number;
+  yMin: number;
+  yMax: number;
+  xCenter: number;
+  yCenter: number;
+  width: number;
+  height: number;
+  location: Location;
+  adjacency: CellAdjacency;
+}
+
+interface CellAdjacency {
+  sameAreaTop: boolean;
+  sameAreaBottom: boolean;
+  sameAreaLeft: boolean;
+  sameAreaRight: boolean;
 }

@@ -41,30 +41,59 @@ public class AreaMonstersSpawner : Spawner
     /// </summary>
     public (int Min, int Max) LevelBounds { get; }
 
-    /// <inheritdoc cref="GetEntitiesToSpawn" />
-    public override IEnumerable<GameEntity> GetInitialEntities(GameState state) => GetEntitiesToSpawn(state);
+    /// <summary>
+    ///     The max number of monster groups spawned per execution of the spawner
+    /// </summary>
+    public int? MaxGroupsSpawnedPerExecution { get; init; }
 
     /// <summary>
     ///     Spawn a team of monster per location of the area where the previous group has disappeared
     /// </summary>
-    public override IEnumerable<GameEntity> GetEntitiesToSpawn(GameState state) => state.Content.Maps.Locations.InArea(Area).SelectMany(l => GetEntityToSpawnAt(state, l));
+    public override IEnumerable<GameEntity> GetEntitiesToSpawn(GameState state)
+    {
+        int groupsSpawned = 0;
+        foreach (Location location in state.Content.Maps.Locations.InArea(Area))
+        {
+            IReadOnlyCollection<GameEntity> spawned = GetEntityToSpawnAt(state, location);
 
-    IEnumerable<GameEntity> GetEntityToSpawnAt(GameState state, Location location)
+            if (spawned.Count > 0)
+            {
+                foreach (GameEntity entity in spawned)
+                {
+                    yield return entity;
+                }
+
+                groupsSpawned += 1;
+
+                if (groupsSpawned >= MaxGroupsSpawnedPerExecution)
+                {
+                    break;
+                }
+            }
+        }
+    }
+
+    IReadOnlyCollection<GameEntity> GetEntityToSpawnAt(GameState state, Location location)
     {
         if (state.Entities.AtLocation<MonsterInstance>(location).Any(m => m.Source is AreaMonstersSpawner spawner && spawner == this))
         {
-            yield break;
+            return Array.Empty<GameEntity>();
         }
 
         Random random = Random.Shared;
 
         int size = random.Next(TeamSize.Min, TeamSize.Max + 1);
         Team team = new();
+
+        List<GameEntity> result = [];
+
         for (int i = 0; i < size; i++)
         {
             MonsterSpecies species = random.Choose(Species);
             int level = random.Next(LevelBounds.Min, LevelBounds.Max + 1);
-            yield return new MonsterInstance(team, species, level, location);
+            result.Add(new MonsterInstance(team, species, level, location));
         }
+
+        return result;
     }
 }
