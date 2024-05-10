@@ -107,7 +107,7 @@ public class Rattlings
         {
             Family = Family,
             Name = "Biggaud",
-            Description = "Towering over their counterparts, Biggaud are the brutes of the rattlings. "
+            Description = "Towering over their counterparts, Biggauds are the brutes of the rattlings. "
                           + "With their immense strength and sturdy build, they serve as formidable defenders, capable of enduring even the fiercest of attacks.",
             Items = [new ItemStack(DirtyShirt, 1), new ItemStack(BellyFat, 1)],
             Experience = 2,
@@ -116,11 +116,11 @@ public class Rattlings
             Attack = 2
         };
 
-        Sorcerat = new MonsterSpecies
+        Melurat = new MonsterSpecies
         {
             Family = Family,
-            Name = "Sorcerat",
-            Description = " Gifted with the ability to harness magic, Sorcerats are esteemed members of the rattling community. "
+            Name = "Melurat",
+            Description = "Gifted with the ability to harness magic, Melurats are esteemed members of the rattling community. "
                           + "Though physically frail, their mastery of spells and enchantments makes them invaluable allies in times of need, wielding arcane forces to protect their kin.",
             Items = [new ItemStack(SparklingWand, 1), new ItemStack(AncientTomeOfMagic, 1)],
             Experience = 3,
@@ -147,5 +147,5 @@ public class Rattlings
     public MonsterSpecies PetitPaw;
     public MonsterSpecies Rapierat;
     public MonsterSpecies Biggaud;
-    public MonsterSpecies Sorcerat;
+    public MonsterSpecies Melurat;
 }
