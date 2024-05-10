@@ -395,7 +395,7 @@ export class AdminGameContentApiClient {
      * @param pageNumber (optional) The page number
      * @param pageSize (optional) The page size
      */
-    searchHarvestables(pageNumber?: number | undefined, pageSize?: number | undefined): Observable<SearchResultOfStaticObject> {
+    searchStaticObjects(pageNumber?: number | undefined, pageSize?: number | undefined): Observable<SearchResultOfStaticObject> {
         let url_ = this.baseUrl + "/admin/game/content/static-objects?";
         if (pageNumber === null)
             throw new Error("The parameter 'pageNumber' cannot be null.");
@@ -416,11 +416,11 @@ export class AdminGameContentApiClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processSearchHarvestables(response_);
+            return this.processSearchStaticObjects(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processSearchHarvestables(response_ as any);
+                    return this.processSearchStaticObjects(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<SearchResultOfStaticObject>;
                 }
@@ -429,7 +429,7 @@ export class AdminGameContentApiClient {
         }));
     }
 
-    protected processSearchHarvestables(response: HttpResponseBase): Observable<SearchResultOfStaticObject> {
+    protected processSearchStaticObjects(response: HttpResponseBase): Observable<SearchResultOfStaticObject> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -697,6 +697,82 @@ export class AdminGameApiClient {
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
+export class AdminGameStateApiClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "https://localhost:7056";
+    }
+
+    /**
+     * Search harvestable instances
+     * @param pageNumber (optional) The page number
+     * @param pageSize (optional) The page size
+     */
+    searchStaticObjectInstances(staticObjectGuid: string, pageNumber?: number | undefined, pageSize?: number | undefined): Observable<SearchResultOfEntity> {
+        let url_ = this.baseUrl + "/admin/game/static-objects/{staticObjectGuid}?";
+        if (staticObjectGuid === undefined || staticObjectGuid === null)
+            throw new Error("The parameter 'staticObjectGuid' must be defined.");
+        url_ = url_.replace("{staticObjectGuid}", encodeURIComponent("" + staticObjectGuid));
+        if (pageNumber === null)
+            throw new Error("The parameter 'pageNumber' cannot be null.");
+        else if (pageNumber !== undefined)
+            url_ += "PageNumber=" + encodeURIComponent("" + pageNumber) + "&";
+        if (pageSize === null)
+            throw new Error("The parameter 'pageSize' cannot be null.");
+        else if (pageSize !== undefined)
+            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSearchStaticObjectInstances(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSearchStaticObjectInstances(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<SearchResultOfEntity>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<SearchResultOfEntity>;
+        }));
+    }
+
+    protected processSearchStaticObjectInstances(response: HttpResponseBase): Observable<SearchResultOfEntity> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = SearchResultOfEntity.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -1819,14 +1895,18 @@ export class Job extends JobMinimal implements IJob {
     /** Is the job innate?
              */
     innate!: boolean;
-    /** The experience to reach each level of the job.
+    /** The experience to reach each level of the job
              */
     levelCaps!: number[];
+    /** The harvests provided by the job
+             */
+    harvests!: HarvestableEntityHarvestMinimal[];
 
     constructor(data?: IJob) {
         super(data);
         if (!data) {
             this.levelCaps = [];
+            this.harvests = [];
         }
     }
 
@@ -1839,6 +1919,11 @@ export class Job extends JobMinimal implements IJob {
                 this.levelCaps = [] as any;
                 for (let item of _data["levelCaps"])
                     this.levelCaps!.push(item);
+            }
+            if (Array.isArray(_data["harvests"])) {
+                this.harvests = [] as any;
+                for (let item of _data["harvests"])
+                    this.harvests!.push(HarvestableEntityHarvestMinimal.fromJS(item));
             }
         }
     }
@@ -1859,6 +1944,11 @@ export class Job extends JobMinimal implements IJob {
             for (let item of this.levelCaps)
                 data["levelCaps"].push(item);
         }
+        if (Array.isArray(this.harvests)) {
+            data["harvests"] = [];
+            for (let item of this.harvests)
+                data["harvests"].push(item.toJSON());
+        }
         super.toJSON(data);
         return data;
     }
@@ -1872,9 +1962,218 @@ export interface IJob extends IJobMinimal {
     /** Is the job innate?
              */
     innate: boolean;
-    /** The experience to reach each level of the job.
+    /** The experience to reach each level of the job
              */
     levelCaps: number[];
+    /** The harvests provided by the job
+             */
+    harvests: HarvestableEntityHarvestMinimal[];
+}
+
+/** Harvestable entity harvest (minimal */
+export class HarvestableEntityHarvestMinimal implements IHarvestableEntityHarvestMinimal {
+    /** The job providing the harvest
+             */
+    job!: JobMinimal;
+    /** The name of the harvest
+             */
+    name!: string;
+    /** The targets compatible with the harvest
+             */
+    targets!: StaticObject[];
+    /** The expected result of the harvest
+             */
+    expectedHarvest!: ItemStack[];
+    /** The expected experience gain from the harvest
+             */
+    expectedExperience!: number;
+
+    constructor(data?: IHarvestableEntityHarvestMinimal) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.job = new JobMinimal();
+            this.targets = [];
+            this.expectedHarvest = [];
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.job = _data["job"] ? JobMinimal.fromJS(_data["job"]) : new JobMinimal();
+            this.name = _data["name"];
+            if (Array.isArray(_data["targets"])) {
+                this.targets = [] as any;
+                for (let item of _data["targets"])
+                    this.targets!.push(StaticObject.fromJS(item));
+            }
+            if (Array.isArray(_data["expectedHarvest"])) {
+                this.expectedHarvest = [] as any;
+                for (let item of _data["expectedHarvest"])
+                    this.expectedHarvest!.push(ItemStack.fromJS(item));
+            }
+            this.expectedExperience = _data["expectedExperience"];
+        }
+    }
+
+    static fromJS(data: any): HarvestableEntityHarvestMinimal {
+        data = typeof data === 'object' ? data : {};
+        let result = new HarvestableEntityHarvestMinimal();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["job"] = this.job ? this.job.toJSON() : <any>undefined;
+        data["name"] = this.name;
+        if (Array.isArray(this.targets)) {
+            data["targets"] = [];
+            for (let item of this.targets)
+                data["targets"].push(item.toJSON());
+        }
+        if (Array.isArray(this.expectedHarvest)) {
+            data["expectedHarvest"] = [];
+            for (let item of this.expectedHarvest)
+                data["expectedHarvest"].push(item.toJSON());
+        }
+        data["expectedExperience"] = this.expectedExperience;
+        return data;
+    }
+}
+
+/** Harvestable entity harvest (minimal */
+export interface IHarvestableEntityHarvestMinimal {
+    /** The job providing the harvest
+             */
+    job: JobMinimal;
+    /** The name of the harvest
+             */
+    name: string;
+    /** The targets compatible with the harvest
+             */
+    targets: StaticObject[];
+    /** The expected result of the harvest
+             */
+    expectedHarvest: ItemStack[];
+    /** The expected experience gain from the harvest
+             */
+    expectedExperience: number;
+}
+
+/** Static object */
+export class StaticObject implements IStaticObject {
+    /** The unique ID of the static object
+             */
+    id!: string;
+    /** The name of the static object
+             */
+    name!: string;
+    /** The description of the static object
+             */
+    description?: string | undefined;
+
+    constructor(data?: IStaticObject) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.description = _data["description"];
+        }
+    }
+
+    static fromJS(data: any): StaticObject {
+        data = typeof data === 'object' ? data : {};
+        let result = new StaticObject();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["description"] = this.description;
+        return data;
+    }
+}
+
+/** Static object */
+export interface IStaticObject {
+    /** The unique ID of the static object
+             */
+    id: string;
+    /** The name of the static object
+             */
+    name: string;
+    /** The description of the static object
+             */
+    description?: string | undefined;
+}
+
+/** Item stack */
+export class ItemStack implements IItemStack {
+    /** The item instance representing this stack
+             */
+    item!: ItemMinimal;
+    /** The number of instances in this stack
+             */
+    count!: number;
+
+    constructor(data?: IItemStack) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.item = new ItemMinimal();
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.item = _data["item"] ? ItemMinimal.fromJS(_data["item"]) : new ItemMinimal();
+            this.count = _data["count"];
+        }
+    }
+
+    static fromJS(data: any): ItemStack {
+        data = typeof data === 'object' ? data : {};
+        let result = new ItemStack();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["item"] = this.item ? this.item.toJSON() : <any>undefined;
+        data["count"] = this.count;
+        return data;
+    }
+}
+
+/** Item stack */
+export interface IItemStack {
+    /** The item instance representing this stack
+             */
+    item: ItemMinimal;
+    /** The number of instances in this stack
+             */
+    count: number;
 }
 
 /** Search result */
@@ -1960,64 +2259,6 @@ export interface ISearchResultOfStaticObject {
     /** The total number of pages
              */
     totalPagesCount: number;
-}
-
-/** Static object */
-export class StaticObject implements IStaticObject {
-    /** The unique ID of the static object
-             */
-    id!: string;
-    /** The name of the static object
-             */
-    name!: string;
-    /** The description of the static object
-             */
-    description?: string | undefined;
-
-    constructor(data?: IStaticObject) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.name = _data["name"];
-            this.description = _data["description"];
-        }
-    }
-
-    static fromJS(data: any): StaticObject {
-        data = typeof data === 'object' ? data : {};
-        let result = new StaticObject();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["name"] = this.name;
-        data["description"] = this.description;
-        return data;
-    }
-}
-
-/** Static object */
-export interface IStaticObject {
-    /** The unique ID of the static object
-             */
-    id: string;
-    /** The name of the static object
-             */
-    name: string;
-    /** The description of the static object
-             */
-    description?: string | undefined;
 }
 
 /** Game settings */
@@ -2144,6 +2385,183 @@ In that case NextTickDate refers to the old tick's next tick date, which means t
     /** If the game is not paused, the date at which next tick will be computed
              */
     nextTickDate?: Date | undefined;
+}
+
+/** Search result */
+export class SearchResultOfEntity implements ISearchResultOfEntity {
+    /** The items found by the query
+             */
+    items!: Entity[];
+    /** The page number corresponding to the results that have been selected
+             */
+    pageNumber!: number;
+    /** The page size used by the search
+             */
+    pageSize!: number;
+    /** The total number of items matching the query
+             */
+    totalItemsCount!: number;
+    /** The total number of pages
+             */
+    totalPagesCount!: number;
+
+    constructor(data?: ISearchResultOfEntity) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.items = [];
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(Entity.fromJS(item));
+            }
+            this.pageNumber = _data["pageNumber"];
+            this.pageSize = _data["pageSize"];
+            this.totalItemsCount = _data["totalItemsCount"];
+            this.totalPagesCount = _data["totalPagesCount"];
+        }
+    }
+
+    static fromJS(data: any): SearchResultOfEntity {
+        data = typeof data === 'object' ? data : {};
+        let result = new SearchResultOfEntity();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        data["pageNumber"] = this.pageNumber;
+        data["pageSize"] = this.pageSize;
+        data["totalItemsCount"] = this.totalItemsCount;
+        data["totalPagesCount"] = this.totalPagesCount;
+        return data;
+    }
+}
+
+/** Search result */
+export interface ISearchResultOfEntity {
+    /** The items found by the query
+             */
+    items: Entity[];
+    /** The page number corresponding to the results that have been selected
+             */
+    pageNumber: number;
+    /** The page size used by the search
+             */
+    pageSize: number;
+    /** The total number of items matching the query
+             */
+    totalItemsCount: number;
+    /** The total number of pages
+             */
+    totalPagesCount: number;
+}
+
+/** Entity (minimal) */
+export class EntityMinimal implements IEntityMinimal {
+    /** The unique ID of the entity
+             */
+    id!: string;
+    /** The name of the entity
+             */
+    name!: string;
+
+    constructor(data?: IEntityMinimal) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): EntityMinimal {
+        data = typeof data === 'object' ? data : {};
+        let result = new EntityMinimal();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        return data;
+    }
+}
+
+/** Entity (minimal) */
+export interface IEntityMinimal {
+    /** The unique ID of the entity
+             */
+    id: string;
+    /** The name of the entity
+             */
+    name: string;
+}
+
+/** Entity */
+export class Entity extends EntityMinimal implements IEntity {
+    /** The location of the entity
+             */
+    location!: LocationMinimal;
+
+    constructor(data?: IEntity) {
+        super(data);
+        if (!data) {
+            this.location = new LocationMinimal();
+        }
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.location = _data["location"] ? LocationMinimal.fromJS(_data["location"]) : new LocationMinimal();
+        }
+    }
+
+    static override fromJS(data: any): Entity {
+        data = typeof data === 'object' ? data : {};
+        let result = new Entity();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["location"] = this.location ? this.location.toJSON() : <any>undefined;
+        super.toJSON(data);
+        return data;
+    }
+}
+
+/** Entity */
+export interface IEntity extends IEntityMinimal {
+    /** The location of the entity
+             */
+    location: LocationMinimal;
 }
 
 /** A player */

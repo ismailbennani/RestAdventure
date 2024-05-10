@@ -15,7 +15,7 @@ public class StaticObjectInstanceDto
     public required Guid Id { get; init; }
 
     /// <summary>
-    ///     The name of the entity
+    ///     The static object association with the entity
     /// </summary>
     [Required]
     public required StaticObjectDto StaticObject { get; init; }
@@ -27,6 +27,6 @@ static class StaticObjectInstanceMappingExtensions
         new()
         {
             Id = staticObjectInstance.Id.Guid,
-            StaticObject = staticObjectInstance.Object.ToDto()
+            StaticObject = staticObjectInstance.Object.ToStaticObjectDto()
         };
 }

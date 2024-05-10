@@ -284,8 +284,11 @@ export class MapComponent implements OnInit {
   }
 
   private drawCellBackground(ctx: CanvasRenderingContext2D, cell: Cell) {
+    ctx.lineWidth = 1;
     ctx.fillStyle = MapComponent.CELL_BG_COLOR;
+    ctx.strokeStyle = MapComponent.CELL_BG_COLOR;
     ctx.fillRect(cell.xMin, cell.yMin, cell.width, cell.height);
+    ctx.strokeRect(cell.xMin, cell.yMin, cell.width, cell.height);
   }
 
   private drawCellBorders(ctx: CanvasRenderingContext2D, cell: Cell, lineColor: string, lineWidth: number) {
@@ -399,10 +402,14 @@ export class MapComponent implements OnInit {
 
     switch (marker.shape) {
       case 'circle':
+        ctx.globalAlpha = marker.alpha ?? 1;
+
         ctx.beginPath();
         ctx.arc(x, y, MapComponent.MARKER_SIZE / 2, 0, 2 * Math.PI);
         ctx.fillStyle = marker.color;
         ctx.fill();
+
+        ctx.globalAlpha = 1;
         break;
     }
   }
@@ -639,6 +646,7 @@ export class MapComponent implements OnInit {
 export interface MapMarker {
   shape: 'circle';
   color: string;
+  alpha?: number;
   positionX: number;
   positionY: number;
 }

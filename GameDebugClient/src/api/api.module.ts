@@ -1,6 +1,6 @@
 import { HttpClientModule } from '@angular/common/http';
 import { InjectionToken, ModuleWithProviders, NgModule } from '@angular/core';
-import { AdminApiStatusApiClient, AdminGameApiClient, AdminGameContentApiClient, AdminPlayersApiClient } from './admin-api-client.generated';
+import { AdminApiStatusApiClient, AdminGameApiClient, AdminGameContentApiClient, AdminGameStateApiClient, AdminPlayersApiClient } from './admin-api-client.generated';
 import {
   CharactersApiClient,
   CombatsApiClient,
@@ -24,6 +24,7 @@ const API_BASE_URL: InjectionToken<string> = new InjectionToken<string>('BASE_UR
     AdminPlayersApiClient,
     AdminGameApiClient,
     AdminGameContentApiClient,
+    AdminGameStateApiClient,
     GameApiStatusApiClient,
     GameApiClient,
     TeamApiClient,

@@ -64,8 +64,8 @@ public class AdminGameContentController : AdminApiController
     ///     Search static objects
     /// </summary>
     [HttpGet("static-objects")]
-    public SearchResultDto<StaticObjectDto> SearchHarvestables([FromQuery] SearchRequestDto request) =>
-        SearchResources(request, content => content.StaticObjects, (_, h) => h.ToDto());
+    public SearchResultDto<StaticObjectDto> SearchStaticObjects([FromQuery] SearchRequestDto request) =>
+        SearchResources(request, content => content.StaticObjects, (_, h) => h.ToStaticObjectDto());
 
     SearchResultDto<TDto> SearchResources<TResource, TDto>(
         [FromQuery] SearchRequestDto request,

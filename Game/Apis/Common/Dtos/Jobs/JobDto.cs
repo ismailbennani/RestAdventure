@@ -20,10 +20,16 @@ public class JobDto : JobMinimalDto
     public required bool Innate { get; init; }
 
     /// <summary>
-    ///     The experience to reach each level of the job.
+    ///     The experience to reach each level of the job
     /// </summary>
     [Required]
     public required IReadOnlyList<int> LevelCaps { get; init; }
+
+    /// <summary>
+    ///     The harvests provided by the job
+    /// </summary>
+    [Required]
+    public required IReadOnlyList<HarvestableEntityHarvestMinimalDto> Harvests { get; init; }
 }
 
 static class JobMappingExtensions
@@ -35,6 +41,7 @@ static class JobMappingExtensions
             Name = job.Name,
             Description = job.Description,
             Innate = job.Innate,
-            LevelCaps = job.LevelCaps
+            LevelCaps = job.LevelCaps,
+            Harvests = job.Harvests.Select(h => h.ToMinimalDto(job)).ToArray()
         };
 }

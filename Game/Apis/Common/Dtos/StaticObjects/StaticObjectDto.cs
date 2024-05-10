@@ -28,7 +28,7 @@ public class StaticObjectDto
 
 static class StaticObjectMappingExtensions
 {
-    public static StaticObjectDto ToDto(this StaticObject staticObject) =>
+    public static StaticObjectDto ToStaticObjectDto(this StaticObject staticObject) =>
         new()
         {
             Id = staticObject.Id.Guid,

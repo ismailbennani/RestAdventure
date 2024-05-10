@@ -75,7 +75,7 @@ public class GameContentController : GameApiController
     [ProducesResponseType<StaticObjectDto>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public ActionResult<StaticObjectDto> GetHarvestable(Guid staticObjectId) =>
-        GetResource(content => content.StaticObjects.Get(new StaticObjectId(staticObjectId)), (_, h) => h.ToDto());
+        GetResource(content => content.StaticObjects.Get(new StaticObjectId(staticObjectId)), (_, h) => h.ToStaticObjectDto());
 
     ActionResult<TDto> GetResource<TResource, TDto>(Func<GameContent, TResource?> findResource, Func<GameContent, TResource, TDto> map) where TResource: GameResource
     {

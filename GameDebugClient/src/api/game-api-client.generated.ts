@@ -2774,6 +2774,9 @@ export class HarvestableEntityHarvestMinimal implements IHarvestableEntityHarves
     /** The name of the harvest
              */
     name!: string;
+    /** The targets compatible with the harvest
+             */
+    targets!: StaticObject[];
     /** The expected result of the harvest
              */
     expectedHarvest!: ItemStack[];
@@ -2790,6 +2793,7 @@ export class HarvestableEntityHarvestMinimal implements IHarvestableEntityHarves
         }
         if (!data) {
             this.job = new JobMinimal();
+            this.targets = [];
             this.expectedHarvest = [];
         }
     }
@@ -2798,6 +2802,11 @@ export class HarvestableEntityHarvestMinimal implements IHarvestableEntityHarves
         if (_data) {
             this.job = _data["job"] ? JobMinimal.fromJS(_data["job"]) : new JobMinimal();
             this.name = _data["name"];
+            if (Array.isArray(_data["targets"])) {
+                this.targets = [] as any;
+                for (let item of _data["targets"])
+                    this.targets!.push(StaticObject.fromJS(item));
+            }
             if (Array.isArray(_data["expectedHarvest"])) {
                 this.expectedHarvest = [] as any;
                 for (let item of _data["expectedHarvest"])
@@ -2818,6 +2827,11 @@ export class HarvestableEntityHarvestMinimal implements IHarvestableEntityHarves
         data = typeof data === 'object' ? data : {};
         data["job"] = this.job ? this.job.toJSON() : <any>undefined;
         data["name"] = this.name;
+        if (Array.isArray(this.targets)) {
+            data["targets"] = [];
+            for (let item of this.targets)
+                data["targets"].push(item.toJSON());
+        }
         if (Array.isArray(this.expectedHarvest)) {
             data["expectedHarvest"] = [];
             for (let item of this.expectedHarvest)
@@ -2836,12 +2850,73 @@ export interface IHarvestableEntityHarvestMinimal {
     /** The name of the harvest
              */
     name: string;
+    /** The targets compatible with the harvest
+             */
+    targets: StaticObject[];
     /** The expected result of the harvest
              */
     expectedHarvest: ItemStack[];
     /** The expected experience gain from the harvest
              */
     expectedExperience: number;
+}
+
+/** Static object */
+export class StaticObject implements IStaticObject {
+    /** The unique ID of the static object
+             */
+    id!: string;
+    /** The name of the static object
+             */
+    name!: string;
+    /** The description of the static object
+             */
+    description?: string | undefined;
+
+    constructor(data?: IStaticObject) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.description = _data["description"];
+        }
+    }
+
+    static fromJS(data: any): StaticObject {
+        data = typeof data === 'object' ? data : {};
+        let result = new StaticObject();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["description"] = this.description;
+        return data;
+    }
+}
+
+/** Static object */
+export interface IStaticObject {
+    /** The unique ID of the static object
+             */
+    id: string;
+    /** The name of the static object
+             */
+    name: string;
+    /** The description of the static object
+             */
+    description?: string | undefined;
 }
 
 /** Item stack */
@@ -2902,7 +2977,7 @@ export class StaticObjectInstance implements IStaticObjectInstance {
     /** The unique ID of the entity
              */
     id!: string;
-    /** The name of the entity
+    /** The static object association with the entity
              */
     staticObject!: StaticObject;
 
@@ -2945,67 +3020,9 @@ export interface IStaticObjectInstance {
     /** The unique ID of the entity
              */
     id: string;
-    /** The name of the entity
+    /** The static object association with the entity
              */
     staticObject: StaticObject;
-}
-
-/** Static object */
-export class StaticObject implements IStaticObject {
-    /** The unique ID of the static object
-             */
-    id!: string;
-    /** The name of the static object
-             */
-    name!: string;
-    /** The description of the static object
-             */
-    description?: string | undefined;
-
-    constructor(data?: IStaticObject) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.name = _data["name"];
-            this.description = _data["description"];
-        }
-    }
-
-    static fromJS(data: any): StaticObject {
-        data = typeof data === 'object' ? data : {};
-        let result = new StaticObject();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["name"] = this.name;
-        data["description"] = this.description;
-        return data;
-    }
-}
-
-/** Static object */
-export interface IStaticObject {
-    /** The unique ID of the static object
-             */
-    id: string;
-    /** The name of the static object
-             */
-    name: string;
-    /** The description of the static object
-             */
-    description?: string | undefined;
 }
 
 /** PVE combat action */
@@ -5574,14 +5591,18 @@ export class Job extends JobMinimal implements IJob {
     /** Is the job innate?
              */
     innate!: boolean;
-    /** The experience to reach each level of the job.
+    /** The experience to reach each level of the job
              */
     levelCaps!: number[];
+    /** The harvests provided by the job
+             */
+    harvests!: HarvestableEntityHarvestMinimal[];
 
     constructor(data?: IJob) {
         super(data);
         if (!data) {
             this.levelCaps = [];
+            this.harvests = [];
         }
     }
 
@@ -5594,6 +5615,11 @@ export class Job extends JobMinimal implements IJob {
                 this.levelCaps = [] as any;
                 for (let item of _data["levelCaps"])
                     this.levelCaps!.push(item);
+            }
+            if (Array.isArray(_data["harvests"])) {
+                this.harvests = [] as any;
+                for (let item of _data["harvests"])
+                    this.harvests!.push(HarvestableEntityHarvestMinimal.fromJS(item));
             }
         }
     }
@@ -5614,6 +5640,11 @@ export class Job extends JobMinimal implements IJob {
             for (let item of this.levelCaps)
                 data["levelCaps"].push(item);
         }
+        if (Array.isArray(this.harvests)) {
+            data["harvests"] = [];
+            for (let item of this.harvests)
+                data["harvests"].push(item.toJSON());
+        }
         super.toJSON(data);
         return data;
     }
@@ -5627,9 +5658,12 @@ export interface IJob extends IJobMinimal {
     /** Is the job innate?
              */
     innate: boolean;
-    /** The experience to reach each level of the job.
+    /** The experience to reach each level of the job
              */
     levelCaps: number[];
+    /** The harvests provided by the job
+             */
+    harvests: HarvestableEntityHarvestMinimal[];
 }
 
 /** Game settings */

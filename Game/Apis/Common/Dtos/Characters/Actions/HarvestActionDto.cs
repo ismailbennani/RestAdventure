@@ -29,7 +29,7 @@ static class HarvestActionMappingExtensions
         new()
         {
             Name = action.Name,
-            Harvest = action.Harvest.ToDto(action.Job),
+            Harvest = action.Harvest.ToMinimalDto(action.Job),
             Target = action.Target.ToDto()
         };
 }

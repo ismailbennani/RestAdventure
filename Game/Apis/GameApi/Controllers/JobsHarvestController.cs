@@ -8,6 +8,7 @@ using RestAdventure.Core.Jobs;
 using RestAdventure.Core.Players;
 using RestAdventure.Game.Apis.Common.Dtos.Items;
 using RestAdventure.Game.Apis.Common.Dtos.Jobs;
+using RestAdventure.Game.Apis.Common.Dtos.StaticObjects;
 using RestAdventure.Game.Authentication;
 using RestAdventure.Kernel.Errors;
 
@@ -65,6 +66,7 @@ public class JobsHarvestController : GameApiController
                     {
                         Job = action.Job.ToMinimalDto(),
                         Name = action.Harvest.Name,
+                        Targets = action.Harvest.Targets.Select(t => t.ToStaticObjectDto()).ToArray(),
                         ExpectedHarvest = action.Harvest.Items.Select(i => i.ToDto()).ToArray(),
                         ExpectedExperience = action.Harvest.Experience,
                         CanHarvest = canHarvest.Success,

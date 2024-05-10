@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Admin API",
-    "version": "0.0.0-alpha.0.200+ff0c6a73381892c141169cd699b01d7f6555c2df"
+    "version": "0.0.0-alpha.0.203+a9a2a6e437ef36380f2a215f6c8bb71f40cfc7b8"
   },
   "servers": [
     {
@@ -246,7 +246,7 @@
           "Game"
         ],
         "summary": "Search static objects",
-        "operationId": "AdminGameContent_SearchHarvestables",
+        "operationId": "AdminGameContent_SearchStaticObjects",
         "parameters": [
           {
             "name": "PageNumber",
@@ -363,6 +363,59 @@
         "responses": {
           "200": {
             "description": ""
+          }
+        }
+      }
+    },
+    "/admin/game/static-objects/{staticObjectGuid}": {
+      "get": {
+        "tags": [
+          "Game"
+        ],
+        "summary": "Search harvestable instances",
+        "operationId": "AdminGameState_SearchStaticObjectInstances",
+        "parameters": [
+          {
+            "name": "staticObjectGuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "description": "The page number\n            ",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "description": "The page size\n            ",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResultOfEntity"
+                }
+              }
+            }
           }
         }
       }
@@ -909,7 +962,8 @@
             "additionalProperties": false,
             "required": [
               "innate",
-              "levelCaps"
+              "levelCaps",
+              "harvests"
             ],
             "properties": {
               "description": {
@@ -923,15 +977,68 @@
               },
               "levelCaps": {
                 "type": "array",
-                "description": "The experience to reach each level of the job.\n            ",
+                "description": "The experience to reach each level of the job\n            ",
                 "items": {
                   "type": "integer",
                   "format": "int32"
+                }
+              },
+              "harvests": {
+                "type": "array",
+                "description": "The harvests provided by the job\n            ",
+                "items": {
+                  "$ref": "#/components/schemas/HarvestableEntityHarvestMinimal"
                 }
               }
             }
           }
         ]
+      },
+      "HarvestableEntityHarvestMinimal": {
+        "type": "object",
+        "description": "Harvestable entity harvest (minimal\n            ",
+        "additionalProperties": false,
+        "required": [
+          "job",
+          "name",
+          "targets",
+          "expectedHarvest",
+          "expectedExperience"
+        ],
+        "properties": {
+          "job": {
+            "description": "The job providing the harvest\n            ",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/JobMinimal"
+              }
+            ]
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the harvest\n            ",
+            "minLength": 1
+          },
+          "targets": {
+            "type": "array",
+            "description": "The targets compatible with the harvest\n            ",
+            "items": {
+              "$ref": "#/components/schemas/StaticObject"
+            }
+          },
+          "expectedHarvest": {
+            "type": "array",
+            "description": "The expected result of the harvest\n            ",
+            "items": {
+              "$ref": "#/components/schemas/ItemStack"
+            }
+          },
+          "expectedExperience": {
+            "type": "integer",
+            "description": "The expected experience gain from the harvest\n            ",
+            "format": "int32"
+          }
+        }
       },
       "JobMinimal": {
         "type": "object",
@@ -952,6 +1059,57 @@
             "type": "string",
             "description": "The name of the job\n            ",
             "minLength": 1
+          }
+        }
+      },
+      "StaticObject": {
+        "type": "object",
+        "description": "Static object\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the static object\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the static object\n            ",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "description": "The description of the static object\n            ",
+            "nullable": true
+          }
+        }
+      },
+      "ItemStack": {
+        "type": "object",
+        "description": "Item stack\n            ",
+        "additionalProperties": false,
+        "required": [
+          "item",
+          "count"
+        ],
+        "properties": {
+          "item": {
+            "description": "The item instance representing this stack\n            ",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ItemMinimal"
+              }
+            ]
+          },
+          "count": {
+            "type": "integer",
+            "description": "The number of instances in this stack\n            ",
+            "format": "int32"
           }
         }
       },
@@ -993,33 +1151,6 @@
             "type": "integer",
             "description": "The total number of pages\n            ",
             "format": "int32"
-          }
-        }
-      },
-      "StaticObject": {
-        "type": "object",
-        "description": "Static object\n            ",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "name"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "The unique ID of the static object\n            ",
-            "format": "guid",
-            "minLength": 1
-          },
-          "name": {
-            "type": "string",
-            "description": "The name of the static object\n            ",
-            "minLength": 1
-          },
-          "description": {
-            "type": "string",
-            "description": "The description of the static object\n            ",
-            "nullable": true
           }
         }
       },
@@ -1078,6 +1209,94 @@
             "description": "If the game is not paused, the date at which next tick will be computed\n            ",
             "format": "date-time",
             "nullable": true
+          }
+        }
+      },
+      "SearchResultOfEntity": {
+        "type": "object",
+        "description": "Search result\n            ",
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "pageNumber",
+          "pageSize",
+          "totalItemsCount",
+          "totalPagesCount"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "description": "The items found by the query\n            ",
+            "items": {
+              "$ref": "#/components/schemas/Entity"
+            }
+          },
+          "pageNumber": {
+            "type": "integer",
+            "description": "The page number corresponding to the results that have been selected\n            ",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "The page size used by the search\n            ",
+            "format": "int32"
+          },
+          "totalItemsCount": {
+            "type": "integer",
+            "description": "The total number of items matching the query\n            ",
+            "format": "int32"
+          },
+          "totalPagesCount": {
+            "type": "integer",
+            "description": "The total number of pages\n            ",
+            "format": "int32"
+          }
+        }
+      },
+      "Entity": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/EntityMinimal"
+          },
+          {
+            "type": "object",
+            "description": "Entity\n            ",
+            "additionalProperties": false,
+            "required": [
+              "location"
+            ],
+            "properties": {
+              "location": {
+                "description": "The location of the entity\n            ",
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/LocationMinimal"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "EntityMinimal": {
+        "type": "object",
+        "description": "Entity (minimal)\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the entity\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the entity\n            ",
+            "minLength": 1
           }
         }
       },
