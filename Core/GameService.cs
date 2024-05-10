@@ -1,7 +1,6 @@
 ﻿using System.Text.Json;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using RestAdventure.Core.Content;
 using RestAdventure.Core.Plugins;
 
 namespace RestAdventure.Core;

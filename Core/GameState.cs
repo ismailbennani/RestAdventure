@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using RestAdventure.Core.Actions;
 using RestAdventure.Core.Combat;
 using RestAdventure.Core.Combat.Pve;
-using RestAdventure.Core.Content;
 using RestAdventure.Core.Entities;
 using RestAdventure.Core.History;
 using RestAdventure.Core.Jobs;
@@ -13,6 +12,8 @@ using RestAdventure.Core.Simulation;
 using RestAdventure.Core.Spawners;
 
 namespace RestAdventure.Core;
+
+public record GameId(Guid Guid);
 
 public class GameState : IDisposable
 {

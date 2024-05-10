@@ -6,7 +6,7 @@ using RestAdventure.Core.Jobs;
 using RestAdventure.Core.Maps;
 using RestAdventure.Core.Resources;
 
-namespace RestAdventure.Core.Content;
+namespace RestAdventure.Core;
 
 public class GameContent
 {

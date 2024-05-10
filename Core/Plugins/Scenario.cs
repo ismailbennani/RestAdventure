@@ -1,5 +1,4 @@
-﻿using RestAdventure.Core.Content;
-using RestAdventure.Core.Entities.Characters;
+﻿using RestAdventure.Core.Entities.Characters;
 using RestAdventure.Core.Entities.Monsters;
 using RestAdventure.Core.Entities.StaticObjects;
 using RestAdventure.Core.Items;
