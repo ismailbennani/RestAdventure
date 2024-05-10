@@ -1,16 +1,13 @@
 ﻿using RestAdventure.Core.Entities.Characters;
 using RestAdventure.Core.Maps.Locations;
 using SandboxGame.Generation;
-using SandboxGame.MyMath;
 
 namespace SandboxGame.Characters;
 
 public class CharacterClasses
 {
-    public CharacterClasses(GeneratedMaps maps)
+    public CharacterClasses(GeneratedMaps maps, Location startLocation)
     {
-        Location startLocation = maps.Locations.MinBy(l => Distance.L1((l.PositionX, l.PositionY), (0, 0))) ?? throw new InvalidOperationException("Map is empty");
-
         Knight = new CharacterClass
         {
             Name = "Knight",

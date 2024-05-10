@@ -23,7 +23,7 @@ public class MapGenerator
     public PartitionGenerator PartitionGenerator { get; }
     public ZonesGenerator ZonesGenerator { get; }
 
-    public GeneratedMaps Generate()
+    public Result Generate()
     {
         Land land = LandGenerator.Generate();
 
@@ -37,14 +37,20 @@ public class MapGenerator
 
         _logger.LogDebug("Zones generation complete: {zones}", string.Join(", ", zones.Select(z => $"{z.Name} (lv. {z.Level})")));
 
-        return Generate(land, partition, zones);
+        return new Result
+        {
+            Land = land,
+            Partition = partition,
+            Zones = zones,
+            GeneratedMaps = Generate(land, partition, zones)
+        };
     }
 
     GeneratedMaps Generate(Land land, Partition partition, IReadOnlyList<Zone> zones)
     {
         MapArea noArea = new() { Name = "Void", Level = 0 };
         List<MapArea> areas = GenerateAreas(zones).ToList();
-        IReadOnlyCollection<Location> locations = GenerateLocations(partition, land, areas, noArea, out bool atLeastOneLocationInNoArea);
+        IReadOnlyCollection<Location> locations = GenerateLocations(land, partition, zones, areas, noArea, out bool atLeastOneLocationInNoArea);
         IReadOnlyCollection<(Location, Location)> connections = GenerateConnections(locations).ToArray();
 
         if (atLeastOneLocationInNoArea)
@@ -64,15 +70,24 @@ public class MapGenerator
 
     static IEnumerable<MapArea> GenerateAreas(IEnumerable<Zone> zones) => zones.Select(z => new MapArea { Name = z.Name, Level = z.Level });
 
-    static IReadOnlyCollection<Location> GenerateLocations(Partition partition, Land land, IReadOnlyList<MapArea> areas, MapArea noArea, out bool atLeastOneLocationInNoArea)
+    static IReadOnlyCollection<Location> GenerateLocations(
+        Land land,
+        Partition partition,
+        IReadOnlyList<Zone> zones,
+        IReadOnlyList<MapArea> areas,
+        MapArea noArea,
+        out bool atLeastOneLocationInNoArea
+    )
     {
+        MapArea[] areasOrderedByPartition = zones.Select((z, i) => new { Area = areas[i], z.PartitionIndex }).OrderBy(x => x.PartitionIndex).Select(x => x.Area).ToArray();
+
         atLeastOneLocationInNoArea = false;
         List<Location> locations = [];
         foreach ((int X, int Y) position in land.Locations)
         {
             if (partition.TryGetSubset(position, out int positionPartition))
             {
-                locations.Add(new Location { Area = areas[positionPartition], PositionX = position.X, PositionY = position.Y });
+                locations.Add(new Location { Area = areasOrderedByPartition[positionPartition], PositionX = position.X, PositionY = position.Y });
             }
             else
             {
@@ -99,5 +114,13 @@ public class MapGenerator
                 yield return (location, right);
             }
         }
+    }
+
+    public class Result
+    {
+        public required Land Land { get; init; }
+        public required Partition Partition { get; init; }
+        public required IReadOnlyList<Zone> Zones { get; init; }
+        public required GeneratedMaps GeneratedMaps { get; init; }
     }
 }

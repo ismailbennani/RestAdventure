@@ -16,13 +16,14 @@ using SandboxGame.Generation.Terraforming;
 using SandboxGame.Generation.Zoning;
 using SandboxGame.Jobs;
 using SandboxGame.Monsters;
+using SandboxGame.MyMath;
 
 namespace SandboxGame;
 
 public class SandboxGameBuilder
 {
     public MapGenerator MapGenerator { get; }
-    public GeneratedMaps GeneratedMaps { get; }
+    public MapGenerator.Result MapGeneratorResult { get; }
     public CharacterClasses CharacterClasses { get; }
     public Rattlings Rattlings { get; }
     public Gatherer Gatherer { get; }
@@ -35,8 +36,18 @@ public class SandboxGameBuilder
             new KingdomZonesGenerator(),
             loggerFactory.CreateLogger<MapGenerator>()
         );
-        GeneratedMaps = MapGenerator.Generate();
-        CharacterClasses = new CharacterClasses(GeneratedMaps);
+        MapGeneratorResult = MapGenerator.Generate();
+
+        (int X, int Y)? partitionCenter = MapGeneratorResult.Zones.MinBy(z => z.Level)?.PartitionCenter;
+        Location? startLocation = partitionCenter == null
+            ? null
+            : MapGeneratorResult.GeneratedMaps.Locations.FirstOrDefault(l => l.PositionX == partitionCenter.Value.X && l.PositionY == partitionCenter.Value.Y);
+        if (startLocation == null)
+        {
+            startLocation = MapGeneratorResult.GeneratedMaps.Locations.MinBy(l => Distance.L1((l.PositionX, l.PositionY), (0, 0)));
+        }
+
+        CharacterClasses = new CharacterClasses(MapGeneratorResult.GeneratedMaps, startLocation!);
         Rattlings = new Rattlings();
         Gatherer = new Gatherer();
     }
@@ -48,19 +59,19 @@ public class SandboxGameBuilder
         ExtractContent(scenario, CharacterClasses);
         ExtractContent(scenario, Rattlings);
         ExtractContent(scenario, Gatherer);
-        ExtractContent(scenario, GeneratedMaps);
+        ExtractContent(scenario, MapGeneratorResult.GeneratedMaps);
 
-        scenario.Spawners.Add(new StaticObjectRandomAreaSpawner(Gatherer.AppleTree, GeneratedMaps.Areas.First(), 5));
+        scenario.Spawners.Add(new StaticObjectRandomAreaSpawner(Gatherer.AppleTree, MapGeneratorResult.GeneratedMaps.Areas.First(), 5));
         scenario.Spawners.Add(
-            new AreaMonstersSpawner(GeneratedMaps.Areas.First(), [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat], (1, 3), (1, 9))
+            new AreaMonstersSpawner(MapGeneratorResult.GeneratedMaps.Areas.First(), [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat], (1, 3), (1, 9))
                 { MaxGroupsSpawnedPerExecution = 1 }
         );
         scenario.Spawners.Add(
-            new AreaMonstersSpawner(GeneratedMaps.Areas.First(), [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat], (4, 6), (1, 9))
+            new AreaMonstersSpawner(MapGeneratorResult.GeneratedMaps.Areas.First(), [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat], (4, 6), (1, 9))
                 { MaxGroupsSpawnedPerExecution = 1 }
         );
         scenario.Spawners.Add(
-            new AreaMonstersSpawner(GeneratedMaps.Areas.First(), [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat], (7, 8), (1, 9))
+            new AreaMonstersSpawner(MapGeneratorResult.GeneratedMaps.Areas.First(), [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat], (7, 8), (1, 9))
                 { MaxGroupsSpawnedPerExecution = 1 }
         );
 

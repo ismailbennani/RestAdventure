@@ -2,12 +2,10 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using SandboxGame;
 using NSwag;
 using NSwag.Generation.Processors.Security;
 using RestAdventure.Core;
 using RestAdventure.Core.Entities.Characters;
-using RestAdventure.Core.Entities.StaticObjects;
 using RestAdventure.Core.Hosting;
 using RestAdventure.Core.Players;
 using RestAdventure.Core.Plugins;
@@ -18,6 +16,7 @@ using RestAdventure.Game.Services;
 using RestAdventure.Game.Settings;
 using RestAdventure.Kernel.OpenApi;
 using RestAdventure.Kernel.Security;
+using SandboxGame;
 using Serilog;
 using Serilog.Events;
 using Serilog.Extensions.Logging;
@@ -153,9 +152,6 @@ async Task<GameState> LoadGameAsync(WebApplication app)
 
     GameService gameService = app.Services.GetRequiredService<GameService>();
     GameState state = await gameService.NewGameAsync(scenario, new GameSettings());
-
-    StaticObjectInstance pearTree = new(sandboxGameBuilder.Gatherer.PearTree, sandboxGameBuilder.GeneratedMaps.Locations.First());
-    await state.Entities.AddAsync(pearTree);
 
     Player player = await state.Players.RegisterPlayerAsync(new User(new UserId(Guid.NewGuid()), "PLAYER"));
     await state.Entities.AddAsync(new Character(player, sandboxGameBuilder.CharacterClasses.Dealer, "Deadea"));

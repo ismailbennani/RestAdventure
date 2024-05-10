@@ -28,7 +28,9 @@ public class KingdomZonesGenerator : ZonesGenerator
 
         Dictionary<int, int> distanceToCentralPartition = ComputeDistancesToPartition(adjacency, centralPartition);
 
-        return Enumerable.Range(0, partition.Count).Select(i => new Zone { Name = $"Zone {i}", Level = distanceToCentralPartition[i] * 10 }).ToArray();
+        return Enumerable.Range(0, partition.Count)
+            .Select(i => new Zone { Name = $"Zone {i}", Level = distanceToCentralPartition[i] * 10, PartitionIndex = i, PartitionCenter = partition.GetSubsetCenter(i) })
+            .ToArray();
     }
 
     static Dictionary<int, HashSet<int>> ComputePartitionAdjacency(Land land, Partition partition)
