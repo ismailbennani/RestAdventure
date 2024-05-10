@@ -1,5 +1,6 @@
 ﻿using ContentToolbox.Maps.Generation;
 using ContentToolbox.Maps.Generation.LandGeneration;
+using ContentToolbox.Maps.Generation.Zoning;
 using ContentToolbox.Spawners;
 using ExampleGame.Characters;
 using ExampleGame.Jobs;
@@ -27,7 +28,11 @@ public class ExampleGameScenarioBuilder
 
     public ExampleGameScenarioBuilder(ILoggerFactory loggerFactory)
     {
-        MapGenerator = new MapGenerator(new ErodedIslandGenerator(50, 50, 0.4), loggerFactory.CreateLogger<MapGenerator>());
+        MapGenerator = new MapGenerator(
+            new ErodedIslandGenerator(50, 50, 0.4),
+            new VoronoiZonesGenerator(20, loggerFactory.CreateLogger<VoronoiZonesGenerator>()),
+            loggerFactory.CreateLogger<MapGenerator>()
+        );
         GeneratedMaps = MapGenerator.Generate();
         CharacterClasses = new CharacterClasses(GeneratedMaps);
         Rattlings = new Rattlings();
