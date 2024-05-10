@@ -46,6 +46,8 @@ public class AreaMonstersSpawner : Spawner
     /// </summary>
     public int? MaxGroupsSpawnedPerExecution { get; init; }
 
+    public override IEnumerable<GameEntity> GetInitialEntities(GameState state) => state.Content.Maps.Locations.InArea(Area).SelectMany(l => SpawnEntities(Random.Shared, l));
+
     /// <summary>
     ///     Spawn a team of monster per location of the area where the previous group has disappeared
     /// </summary>
@@ -54,7 +56,12 @@ public class AreaMonstersSpawner : Spawner
         int groupsSpawned = 0;
         foreach (Location location in state.Content.Maps.Locations.InArea(Area))
         {
-            IReadOnlyCollection<GameEntity> spawned = GetEntityToSpawnAt(state, location);
+            if (state.Entities.AtLocation<MonsterInstance>(location).Any(m => m.Source is AreaMonstersSpawner spawner && spawner == this))
+            {
+                continue;
+            }
+
+            IReadOnlyCollection<GameEntity> spawned = SpawnEntities(Random.Shared, location).ToArray();
 
             if (spawned.Count > 0)
             {
@@ -73,27 +80,16 @@ public class AreaMonstersSpawner : Spawner
         }
     }
 
-    IReadOnlyCollection<GameEntity> GetEntityToSpawnAt(GameState state, Location location)
+    IEnumerable<GameEntity> SpawnEntities(Random random, Location location)
     {
-        if (state.Entities.AtLocation<MonsterInstance>(location).Any(m => m.Source is AreaMonstersSpawner spawner && spawner == this))
-        {
-            return Array.Empty<GameEntity>();
-        }
-
-        Random random = Random.Shared;
-
         int size = random.Next(TeamSize.Min, TeamSize.Max + 1);
         Team team = new();
-
-        List<GameEntity> result = [];
 
         for (int i = 0; i < size; i++)
         {
             MonsterSpecies species = random.Choose(Species);
             int level = random.Next(LevelBounds.Min, LevelBounds.Max + 1);
-            result.Add(new MonsterInstance(team, species, level, location));
+            yield return new MonsterInstance(team, species, level, location);
         }
-
-        return result;
     }
 }
