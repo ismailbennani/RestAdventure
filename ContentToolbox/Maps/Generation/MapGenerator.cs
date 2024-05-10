@@ -30,10 +30,36 @@ public class MapGenerator
 
         _logger.LogDebug("Zones generation complete: {n} zones", zones.Count);
 
-        MapArea noArea = new() { Name = "Void" };
-        List<MapArea> areas = Enumerable.Range(0, zones.Count).Select(i => new MapArea { Name = "Zone " + i }).ToList();
+        return Generate(zones, land);
+    }
 
-        bool atLeastOneLocationInNoArea = false;
+    GeneratedMaps Generate(Zones zones, Land land)
+    {
+        MapArea noArea = new() { Name = "Void" };
+        List<MapArea> areas = GenerateAreas(zones).ToList();
+        IReadOnlyCollection<Location> locations = GenerateLocations(zones, land, areas, noArea, out bool atLeastOneLocationInNoArea);
+        IReadOnlyCollection<(Location, Location)> connections = GenerateConnections(locations).ToArray();
+
+        if (atLeastOneLocationInNoArea)
+        {
+            _logger.LogWarning("Some locations were not zoned, they were assigned to a default area called 'Void'");
+            areas.Add(noArea);
+        }
+
+        return new GeneratedMaps
+        {
+            Areas = areas,
+            Locations = locations,
+            Connections = connections,
+            Spawners = []
+        };
+    }
+
+    static IEnumerable<MapArea> GenerateAreas(Zones zones) => Enumerable.Range(0, zones.Count).Select(i => new MapArea { Name = "Zone " + i });
+
+    public IReadOnlyCollection<Location> GenerateLocations(Zones zones, Land land, IReadOnlyList<MapArea> areas, MapArea noArea, out bool atLeastOneLocationInNoArea)
+    {
+        atLeastOneLocationInNoArea = false;
         List<Location> locations = new();
         foreach ((int x, int y) in land.Locations)
         {
@@ -49,18 +75,23 @@ public class MapGenerator
             }
         }
 
-        if (atLeastOneLocationInNoArea)
-        {
-            _logger.LogWarning("Some locations were not zoned, they were assigned to a default area called 'Void'");
-            areas.Add(noArea);
-        }
+        return locations;
+    }
 
-        return new GeneratedMaps
+    IEnumerable<(Location, Location)> GenerateConnections(IReadOnlyCollection<Location> locations)
+    {
+        foreach (Location location in locations)
         {
-            Areas = areas,
-            Locations = locations,
-            Connections = [],
-            Spawners = []
-        };
+            Location? top = locations.FirstOrDefault(l => l.PositionX == location.PositionX && l.PositionY == location.PositionY + 1);
+            if (top != null)
+            {
+                yield return (location, top);
+            }
+            Location? right = locations.FirstOrDefault(l => l.PositionX == location.PositionX + 1 && l.PositionY == location.PositionY);
+            if (right != null)
+            {
+                yield return (location, right);
+            }
+        }
     }
 }

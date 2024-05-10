@@ -1,8 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { map } from 'rxjs';
-import { AdminGameContentApiClient } from '../../../../api/admin-api-client.generated';
-import { Location } from '../../../../api/game-api-client.generated';
+import { AdminGameContentApiClient, LocationMinimal } from '../../../../api/admin-api-client.generated';
 import { TeamService } from '../../services/team/team.service';
 import { MapComponent, MapMarker } from '../../widgets/map/map.component';
 
@@ -13,7 +12,7 @@ import { MapComponent, MapMarker } from '../../widgets/map/map.component';
   imports: [CommonModule, MapComponent],
 })
 export class MapPageComponent implements OnInit {
-  protected locations: Location[] = [];
+  protected locations: LocationMinimal[] = [];
   protected markers: MapMarker[] = [];
 
   constructor(
@@ -23,7 +22,7 @@ export class MapPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.adminGameContentApiClient
-      .searchLocations(1, 99999999)
+      .searchLocationsMinimal(1, 99999999)
       .pipe(map(locations => (this.locations = locations.items)))
       .subscribe();
 

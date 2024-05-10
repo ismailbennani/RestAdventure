@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, ElementRef, HostListener, Input, OnInit, ViewChild } from '@angular/core';
 import { ReplaySubject, debounceTime } from 'rxjs';
-import { Location } from '../../../../api/game-api-client.generated';
+import { LocationMinimal } from '../../../../api/game-api-client.generated';
 
 @Component({
   selector: 'app-map',
@@ -29,15 +29,15 @@ export class MapComponent implements OnInit {
   @ViewChild('canvas', { static: true }) canvas: ElementRef<HTMLCanvasElement> | undefined;
 
   @Input({ required: true })
-  public get locations(): Location[] {
+  public get locations(): LocationMinimal[] {
     return this._locations;
   }
-  public set locations(value: Location[]) {
+  public set locations(value: LocationMinimal[]) {
     this._locations = value;
     this.updateLocationCaches();
     this.queueRedraw();
   }
-  private _locations: Location[] = [];
+  private _locations: LocationMinimal[] = [];
 
   @Input()
   public get centerAt(): [number, number] | undefined {
@@ -64,8 +64,8 @@ export class MapComponent implements OnInit {
   protected zoom: number = 1;
 
   private redrawSubject: ReplaySubject<void> = new ReplaySubject<void>(1);
-  private locationsByArea: { [areaName: string]: Location[] } = {};
-  private locationsByPosition: { [x: number]: { [y: number]: Location[] } } = {};
+  private locationsByArea: { [areaName: string]: LocationMinimal[] } = {};
+  private locationsByPosition: { [x: number]: { [y: number]: LocationMinimal[] } } = {};
   private locationAreaAdjacency: { [locationId: string]: CellAdjacency } = {};
   private markersByPosition: { [x: number]: { [y: number]: MapMarker[] } } = {};
 
@@ -443,7 +443,7 @@ interface Cell {
   yCenter: number;
   width: number;
   height: number;
-  location: Location;
+  location: LocationMinimal;
   adjacency: CellAdjacency;
 }
 

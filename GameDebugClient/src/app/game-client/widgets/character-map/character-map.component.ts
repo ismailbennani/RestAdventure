@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { ReplaySubject, combineLatest, map } from 'rxjs';
-import { AdminGameContentApiClient, Location } from '../../../../api/admin-api-client.generated';
+import { AdminGameContentApiClient, LocationMinimal } from '../../../../api/admin-api-client.generated';
 import { TeamCharacter } from '../../../../api/game-api-client.generated';
 import { TeamService } from '../../services/team/team.service';
 import { MapComponent, MapMarker } from '../map/map.component';
@@ -29,7 +29,7 @@ export class CharacterMapComponent implements OnInit {
   private _character: TeamCharacter = null!;
 
   protected currentCharacterId: string | undefined;
-  protected locations: Location[] = [];
+  protected locations: LocationMinimal[] = [];
   protected centerAt: [number, number] | undefined;
   protected markers: MapMarker[] = [];
 
@@ -42,7 +42,7 @@ export class CharacterMapComponent implements OnInit {
 
   ngOnInit(): void {
     this.adminGameContentApiClient
-      .searchLocations(1, 99999999)
+      .searchLocationsMinimal(1, 99999999)
       .pipe(map(locations => (this.locations = locations.items)))
       .subscribe();
 

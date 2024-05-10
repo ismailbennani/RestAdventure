@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Admin API",
-    "version": "0.0.0-alpha.0.171+1e9da3d9b32afb772baa834f0991018652b9a828"
+    "version": "0.0.0-alpha.0.191+7491c7c83a582ae808f944810dffc03cf9eeaa1f"
   },
   "servers": [
     {
@@ -147,6 +147,49 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SearchResultOfLocation"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/game/content/locations/minimal": {
+      "get": {
+        "tags": [
+          "Game"
+        ],
+        "summary": "Search locations (minimal)",
+        "operationId": "AdminGameContent_SearchLocationsMinimal",
+        "parameters": [
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "description": "The page number\n            ",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "description": "The page size\n            ",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResultOfLocationMinimal"
                 }
               }
             }
@@ -764,6 +807,47 @@
             "type": "string",
             "description": "The name of the area\n            ",
             "minLength": 1
+          }
+        }
+      },
+      "SearchResultOfLocationMinimal": {
+        "type": "object",
+        "description": "Search result\n            ",
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "pageNumber",
+          "pageSize",
+          "totalItemsCount",
+          "totalPagesCount"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "description": "The items found by the query\n            ",
+            "items": {
+              "$ref": "#/components/schemas/LocationMinimal"
+            }
+          },
+          "pageNumber": {
+            "type": "integer",
+            "description": "The page number corresponding to the results that have been selected\n            ",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "The page size used by the search\n            ",
+            "format": "int32"
+          },
+          "totalItemsCount": {
+            "type": "integer",
+            "description": "The total number of items matching the query\n            ",
+            "format": "int32"
+          },
+          "totalPagesCount": {
+            "type": "integer",
+            "description": "The total number of pages\n            ",
+            "format": "int32"
           }
         }
       },

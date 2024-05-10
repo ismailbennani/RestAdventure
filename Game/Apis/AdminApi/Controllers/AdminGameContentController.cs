@@ -48,6 +48,13 @@ public class AdminGameContentController : AdminApiController
         SearchResources(request, content => content.Maps.Locations, (content, l) => l.ToDiscoveredLocationDto(content));
 
     /// <summary>
+    ///     Search locations (minimal)
+    /// </summary>
+    [HttpGet("locations/minimal")]
+    public SearchResultDto<LocationMinimalDto> SearchLocationsMinimal([FromQuery] SearchRequestDto request) =>
+        SearchResources(request, content => content.Maps.Locations, (content, l) => l.ToMinimalDto());
+
+    /// <summary>
     ///     Search jobs
     /// </summary>
     [HttpGet("jobs")]
