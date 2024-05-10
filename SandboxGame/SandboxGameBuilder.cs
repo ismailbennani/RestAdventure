@@ -31,8 +31,8 @@ public class SandboxGameBuilder
     public SandboxGameBuilder(ILoggerFactory loggerFactory)
     {
         MapGenerator = new MapGenerator(
-            new ErodedIslandGenerator(100, 100, 0.4),
-            new VoronoiPartitionGenerator(40, loggerFactory.CreateLogger<VoronoiPartitionGenerator>()),
+            new ErodedIslandGenerator(100, 100, 0.6),
+            new VoronoiPartitionGenerator(30, loggerFactory.CreateLogger<VoronoiPartitionGenerator>()),
             new KingdomZonesGenerator(),
             loggerFactory.CreateLogger<MapGenerator>()
         );
