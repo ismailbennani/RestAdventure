@@ -6,6 +6,11 @@
     <ng-container [ngTemplateOutlet]="menuTitle" [ngTemplateOutletContext]="{ icon: 'people', name: 'Players' }"></ng-container>
     <app-players></app-players>
 
+    <ng-container [ngTemplateOutlet]="menuTitle" [ngTemplateOutletContext]="{ icon: 'map', name: 'Map', active: this.currentPageService.isMapOpened() }"></ng-container>
+    <div class="list-group list-group-flush">
+      <a type="button" class="list-group-item list-group-item-action" [class.active]="this.currentPageService.isMapOpened()" (click)="this.currentPageService.openMap()"> World </a>
+    </div>
+
     <ng-container
       [ngTemplateOutlet]="menuTitle"
       [ngTemplateOutletContext]="{ icon: 'people', name: 'Team', active: this.currentPageService.isAnyCharacterOpened() }"

@@ -65,13 +65,8 @@ public class ErodedIslandGenerator : LandGenerator
             }
 
             (int X, int Y) toErode = random.Choose(canBeEroded);
-            canBeEroded.Remove(toErode);
-            erodedCells.Add(toErode);
 
-            canBeEroded.Add((toErode.X - 1, toErode.Y));
-            canBeEroded.Add((toErode.X + 1, toErode.Y));
-            canBeEroded.Add((toErode.X, toErode.Y - 1));
-            canBeEroded.Add((toErode.X, toErode.Y + 1));
+            Erode(erodedCells, canBeEroded, toErode, xMin, xMax, yMin, yMax);
         }
 
         HashSet<(int x, int y)> locations = Enumerable.Range(xMin, Width)
@@ -94,7 +89,7 @@ public class ErodedIslandGenerator : LandGenerator
         };
     }
 
-    void DoDetachPeninsulas(HashSet<(int x, int y)> locations)
+    static void DoDetachPeninsulas(HashSet<(int x, int y)> locations)
     {
         List<(int, int)> toRemove = new();
         foreach ((int x, int y) in locations)
@@ -113,5 +108,31 @@ public class ErodedIslandGenerator : LandGenerator
         {
             locations.Remove(position);
         }
+    }
+
+    static void Erode(HashSet<(int X, int Y)> erodedCells, HashSet<(int X, int Y)> canBeEroded, (int X, int Y) toErode, int xMin, int xMax, int yMin, int yMax)
+    {
+        canBeEroded.Remove(toErode);
+        erodedCells.Add(toErode);
+
+        MarkForErosion(erodedCells, canBeEroded, (toErode.X - 1, toErode.Y), xMin, xMax, yMin, yMax);
+        MarkForErosion(erodedCells, canBeEroded, (toErode.X + 1, toErode.Y), xMin, xMax, yMin, yMax);
+        MarkForErosion(erodedCells, canBeEroded, (toErode.X, toErode.Y - 1), xMin, xMax, yMin, yMax);
+        MarkForErosion(erodedCells, canBeEroded, (toErode.X, toErode.Y + 1), xMin, xMax, yMin, yMax);
+    }
+
+    static void MarkForErosion(HashSet<(int X, int Y)> erodedCells, HashSet<(int X, int Y)> canBeEroded, (int X, int Y) toMark, int xMin, int xMax, int yMin, int yMax)
+    {
+        if (toMark.X < xMin || toMark.X > xMax || toMark.Y < yMin || toMark.Y > yMax)
+        {
+            return;
+        }
+
+        if (erodedCells.Contains(toMark))
+        {
+            return;
+        }
+
+        canBeEroded.Add((toMark.X, toMark.Y));
     }
 }

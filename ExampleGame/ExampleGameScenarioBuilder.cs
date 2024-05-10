@@ -4,6 +4,7 @@ using ContentToolbox.Spawners;
 using ExampleGame.Characters;
 using ExampleGame.Jobs;
 using ExampleGame.Monsters;
+using Microsoft.Extensions.Logging;
 using RestAdventure.Core.Entities.Characters;
 using RestAdventure.Core.Entities.Monsters;
 using RestAdventure.Core.Entities.StaticObjects;
@@ -24,9 +25,9 @@ public class ExampleGameScenarioBuilder
     public Rattlings Rattlings { get; }
     public Gatherer Gatherer { get; }
 
-    public ExampleGameScenarioBuilder()
+    public ExampleGameScenarioBuilder(ILoggerFactory loggerFactory)
     {
-        MapGenerator = new MapGenerator(new ErodedIslandGenerator(10, 10, 0.4));
+        MapGenerator = new MapGenerator(new ErodedIslandGenerator(50, 50, 0.4), loggerFactory.CreateLogger<MapGenerator>());
         GeneratedMaps = MapGenerator.Generate();
         CharacterClasses = new CharacterClasses(GeneratedMaps);
         Rattlings = new Rattlings();

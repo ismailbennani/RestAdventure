@@ -148,7 +148,7 @@ void SetupOpenApiDocuments(WebApplicationBuilder builder)
 
 async Task<GameState> LoadGameAsync(WebApplication app)
 {
-    ExampleGameScenarioBuilder exampleGameScenarioBuilder = new();
+    ExampleGameScenarioBuilder exampleGameScenarioBuilder = new(loggerFactory);
     Scenario scenario = exampleGameScenarioBuilder.Build();
 
     GameService gameService = app.Services.GetRequiredService<GameService>();
