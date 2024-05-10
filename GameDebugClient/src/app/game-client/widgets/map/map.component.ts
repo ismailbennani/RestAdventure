@@ -116,6 +116,8 @@ export class MapComponent implements OnInit {
 
     const step = event.deltaY > 0 ? -MapComponent.ZOOM_STEP : MapComponent.ZOOM_STEP;
     this.setZoom(this.zoom + step);
+
+    event.preventDefault();
   }
 
   private redraw() {
