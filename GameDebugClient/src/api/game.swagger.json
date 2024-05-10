@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0-alpha.0.191+7491c7c83a582ae808f944810dffc03cf9eeaa1f"
+    "version": "0.0.0-alpha.0.200+ff0c6a73381892c141169cd699b01d7f6555c2df"
   },
   "servers": [
     {
@@ -1623,7 +1623,8 @@
         "additionalProperties": false,
         "required": [
           "id",
-          "name"
+          "name",
+          "level"
         ],
         "properties": {
           "id": {
@@ -1636,6 +1637,11 @@
             "type": "string",
             "description": "The name of the area\n            ",
             "minLength": 1
+          },
+          "level": {
+            "type": "integer",
+            "description": "The level of the area\n            ",
+            "format": "int32"
           }
         }
       },
@@ -2184,8 +2190,6 @@
             "teleported": "#/components/schemas/CharacterTeleporteLocationHistoryEntry",
             "moved": "#/components/schemas/CharacterMoveLocationHistoryEntry",
             "inventory-changed": "#/components/schemas/CharacterInventoryChangedHistoryEntry",
-            "interaction-started": "#/components/schemas/ActionStartedHistoryEntry",
-            "interaction-ended": "#/components/schemas/ActionEndedHistoryEntry",
             "job-learned": "#/components/schemas/CharacterLearnedJobHistoryEntry",
             "job-gained-experience": "#/components/schemas/CharacterJobGainedExperienceHistoryEntry",
             "job-leveled-up": "#/components/schemas/CharacterJobLeveledUpHistoryEntry",
@@ -2438,50 +2442,6 @@
                 "type": "integer",
                 "description": "The\n            ",
                 "format": "int32"
-              }
-            }
-          }
-        ]
-      },
-      "ActionStartedHistoryEntry": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/CharacterHistoryEntry"
-          },
-          {
-            "type": "object",
-            "description": "Action started history entry\n            ",
-            "additionalProperties": false,
-            "required": [
-              "actionName"
-            ],
-            "properties": {
-              "actionName": {
-                "type": "string",
-                "description": "The name of the action that has started\n            ",
-                "minLength": 1
-              }
-            }
-          }
-        ]
-      },
-      "ActionEndedHistoryEntry": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/CharacterHistoryEntry"
-          },
-          {
-            "type": "object",
-            "description": "Action ended history entry\n            ",
-            "additionalProperties": false,
-            "required": [
-              "actionName"
-            ],
-            "properties": {
-              "actionName": {
-                "type": "string",
-                "description": "The name of the action that has ended\n            ",
-                "minLength": 1
               }
             }
           }

@@ -3,6 +3,7 @@ using RestAdventure.Core.Maps.Areas;
 using RestAdventure.Core.Maps.Locations;
 using SandboxGame.Generation.Partitioning;
 using SandboxGame.Generation.Terraforming;
+using SandboxGame.Generation.Zoning;
 
 namespace SandboxGame.Generation;
 
@@ -10,15 +11,17 @@ public class MapGenerator
 {
     readonly ILogger<MapGenerator> _logger;
 
-    public MapGenerator(LandGenerator landGenerator, PartitionGenerator partitionGenerator, ILogger<MapGenerator> logger)
+    public MapGenerator(LandGenerator landGenerator, PartitionGenerator partitionGenerator, ZonesGenerator zonesGenerator, ILogger<MapGenerator> logger)
     {
         _logger = logger;
         LandGenerator = landGenerator;
         PartitionGenerator = partitionGenerator;
+        ZonesGenerator = zonesGenerator;
     }
 
     public LandGenerator LandGenerator { get; }
     public PartitionGenerator PartitionGenerator { get; }
+    public ZonesGenerator ZonesGenerator { get; }
 
     public GeneratedMaps Generate()
     {
@@ -30,13 +33,17 @@ public class MapGenerator
 
         _logger.LogDebug("Partition generation complete: {n} partition", partition.Count);
 
-        return Generate(land, partition);
+        IReadOnlyList<Zone> zones = ZonesGenerator.Generate(land, partition);
+
+        _logger.LogDebug("Zones generation complete: {zones}", string.Join(", ", zones.Select(z => $"{z.Name} (lv. {z.Level})")));
+
+        return Generate(land, partition, zones);
     }
 
-    GeneratedMaps Generate(Land land, Partition partition)
+    GeneratedMaps Generate(Land land, Partition partition, IReadOnlyList<Zone> zones)
     {
         MapArea noArea = new() { Name = "Void", Level = 0 };
-        List<MapArea> areas = GenerateAreas(partition).ToList();
+        List<MapArea> areas = GenerateAreas(zones).ToList();
         IReadOnlyCollection<Location> locations = GenerateLocations(partition, land, areas, noArea, out bool atLeastOneLocationInNoArea);
         IReadOnlyCollection<(Location, Location)> connections = GenerateConnections(locations).ToArray();
 
@@ -55,22 +62,21 @@ public class MapGenerator
         };
     }
 
-    static IEnumerable<MapArea> GenerateAreas(Partition partition) => Enumerable.Range(0, partition.Count).Select(i => new MapArea { Name = "Zone " + i, Level = 0 });
+    static IEnumerable<MapArea> GenerateAreas(IEnumerable<Zone> zones) => zones.Select(z => new MapArea { Name = z.Name, Level = z.Level });
 
-    public IReadOnlyCollection<Location> GenerateLocations(Partition partition, Land land, IReadOnlyList<MapArea> areas, MapArea noArea, out bool atLeastOneLocationInNoArea)
+    static IReadOnlyCollection<Location> GenerateLocations(Partition partition, Land land, IReadOnlyList<MapArea> areas, MapArea noArea, out bool atLeastOneLocationInNoArea)
     {
         atLeastOneLocationInNoArea = false;
-        List<Location> locations = new();
-        foreach ((int x, int y) in land.Locations)
+        List<Location> locations = [];
+        foreach ((int X, int Y) position in land.Locations)
         {
-            int? zone = partition.GetSubsetContaining((x, y));
-            if (zone.HasValue)
+            if (partition.TryGetSubset(position, out int positionPartition))
             {
-                locations.Add(new Location { Area = areas[zone.Value], PositionX = x, PositionY = y });
+                locations.Add(new Location { Area = areas[positionPartition], PositionX = position.X, PositionY = position.Y });
             }
             else
             {
-                locations.Add(new Location { Area = noArea, PositionX = x, PositionY = y });
+                locations.Add(new Location { Area = noArea, PositionX = position.X, PositionY = position.Y });
                 atLeastOneLocationInNoArea = true;
             }
         }
@@ -78,7 +84,7 @@ public class MapGenerator
         return locations;
     }
 
-    IEnumerable<(Location, Location)> GenerateConnections(IReadOnlyCollection<Location> locations)
+    static IEnumerable<(Location, Location)> GenerateConnections(IReadOnlyCollection<Location> locations)
     {
         foreach (Location location in locations)
         {

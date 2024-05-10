@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Admin API",
-    "version": "0.0.0-alpha.0.191+7491c7c83a582ae808f944810dffc03cf9eeaa1f"
+    "version": "0.0.0-alpha.0.200+ff0c6a73381892c141169cd699b01d7f6555c2df"
   },
   "servers": [
     {
@@ -794,7 +794,8 @@
         "additionalProperties": false,
         "required": [
           "id",
-          "name"
+          "name",
+          "level"
         ],
         "properties": {
           "id": {
@@ -807,6 +808,11 @@
             "type": "string",
             "description": "The name of the area\n            ",
             "minLength": 1
+          },
+          "level": {
+            "type": "integer",
+            "description": "The level of the area\n            ",
+            "format": "int32"
           }
         }
       },

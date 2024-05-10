@@ -2165,6 +2165,9 @@ export class MapArea implements IMapArea {
     /** The name of the area
              */
     name!: string;
+    /** The level of the area
+             */
+    level!: number;
 
     constructor(data?: IMapArea) {
         if (data) {
@@ -2179,6 +2182,7 @@ export class MapArea implements IMapArea {
         if (_data) {
             this.id = _data["id"];
             this.name = _data["name"];
+            this.level = _data["level"];
         }
     }
 
@@ -2193,6 +2197,7 @@ export class MapArea implements IMapArea {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
         data["name"] = this.name;
+        data["level"] = this.level;
         return data;
     }
 }
@@ -2205,6 +2210,9 @@ export interface IMapArea {
     /** The name of the area
              */
     name: string;
+    /** The level of the area
+             */
+    level: number;
 }
 
 /** Inventory */
@@ -3376,16 +3384,6 @@ export class CharacterHistoryEntry implements ICharacterHistoryEntry {
             result.init(data);
             return result;
         }
-        if (data["$type"] === "interaction-started") {
-            let result = new ActionStartedHistoryEntry();
-            result.init(data);
-            return result;
-        }
-        if (data["$type"] === "interaction-ended") {
-            let result = new ActionEndedHistoryEntry();
-            result.init(data);
-            return result;
-        }
         if (data["$type"] === "job-learned") {
             let result = new CharacterLearnedJobHistoryEntry();
             result.init(data);
@@ -3790,86 +3788,6 @@ export interface ICharacterInventoryChangedHistoryEntry extends ICharacterHistor
     /** The
              */
     newCount: number;
-}
-
-/** Action started history entry */
-export class ActionStartedHistoryEntry extends CharacterHistoryEntry implements IActionStartedHistoryEntry {
-    /** The name of the action that has started
-             */
-    actionName!: string;
-
-    constructor(data?: IActionStartedHistoryEntry) {
-        super(data);
-        this._discriminator = "interaction-started";
-    }
-
-    override init(_data?: any) {
-        super.init(_data);
-        if (_data) {
-            this.actionName = _data["actionName"];
-        }
-    }
-
-    static override fromJS(data: any): ActionStartedHistoryEntry {
-        data = typeof data === 'object' ? data : {};
-        let result = new ActionStartedHistoryEntry();
-        result.init(data);
-        return result;
-    }
-
-    override toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["actionName"] = this.actionName;
-        super.toJSON(data);
-        return data;
-    }
-}
-
-/** Action started history entry */
-export interface IActionStartedHistoryEntry extends ICharacterHistoryEntry {
-    /** The name of the action that has started
-             */
-    actionName: string;
-}
-
-/** Action ended history entry */
-export class ActionEndedHistoryEntry extends CharacterHistoryEntry implements IActionEndedHistoryEntry {
-    /** The name of the action that has ended
-             */
-    actionName!: string;
-
-    constructor(data?: IActionEndedHistoryEntry) {
-        super(data);
-        this._discriminator = "interaction-ended";
-    }
-
-    override init(_data?: any) {
-        super.init(_data);
-        if (_data) {
-            this.actionName = _data["actionName"];
-        }
-    }
-
-    static override fromJS(data: any): ActionEndedHistoryEntry {
-        data = typeof data === 'object' ? data : {};
-        let result = new ActionEndedHistoryEntry();
-        result.init(data);
-        return result;
-    }
-
-    override toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["actionName"] = this.actionName;
-        super.toJSON(data);
-        return data;
-    }
-}
-
-/** Action ended history entry */
-export interface IActionEndedHistoryEntry extends ICharacterHistoryEntry {
-    /** The name of the action that has ended
-             */
-    actionName: string;
 }
 
 /** Character learned job history entry */

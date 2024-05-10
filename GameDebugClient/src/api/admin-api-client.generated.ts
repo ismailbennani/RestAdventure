@@ -1541,6 +1541,9 @@ export class MapArea implements IMapArea {
     /** The name of the area
              */
     name!: string;
+    /** The level of the area
+             */
+    level!: number;
 
     constructor(data?: IMapArea) {
         if (data) {
@@ -1555,6 +1558,7 @@ export class MapArea implements IMapArea {
         if (_data) {
             this.id = _data["id"];
             this.name = _data["name"];
+            this.level = _data["level"];
         }
     }
 
@@ -1569,6 +1573,7 @@ export class MapArea implements IMapArea {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
         data["name"] = this.name;
+        data["level"] = this.level;
         return data;
     }
 }
@@ -1581,6 +1586,9 @@ export interface IMapArea {
     /** The name of the area
              */
     name: string;
+    /** The level of the area
+             */
+    level: number;
 }
 
 /** Search result */

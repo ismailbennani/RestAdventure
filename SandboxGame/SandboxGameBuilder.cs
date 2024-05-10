@@ -13,6 +13,7 @@ using SandboxGame.Characters;
 using SandboxGame.Generation;
 using SandboxGame.Generation.Partitioning;
 using SandboxGame.Generation.Terraforming;
+using SandboxGame.Generation.Zoning;
 using SandboxGame.Jobs;
 using SandboxGame.Monsters;
 
@@ -31,6 +32,7 @@ public class SandboxGameBuilder
         MapGenerator = new MapGenerator(
             new ErodedIslandGenerator(100, 100, 0.4),
             new VoronoiPartitionGenerator(40, loggerFactory.CreateLogger<VoronoiPartitionGenerator>()),
+            new KingdomZonesGenerator(),
             loggerFactory.CreateLogger<MapGenerator>()
         );
         GeneratedMaps = MapGenerator.Generate();

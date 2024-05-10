@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, ElementRef, HostListener, Input, OnInit, ViewChild } from '@angular/core';
 import { ReplaySubject, debounceTime } from 'rxjs';
+import { MapArea } from '../../../../api/admin-api-client.generated';
 import { LocationMinimal } from '../../../../api/game-api-client.generated';
 
 @Component({
@@ -92,7 +93,7 @@ export class MapComponent implements OnInit {
   private locationsByArea: { [areaId: string]: LocationMinimal[] } = {};
   private locationsByPosition: { [x: number]: { [y: number]: LocationMinimal[] } } = {};
   private locationAreaAdjacencies: { [locationId: string]: CellAdjacency } = {};
-  private areaNames: { [areaId: string]: string } = {};
+  private areas: { [areaId: string]: MapArea } = {};
   private areaCenters: { [areaId: string]: [number, number] } = {};
   private markersByPosition: { [x: number]: { [y: number]: MapMarker[] } } = {};
 
@@ -355,17 +356,35 @@ export class MapComponent implements OnInit {
     const center = this.areaCenters[areaId];
     const viewPosition = this.computeViewCoords(this.center, [this.grid.size[0], this.grid.size[1]], center);
 
-    const text = this.areaNames[areaId] ?? '???';
-    const textSize = ctx.measureText(text);
+    const area = this.areas[areaId];
+
+    const firstLine = area ? area.name : '???';
+    const firstLineSize = ctx.measureText(firstLine);
 
     ctx.lineWidth = 1;
     ctx.fillStyle = color;
-    ctx.font = '12px sans-serif';
+    ctx.font = '14px sans-serif';
     ctx.fillText(
-      text,
-      this.grid.xMin + viewPosition[0] * this.grid.cellWidth - textSize.width / 2,
-      this.grid.yMin + viewPosition[1] * this.grid.cellHeight + (textSize.actualBoundingBoxAscent + textSize.actualBoundingBoxDescent) / 2,
+      firstLine,
+      this.grid.xMin + viewPosition[0] * this.grid.cellWidth - firstLineSize.width / 2,
+      this.grid.yMin + viewPosition[1] * this.grid.cellHeight + (firstLineSize.actualBoundingBoxAscent + firstLineSize.actualBoundingBoxDescent) / 2,
     );
+
+    if (area) {
+      const secondLine = area ? `lv. ${area.level}` : '';
+      const secondLineSize = ctx.measureText(secondLine);
+
+      ctx.font = '12px sans-serif';
+      ctx.fillText(
+        secondLine,
+        this.grid.xMin + viewPosition[0] * this.grid.cellWidth - secondLineSize.width / 2,
+        this.grid.yMin +
+          viewPosition[1] * this.grid.cellHeight +
+          12 +
+          (firstLineSize.actualBoundingBoxAscent + firstLineSize.actualBoundingBoxDescent) / 2 +
+          (secondLineSize.actualBoundingBoxAscent + secondLineSize.actualBoundingBoxDescent) / 2,
+      );
+    }
   }
 
   private drawMarker(ctx: CanvasRenderingContext2D, marker: MapMarker, xRelativePos: number = 0.5) {
@@ -494,11 +513,11 @@ export class MapComponent implements OnInit {
       };
     }
 
-    this.areaNames = {};
+    this.areas = {};
     for (const areaId of Object.keys(this.locationsByArea)) {
       const locations = this.locationsByArea[areaId];
       if (locations.length > 0) {
-        this.areaNames[areaId] = locations[0].area.name;
+        this.areas[areaId] = locations[0].area;
       }
     }
 

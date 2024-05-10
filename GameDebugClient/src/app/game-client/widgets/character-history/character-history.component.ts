@@ -2,8 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { ReplaySubject, combineLatest, map, switchMap, tap } from 'rxjs';
 import {
-  ActionEndedHistoryEntry,
-  ActionStartedHistoryEntry,
   CharacterCombatEndedHistoryEntry,
   CharacterCombatStartedHistoryEntry,
   CharacterCreatedHistoryEntry,
@@ -117,14 +115,6 @@ export class CharacterHistoryComponent implements OnInit {
       } else {
         return `Dropped ${entry.oldCount - entry.newCount}x ${entry.itemName}`;
       }
-    }
-
-    if (entry instanceof ActionStartedHistoryEntry) {
-      return `Started action ${entry.actionName}`;
-    }
-
-    if (entry instanceof ActionEndedHistoryEntry) {
-      return `Ended action ${entry.actionName}`;
     }
 
     if (entry instanceof CharacterLearnedJobHistoryEntry) {

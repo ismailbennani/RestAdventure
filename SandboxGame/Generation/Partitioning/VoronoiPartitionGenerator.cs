@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using RestAdventure.Core.Extensions;
 using SandboxGame.Generation.Terraforming;
+using SandboxGame.MyMath;
 
 namespace SandboxGame.Generation.Partitioning;
 
@@ -31,7 +32,7 @@ public class VoronoiPartitionGenerator : PartitionGenerator
             _logger.LogWarning("Could not generate enough zones: ran out of fuel");
         }
 
-        Dictionary<(int, int), int> zoning = new();
+        Dictionary<(int X, int Y), int> zoning = new();
 
         foreach ((int X, int Y) location in land.Locations)
         {
@@ -65,7 +66,7 @@ public class VoronoiPartitionGenerator : PartitionGenerator
 
         for (int i = 0; i < zoneCenters.Count; i++)
         {
-            int dist = ComputeDistance(location, zoneCenters[i]);
+            int dist = Distance.L1(location, zoneCenters[i]);
             if (dist < minDist)
             {
                 minDist = dist;
@@ -75,6 +76,4 @@ public class VoronoiPartitionGenerator : PartitionGenerator
 
         return zone;
     }
-
-    static int ComputeDistance((int X, int Y) p1, (int X, int Y) p2) => Math.Abs(p2.X - p1.X) + Math.Abs(p2.Y - p1.Y);
 }

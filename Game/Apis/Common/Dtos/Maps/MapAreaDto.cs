@@ -19,9 +19,15 @@ public class MapAreaDto
     /// </summary>
     [Required]
     public required string Name { get; init; }
+    
+    /// <summary>
+    ///     The level of the area
+    /// </summary>
+    [Required]
+    public required int Level { get; init; }
 }
 
 static class MapAreaMappingExtensions
 {
-    public static MapAreaDto ToDto(this MapArea area) => new() { Id = area.Id.Guid, Name = area.Name };
+    public static MapAreaDto ToDto(this MapArea area) => new() { Id = area.Id.Guid, Name = area.Name, Level = area.Level };
 }
