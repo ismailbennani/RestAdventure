@@ -21,6 +21,9 @@
   <div class="list-group-item">
     <div [class.fw-bold]="plansToHarvestHarvestable || isHarvestingHarvestable">
       {{ harvestable.name }}
+      @if (harvestable.count > 1) {
+        x{{ harvestable.count }}
+      }
     </div>
     <div class="list-group small">
       @for (harvestableHarvest of harvestable.harvests; track harvestableHarvest.name) {

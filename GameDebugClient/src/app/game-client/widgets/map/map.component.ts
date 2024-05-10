@@ -201,8 +201,6 @@ export class MapComponent implements OnInit {
           const x = cellXMin + (i + 1) * step;
           const y = cellYCenter;
           this.drawMarker(ctx, marker, x, y);
-
-          console.log(marker, x, y, step);
         }
       }
     }
