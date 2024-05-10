@@ -9,15 +9,21 @@
         <a
           role="button"
           class="list-group-item list-group-item-action"
-          [class.active]="plansToMove(locationWithAccess.location)"
           [class.disabled]="!locationWithAccess.isAccessible"
           [class.text-danger]="!locationWithAccess.isAccessible"
           (click)="moveToLocation(locationWithAccess)"
         >
-          <div>{{ locationWithAccess.location.area.name }} [{{ locationWithAccess.location.positionX }}, {{ locationWithAccess.location.positionY }}]</div>
-          @if (!locationWithAccess.isAccessible) {
-            <div class="small">{{ locationWithAccess.whyIsNotAccessible }}</div>
-          }
+          <div class="d-flex align-items-center">
+            <div class="flex-grow-1">
+              <div>{{ locationWithAccess.location.area.name }} [{{ locationWithAccess.location.positionX }}, {{ locationWithAccess.location.positionY }}]</div>
+              @if (!locationWithAccess.isAccessible) {
+                <div class="small">{{ locationWithAccess.whyIsNotAccessible }}</div>
+              }
+            </div>
+            <div>
+              <a role="button" class="btn stretched-link" [ngClass]="plansToMove(locationWithAccess.location) ? 'btn-primary' : 'btn-outline-secondary'"> Move </a>
+            </div>
+          </div>
         </a>
       }
     } @else {

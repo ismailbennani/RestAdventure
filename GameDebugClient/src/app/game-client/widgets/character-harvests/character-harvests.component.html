@@ -22,7 +22,7 @@
     <div [class.fw-bold]="plansToHarvestHarvestable || isHarvestingHarvestable">
       {{ harvestable.name }}
     </div>
-    <div class="list-group list-group-flush">
+    <div class="list-group small">
       @for (harvestableHarvest of harvestable.harvests; track harvestableHarvest.name) {
         <ng-container
           [ngTemplateOutlet]="harvestableHarvestListItem"
