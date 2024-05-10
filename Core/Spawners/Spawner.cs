@@ -8,7 +8,7 @@ public record SpawnerId(Guid Guid) : ResourceId(Guid);
 /// <summary>
 ///     Resource that spawns entities during gameplay
 /// </summary>
-public abstract class Spawner : GameResource<SpawnerId>, IEquatable<Spawner>, IGameEntitySource
+public abstract class Spawner : GameResource<SpawnerId>, IEquatable<Spawner>
 {
     protected Spawner() : base(new SpawnerId(Guid.NewGuid()))
     {

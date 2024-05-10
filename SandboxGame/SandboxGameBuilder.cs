@@ -1,4 +1,6 @@
 ﻿using ContentToolbox.Spawners;
+using ContentToolbox.Spawners.EntitySpawners;
+using ContentToolbox.Spawners.LocationSelectors;
 using Microsoft.Extensions.Logging;
 using RestAdventure.Core.Entities.Characters;
 using RestAdventure.Core.Entities.Monsters;
@@ -61,18 +63,44 @@ public class SandboxGameBuilder
         ExtractContent(scenario, Gatherer);
         ExtractContent(scenario, MapGeneratorResult.GeneratedMaps);
 
-        scenario.Spawners.Add(new StaticObjectRandomAreaSpawner(Gatherer.AppleTree, MapGeneratorResult.GeneratedMaps.Areas.First(), 5));
         scenario.Spawners.Add(
-            new AreaMonstersSpawner(MapGeneratorResult.GeneratedMaps.Areas.First(), [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat], (1, 3), (1, 9))
-                { MaxGroupsSpawnedPerExecution = 3 }
+            new RandomSpawner(
+                new MapAreaSpawnerLocationSelector { Area = MapGeneratorResult.GeneratedMaps.Areas.First() },
+                new StaticObjectSpawner { StaticObject = Gatherer.AppleTree }
+            ) { MaxCount = 500 }
         );
         scenario.Spawners.Add(
-            new AreaMonstersSpawner(MapGeneratorResult.GeneratedMaps.Areas.First(), [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat], (4, 6), (1, 9))
-                { MaxGroupsSpawnedPerExecution = 3 }
+            new RandomSpawner(
+                new MapAreaSpawnerLocationSelector { Area = MapGeneratorResult.GeneratedMaps.Areas.First() },
+                new MonsterGroupSpawner
+                {
+                    Species = [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat],
+                    TeamSize = (1, 3),
+                    LevelBounds = (1, 9)
+                }
+            ) { MaxCountPerLocation = 1 }
         );
         scenario.Spawners.Add(
-            new AreaMonstersSpawner(MapGeneratorResult.GeneratedMaps.Areas.First(), [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat], (7, 8), (1, 9))
-                { MaxGroupsSpawnedPerExecution = 3 }
+            new RandomSpawner(
+                new MapAreaSpawnerLocationSelector { Area = MapGeneratorResult.GeneratedMaps.Areas.First() },
+                new MonsterGroupSpawner
+                {
+                    Species = [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat],
+                    TeamSize = (4, 6),
+                    LevelBounds = (1, 9)
+                }
+            ) { MaxCountPerLocation = 1 }
+        );
+        scenario.Spawners.Add(
+            new RandomSpawner(
+                new MapAreaSpawnerLocationSelector { Area = MapGeneratorResult.GeneratedMaps.Areas.First() },
+                new MonsterGroupSpawner
+                {
+                    Species = [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat],
+                    TeamSize = (7, 8),
+                    LevelBounds = (1, 9)
+                }
+            ) { MaxCountPerLocation = 1 }
         );
 
         return scenario;

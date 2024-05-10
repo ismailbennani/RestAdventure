@@ -34,7 +34,6 @@ public class SpawnerSimulationWorkProvider : SimulationWorkProvider
 
         foreach (GameEntity entity in toSpawn)
         {
-            entity.Source = spawner;
             await _state.Entities.AddAsync(entity);
         }
     }
