@@ -1,10 +1,10 @@
-﻿using ContentToolbox.Maps.Generation.LandGeneration;
-using ContentToolbox.Maps.Generation.Zoning;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using RestAdventure.Core.Maps.Areas;
 using RestAdventure.Core.Maps.Locations;
+using SandboxGame.Generation.LandGeneration;
+using SandboxGame.Generation.Zoning;
 
-namespace ContentToolbox.Maps.Generation;
+namespace SandboxGame.Generation;
 
 public class MapGenerator
 {

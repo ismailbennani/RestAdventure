@@ -1,4 +1,4 @@
-﻿namespace ContentToolbox.Maps.Generation.LandGeneration;
+﻿namespace SandboxGame.Generation.LandGeneration;
 
 public class Land
 {

@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace ExampleGame;
+namespace SandboxGame;
 
 public static class ObjectExplorer
 {

@@ -1,10 +1,4 @@
-﻿using ContentToolbox.Maps.Generation;
-using ContentToolbox.Maps.Generation.LandGeneration;
-using ContentToolbox.Maps.Generation.Zoning;
-using ContentToolbox.Spawners;
-using ExampleGame.Characters;
-using ExampleGame.Jobs;
-using ExampleGame.Monsters;
+﻿using ContentToolbox.Spawners;
 using Microsoft.Extensions.Logging;
 using RestAdventure.Core.Entities.Characters;
 using RestAdventure.Core.Entities.Monsters;
@@ -15,10 +9,16 @@ using RestAdventure.Core.Maps.Areas;
 using RestAdventure.Core.Maps.Locations;
 using RestAdventure.Core.Plugins;
 using RestAdventure.Core.Spawners;
+using SandboxGame.Characters;
+using SandboxGame.Generation;
+using SandboxGame.Generation.LandGeneration;
+using SandboxGame.Generation.Zoning;
+using SandboxGame.Jobs;
+using SandboxGame.Monsters;
 
-namespace ExampleGame;
+namespace SandboxGame;
 
-public class ExampleGameScenarioBuilder
+public class SandboxGameBuilder
 {
     public MapGenerator MapGenerator { get; }
     public GeneratedMaps GeneratedMaps { get; }
@@ -26,7 +26,7 @@ public class ExampleGameScenarioBuilder
     public Rattlings Rattlings { get; }
     public Gatherer Gatherer { get; }
 
-    public ExampleGameScenarioBuilder(ILoggerFactory loggerFactory)
+    public SandboxGameBuilder(ILoggerFactory loggerFactory)
     {
         MapGenerator = new MapGenerator(
             new ErodedIslandGenerator(100, 100, 0.4),

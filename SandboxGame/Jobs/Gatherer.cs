@@ -2,7 +2,7 @@
 using RestAdventure.Core.Items;
 using RestAdventure.Core.Jobs;
 
-namespace ExampleGame.Jobs;
+namespace SandboxGame.Jobs;
 
 public class Gatherer
 {

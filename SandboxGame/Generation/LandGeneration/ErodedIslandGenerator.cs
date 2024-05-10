@@ -1,6 +1,6 @@
 ﻿using RestAdventure.Core.Extensions;
 
-namespace ContentToolbox.Maps.Generation.LandGeneration;
+namespace SandboxGame.Generation.LandGeneration;
 
 public class ErodedIslandGenerator : LandGenerator
 {

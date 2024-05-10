@@ -1,4 +1,4 @@
-﻿namespace ContentToolbox.Maps.Generation.Zoning;
+﻿namespace SandboxGame.Generation.Zoning;
 
 public class Zones
 {

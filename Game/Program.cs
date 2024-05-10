@@ -2,7 +2,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using ExampleGame;
+using SandboxGame;
 using NSwag;
 using NSwag.Generation.Processors.Security;
 using RestAdventure.Core;
@@ -148,18 +148,18 @@ void SetupOpenApiDocuments(WebApplicationBuilder builder)
 
 async Task<GameState> LoadGameAsync(WebApplication app)
 {
-    ExampleGameScenarioBuilder exampleGameScenarioBuilder = new(loggerFactory);
-    Scenario scenario = exampleGameScenarioBuilder.Build();
+    SandboxGameBuilder sandboxGameBuilder = new(loggerFactory);
+    Scenario scenario = sandboxGameBuilder.Build();
 
     GameService gameService = app.Services.GetRequiredService<GameService>();
     GameState state = await gameService.NewGameAsync(scenario, new GameSettings());
 
-    StaticObjectInstance pearTree = new(exampleGameScenarioBuilder.Gatherer.PearTree, exampleGameScenarioBuilder.GeneratedMaps.Locations.First());
+    StaticObjectInstance pearTree = new(sandboxGameBuilder.Gatherer.PearTree, sandboxGameBuilder.GeneratedMaps.Locations.First());
     await state.Entities.AddAsync(pearTree);
 
     Player player = await state.Players.RegisterPlayerAsync(new User(new UserId(Guid.NewGuid()), "PLAYER"));
-    await state.Entities.AddAsync(new Character(player, exampleGameScenarioBuilder.CharacterClasses.Dealer, "Deadea"));
-    await state.Entities.AddAsync(new Character(player, exampleGameScenarioBuilder.CharacterClasses.Knight, "Knikni"));
+    await state.Entities.AddAsync(new Character(player, sandboxGameBuilder.CharacterClasses.Dealer, "Deadea"));
+    await state.Entities.AddAsync(new Character(player, sandboxGameBuilder.CharacterClasses.Knight, "Knikni"));
 
     return state;
 }

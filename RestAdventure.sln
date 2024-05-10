@@ -8,7 +8,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kernel", "Kernel\Kernel.csp
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Apps", "Apps", "{97A732DC-539D-4E1F-841F-94054AD7EBED}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExampleGame", "ExampleGame\ExampleGame.csproj", "{824D8FB7-B803-4B41-9AF2-F1652CBC76FC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SandboxGame", "SandboxGame\SandboxGame.csproj", "{824D8FB7-B803-4B41-9AF2-F1652CBC76FC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Content", "Content", "{D31F2461-6ED2-42D7-BE93-25FAA3D365EE}"
 EndProject

@@ -2,7 +2,7 @@
 using RestAdventure.Core.Maps.Locations;
 using RestAdventure.Core.Spawners;
 
-namespace ContentToolbox.Maps.Generation;
+namespace SandboxGame.Generation;
 
 public class GeneratedMaps
 {

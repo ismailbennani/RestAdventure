@@ -1,8 +1,8 @@
-﻿using ContentToolbox.Maps.Generation.LandGeneration;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using RestAdventure.Core.Extensions;
+using SandboxGame.Generation.LandGeneration;
 
-namespace ContentToolbox.Maps.Generation.Zoning;
+namespace SandboxGame.Generation.Zoning;
 
 public class VoronoiZonesGenerator : ZonesGenerator
 {

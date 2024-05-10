@@ -1,7 +1,7 @@
 ﻿using RestAdventure.Core.Entities.Monsters;
 using RestAdventure.Core.Items;
 
-namespace ExampleGame.Monsters;
+namespace SandboxGame.Monsters;
 
 public class Rattlings
 {

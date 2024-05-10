@@ -1,8 +1,8 @@
-﻿using ContentToolbox.Maps.Generation;
-using RestAdventure.Core.Entities.Characters;
+﻿using RestAdventure.Core.Entities.Characters;
 using RestAdventure.Core.Maps.Locations;
+using SandboxGame.Generation;
 
-namespace ExampleGame.Characters;
+namespace SandboxGame.Characters;
 
 public class CharacterClasses
 {

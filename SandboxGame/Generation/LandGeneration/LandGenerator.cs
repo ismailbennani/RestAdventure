@@ -1,4 +1,4 @@
-﻿namespace ContentToolbox.Maps.Generation.LandGeneration;
+﻿namespace SandboxGame.Generation.LandGeneration;
 
 /// <summary>
 ///     Generate locations on a 2D grid
