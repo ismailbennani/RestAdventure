@@ -11,7 +11,7 @@ using RestAdventure.Core.Plugins;
 using RestAdventure.Core.Spawners;
 using SandboxGame.Characters;
 using SandboxGame.Generation;
-using SandboxGame.Generation.LandGeneration;
+using SandboxGame.Generation.Terraforming;
 using SandboxGame.Generation.Zoning;
 using SandboxGame.Jobs;
 using SandboxGame.Monsters;
@@ -50,15 +50,15 @@ public class SandboxGameBuilder
 
         scenario.Spawners.Add(new StaticObjectRandomAreaSpawner(Gatherer.AppleTree, GeneratedMaps.Areas.First(), 5));
         scenario.Spawners.Add(
-            new AreaMonstersSpawner(GeneratedMaps.Areas.First(), [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Sorcerat], (1, 3), (1, 9))
+            new AreaMonstersSpawner(GeneratedMaps.Areas.First(), [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat], (1, 3), (1, 9))
                 { MaxGroupsSpawnedPerExecution = 1 }
         );
         scenario.Spawners.Add(
-            new AreaMonstersSpawner(GeneratedMaps.Areas.First(), [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Sorcerat], (4, 6), (1, 9))
+            new AreaMonstersSpawner(GeneratedMaps.Areas.First(), [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat], (4, 6), (1, 9))
                 { MaxGroupsSpawnedPerExecution = 1 }
         );
         scenario.Spawners.Add(
-            new AreaMonstersSpawner(GeneratedMaps.Areas.First(), [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Sorcerat], (7, 8), (1, 9))
+            new AreaMonstersSpawner(GeneratedMaps.Areas.First(), [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat], (7, 8), (1, 9))
                 { MaxGroupsSpawnedPerExecution = 1 }
         );
 

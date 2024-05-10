@@ -1,4 +1,4 @@
-﻿namespace SandboxGame.Generation.LandGeneration;
+﻿namespace SandboxGame.Generation.Terraforming;
 
 /// <summary>
 ///     Generate locations on a 2D grid

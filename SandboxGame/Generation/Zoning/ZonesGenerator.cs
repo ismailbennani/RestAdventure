@@ -1,4 +1,4 @@
-﻿using SandboxGame.Generation.LandGeneration;
+﻿using SandboxGame.Generation.Terraforming;
 
 namespace SandboxGame.Generation.Zoning;
 

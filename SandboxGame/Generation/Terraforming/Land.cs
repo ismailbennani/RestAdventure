@@ -1,4 +1,4 @@
-﻿namespace SandboxGame.Generation.LandGeneration;
+﻿namespace SandboxGame.Generation.Terraforming;
 
 public class Land
 {

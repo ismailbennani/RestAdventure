@@ -1,4 +1,4 @@
-﻿namespace SandboxGame.Generation.LandGeneration;
+﻿namespace SandboxGame.Generation.Terraforming;
 
 public static class LandGraph
 {

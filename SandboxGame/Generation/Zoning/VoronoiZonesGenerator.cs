@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using RestAdventure.Core.Extensions;
-using SandboxGame.Generation.LandGeneration;
+using SandboxGame.Generation.Terraforming;
 
 namespace SandboxGame.Generation.Zoning;
 

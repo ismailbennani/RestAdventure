@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using RestAdventure.Core.Maps.Areas;
 using RestAdventure.Core.Maps.Locations;
-using SandboxGame.Generation.LandGeneration;
+using SandboxGame.Generation.Terraforming;
 using SandboxGame.Generation.Zoning;
 
 namespace SandboxGame.Generation;
