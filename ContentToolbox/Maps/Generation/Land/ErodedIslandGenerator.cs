@@ -14,6 +14,7 @@ public class ErodedIslandGenerator : LandGenerator
     public int Width { get; }
     public int Height { get; }
     public double TargetErosionRatio { get; }
+    public bool DetachPeninsulas { get; init; } = true;
 
     public override Land Generate()
     {
@@ -73,13 +74,44 @@ public class ErodedIslandGenerator : LandGenerator
             canBeEroded.Add((toErode.X, toErode.Y + 1));
         }
 
+        HashSet<(int x, int y)> locations = Enumerable.Range(xMin, Width)
+            .SelectMany(x => Enumerable.Range(yMin, Height).Select(y => (x, y)))
+            .Where(pos => !erodedCells.Contains(pos))
+            .ToHashSet();
+
+        if (DetachPeninsulas)
+        {
+            DoDetachPeninsulas(locations);
+        }
+
         return new Land
         {
-            Locations = Enumerable.Range(xMin, Width).SelectMany(x => Enumerable.Range(yMin, Height).Select(y => (x, y))).Where(pos => !erodedCells.Contains(pos)).ToArray(),
+            Locations = locations,
             XMin = xMin,
             XMax = xMax,
             YMin = yMin,
             YMax = yMax
         };
+    }
+
+    void DoDetachPeninsulas(HashSet<(int x, int y)> locations)
+    {
+        List<(int, int)> toRemove = new();
+        foreach ((int x, int y) in locations)
+        {
+            if (!locations.Contains((x + 1, y))
+                && !locations.Contains((x - 1, y))
+                && !locations.Contains((x, y + 1))
+                && !locations.Contains((x, y - 1))
+                && (locations.Contains((x + 1, y + 1)) || locations.Contains((x - 1, y + 1)) || locations.Contains((x + 1, y - 1)) || locations.Contains((x - 1, y - 1))))
+            {
+                toRemove.Add((x, y));
+            }
+        }
+
+        foreach ((int, int) position in toRemove)
+        {
+            locations.Remove(position);
+        }
     }
 }
