@@ -64,15 +64,15 @@ public class SandboxGameBuilder
         scenario.Spawners.Add(new StaticObjectRandomAreaSpawner(Gatherer.AppleTree, MapGeneratorResult.GeneratedMaps.Areas.First(), 5));
         scenario.Spawners.Add(
             new AreaMonstersSpawner(MapGeneratorResult.GeneratedMaps.Areas.First(), [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat], (1, 3), (1, 9))
-                { MaxGroupsSpawnedPerExecution = 1 }
+                { MaxGroupsSpawnedPerExecution = 3 }
         );
         scenario.Spawners.Add(
             new AreaMonstersSpawner(MapGeneratorResult.GeneratedMaps.Areas.First(), [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat], (4, 6), (1, 9))
-                { MaxGroupsSpawnedPerExecution = 1 }
+                { MaxGroupsSpawnedPerExecution = 3 }
         );
         scenario.Spawners.Add(
             new AreaMonstersSpawner(MapGeneratorResult.GeneratedMaps.Areas.First(), [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat], (7, 8), (1, 9))
-                { MaxGroupsSpawnedPerExecution = 1 }
+                { MaxGroupsSpawnedPerExecution = 3 }
         );
 
         return scenario;
