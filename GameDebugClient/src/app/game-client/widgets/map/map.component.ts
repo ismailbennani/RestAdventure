@@ -210,6 +210,34 @@ export class MapComponent implements OnInit {
     ctx.clearRect(0, 0, MapComponent.MARGIN_SIZE, totalHeight);
     ctx.clearRect(0, 0, totalWidth, MapComponent.MARGIN_SIZE);
 
+    for (let x = 0; x < cellsInViewXCeiled; x++) {
+      const mapX = this.computeLocationCoords(this.center, cellsInViewCeiled, [x, 0])[0];
+      const text = `${mapX}`;
+      const textSize = ctx.measureText(text);
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = MapComponent.RULER_COLOR;
+      ctx.strokeText(
+        text,
+        startAtX + (x + 0.5) * MapComponent.CELL_WIDTH - textSize.width / 2,
+        MapComponent.MARGIN_SIZE / 2 + (textSize.actualBoundingBoxAscent + textSize.actualBoundingBoxDescent) / 2,
+      );
+    }
+
+    for (let y = 0; y < cellsInViewYCeiled; y++) {
+      const mapY = this.computeLocationCoords(this.center, cellsInViewCeiled, [0, y])[1];
+      const text = `${mapY}`;
+      const textSize = ctx.measureText(text);
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = MapComponent.RULER_COLOR;
+      ctx.strokeText(
+        text,
+        MapComponent.MARGIN_SIZE / 2 - textSize.width / 2,
+        startAtY + (y + 0.5) * MapComponent.CELL_HEIGHT + (textSize.actualBoundingBoxAscent + textSize.actualBoundingBoxDescent) / 2,
+      );
+    }
+
+    ctx.clearRect(0, 0, MapComponent.MARGIN_SIZE, MapComponent.MARGIN_SIZE);
+
     ctx.beginPath();
     ctx.moveTo(0, MapComponent.MARGIN_SIZE);
     ctx.lineTo(canvas.width, MapComponent.MARGIN_SIZE);
@@ -223,30 +251,6 @@ export class MapComponent implements OnInit {
     ctx.lineWidth = MapComponent.GRID_LINE_WIDTH;
     ctx.strokeStyle = MapComponent.RULER_COLOR;
     ctx.stroke();
-
-    for (let x = 0; x < cellsInViewXCeiled; x++) {
-      const mapX = this.computeLocationCoords(this.center, cellsInViewCeiled, [x, 0])[0];
-      const text = `${mapX}`;
-      const textSize = ctx.measureText(text);
-      ctx.strokeStyle = MapComponent.RULER_COLOR;
-      ctx.strokeText(
-        text,
-        startAtX + (x + 0.5) * MapComponent.CELL_WIDTH - textSize.width / 2,
-        MapComponent.MARGIN_SIZE / 2 + (textSize.actualBoundingBoxAscent + textSize.actualBoundingBoxDescent) / 2,
-      );
-    }
-
-    for (let y = 0; y < cellsInViewYCeiled; y++) {
-      const mapY = this.computeLocationCoords(this.center, cellsInViewCeiled, [0, y])[1];
-      const text = `${mapY}`;
-      const textSize = ctx.measureText(text);
-      ctx.strokeStyle = MapComponent.RULER_COLOR;
-      ctx.strokeText(
-        text,
-        MapComponent.MARGIN_SIZE / 2 - textSize.width / 2,
-        startAtY + (y + 0.5) * MapComponent.CELL_HEIGHT + (textSize.actualBoundingBoxAscent + textSize.actualBoundingBoxDescent) / 2,
-      );
-    }
   }
 
   private drawMarker(ctx: CanvasRenderingContext2D, marker: MapMarker, x: number, y: number) {
