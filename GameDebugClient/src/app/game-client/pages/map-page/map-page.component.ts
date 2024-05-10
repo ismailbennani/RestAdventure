@@ -23,7 +23,7 @@ export class MapPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.adminGameContentApiClient
-      .searchLocations(1, 1000)
+      .searchLocations(1, 99999999)
       .pipe(map(locations => (this.locations = locations.items)))
       .subscribe();
 

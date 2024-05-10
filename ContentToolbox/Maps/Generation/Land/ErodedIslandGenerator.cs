@@ -82,10 +82,10 @@ public class ErodedIslandGenerator : LandGenerator
         return new Land
         {
             Locations = locations,
-            XMin = xMin,
-            XMax = xMax,
-            YMin = yMin,
-            YMax = yMax
+            XMin = locations.Min(l => l.x),
+            XMax = locations.Max(l => l.x),
+            YMin = locations.Min(l => l.y),
+            YMax = locations.Max(l => l.y)
         };
     }
 
