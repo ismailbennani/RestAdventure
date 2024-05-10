@@ -7,7 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\ContentToolbox\ContentToolbox.csproj" />
       <ProjectReference Include="..\Core\Core.csproj" />
     </ItemGroup>
 

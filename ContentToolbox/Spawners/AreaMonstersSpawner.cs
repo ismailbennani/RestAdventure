@@ -1,11 +1,16 @@
-﻿using RestAdventure.Core.Entities;
+﻿using RestAdventure.Core;
+using RestAdventure.Core.Entities;
 using RestAdventure.Core.Entities.Monsters;
 using RestAdventure.Core.Extensions;
 using RestAdventure.Core.Maps.Areas;
 using RestAdventure.Core.Maps.Locations;
+using RestAdventure.Core.Spawners;
 
-namespace RestAdventure.Core.Spawners;
+namespace ContentToolbox.Spawners;
 
+/// <summary>
+///     Spawn a monster group at each location of an area
+/// </summary>
 public class AreaMonstersSpawner : Spawner
 {
     public AreaMonstersSpawner(MapArea area, IReadOnlyCollection<MonsterSpecies> species, (int Min, int Max) teamSize, (int Min, int Max) levelBounds)
@@ -16,11 +21,32 @@ public class AreaMonstersSpawner : Spawner
         LevelBounds = levelBounds;
     }
 
+    /// <summary>
+    ///     The area to spawn the monsters in
+    /// </summary>
     public MapArea Area { get; }
+
+    /// <summary>
+    ///     The species that should be sampled for each instance
+    /// </summary>
     public IReadOnlyCollection<MonsterSpecies> Species { get; }
+
+    /// <summary>
+    ///     The number of monsters per team
+    /// </summary>
     public (int Min, int Max) TeamSize { get; }
+
+    /// <summary>
+    ///     The level of each monster
+    /// </summary>
     public (int Min, int Max) LevelBounds { get; }
 
+    /// <inheritdoc cref="GetEntitiesToSpawn" />
+    public override IEnumerable<GameEntity> GetInitialEntities(GameState state) => GetEntitiesToSpawn(state);
+
+    /// <summary>
+    ///     Spawn a team of monster per location of the area where the previous group has disappeared
+    /// </summary>
     public override IEnumerable<GameEntity> GetEntitiesToSpawn(GameState state) => state.Content.Maps.Locations.InArea(Area).SelectMany(l => GetEntityToSpawnAt(state, l));
 
     IEnumerable<GameEntity> GetEntityToSpawnAt(GameState state, Location location)

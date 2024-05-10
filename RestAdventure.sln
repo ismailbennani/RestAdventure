@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExampleGame", "ExampleGame\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Content", "Content", "{D31F2461-6ED2-42D7-BE93-25FAA3D365EE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContentToolbox", "ContentToolbox\ContentToolbox.csproj", "{8F63C6B7-4CA6-4F05-A12A-03ECA6E63BAB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -34,9 +36,14 @@ Global
 		{824D8FB7-B803-4B41-9AF2-F1652CBC76FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{824D8FB7-B803-4B41-9AF2-F1652CBC76FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{824D8FB7-B803-4B41-9AF2-F1652CBC76FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F63C6B7-4CA6-4F05-A12A-03ECA6E63BAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F63C6B7-4CA6-4F05-A12A-03ECA6E63BAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F63C6B7-4CA6-4F05-A12A-03ECA6E63BAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F63C6B7-4CA6-4F05-A12A-03ECA6E63BAB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{44BFFE5E-C024-4C02-9FEF-6EAEB26E9280} = {97A732DC-539D-4E1F-841F-94054AD7EBED}
 		{824D8FB7-B803-4B41-9AF2-F1652CBC76FC} = {D31F2461-6ED2-42D7-BE93-25FAA3D365EE}
+		{8F63C6B7-4CA6-4F05-A12A-03ECA6E63BAB} = {D31F2461-6ED2-42D7-BE93-25FAA3D365EE}
 	EndGlobalSection
 EndGlobal

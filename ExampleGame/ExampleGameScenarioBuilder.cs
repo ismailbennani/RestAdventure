@@ -1,4 +1,5 @@
-﻿using ExampleGame.Characters;
+﻿using ContentToolbox.Spawners;
+using ExampleGame.Characters;
 using ExampleGame.Jobs;
 using ExampleGame.Maps;
 using ExampleGame.Monsters;
