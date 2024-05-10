@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Collections.Concurrent;
+using Microsoft.Extensions.Logging;
 using RestAdventure.Core.Extensions;
 using SandboxGame.Generation.Terraforming;
-using SandboxGame.MyMath;
 
 namespace SandboxGame.Generation.Partitioning;
 
@@ -26,17 +26,19 @@ public class VoronoiPartitionGenerator : PartitionGenerator
 
         Random random = Random.Shared;
 
-        (int, int)[] subsetsCenters = GenerateSubsetsCenters(random, land, SubsetsCount).ToArray();
+        (int X, int Y)[] subsetsCenters = GenerateSubsetsCenters(random, land, SubsetsCount).ToArray();
         if (subsetsCenters.Length < SubsetsCount)
         {
             _logger.LogWarning("Could not generate enough subsets: ran out of fuel");
         }
 
-        Dictionary<(int X, int Y), int> subsets = new();
+        Dictionary<(int, int), HashSet<(int, int)>> adjacency = LandGraph.ComputeLandAdjacency(land);
+        ConcurrentDictionary<(int, int), int> subsets = new();
 
-        foreach ((int X, int Y) location in land.Locations)
+        ParallelLoopResult result = Parallel.ForEach(land.Locations, l => subsets[l] = ComputeSubsetForLocation(subsetsCenters, l, adjacency));
+        if (!result.IsCompleted)
         {
-            subsets[location] = ComputeSubset(location, subsetsCenters);
+            throw new InvalidOperationException("Computing subsets for locations didn't compelte");
         }
 
         (int, int)[][] subsetsArr = subsets.GroupBy(kv => kv.Value).OrderBy(g => g.Key).Select(g => g.Select(kv => kv.Key).ToArray()).ToArray();
@@ -59,21 +61,15 @@ public class VoronoiPartitionGenerator : PartitionGenerator
         return subsetsCenters;
     }
 
-    static int ComputeSubset((int X, int Y) location, IReadOnlyList<(int, int)> subsetCenters)
-    {
-        int minDist = int.MaxValue;
-        int subset = -1;
-
-        for (int i = 0; i < subsetCenters.Count; i++)
-        {
-            int dist = Distance.L1(location, subsetCenters[i]);
-            if (dist < minDist)
-            {
-                minDist = dist;
-                subset = i;
-            }
-        }
-
-        return subset;
-    }
+    static int ComputeSubsetForLocation(IEnumerable<(int X, int Y)> subsetsCenters, (int X, int Y) location, Dictionary<(int, int), HashSet<(int, int)>> adjacency) =>
+        subsetsCenters.Select(
+                (c, i) => new
+                {
+                    Distance = LandGraph.AStartDistance(location, c, adjacency),
+                    Subset = i
+                }
+            )
+            .MinBy(x => x.Distance)
+            ?.Subset
+        ?? 0;
 }

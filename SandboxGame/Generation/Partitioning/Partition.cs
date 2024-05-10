@@ -18,7 +18,7 @@ public class Partition
 
     public int Count { get; }
 
-    public (int X, int Y) GetSubsetCenter(int subset) => _subsetsCenters[subset];
+    public (int X, int Y) GetSubsetCenter(int subset) => _subsetsCenters.ElementAtOrDefault(subset);
 
     public int? GetSubset((int X, int Y) position) => TryGetSubset(position, out int subset) ? subset : null;
 
