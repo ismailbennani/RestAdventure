@@ -1,8 +1,10 @@
-<div class="w-100 h-100 border py-3 px-4">
-  <h6>Jobs</h6>
+<div class="w-100 h-100 border">
   <ul class="list-group list-group-flush">
+    <li class="list-group-item">
+      <div class="fw-semibold">Jobs</div>
+    </li>
     @for (jobInstance of jobs; track jobInstance.job.id) {
-      <li class="list-group-item">
+      <li role="button" class="list-group-item list-group-item-action">
         <div class="d-flex gap-4 align-items-center">
           <div>{{ jobInstance.job.name | titlecase }}</div>
           <div class="flex-grow-1">

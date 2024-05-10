@@ -1,26 +1,19 @@
-<div class="w-100 h-100 border py-3 px-4">
-  <div class="d-flex justify-content-between mb-2">
-    <span class="fw-semibold me-2">Inventory</span>
-    <span>
-      <i class="bi bi-duffle-fill" title="Weight"></i>
-      {{ inventory.weight }}
-    </span>
-  </div>
-  <div class="d-flex gap-2 flex-wrap">
+<div class="w-100 h-100 border">
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item d-flex justify-content-between">
+      <div class="fw-semibold">Inventory</div>
+      <div>
+        <i class="bi bi-duffle-fill" title="Weight"></i>
+        {{ inventory.weight }}
+      </div>
+    </li>
     @for (stack of inventory.stacks; track stack.itemInstance.id) {
-      <button class="btn btn-outline-secondary">
-        <div class="flex-shrink-1 d-flex gap-2">
-          <div>
-            {{ stack.count }}x
-            {{ stack.itemInstance.item.name }}
-          </div>
-          <div class="vr"></div>
-          <div>
-            <i class="bi bi-duffle-fill" title="Weight"></i>
-            {{ stack.itemInstance.item.weight * stack.count }}
-          </div>
-        </div>
-      </button>
+      <li role="button" class="list-group-item list-group-item-action text-truncate">
+        {{ stack.count }}x
+        {{ stack.itemInstance.item.name }}
+      </li>
     }
-  </div>
+  </ul>
+
+  <div class="d-flex gap-2 flex-wrap"></div>
 </div>
