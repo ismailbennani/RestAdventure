@@ -27,14 +27,16 @@ public class MonsterGroupSpawner : EntitySpawner, IGameEntitySource
     public override IEnumerable<GameEntity> Spawn(Location location)
     {
         Random random = Random.Shared;
-        int size = random.Next(TeamSize.Min, TeamSize.Max + 1);
-        Team team = new();
 
+        int size = random.Next(TeamSize.Min, TeamSize.Max + 1);
+        List<MonsterInGroup> group = [];
         for (int i = 0; i < size; i++)
         {
             MonsterSpecies species = random.Choose(Species);
             int level = random.Next(LevelBounds.Min, LevelBounds.Max + 1);
-            yield return new MonsterInstance(team, species, level, location) { Source = this };
+            group.Add(new MonsterInGroup { Species = species, Level = level });
         }
+
+        yield return new MonsterGroup(group, location) { Source = this };
     }
 }

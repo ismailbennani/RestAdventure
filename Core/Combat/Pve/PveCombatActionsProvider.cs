@@ -1,5 +1,4 @@
 ﻿using RestAdventure.Core.Actions;
-using RestAdventure.Core.Entities;
 using RestAdventure.Core.Entities.Characters;
 using RestAdventure.Core.Entities.Monsters;
 using Action = RestAdventure.Core.Actions.Action;
@@ -10,10 +9,10 @@ public class PveCombatActionsProvider : IActionsProvider
 {
     public IEnumerable<Action> GetActions(GameState state, Character character)
     {
-        IEnumerable<IGrouping<Team?, MonsterInstance>> monsters = state.Entities.AtLocation<MonsterInstance>(character.Location).GroupBy(m => m.Team);
-        foreach (IGrouping<Team?, MonsterInstance> group in monsters)
+        IEnumerable<MonsterGroup> groups = state.Entities.AtLocation<MonsterGroup>(character.Location);
+        foreach (MonsterGroup group in groups)
         {
-            yield return new PveCombatAction(group.ToArray());
+            yield return group.CombatAction;
         }
     }
 }

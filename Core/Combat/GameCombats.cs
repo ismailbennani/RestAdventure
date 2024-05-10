@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using RestAdventure.Core.Combat.Notifications;
 using RestAdventure.Core.Combat.Options;
+using RestAdventure.Core.Entities.Monsters;
 using RestAdventure.Core.Extensions;
 using RestAdventure.Core.Maps.Locations;
 using RestAdventure.Kernel.Errors;
@@ -27,6 +28,16 @@ public class GameCombats : IEnumerable<CombatInstance>, IDisposable
 
     public IEnumerator<CombatInstance> GetEnumerator() => _combats.Values.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_combats.Values).GetEnumerator();
+
+    public Maybe CanStartCombat(IReadOnlyList<IGameEntityWithCombatStatistics> attackers, MonsterGroup monsterGroup)
+    {
+        if (monsterGroup.Busy)
+        {
+            return "Target is busy";
+        }
+
+        return true;
+    }
 
     public Maybe CanStartCombat(IReadOnlyList<IGameEntityWithCombatStatistics> attackers, IReadOnlyList<IGameEntityWithCombatStatistics> defenders)
     {

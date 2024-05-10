@@ -24,11 +24,7 @@ namespace SandboxGame;
 
 public class SandboxGameBuilder
 {
-    public MapGenerator MapGenerator { get; }
-    public MapGenerator.Result MapGeneratorResult { get; }
-    public CharacterClasses CharacterClasses { get; }
-    public Rattlings Rattlings { get; }
-    public Gatherer Gatherer { get; }
+    readonly Location _startLocation;
 
     public SandboxGameBuilder(ILoggerFactory loggerFactory)
     {
@@ -49,10 +45,18 @@ public class SandboxGameBuilder
             startLocation = MapGeneratorResult.GeneratedMaps.Locations.MinBy(l => Distance.L1((l.PositionX, l.PositionY), (0, 0)));
         }
 
-        CharacterClasses = new CharacterClasses(MapGeneratorResult.GeneratedMaps, startLocation!);
+        _startLocation = startLocation!;
+
+        CharacterClasses = new CharacterClasses(MapGeneratorResult.GeneratedMaps, _startLocation);
         Rattlings = new Rattlings();
         Gatherer = new Gatherer();
     }
+
+    public MapGenerator MapGenerator { get; }
+    public MapGenerator.Result MapGeneratorResult { get; }
+    public CharacterClasses CharacterClasses { get; }
+    public Rattlings Rattlings { get; }
+    public Gatherer Gatherer { get; }
 
     public Scenario Build()
     {
@@ -64,14 +68,11 @@ public class SandboxGameBuilder
         ExtractContent(scenario, MapGeneratorResult.GeneratedMaps);
 
         scenario.Spawners.Add(
-            new RandomSpawner(
-                new MapAreaSpawnerLocationSelector { Area = MapGeneratorResult.GeneratedMaps.Areas.First() },
-                new StaticObjectSpawner { StaticObject = Gatherer.AppleTree }
-            ) { MaxCount = 500 }
+            new RandomSpawner(new MapAreaSpawnerLocationSelector { Area = _startLocation.Area }, new StaticObjectSpawner { StaticObject = Gatherer.AppleTree }) { MaxCount = 500 }
         );
         scenario.Spawners.Add(
             new RandomSpawner(
-                new MapAreaSpawnerLocationSelector { Area = MapGeneratorResult.GeneratedMaps.Areas.First() },
+                new MapAreaSpawnerLocationSelector { Area = _startLocation.Area },
                 new MonsterGroupSpawner
                 {
                     Species = [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat],
@@ -82,7 +83,7 @@ public class SandboxGameBuilder
         );
         scenario.Spawners.Add(
             new RandomSpawner(
-                new MapAreaSpawnerLocationSelector { Area = MapGeneratorResult.GeneratedMaps.Areas.First() },
+                new MapAreaSpawnerLocationSelector { Area = _startLocation.Area },
                 new MonsterGroupSpawner
                 {
                     Species = [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat],
@@ -93,7 +94,7 @@ public class SandboxGameBuilder
         );
         scenario.Spawners.Add(
             new RandomSpawner(
-                new MapAreaSpawnerLocationSelector { Area = MapGeneratorResult.GeneratedMaps.Areas.First() },
+                new MapAreaSpawnerLocationSelector { Area = _startLocation.Area },
                 new MonsterGroupSpawner
                 {
                     Species = [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat],

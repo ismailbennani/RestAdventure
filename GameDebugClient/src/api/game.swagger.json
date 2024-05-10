@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0-alpha.0.203+a9a2a6e437ef36380f2a215f6c8bb71f40cfc7b8"
+    "version": "0.0.0-alpha.0.208+f37702603027ed40466718ed8074c5c1589b4f41"
   },
   "servers": [
     {
@@ -531,76 +531,6 @@
                 }
               }
             }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "api-key": []
-          }
-        ]
-      }
-    },
-    "/game/team/characters/{characterGuid}/combats/in-preparation/{combatGuid}/{side}/join": {
-      "post": {
-        "tags": [
-          "Combats"
-        ],
-        "summary": "Join combat in preparation",
-        "operationId": "CombatsInPreparation_JoinCombatInPreparation",
-        "parameters": [
-          {
-            "name": "characterGuid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid"
-            },
-            "x-position": 1
-          },
-          {
-            "name": "combatGuid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid"
-            },
-            "x-position": 2
-          },
-          {
-            "name": "side",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/CombatSide"
-            },
-            "x-position": 3
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": ""
           },
           "400": {
             "description": "",
@@ -1409,6 +1339,67 @@
         ]
       }
     },
+    "/game/team/characters/{characterGuid}/pve/{combatGuid}/join": {
+      "post": {
+        "tags": [
+          "Pve"
+        ],
+        "summary": "Join combat in preparation",
+        "operationId": "Pve_JoinCombatInPreparation",
+        "parameters": [
+          {
+            "name": "characterGuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "combatGuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ]
+      }
+    },
     "/game/team": {
       "get": {
         "tags": [
@@ -2047,7 +2038,7 @@
             "required": [
               "combatId",
               "attackers",
-              "defenders"
+              "monsterGroup"
             ],
             "properties": {
               "combatId": {
@@ -2063,12 +2054,13 @@
                   "$ref": "#/components/schemas/EntityMinimal"
                 }
               },
-              "defenders": {
-                "type": "array",
-                "description": "The defenders in the combat instance\n            ",
-                "items": {
-                  "$ref": "#/components/schemas/EntityMinimal"
-                }
+              "monsterGroup": {
+                "description": "The group of monsters\n            ",
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/MonsterGroupMinimal"
+                  }
+                ]
               }
             }
           }
@@ -2093,6 +2085,109 @@
             "type": "string",
             "description": "The name of the entity\n            ",
             "minLength": 1
+          }
+        }
+      },
+      "MonsterGroupMinimal": {
+        "type": "object",
+        "description": "Monster group (minimal)\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "monsters",
+          "expectedExperience"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the group\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "monsters": {
+            "type": "array",
+            "description": "The monsters in the group\n            ",
+            "items": {
+              "$ref": "#/components/schemas/MonsterInGroup"
+            }
+          },
+          "expectedExperience": {
+            "type": "integer",
+            "description": "The expected experience gain if the character defeats the monster group\n            ",
+            "format": "int32"
+          }
+        }
+      },
+      "MonsterInGroup": {
+        "type": "object",
+        "description": "Monster in group\n            ",
+        "additionalProperties": false,
+        "required": [
+          "species",
+          "level"
+        ],
+        "properties": {
+          "species": {
+            "description": "The species of the monster\n            ",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/MonsterSpecies"
+              }
+            ]
+          },
+          "level": {
+            "type": "integer",
+            "description": "The level of the monster\n            ",
+            "format": "int32"
+          }
+        }
+      },
+      "MonsterSpecies": {
+        "type": "object",
+        "description": "Monster species\n            ",
+        "additionalProperties": false,
+        "required": [
+          "family",
+          "name"
+        ],
+        "properties": {
+          "family": {
+            "description": "The family of monsters\n            ",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/MonsterFamily"
+              }
+            ]
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the species\n            ",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "description": "The description of the species\n            ",
+            "nullable": true
+          }
+        }
+      },
+      "MonsterFamily": {
+        "type": "object",
+        "description": "Monster family\n            ",
+        "additionalProperties": false,
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the family\n            ",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "description": "The description of the family\n            ",
+            "nullable": true
           }
         }
       },
@@ -3638,62 +3733,26 @@
         }
       },
       "MonsterGroup": {
-        "type": "object",
-        "description": "Monster group\n            ",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "monsters",
-          "canAttack",
-          "expectedExperience"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "The unique ID of the group\n            ",
-            "format": "guid",
-            "minLength": 1
-          },
-          "monsters": {
-            "type": "array",
-            "description": "The monsters in the group\n            ",
-            "items": {
-              "$ref": "#/components/schemas/MonsterInstanceMinimal"
-            }
-          },
-          "canAttack": {
-            "type": "boolean",
-            "description": "Can the character attack the monsters\n            "
-          },
-          "whyCannotAttack": {
-            "type": "string",
-            "description": "Why cannot the character attack the monsters\n            ",
-            "nullable": true
-          },
-          "expectedExperience": {
-            "type": "integer",
-            "description": "The expected experience gain if the character defeats the monster group\n            ",
-            "format": "int32"
-          }
-        }
-      },
-      "MonsterInstanceMinimal": {
         "allOf": [
           {
-            "$ref": "#/components/schemas/EntityMinimal"
+            "$ref": "#/components/schemas/MonsterGroupMinimal"
           },
           {
             "type": "object",
-            "description": "Monster minimal\n            ",
+            "description": "Monster group\n            ",
             "additionalProperties": false,
             "required": [
-              "level"
+              "canAttack"
             ],
             "properties": {
-              "level": {
-                "type": "integer",
-                "description": "The level of the monster\n            ",
-                "format": "int32"
+              "canAttack": {
+                "type": "boolean",
+                "description": "Can the character attack the monsters\n            "
+              },
+              "whyCannotAttack": {
+                "type": "string",
+                "description": "Why cannot the character attack the monsters\n            ",
+                "nullable": true
               }
             }
           }

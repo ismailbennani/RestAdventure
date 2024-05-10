@@ -1,9 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using RestAdventure.Core.Combat.Notifications;
 using RestAdventure.Core.Combat.Options;
-using RestAdventure.Core.Entities.Characters;
-using RestAdventure.Core.Entities.Monsters;
-using RestAdventure.Core.Items;
 using RestAdventure.Core.Simulation;
 using RestAdventure.Kernel.Errors;
 
@@ -93,26 +90,7 @@ public class CombatSimulationWorkProvider : SimulationWorkProvider
 
         if (combat.Winner.HasValue)
         {
-            CombatFormation winnerTeam = combat.GetTeam(combat.Winner.Value);
-            CombatFormation loserTeam = combat.GetTeam(combat.Winner.Value.OtherSide());
-
-            int baseExperience = loserTeam.Entities.OfType<MonsterInstance>().Sum(m => m.Species.Experience);
-            ItemStack[] loot = loserTeam.Entities.OfType<MonsterInstance>()
-                .Aggregate(Enumerable.Empty<ItemStack>(), (items, m) => items.Concat(m.Species.Items.Concat(m.Species.Family.Items)))
-                .ToArray();
-
-            IEnumerable<Character> characters = winnerTeam.Entities.OfType<Character>();
-            foreach (Character character in characters)
-            {
-                if (baseExperience > 0)
-                {
-                    character.Progression.Progress(baseExperience);
-                }
-
-                character.Inventory.Add(loot);
-            }
-
-            foreach (IGameEntityWithCombatStatistics entity in loserTeam.Entities)
+            foreach (IGameEntityWithCombatStatistics entity in combat.GetTeam(combat.Winner.Value.OtherSide()).Entities)
             {
                 await entity.KillAsync(_state);
             }

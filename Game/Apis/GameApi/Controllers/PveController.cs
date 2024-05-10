@@ -4,6 +4,7 @@ using RestAdventure.Core;
 using RestAdventure.Core.Combat;
 using RestAdventure.Core.Combat.Pve;
 using RestAdventure.Core.Entities.Characters;
+using RestAdventure.Core.Entities.Monsters;
 using RestAdventure.Core.Players;
 using RestAdventure.Game.Apis.Common.Dtos.Combats;
 using RestAdventure.Game.Apis.Common.Dtos.Monsters;
@@ -59,11 +60,11 @@ public class PveController : GameApiController
             result.Add(
                 new MonsterGroupDto
                 {
-                    Id = action.Defenders.First().Id.Guid,
-                    Monsters = action.Defenders.Select(m => m.ToDto()).ToArray(),
+                    Id = action.MonsterGroup!.Id.Guid,
+                    Monsters = action.MonsterGroup.Monsters.Select(m => m.ToDto()).ToArray(),
+                    ExpectedExperience = action.MonsterGroup.Monsters.Sum(m => m.Species.Experience),
                     CanAttack = canStartCombat.Success,
-                    WhyCannotAttack = canStartCombat.WhyNot,
-                    ExpectedExperience = action.Defenders.Sum(m => m.Species.Experience)
+                    WhyCannotAttack = canStartCombat.WhyNot
                 }
             );
         }
@@ -91,7 +92,8 @@ public class PveController : GameApiController
             return BadRequest();
         }
 
-        PveCombatAction? action = state.Actions.GetAvailableActions(character).OfType<PveCombatAction>().SingleOrDefault(a => a.Defenders[0].Id.Guid == groupId);
+        MonsterGroupId monsterGroupId = new(groupId);
+        PveCombatAction? action = state.Actions.GetAvailableActions(character).OfType<PveCombatAction>().SingleOrDefault(a => a.MonsterGroup.Id == monsterGroupId);
         if (action == null)
         {
             return NotFound();
@@ -99,7 +101,42 @@ public class PveController : GameApiController
 
         if (options != null)
         {
-            action.SetOptions(CombatSide.Attackers, options.ToBusiness());
+            action.SetOptions(options.ToBusiness());
+        }
+
+        state.Actions.QueueAction(character, action);
+
+        return NoContent();
+    }
+
+    /// <summary>
+    ///     Join combat in preparation
+    /// </summary>
+    [HttpPost("{combatGuid:guid}/join")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    public ActionResult JoinCombatInPreparation(Guid characterGuid, Guid combatGuid)
+    {
+        GameState state = _gameService.RequireGameState();
+        Player player = ControllerContext.RequirePlayer(state);
+
+        CharacterId characterId = new(characterGuid);
+        Character? character = state.Entities.Get<Character>(characterId);
+
+        if (character == null || character.Player != player)
+        {
+            return BadRequest();
+        }
+
+        CombatInstanceId combatId = new(combatGuid);
+        PveCombatAction? action = state.Actions.GetAvailableActions(character)
+            .OfType<PveCombatAction>()
+            .SingleOrDefault(a => a.CombatInPreparation != null && a.CombatInPreparation.Id == combatId);
+
+        if (action == null || action.CombatInPreparation!.Location != character.Location)
+        {
+            return NotFound();
         }
 
         state.Actions.QueueAction(character, action);

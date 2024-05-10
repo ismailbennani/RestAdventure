@@ -11,7 +11,7 @@ export class CharacterActionUtils {
     }
 
     if (action instanceof PveCombatAction) {
-      return `combat ${action.attackers.map(a => a.name).join(', ')} vs. ${action.defenders.map(a => a.name).join(', ')}`;
+      return `combat ${action.attackers.map(a => a.name).join(', ')} vs. ${action.monsterGroup.monsters.map(a => a.species.name).join(', ')}`;
     }
 
     return '???';

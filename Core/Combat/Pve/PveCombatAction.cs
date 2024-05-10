@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
 using RestAdventure.Core.Combat.Options;
+using RestAdventure.Core.Entities;
 using RestAdventure.Core.Entities.Characters;
 using RestAdventure.Core.Entities.Monsters;
+using RestAdventure.Core.Items;
 using RestAdventure.Kernel.Errors;
 using Action = RestAdventure.Core.Actions.Action;
 
@@ -10,18 +12,17 @@ namespace RestAdventure.Core.Combat.Pve;
 public class PveCombatAction : Action
 {
     CombatFormationOptions? _attackersOptions;
-    CombatFormationOptions? _defendersOptions;
-    IReadOnlyList<MonsterInstance>? _defenders;
+    IReadOnlyList<MonsterCombatInstance>? _monsters;
+    readonly CombatFormationOptions? _monstersOptions;
+    bool _monsterGroupKilled;
 
-    public PveCombatAction(IReadOnlyList<MonsterInstance> defenders) : base("combat")
+    public PveCombatAction(MonsterGroup monsterGroup) : base("pve-combat")
     {
-        _defenders = defenders;
+        MonsterGroup = monsterGroup;
+        _monstersOptions = new CombatFormationOptions { Accessibility = CombatFormationAccessibility.TeamOnly };
 
-    }
-
-    public PveCombatAction(CombatInPreparation combatInPreparation) : base("combat")
-    {
-        CombatInPreparation = combatInPreparation;
+        ExperienceReward = MonsterGroup.Monsters.Sum(m => m.Species.Experience);
+        ItemsReward = MonsterGroup.Monsters.Aggregate(Enumerable.Empty<ItemStack>(), (items, m) => items.Concat(m.Species.Items.Concat(m.Species.Family.Items))).ToArray();
     }
 
     public IReadOnlyList<Character> Attackers =>
@@ -29,53 +30,25 @@ public class PveCombatAction : Action
 
     public CombatFormationOptions AttackersOptions => CombatInPreparation?.Attackers.Options ?? _attackersOptions ?? CombatFormationOptions.Default;
 
-    public IReadOnlyList<MonsterInstance> Defenders =>
-        _defenders
-        ?? CombatInPreparation?.Defenders.Entities.OfType<MonsterInstance>().ToArray()
-        ?? Combat?.Defenders.Entities.OfType<MonsterInstance>().ToArray() ?? Array.Empty<MonsterInstance>();
-
-    public CombatFormationOptions DefendersOptions => CombatInPreparation?.Defenders.Options ?? _attackersOptions ?? CombatFormationOptions.Default;
+    public MonsterGroup MonsterGroup { get; }
+    public int ExperienceReward { get; }
+    public ItemStack[] ItemsReward { get; }
 
     public CombatInPreparation? CombatInPreparation { get; private set; }
     public CombatInstance? Combat { get; private set; }
 
     public bool Interrupt { get; private set; }
 
-    public Maybe SetOptions(CombatSide side, CombatFormationOptions options)
+    public Maybe SetOptions(CombatFormationOptions options)
     {
         //FIXME: hard ot use
 
-        if (CombatInPreparation == null)
-        {
-            switch (side)
-            {
-                case CombatSide.Attackers:
-                    _attackersOptions = options;
-                    break;
-                case CombatSide.Defenders:
-                    _defendersOptions = options;
-                    break;
-            }
-            return true;
-        }
-
-        return "Combat is in preparation";
+        _attackersOptions = options;
+        return true;
     }
 
-    protected override Maybe CanPerformInternal(GameState state, Character character)
-    {
-        if (CombatInPreparation != null)
-        {
-            return state.Combats.CanJoinCombat(character, CombatInPreparation, CombatSide.Attackers);
-        }
-
-        if (_defenders != null)
-        {
-            return state.Combats.CanStartCombat([character], _defenders);
-        }
-
-        return "Internal error";
-    }
+    protected override Maybe CanPerformInternal(GameState state, Character character) =>
+        CombatInPreparation == null ? state.Combats.CanStartCombat([character], MonsterGroup) : state.Combats.CanJoinCombat(character, CombatInPreparation, CombatSide.Attackers);
 
     public override bool IsOver(GameState state, Character character) =>
         // interrupted
@@ -91,18 +64,19 @@ public class PveCombatAction : Action
 
         if (CombatInPreparation == null)
         {
-            if (_defenders == null)
+            Team team = new();
+            _monsters = MonsterGroup.Monsters.Select(m => new MonsterCombatInstance(team, m.Species, m.Level, character.Location)).ToArray();
+
+            foreach (MonsterCombatInstance monster in _monsters)
             {
-                logger.LogError("Combat creation failed: no defenders");
-                Interrupt = true;
-                return;
+                await state.Entities.AddAsync(monster);
             }
 
             Maybe<CombatInPreparation> combat = await state.Combats.StartCombatPreparationAsync(
                 [character],
                 _attackersOptions ?? CombatFormationOptions.Default,
-                _defenders,
-                _defendersOptions ?? CombatFormationOptions.Default
+                _monsters,
+                _monstersOptions ?? CombatFormationOptions.Default
             );
             if (!combat.Success)
             {
@@ -111,13 +85,12 @@ public class PveCombatAction : Action
                 return;
             }
 
-            CombatInPreparation = combat.Value;
-
-            foreach (MonsterInstance defender in _defenders)
+            foreach (MonsterCombatInstance monster in _monsters)
             {
-                defender.Busy = true;
+                monster.Busy = true;
             }
-            _defenders = null;
+
+            CombatInPreparation = combat.Value;
         }
         else
         {
@@ -148,5 +121,44 @@ public class PveCombatAction : Action
         return Task.CompletedTask;
     }
 
-    public override string ToString() => $"{string.Join(", ", Attackers)} v. {string.Join(", ", Defenders)}";
+    protected override async Task OnEndAsync(GameState state, Character character)
+    {
+        if (Combat?.Winner == null)
+        {
+            return;
+        }
+
+        switch (Combat.Winner)
+        {
+            case CombatSide.Attackers:
+                if (ExperienceReward > 0)
+                {
+                    character.Progression.Progress(ExperienceReward);
+                }
+
+                character.Inventory.Add(ItemsReward);
+
+                if (!_monsterGroupKilled)
+                {
+                    await MonsterGroup.KillAsync(state);
+                    _monsterGroupKilled = true;
+                }
+
+                break;
+            case CombatSide.Defenders:
+                // kill spawned monsters in all cases, even if they win. The monster group remains in this case
+                if (_monsters != null)
+                {
+                    foreach (MonsterCombatInstance monster in _monsters)
+                    {
+                        await monster.KillAsync(state);
+                    }
+
+                    _monsters = null;
+                }
+                break;
+        }
+    }
+
+    public override string ToString() => $"{string.Join(", ", Attackers)} v. {string.Join(", ", _monsters ?? [])}";
 }

@@ -130,11 +130,11 @@ export class CharacterHistoryComponent implements OnInit {
     }
 
     if (entry instanceof CharacterStartedCombatPreparationHistoryEntry) {
-      return `Started combat preparation: ${entry.attackers.map(e => e.name).join(',')} v. ${entry.defenders.map(e => e.name).join(',')} at ${entry.locationAreaName} [${entry.locationPositionX}, ${entry.locationPositionY}]`;
+      return `Started combat preparation: ${entry.attackers.map(e => e.name).join(', ')} v. ${entry.defenders.map(e => e.name).join(', ')} at ${entry.locationAreaName} [${entry.locationPositionX}, ${entry.locationPositionY}]`;
     }
 
     if (entry instanceof CharacterCombatStartedHistoryEntry) {
-      return `Started combat: ${entry.attackers.map(e => e.name).join(',')} v. ${entry.defenders.map(e => e.name).join(',')} at ${entry.locationAreaName} [${entry.locationPositionX}, ${entry.locationPositionY}]`;
+      return `Started combat: ${entry.attackers.map(e => e.name).join(', ')} v. ${entry.defenders.map(e => e.name).join(', ')} at ${entry.locationAreaName} [${entry.locationPositionX}, ${entry.locationPositionY}]`;
     }
 
     if (entry instanceof CharacterCombatEndedHistoryEntry) {

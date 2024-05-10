@@ -12,6 +12,7 @@ import {
   CombatsApiClient,
   CombatsHistoryApiClient,
   CombatsInPreparationApiClient,
+  PveApiClient,
   PveCombatAction,
   TeamCharacter,
 } from '../../../../api/game-api-client.generated';
@@ -50,6 +51,7 @@ export class CharacterCombatsComponent implements OnInit {
 
   constructor(
     private gameService: GameService,
+    private pveApiClient: PveApiClient,
     private combatsInPreparationApiClient: CombatsInPreparationApiClient,
     private combatsApiClient: CombatsApiClient,
     private combatsHistoryApiClient: CombatsHistoryApiClient,
@@ -110,8 +112,8 @@ export class CharacterCombatsComponent implements OnInit {
       return;
     }
 
-    this.combatsInPreparationApiClient
-      .joinCombatInPreparation(this.character.id, combat.id, CombatSide.Attackers)
+    this.pveApiClient
+      .joinCombatInPreparation(this.character.id, combat.id)
       .pipe(switchMap(() => this.gameService.refreshNow(true)))
       .subscribe();
   }

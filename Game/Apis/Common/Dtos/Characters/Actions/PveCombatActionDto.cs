@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using RestAdventure.Core.Combat.Pve;
 using RestAdventure.Game.Apis.Common.Dtos.Entities;
+using RestAdventure.Game.Apis.Common.Dtos.Monsters;
 
 namespace RestAdventure.Game.Apis.Common.Dtos.Characters.Actions;
 
@@ -22,10 +23,10 @@ public class PveCombatActionDto : ActionDto
     public required IReadOnlyList<EntityMinimalDto> Attackers { get; init; }
 
     /// <summary>
-    ///     The defenders in the combat instance
+    ///     The group of monsters
     /// </summary>
     [Required]
-    public required IReadOnlyList<EntityMinimalDto> Defenders { get; init; }
+    public required MonsterGroupMinimalDto MonsterGroup { get; init; }
 }
 
 static class PveCombatActionMappingExtensions
@@ -36,6 +37,6 @@ static class PveCombatActionMappingExtensions
             Name = action.Name,
             CombatId = action.CombatInPreparation?.Id.Guid ?? action.Combat?.Id.Guid ?? default,
             Attackers = action.Attackers.Select(e => e.ToMinimalDto()).ToArray(),
-            Defenders = action.Defenders.Select(e => e.ToMinimalDto()).ToArray()
+            MonsterGroup = action.MonsterGroup.ToMonsterGroupMinimalDto()
         };
 }

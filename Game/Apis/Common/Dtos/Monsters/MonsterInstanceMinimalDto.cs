@@ -18,11 +18,11 @@ public class MonsterInstanceMinimalDto : EntityMinimalDto
 
 static class MonsterMinimalMappingExtensions
 {
-    public static MonsterInstanceMinimalDto ToDto(this MonsterInstance monster) =>
+    public static MonsterInstanceMinimalDto ToDto(this MonsterCombatInstance monsterCombat) =>
         new()
         {
-            Id = monster.Id.Guid,
-            Name = monster.Name,
-            Level = monster.Level
+            Id = monsterCombat.Id.Guid,
+            Name = monsterCombat.Name,
+            Level = monsterCombat.Level
         };
 }

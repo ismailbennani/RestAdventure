@@ -37,7 +37,7 @@ export class CharacterMonstersComponent implements OnInit {
         tap(monsterGroups => {
           this.monsterGroups = monsterGroups.map(g => ({
             ...g,
-            display: g.monsters.map(m => `${m.name} lv. ${m.level}`).join(', '),
+            display: g.monsters.map(m => `${m.species.name} lv. ${m.level}`).join(', '),
             totalLevel: g.monsters.reduce((level, m) => level + m.level, 0),
           }));
         }),
@@ -73,9 +73,6 @@ export class CharacterMonstersComponent implements OnInit {
       return true;
     }
 
-    const inCombat = [...action.attackers.map(a => a.id), ...action.defenders.map(a => a.id)];
-    const inGroup = monsterGroup.monsters.map(m => m.id);
-
-    return inGroup.some(id => inCombat.includes(id));
+    return action.monsterGroup.id === monsterGroup.id;
   }
 }
