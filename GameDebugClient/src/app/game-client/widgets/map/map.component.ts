@@ -11,23 +11,32 @@ import { LocationMinimal } from '../../../../api/game-api-client.generated';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MapComponent implements OnInit {
+  private static readonly MIN_REDRAW_DELAY_MS = 10;
+  private static readonly MIN_REDRAW_SELECTION_DELAY_MS = 1;
+
   private static readonly MARGIN_SIZE = 20;
+  private static readonly RULER_COLOR = 'grey';
+
   private static readonly CELL_WIDTH = 30;
   private static readonly CELL_HEIGHT = 15;
   private static readonly CELL_BG_COLOR = 'ghostwhite';
-  private static readonly RULER_COLOR = 'grey';
-  private static readonly GRID_LINE_COLOR = 'lightgrey';
-  private static readonly GRID_LINE_WIDTH = 1;
   private static readonly AREA_BORDER_COLOR = 'lightgrey';
   private static readonly AREA_BORDER_WIDTH = 2;
+
+  private static readonly GRID_LINE_COLOR = 'lightgrey';
+  private static readonly GRID_LINE_WIDTH = 1;
+
   private static readonly MARKER_SIZE = 8;
+
   private static readonly ZOOM_MIN = 0.1;
   private static readonly ZOOM_MAX = 5;
-  private static readonly ZOOM_STEP = 0.01;
-  private static readonly MIN_REDRAW_DELAY_MS = 10;
+  private static readonly ZOOM_STEP = 0.1;
+
+  private static readonly SELECTION_COLOR = 'gold';
 
   @ViewChild('parent', { static: true }) parent: ElementRef<HTMLDivElement> | undefined;
-  @ViewChild('canvas', { static: true }) canvas: ElementRef<HTMLCanvasElement> | undefined;
+  @ViewChild('layer0', { static: true }) layer0: ElementRef<HTMLCanvasElement> | undefined;
+  @ViewChild('layer1', { static: true }) layer1: ElementRef<HTMLCanvasElement> | undefined;
 
   @Input({ required: true })
   public get locations(): LocationMinimal[] {
@@ -36,7 +45,7 @@ export class MapComponent implements OnInit {
   public set locations(value: LocationMinimal[]) {
     this._locations = value;
     this.updateLocationCaches();
-    this.queueRedraw();
+    this.redrawSubject.next();
   }
   private _locations: LocationMinimal[] = [];
 
@@ -46,7 +55,12 @@ export class MapComponent implements OnInit {
   }
   public set centerAt(value: [number, number] | undefined) {
     this._centerAt = value;
-    this.queueRedraw();
+
+    if (value) {
+      this.center = [...value];
+    }
+
+    this.redrawSubject.next();
   }
   private _centerAt: [number, number] | undefined = undefined;
 
@@ -57,7 +71,7 @@ export class MapComponent implements OnInit {
   public set markers(value: MapMarker[]) {
     this._markers = value;
     this.updateMarkerCaches();
-    this.queueRedraw();
+    this.redrawSubject.next();
   }
   private _markers: MapMarker[] = [];
 
@@ -67,6 +81,14 @@ export class MapComponent implements OnInit {
   protected zoom: number = 1;
 
   private redrawSubject: ReplaySubject<void> = new ReplaySubject<void>(1);
+  private redrawSelectionSubject: ReplaySubject<[number, number]> = new ReplaySubject<[number, number]>(1);
+
+  private lastMouseCoords: [number, number] | undefined;
+
+  private grid: Grid | undefined;
+  private cells: Cell[] = [];
+  private cellByPosition: { [x: number]: { [y: number]: Cell } } = {};
+
   private locationsByArea: { [areaId: string]: LocationMinimal[] } = {};
   private locationsByPosition: { [x: number]: { [y: number]: LocationMinimal[] } } = {};
   private locationAreaAdjacencies: { [locationId: string]: CellAdjacency } = {};
@@ -79,24 +101,34 @@ export class MapComponent implements OnInit {
       new ResizeObserver(() => this.resize()).observe(this.parent.nativeElement);
     }
 
-    this.redrawSubject.pipe(debounceTime(MapComponent.MIN_REDRAW_DELAY_MS)).subscribe(() => this.redraw());
+    this.redrawSubject.pipe(debounceTime(MapComponent.MIN_REDRAW_DELAY_MS)).subscribe(() => {
+      this.redraw();
+
+      if (this.lastMouseCoords) {
+        this.redrawSelection(this.lastMouseCoords);
+      }
+    });
+    this.redrawSelectionSubject.pipe(debounceTime(MapComponent.MIN_REDRAW_SELECTION_DELAY_MS)).subscribe(coords => {
+      this.lastMouseCoords = coords;
+      this.redrawSelection(coords);
+    });
 
     this.resize();
   }
 
-  private queueRedraw() {
-    this.redrawSubject.next();
-  }
-
   private resize() {
-    if (!this.canvas || !this.parent) {
+    if (!this.layer0 || !this.layer1 || !this.parent) {
       return;
     }
 
-    this.canvas.nativeElement.width = this.parent.nativeElement.offsetWidth;
-    this.canvas.nativeElement.height = this.parent.nativeElement.offsetHeight;
+    this.layer0.nativeElement.width = this.parent.nativeElement.offsetWidth;
+    this.layer0.nativeElement.height = this.parent.nativeElement.offsetHeight;
 
-    this.queueRedraw();
+    this.layer1.nativeElement.width = this.parent.nativeElement.offsetWidth;
+    this.layer1.nativeElement.height = this.parent.nativeElement.offsetHeight;
+
+    this.updateGridCaches();
+    this.redrawSubject.next();
   }
 
   setZoom(zoom: number) {
@@ -110,7 +142,8 @@ export class MapComponent implements OnInit {
       this.zoom = MapComponent.ZOOM_MAX;
     }
 
-    this.queueRedraw();
+    this.updateGridCaches();
+    this.redrawSubject.next();
   }
 
   @HostListener('wheel', ['$event'])
@@ -125,16 +158,16 @@ export class MapComponent implements OnInit {
     event.preventDefault();
   }
 
+  onMouseMove(event: MouseEvent) {
+    this.redrawSelectionSubject.next([event.offsetX, event.offsetY]);
+  }
+
   private redraw() {
-    if (!this.canvas || !this.parent) {
+    if (!this.layer0 || !this.parent || !this.grid) {
       return;
     }
 
-    if (this.centerAt) {
-      this.center = [...this.centerAt];
-    }
-
-    const canvas = this.canvas.nativeElement;
+    const canvas = this.layer0.nativeElement;
     const ctx = canvas.getContext('2d');
     if (!ctx) {
       console.error('Could not get canvas context');
@@ -143,69 +176,13 @@ export class MapComponent implements OnInit {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    const cellWidth = MapComponent.CELL_WIDTH * this.zoom;
-    const cellHeight = MapComponent.CELL_HEIGHT * this.zoom;
-
-    const cellsInViewX = (canvas.width - MapComponent.MARGIN_SIZE) / cellWidth;
-    const cellsInViewY = (canvas.height - MapComponent.MARGIN_SIZE) / cellHeight;
-
-    const cellsInViewXCeiled = Math.ceil(cellsInViewX);
-    const cellsInViewYCeiled = Math.ceil(cellsInViewY);
-    const cellsInViewCeiled: [number, number] = [cellsInViewXCeiled, cellsInViewYCeiled];
-
-    const totalWidth = cellsInViewXCeiled * cellWidth;
-    const totalHeight = cellsInViewYCeiled * cellHeight;
-
-    const startAtX = Math.ceil((canvas.width - MapComponent.MARGIN_SIZE - totalWidth) / 2) + MapComponent.MARGIN_SIZE;
-    const startAtY = Math.ceil((canvas.height - MapComponent.MARGIN_SIZE - totalHeight) / 2) + MapComponent.MARGIN_SIZE;
-
-    const grid: Grid = {
-      cellWidth: cellWidth,
-      cellHeight: cellHeight,
-      lineWidth: Math.ceil(cellsInViewX),
-      colHeight: Math.ceil(cellsInViewY),
-      width: cellsInViewXCeiled * cellWidth,
-      height: cellsInViewYCeiled * cellHeight,
-      xMin: startAtX,
-      yMin: startAtY,
-      xMax: startAtX + totalWidth,
-      yMax: startAtY + totalHeight,
-    };
-
-    const cells: Cell[] = [];
-
-    for (let x = 0; x < cellsInViewXCeiled; x++) {
-      for (let y = 0; y < cellsInViewYCeiled; y++) {
-        const position = this.computeLocationCoords(this.center, cellsInViewCeiled, [x, y]);
-
-        if (!this.locationsByPosition[position[0]] || !this.locationsByPosition[position[0]][position[1]]) {
-          continue;
-        }
-
-        const location = this.locationsByPosition[position[0]][position[1]][0];
-
-        cells.push({
-          width: grid.cellWidth,
-          height: grid.cellHeight,
-          xMin: grid.xMin + x * grid.cellWidth,
-          xMax: grid.xMin + (x + 1) * grid.cellWidth,
-          yMin: grid.yMin + y * grid.cellHeight,
-          yMax: grid.yMin + (y + 1) * grid.cellHeight,
-          xCenter: grid.xMin + (x + 0.5) * grid.cellWidth,
-          yCenter: grid.yMin + (y + 0.5) * grid.cellHeight,
-          location,
-          adjacency: this.locationAreaAdjacencies[location.id],
-        });
-      }
-    }
-
     if (this.gridPosition === 'below') {
-      this.drawGrid(ctx, grid);
+      this.drawGrid(ctx);
     }
 
     // 1st pass ------------
 
-    for (const cell of cells) {
+    for (const cell of this.cells) {
       this.drawCellBackground(ctx, cell);
     }
 
@@ -213,21 +190,21 @@ export class MapComponent implements OnInit {
 
     // 2nd pass ------------
 
-    for (const cell of cells) {
-      this.drawCellBorders(ctx, cell);
+    for (const cell of this.cells) {
+      this.drawAreaBordersAtCell(ctx, cell, MapComponent.AREA_BORDER_COLOR, MapComponent.AREA_BORDER_WIDTH);
     }
 
     // ---------------------
 
     // 3rd pass ------------
 
-    for (const cell of cells) {
+    for (const cell of this.cells) {
       const markers = this.markersByPosition[cell.location.positionX] ? this.markersByPosition[cell.location.positionX][cell.location.positionY] ?? [] : [];
 
       if (markers.length > 0) {
         const step = 1 / (markers.length + 1);
         for (let i = 0; i < markers.length; i++) {
-          this.drawMarker(ctx, grid, markers[i], (i + 1) * step);
+          this.drawMarker(ctx, markers[i], (i + 1) * step);
         }
       }
     }
@@ -237,36 +214,68 @@ export class MapComponent implements OnInit {
     // 4th pass ------------
 
     if (this.gridPosition === 'above') {
-      this.drawGrid(ctx, grid);
+      this.drawGrid(ctx);
     }
 
     for (const areaId of Object.keys(this.areaCenters)) {
-      this.drawAreaName(ctx, grid, areaId);
+      this.drawAreaName(ctx, areaId, MapComponent.AREA_BORDER_COLOR);
     }
 
     // ---------------------
 
     // 5th pass ------------
 
-    this.drawMargins(ctx, grid);
+    this.drawMargins(ctx);
 
     // ---------------------
   }
 
-  private drawGrid(ctx: CanvasRenderingContext2D, grid: Grid) {
-    for (let x = 1; x < grid.lineWidth; x++) {
+  private redrawSelection(coords: [number, number]) {
+    if (!this.layer1 || !this.parent || !this.grid) {
+      return;
+    }
+
+    const canvas = this.layer1.nativeElement;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      console.error('Could not get canvas context');
+      return;
+    }
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const viewCoords: [number, number] = [(coords[0] - this.grid.xMin) / this.grid.cellWidth, (coords[1] - this.grid.yMin) / this.grid.cellHeight];
+    const locationCoords = this.computeLocationCoords(this.center, this.grid.size, viewCoords);
+
+    const locationCoordsInt = [Math.floor(locationCoords[0]), Math.floor(locationCoords[1]) + 1];
+    const cell = this.cellByPosition[locationCoordsInt[0]] ? this.cellByPosition[locationCoordsInt[0]][locationCoordsInt[1]] : undefined;
+    if (!cell) {
+      return;
+    }
+
+    this.drawCellBorders(ctx, cell, MapComponent.SELECTION_COLOR, 2);
+    this.drawAreaBorders(ctx, cell.location.area.id, MapComponent.SELECTION_COLOR, 2);
+    this.drawAreaName(ctx, cell.location.area.id, MapComponent.SELECTION_COLOR);
+  }
+
+  private drawGrid(ctx: CanvasRenderingContext2D) {
+    if (!this.grid) {
+      return;
+    }
+
+    for (let x = 1; x < this.grid.size[0]; x++) {
       ctx.beginPath();
-      ctx.moveTo(grid.xMin + x * grid.cellWidth, grid.yMin);
-      ctx.lineTo(grid.xMin + x * grid.cellWidth, grid.yMax);
+      ctx.moveTo(this.grid.xMin + x * this.grid.cellWidth, this.grid.yMin);
+      ctx.lineTo(this.grid.xMin + x * this.grid.cellWidth, this.grid.yMax);
       ctx.lineWidth = MapComponent.GRID_LINE_WIDTH;
       ctx.strokeStyle = MapComponent.GRID_LINE_COLOR;
       ctx.stroke();
     }
 
-    for (let y = 1; y < grid.colHeight; y++) {
+    for (let y = 1; y < this.grid.size[1]; y++) {
       ctx.beginPath();
-      ctx.moveTo(grid.xMin, grid.yMin + y * grid.cellHeight);
-      ctx.lineTo(grid.xMax, grid.yMin + y * grid.cellHeight);
+      ctx.moveTo(this.grid.xMin, this.grid.yMin + y * this.grid.cellHeight);
+      ctx.lineTo(this.grid.xMax, this.grid.yMin + y * this.grid.cellHeight);
       ctx.lineWidth = MapComponent.GRID_LINE_WIDTH;
       ctx.strokeStyle = MapComponent.GRID_LINE_COLOR;
       ctx.stroke();
@@ -278,13 +287,35 @@ export class MapComponent implements OnInit {
     ctx.fillRect(cell.xMin, cell.yMin, cell.width, cell.height);
   }
 
-  private drawCellBorders(ctx: CanvasRenderingContext2D, cell: Cell) {
+  private drawCellBorders(ctx: CanvasRenderingContext2D, cell: Cell, lineColor: string, lineWidth: number) {
+    ctx.beginPath();
+    ctx.moveTo(cell.xMin, cell.yMax);
+    ctx.lineTo(cell.xMax, cell.yMax);
+    ctx.lineTo(cell.xMax, cell.yMin);
+    ctx.lineTo(cell.xMin, cell.yMin);
+    ctx.closePath();
+    ctx.lineWidth = lineWidth;
+    ctx.strokeStyle = lineColor;
+    ctx.stroke();
+  }
+
+  private drawAreaBorders(ctx: CanvasRenderingContext2D, areaId: string, lineColor: string, lineWidth: number) {
+    for (const cell of this.cells) {
+      if (cell.location.area.id !== areaId) {
+        continue;
+      }
+
+      this.drawAreaBordersAtCell(ctx, cell, lineColor, lineWidth);
+    }
+  }
+
+  private drawAreaBordersAtCell(ctx: CanvasRenderingContext2D, cell: Cell, lineColor: string, lineWidth: number) {
     if (!cell.adjacency.sameAreaBottom) {
       ctx.beginPath();
       ctx.moveTo(cell.xMin, cell.yMax);
       ctx.lineTo(cell.xMax, cell.yMax);
-      ctx.lineWidth = MapComponent.AREA_BORDER_WIDTH;
-      ctx.strokeStyle = MapComponent.AREA_BORDER_COLOR;
+      ctx.lineWidth = lineWidth;
+      ctx.strokeStyle = lineColor;
       ctx.stroke();
     }
 
@@ -292,8 +323,8 @@ export class MapComponent implements OnInit {
       ctx.beginPath();
       ctx.moveTo(cell.xMin, cell.yMin);
       ctx.lineTo(cell.xMax, cell.yMin);
-      ctx.lineWidth = MapComponent.AREA_BORDER_WIDTH;
-      ctx.strokeStyle = MapComponent.AREA_BORDER_COLOR;
+      ctx.lineWidth = lineWidth;
+      ctx.strokeStyle = lineColor;
       ctx.stroke();
     }
 
@@ -301,8 +332,8 @@ export class MapComponent implements OnInit {
       ctx.beginPath();
       ctx.moveTo(cell.xMin, cell.yMin);
       ctx.lineTo(cell.xMin, cell.yMax);
-      ctx.lineWidth = MapComponent.AREA_BORDER_WIDTH;
-      ctx.strokeStyle = MapComponent.AREA_BORDER_COLOR;
+      ctx.lineWidth = lineWidth;
+      ctx.strokeStyle = lineColor;
       ctx.stroke();
     }
 
@@ -310,33 +341,42 @@ export class MapComponent implements OnInit {
       ctx.beginPath();
       ctx.moveTo(cell.xMax, cell.yMin);
       ctx.lineTo(cell.xMax, cell.yMax);
-      ctx.lineWidth = MapComponent.AREA_BORDER_WIDTH;
-      ctx.strokeStyle = MapComponent.AREA_BORDER_COLOR;
+      ctx.lineWidth = lineWidth;
+      ctx.strokeStyle = lineColor;
       ctx.stroke();
     }
   }
 
-  private drawAreaName(ctx: CanvasRenderingContext2D, grid: Grid, areaId: string) {
+  private drawAreaName(ctx: CanvasRenderingContext2D, areaId: string, color: string) {
+    if (!this.grid) {
+      return;
+    }
+
     const center = this.areaCenters[areaId];
-    const viewPosition = this.computeViewCoords(this.center, [grid.lineWidth, grid.colHeight], center);
+    const viewPosition = this.computeViewCoords(this.center, [this.grid.size[0], this.grid.size[1]], center);
 
     const text = this.areaNames[areaId] ?? '???';
     const textSize = ctx.measureText(text);
 
     ctx.lineWidth = 1;
-    ctx.strokeStyle = MapComponent.AREA_BORDER_COLOR;
-    ctx.strokeText(
+    ctx.fillStyle = color;
+    ctx.font = '12px sans-serif';
+    ctx.fillText(
       text,
-      grid.xMin + viewPosition[0] * grid.cellWidth - textSize.width / 2,
-      grid.yMin + viewPosition[1] * grid.cellHeight + (textSize.actualBoundingBoxAscent + textSize.actualBoundingBoxDescent) / 2,
+      this.grid.xMin + viewPosition[0] * this.grid.cellWidth - textSize.width / 2,
+      this.grid.yMin + viewPosition[1] * this.grid.cellHeight + (textSize.actualBoundingBoxAscent + textSize.actualBoundingBoxDescent) / 2,
     );
   }
 
-  private drawMarker(ctx: CanvasRenderingContext2D, grid: Grid, marker: MapMarker, xRelativePos: number = 0.5) {
-    const coords = this.computeViewCoords(this.center, [grid.lineWidth, grid.colHeight], [marker.positionX, marker.positionY]);
+  private drawMarker(ctx: CanvasRenderingContext2D, marker: MapMarker, xRelativePos: number = 0.5) {
+    if (!this.grid) {
+      return;
+    }
 
-    const x = grid.xMin + coords[0] * grid.cellWidth + xRelativePos * grid.cellWidth;
-    const y = (coords[1] + 0.5) * grid.cellHeight + grid.yMin;
+    const coords = this.computeViewCoords(this.center, [this.grid.size[0], this.grid.size[1]], [marker.positionX, marker.positionY]);
+
+    const x = this.grid.xMin + coords[0] * this.grid.cellWidth + xRelativePos * this.grid.cellWidth;
+    const y = (coords[1] + 0.5) * this.grid.cellHeight + this.grid.yMin;
 
     switch (marker.shape) {
       case 'circle':
@@ -348,25 +388,29 @@ export class MapComponent implements OnInit {
     }
   }
 
-  private drawMargins(ctx: CanvasRenderingContext2D, grid: Grid) {
-    ctx.clearRect(0, 0, MapComponent.MARGIN_SIZE, grid.height);
-    ctx.clearRect(0, 0, grid.width, MapComponent.MARGIN_SIZE);
+  private drawMargins(ctx: CanvasRenderingContext2D) {
+    if (!this.grid) {
+      return;
+    }
 
-    for (let x = 0; x < grid.lineWidth; x++) {
-      const mapX = this.computeLocationCoords(this.center, [grid.lineWidth, grid.colHeight], [x, 0])[0];
+    ctx.clearRect(0, 0, MapComponent.MARGIN_SIZE, this.grid.height);
+    ctx.clearRect(0, 0, this.grid.width, MapComponent.MARGIN_SIZE);
+
+    for (let x = 0; x < this.grid.size[0]; x++) {
+      const mapX = this.computeLocationCoords(this.center, [this.grid.size[0], this.grid.size[1]], [x, 0])[0];
       const text = `${mapX}`;
       const textSize = ctx.measureText(text);
       ctx.lineWidth = 1;
       ctx.strokeStyle = MapComponent.RULER_COLOR;
       ctx.strokeText(
         text,
-        grid.xMin + (x + 0.5) * grid.cellWidth - textSize.width / 2,
+        this.grid.xMin + (x + 0.5) * this.grid.cellWidth - textSize.width / 2,
         MapComponent.MARGIN_SIZE / 2 + (textSize.actualBoundingBoxAscent + textSize.actualBoundingBoxDescent) / 2,
       );
     }
 
-    for (let y = 0; y < grid.colHeight; y++) {
-      const mapY = this.computeLocationCoords(this.center, [grid.lineWidth, grid.colHeight], [0, y])[1];
+    for (let y = 0; y < this.grid.size[1]; y++) {
+      const mapY = this.computeLocationCoords(this.center, [this.grid.size[0], this.grid.size[1]], [0, y])[1];
       const text = `${mapY}`;
       const textSize = ctx.measureText(text);
       ctx.lineWidth = 1;
@@ -374,7 +418,7 @@ export class MapComponent implements OnInit {
       ctx.strokeText(
         text,
         MapComponent.MARGIN_SIZE / 2 - textSize.width / 2,
-        grid.yMin + (y + 0.5) * grid.cellHeight + (textSize.actualBoundingBoxAscent + textSize.actualBoundingBoxDescent) / 2,
+        this.grid.yMin + (y + 0.5) * this.grid.cellHeight + (textSize.actualBoundingBoxAscent + textSize.actualBoundingBoxDescent) / 2,
       );
     }
 
@@ -481,6 +525,8 @@ export class MapComponent implements OnInit {
 
       this.areaCenters[areaId] = [sumX / totalMass, sumY / totalMass];
     }
+
+    this.updateGridCaches();
   }
 
   private updateMarkerCaches() {
@@ -502,6 +548,73 @@ export class MapComponent implements OnInit {
       this.markersByPosition[marker.positionX][marker.positionY].push(marker);
     }
   }
+
+  private updateGridCaches() {
+    if (!this.layer0) {
+      this.grid = undefined;
+      return;
+    }
+
+    const cellWidth = MapComponent.CELL_WIDTH * this.zoom;
+    const cellHeight = MapComponent.CELL_HEIGHT * this.zoom;
+
+    const cellsInViewX = (this.layer0.nativeElement.width - MapComponent.MARGIN_SIZE) / cellWidth;
+    const cellsInViewY = (this.layer0.nativeElement.height - MapComponent.MARGIN_SIZE) / cellHeight;
+
+    const cellsInViewXCeiled = Math.ceil(cellsInViewX);
+    const cellsInViewYCeiled = Math.ceil(cellsInViewY);
+
+    const totalWidth = cellsInViewXCeiled * cellWidth;
+    const totalHeight = cellsInViewYCeiled * cellHeight;
+
+    const startAtX = Math.ceil((this.layer0.nativeElement.width - MapComponent.MARGIN_SIZE - totalWidth) / 2) + MapComponent.MARGIN_SIZE;
+    const startAtY = Math.ceil((this.layer0.nativeElement.height - MapComponent.MARGIN_SIZE - totalHeight) / 2) + MapComponent.MARGIN_SIZE;
+
+    this.grid = {
+      size: [Math.ceil(cellsInViewX), Math.ceil(cellsInViewY)],
+      cellWidth: cellWidth,
+      cellHeight: cellHeight,
+      width: cellsInViewXCeiled * cellWidth,
+      height: cellsInViewYCeiled * cellHeight,
+      xMin: startAtX,
+      yMin: startAtY,
+      xMax: startAtX + totalWidth,
+      yMax: startAtY + totalHeight,
+    };
+
+    this.cells = [];
+    for (let x = 0; x < this.grid.size[0]; x++) {
+      for (let y = 0; y < this.grid.size[1]; y++) {
+        const position = this.computeLocationCoords(this.center, this.grid.size, [x, y]);
+
+        if (!this.locationsByPosition[position[0]] || !this.locationsByPosition[position[0]][position[1]]) {
+          continue;
+        }
+
+        const location = this.locationsByPosition[position[0]][position[1]][0];
+        const cell = {
+          width: this.grid.cellWidth,
+          height: this.grid.cellHeight,
+          xMin: this.grid.xMin + x * this.grid.cellWidth,
+          xMax: this.grid.xMin + (x + 1) * this.grid.cellWidth,
+          yMin: this.grid.yMin + y * this.grid.cellHeight,
+          yMax: this.grid.yMin + (y + 1) * this.grid.cellHeight,
+          xCenter: this.grid.xMin + (x + 0.5) * this.grid.cellWidth,
+          yCenter: this.grid.yMin + (y + 0.5) * this.grid.cellHeight,
+          location,
+          adjacency: this.locationAreaAdjacencies[location.id],
+        };
+
+        this.cells.push(cell);
+
+        if (!this.cellByPosition[location.positionX]) {
+          this.cellByPosition[location.positionX] = {};
+        }
+
+        this.cellByPosition[location.positionX][location.positionY] = cell;
+      }
+    }
+  }
 }
 
 export interface MapMarker {
@@ -512,6 +625,7 @@ export interface MapMarker {
 }
 
 interface Grid {
+  size: [number, number];
   xMin: number;
   xMax: number;
   yMin: number;
@@ -520,8 +634,6 @@ interface Grid {
   height: number;
   cellWidth: number;
   cellHeight: number;
-  lineWidth: number;
-  colHeight: number;
 }
 
 interface Cell {
