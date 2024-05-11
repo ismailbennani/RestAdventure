@@ -29,8 +29,8 @@ public class SandboxGameBuilder
     public SandboxGameBuilder(ILoggerFactory loggerFactory)
     {
         MapGenerator = new MapGenerator(
-            new ErodedIslandGenerator(100, 100, 0.6),
-            new VoronoiPartitionGenerator(30, loggerFactory.CreateLogger<VoronoiPartitionGenerator>()),
+            new ErodedIslandGenerator(20, 20, 0.6),
+            new VoronoiPartitionGenerator(5, loggerFactory.CreateLogger<VoronoiPartitionGenerator>()),
             new KingdomZonesGenerator(),
             loggerFactory.CreateLogger<MapGenerator>()
         );
@@ -67,7 +67,7 @@ public class SandboxGameBuilder
         ExtractContent(scenario, Gatherer);
         ExtractContent(scenario, MapGeneratorResult.GeneratedMaps);
 
-        scenario.Spawners.Add(new RandomSpawner(new WholeMapSpawnerLocationSelector(), new StaticObjectSpawner { StaticObject = Gatherer.AppleTree }) { MaxCount = 5000 });
+        scenario.Spawners.Add(new RandomSpawner(new WholeMapSpawnerLocationSelector(), new StaticObjectSpawner { StaticObject = Gatherer.AppleTree }) { MaxCount = 500 });
         scenario.Spawners.Add(
             new RandomSpawner(
                 new WholeMapSpawnerLocationSelector(),
@@ -77,7 +77,7 @@ public class SandboxGameBuilder
                     TeamSize = (1, 3),
                     LevelBounds = (1, 9)
                 }
-            ) { MaxCountPerLocation = 1 }
+            ) { MaxCountPerLocation = 1, RespawnDelay = (5, 10) }
         );
         scenario.Spawners.Add(
             new RandomSpawner(
@@ -88,7 +88,7 @@ public class SandboxGameBuilder
                     TeamSize = (4, 6),
                     LevelBounds = (1, 9)
                 }
-            ) { MaxCountPerLocation = 1 }
+            ) { MaxCountPerLocation = 1, RespawnDelay = (5, 10) }
         );
         scenario.Spawners.Add(
             new RandomSpawner(
@@ -99,7 +99,7 @@ public class SandboxGameBuilder
                     TeamSize = (7, 8),
                     LevelBounds = (1, 9)
                 }
-            ) { MaxCountPerLocation = 1 }
+            ) { MaxCountPerLocation = 1, RespawnDelay = (5, 10) }
         );
 
         return scenario;
