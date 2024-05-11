@@ -5,15 +5,15 @@ import {
   Action,
   ArchivedCombat,
   CombatFormationAccessibility,
-  CombatFormationOptions,
   CombatInPreparation,
-  CombatInstance,
   CombatSide,
   CombatsApiClient,
   CombatsHistoryApiClient,
   CombatsInPreparationApiClient,
+  JoinPveCombatAction,
+  OngoingCombat,
   PveApiClient,
-  PveCombatAction,
+  StartPveCombatAction,
   TeamCharacter,
 } from '../../../../api/game-api-client.generated';
 import { GameService } from '../../services/game.service';
@@ -37,10 +37,10 @@ export class CharacterCombatsComponent implements OnInit {
     this.characterSubject.next(value);
   }
 
-  protected combats: CombatInstance[] = [];
+  protected combats: OngoingCombat[] = [];
   protected combatsInPreparation: CombatInPreparation[] = [];
   protected archivedCombats: ArchivedCombat[] = [];
-  protected selectedCombat: CombatInstance | undefined;
+  protected selectedCombat: OngoingCombat | undefined;
   protected selectedCombatInPreparation: CombatInPreparation | undefined;
   protected selectedArchivedCombat: ArchivedCombat | undefined;
 
@@ -63,18 +63,17 @@ export class CharacterCombatsComponent implements OnInit {
         switchMap(() => {
           return forkJoin({
             combats: this.combatsApiClient.getCombats(this.character.id),
-            combatsInPreparation: this.combatsInPreparationApiClient.getCombatsInPreparation(this.character.id),
             archivedCombats: this.combatsHistoryApiClient.searchArchivedCombats(this.character.id),
           });
         }),
         map(result => {
-          this.combats = result?.combats ?? [];
-          this.combatsInPreparation = result?.combatsInPreparation ?? [];
+          this.combats = result?.combats.filter(c => c instanceof OngoingCombat).map(c => c as OngoingCombat) ?? [];
+          this.combatsInPreparation = result?.combats.filter(c => c instanceof CombatInPreparation).map(c => c as CombatInPreparation) ?? [];
           this.archivedCombats = result?.archivedCombats.items ?? [];
 
           this.cachedValues = {};
           this.updateCachedValues(this.combats.map(c => ({ id: c.id, attackers: c.attackers, defenders: c.defenders })));
-          this.updateCachedValues(this.combatsInPreparation.map(c => ({ id: c.id, attackers: c.attackers.entities, defenders: c.defenders.entities })));
+          this.updateCachedValues(this.combatsInPreparation.map(c => ({ id: c.id, attackers: c.attackers, defenders: c.defenders })));
           this.updateCachedValues(this.archivedCombats.map(c => ({ id: c.id, attackers: c.attackers, defenders: c.defenders })));
 
           this.autoSelectCombatAfterRefresh();
@@ -83,7 +82,7 @@ export class CharacterCombatsComponent implements OnInit {
       .subscribe();
   }
 
-  selectCombat(combat: CombatInstance) {
+  selectCombat(combat: OngoingCombat) {
     this.selectedCombat = combat;
     this.selectedCombatInPreparation = undefined;
     this.selectedArchivedCombat = undefined;
@@ -107,22 +106,7 @@ export class CharacterCombatsComponent implements OnInit {
     this.selectedArchivedCombat = undefined;
   }
 
-  joinCombat(combat: CombatInPreparation) {
-    if (!this.character) {
-      return;
-    }
-
-    this.pveApiClient
-      .joinCombatInPreparation(this.character.id, combat.id)
-      .pipe(switchMap(() => this.gameService.refreshNow(true)))
-      .subscribe();
-  }
-
-  plansToJoinCombat(combat: CombatInPreparation) {
-    return this.character?.plannedAction && this.isCombatAction(this.character.plannedAction, combat);
-  }
-
-  isInCombat(combat: CombatInPreparation | CombatInstance) {
+  isInCombat(combat: CombatInPreparation | OngoingCombat) {
     return this.character?.ongoingAction && this.isCombatAction(this.character.ongoingAction, combat);
   }
 
@@ -131,15 +115,14 @@ export class CharacterCombatsComponent implements OnInit {
       return;
     }
 
-    const newOptions = new CombatFormationOptions({ ...combat.attackers.options, accessibility: accessibility });
     this.combatsInPreparationApiClient
-      .setCombatInPreparationOptions(this.character.id, combat.id, CombatSide.Attackers, newOptions)
+      .setCombatInPreparationAccessibility(this.character.id, combat.id, CombatSide.Attackers, accessibility)
       .pipe(switchMap(() => this.gameService.refreshNow(true)))
       .subscribe();
   }
 
-  private isCombatAction(action: Action, combat: CombatInPreparation | CombatInstance) {
-    return action instanceof PveCombatAction && action.combatId === combat.id;
+  private isCombatAction(action: Action, combat: CombatInPreparation | OngoingCombat) {
+    return action instanceof StartPveCombatAction || (action instanceof JoinPveCombatAction && action.combat.id === combat.id);
   }
 
   private autoSelectCombatAfterRefresh() {
@@ -171,7 +154,7 @@ export class CharacterCombatsComponent implements OnInit {
     }
 
     const combatInPreparationInvolvingCharacter = this.combatsInPreparation.find(
-      c => c.attackers.entities.some(e => e.id === this.character.id) || c.defenders.entities.some(e => e.id === this.character.id),
+      c => c.attackers.some(e => e.id === this.character.id) || c.defenders.some(e => e.id === this.character.id),
     );
     if (combatInPreparationInvolvingCharacter) {
       this.selectCombatInPreparation(combatInPreparationInvolvingCharacter);

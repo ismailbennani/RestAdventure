@@ -1,6 +1,6 @@
 <div class="w-100 h-100 border">
   <div class="p-2">
-    <h6 class="m-0" [class.fw-bold]="plansToAttack()">Monsters</h6>
+    <h6 class="m-0" [class.fw-bold]="plansToAttackOrJoin()">Monsters</h6>
   </div>
   <hr class="m-0" />
   <ul class="list-group list-group-flush">
@@ -8,7 +8,7 @@
       @for (monsterGroup of monsterGroups; track monsterGroup.id) {
         <ng-container
           [ngTemplateOutlet]="monsterGroupListItem"
-          [ngTemplateOutletContext]="{ monsterGroup, plansToAttack: plansToAttack(monsterGroup), isAttacking: isAttacking(monsterGroup) }"
+          [ngTemplateOutletContext]="{ monsterGroup, plansToAttackOrJoin: plansToAttackOrJoin(monsterGroup), isAttacking: isAttacking(monsterGroup) }"
         ></ng-container>
       }
     } @else {
@@ -17,8 +17,8 @@
   </ul>
 </div>
 
-<ng-template #monsterGroupListItem let-monsterGroup="monsterGroup" let-plansToAttack="plansToAttack" let-isAttacking="isAttacking">
-  <li class="list-group-item" [class.text-danger]="!monsterGroup.canAttack && !isAttacking">
+<ng-template #monsterGroupListItem let-monsterGroup="monsterGroup" let-plansToAttackOrJoin="plansToAttackOrJoin" let-isAttacking="isAttacking">
+  <li class="list-group-item" [class.text-danger]="!monsterGroup.canAttackOrJoin && !isAttacking">
     <div>
       <span class="fw-semibold">Lv.{{ monsterGroup.totalLevel }}: </span>
       <span class="small">{{ monsterGroup.expectedExperience }} exp</span>
@@ -29,15 +29,27 @@
     <div class="mt-2 d-flex justify-content-end">
       @if (isAttacking) {
         <a class="btn btn-primary stretched-link small">In combat</a>
-      } @else if (plansToAttack) {
-        <a class="btn btn-primary stretched-link small">Attack</a>
-      } @else if (monsterGroup.canAttack) {
-        <a class="btn btn-outline-secondary stretched-link small" (click)="attack(monsterGroup)">Attack</a>
+      } @else if (plansToAttackOrJoin) {
+        <a class="btn btn-primary stretched-link small">
+          @if (monsterGroup.attacked) {
+            Join
+          } @else {
+            Attack
+          }
+        </a>
+      } @else if (monsterGroup.canAttackOrJoin) {
+        <a class="btn btn-outline-secondary stretched-link small" (click)="attack(monsterGroup)">
+          @if (monsterGroup.attacked) {
+            Join
+          } @else {
+            Attack
+          }
+        </a>
       }
     </div>
-    @if (!isAttacking && !monsterGroup.canAttack) {
-      <span class="small text-truncate" [title]="monsterGroup.whyCannotAttack">
-        {{ monsterGroup.whyCannotAttack }}
+    @if (!isAttacking && !monsterGroup.canAttackOrJoin) {
+      <span class="small text-truncate" [title]="monsterGroup.whyCannotAttackOrJoin">
+        {{ monsterGroup.whyCannotAttackOrJoin }}
       </span>
     }
   </li>

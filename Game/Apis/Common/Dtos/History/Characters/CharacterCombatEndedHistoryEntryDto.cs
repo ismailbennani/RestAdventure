@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using RestAdventure.Core.Combat;
+using RestAdventure.Core.Combat.Old;
 using RestAdventure.Core.History.Characters;
 using RestAdventure.Game.Apis.Common.Dtos.History.Common;
 

@@ -1,10 +1,12 @@
 ﻿using MediatR;
 using RestAdventure.Core.Combat;
 using RestAdventure.Core.Combat.Notifications;
+using RestAdventure.Core.Combat.Old;
 using RestAdventure.Core.Entities;
 using RestAdventure.Core.Entities.Characters;
 using RestAdventure.Core.Maps.Areas;
 using RestAdventure.Core.Maps.Locations;
+using CombatInstance = RestAdventure.Core.Combat.CombatInstance;
 
 namespace RestAdventure.Core.History.Characters;
 
@@ -49,7 +51,7 @@ public class CreateCharacterEndedCombatHistoryEntry : INotificationHandler<Comba
     {
         GameState state = _gameService.RequireGameState();
 
-        foreach (IGameEntityWithCombatStatistics entity in notification.Combat.Attackers.Entities.Concat(notification.Combat.Defenders.Entities))
+        foreach (IGameEntityWithCombatCapabilities entity in notification.Combat.Attackers.Entities.Concat(notification.Combat.Defenders.Entities))
         {
             if (entity is not Character character)
             {

@@ -2,9 +2,10 @@
 using NSwag.Annotations;
 using RestAdventure.Core;
 using RestAdventure.Core.Combat;
+using RestAdventure.Core.Combat.Old;
+using RestAdventure.Core.Combat.Options;
 using RestAdventure.Core.Entities.Characters;
 using RestAdventure.Core.Players;
-using RestAdventure.Game.Apis.Common.Dtos.Combats;
 using RestAdventure.Game.Authentication;
 using RestAdventure.Kernel.Errors;
 
@@ -13,7 +14,7 @@ namespace RestAdventure.Game.Apis.GameApi.Controllers;
 /// <summary>
 ///     Combats in preparation operations
 /// </summary>
-[Route("game/team/characters/{characterGuid:guid}/combats/in-preparation")]
+[Route("game/team/characters/{characterGuid:guid}/combats/preparation")]
 [OpenApiTag("Combats")]
 public class CombatsInPreparationController : GameApiController
 {
@@ -27,37 +28,13 @@ public class CombatsInPreparationController : GameApiController
     }
 
     /// <summary>
-    ///     Get combats in preparation
-    /// </summary>
-    [HttpGet]
-    [ProducesResponseType<IReadOnlyCollection<CombatInPreparationDto>>(StatusCodes.Status200OK)]
-    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
-    public ActionResult<IReadOnlyCollection<CombatInPreparationDto>> GetCombatsInPreparation(Guid characterGuid)
-    {
-        GameState state = _gameService.RequireGameState();
-        Player player = ControllerContext.RequirePlayer(state);
-
-        CharacterId characterId = new(characterGuid);
-        Character? character = state.Entities.Get<Character>(characterId);
-
-        if (character == null || character.Player != player)
-        {
-            return BadRequest();
-        }
-
-        IEnumerable<CombatInPreparation> combats = state.Combats.GetCombatInPreparationAtLocation(character.Location);
-        return combats.Select(c => c.ToDto(c.Attackers.CanJoin(character))).ToArray();
-    }
-
-    /// <summary>
     ///     Set combat in preparation options
     /// </summary>
-    [HttpPost("{combatGuid:guid}/{side}/options")]
+    [HttpPost("{combatGuid:guid}/{side}/options/accessibility")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
-    public ActionResult SetCombatInPreparationOptions(Guid characterGuid, Guid combatGuid, CombatSide side, CombatFormationOptionsDto options)
+    public ActionResult SetCombatInPreparationAccessibility(Guid characterGuid, Guid combatGuid, CombatSide side, CombatFormationAccessibility value)
     {
         GameState state = _gameService.RequireGameState();
         Player player = ControllerContext.RequirePlayer(state);
@@ -71,13 +48,14 @@ public class CombatsInPreparationController : GameApiController
         }
 
         CombatInstanceId combatId = new(combatGuid);
-        CombatInPreparation? combatInPreparation = state.Combats.GetCombatInPreparation(combatId);
-        if (combatInPreparation == null || combatInPreparation.Location != character.Location)
+        CombatInstance? combat = state.Combats.GetCombat(combatId);
+        if (combat == null || combat.Location != character.Location)
         {
             return NotFound();
         }
 
-        Maybe performed = combatInPreparation.GetTeam(side).SetOptions(character, options.ToBusiness());
+        CombatFormation formation = combat.GetTeam(side);
+        Maybe performed = formation.SetOptions(character, new CombatFormationOptions { Accessibility = value, MaxCount = formation.Options.MaxCount });
         if (!performed.Success)
         {
             return Problem(performed.WhyNot, statusCode: StatusCodes.Status400BadRequest);

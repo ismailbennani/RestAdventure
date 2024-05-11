@@ -10,7 +10,7 @@ namespace RestAdventure.Core.History.Characters;
 
 public class CharacterStartedCombatPreparationHistoryEntry : CharacterHistoryEntry
 {
-    public CharacterStartedCombatPreparationHistoryEntry(Character character, CombatInPreparation combat, long tick) : base(character, tick)
+    public CharacterStartedCombatPreparationHistoryEntry(Character character, CombatInstance combat, long tick) : base(character, tick)
     {
         CombatInstanceId = combat.Id;
         LocationId = combat.Location.Id;
@@ -45,7 +45,7 @@ public class CreateCharacterStartedCombatPreparationHistoryEntry : INotification
     {
         GameState state = _gameService.RequireGameState();
 
-        foreach (IGameEntityWithCombatStatistics entity in notification.Combat.Attackers.Entities.Concat(notification.Combat.Defenders.Entities))
+        foreach (IGameEntityWithCombatCapabilities entity in notification.Combat.Attackers.Entities.Concat(notification.Combat.Defenders.Entities))
         {
             if (entity is not Character character)
             {

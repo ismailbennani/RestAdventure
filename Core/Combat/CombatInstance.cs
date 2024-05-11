@@ -1,190 +1,233 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using RestAdventure.Core.Entities;
+﻿using RestAdventure.Core.Combat.Old;
+using RestAdventure.Core.Combat.Options;
 using RestAdventure.Core.Maps.Locations;
+using RestAdventure.Kernel.Errors;
 
 namespace RestAdventure.Core.Combat;
 
 public record CombatInstanceId(Guid Guid);
 
-public class CombatInstance : IDisposable
+public class CombatInstance
 {
-    readonly GameSettings _settings;
-    readonly Dictionary<GameEntityId, EntityState> _states;
+    readonly Dictionary<IGameEntityWithCombatCapabilities, IReadOnlyCollection<EntityState>> _entities = new();
+    CombatFormationOptions? _attackersOptionsToSet;
+    CombatFormationOptions? _defendersOptionsToSet;
 
-    internal CombatInstance(CombatInPreparation combatInPreparation)
+    public CombatInstance(
+        IEnumerable<IGameEntityWithCombatCapabilities> attackers,
+        CombatFormationOptions attackersOptions,
+        IEnumerable<IGameEntityWithCombatCapabilities> defenders,
+        CombatFormationOptions defendersOptions,
+        CombatOptions options
+    )
     {
-        Id = combatInPreparation.Id;
-        Location = combatInPreparation.Location;
-        CombatFormation attackers = combatInPreparation.Attackers.Lock();
-        CombatFormation defenders = combatInPreparation.Defenders.Lock();
-
-        if (!attackers.Entities.Any(e => e.CombatStatistics.Health > 0))
-        {
-            throw new ArgumentException("Team 1 cannot be empty", nameof(combatInPreparation));
-        }
-
-        if (!defenders.Entities.Any(e => e.CombatStatistics.Health > 0))
-        {
-            throw new ArgumentException("Team 2 cannot be empty", nameof(combatInPreparation));
-        }
-
-        _settings = combatInPreparation.Settings;
-
-        Attackers = attackers;
-        Defenders = defenders;
-
-        _states = new Dictionary<GameEntityId, EntityState>();
-
-        foreach (IGameEntityWithCombatStatistics entity in attackers.Entities)
-        {
-            _states[entity.Id] = new EntityState(entity, CombatSide.Attackers);
-        }
-
-        foreach (IGameEntityWithCombatStatistics entity in defenders.Entities)
-        {
-            _states[entity.Id] = new EntityState(entity, CombatSide.Defenders);
-        }
+        Options = options;
+        Attackers = new CombatFormation(this, attackers, attackersOptions);
+        Defenders = new CombatFormation(this, defenders, defendersOptions);
+        Phase = CombatPhase.Preparation;
+        Location = Attackers.Owner.Location;
     }
 
-    public CombatInstanceId Id { get; }
-    public Location Location { get; }
-    public CombatFormation Attackers { get; }
-    public CombatFormation Defenders { get; }
-
+    public CombatInstanceId Id { get; } = new(Guid.NewGuid());
+    public CombatPhase Phase { get; private set; }
     public int Turn { get; private set; }
+    public Location Location { get; set; }
+    public CombatOptions Options { get; }
+    public CombatFormation Attackers { get; private set; }
+    public CombatFormation Defenders { get; private set; }
 
-    [MemberNotNullWhen(true, nameof(Winner))]
-    public bool Over { get; private set; }
+    public IReadOnlyList<ICombatEntity> AttackerCombatEntities =>
+        _entities.Values.SelectMany(e => e).Where(e => e.Side == CombatSide.Attackers).OrderBy(e => e.Position).Select(e => e.Entity).ToArray();
+
+    public IReadOnlyList<ICombatEntity> DefenderCombatEntities =>
+        _entities.Values.SelectMany(e => e).Where(e => e.Side == CombatSide.Defenders).OrderBy(e => e.Position).Select(e => e.Entity).ToArray();
 
     public CombatSide? Winner { get; private set; }
 
-    public event EventHandler<CombatEntityAttackedEvent>? Attacked;
-    public event EventHandler<CombatEntityDiedEvent>? Died;
+    public event EventHandler? Started;
+    public event EventHandler<CombatEntityAttackedEvent>? CombatEntityAttacked;
+    public event EventHandler<CombatEntityDiedEvent>? CombatEntityDied;
+    public event EventHandler? Ended;
 
-    IEnumerable<EntityState> Alive => _states.Values.Where(s => s.Entity.CombatStatistics.Health > 0);
+    public Maybe Tick()
+    {
+        switch (Phase)
+        {
+            case CombatPhase.Preparation:
+                TickInPreparation();
+                return true;
+            case CombatPhase.Combat:
+                TickInCombat();
+                return true;
+            case CombatPhase.End:
+                return "Combat is over";
+            default:
+                throw new ArgumentOutOfRangeException(nameof(Phase), Phase, null);
+        }
+    }
 
-    public async Task PlayTurnAsync()
+    public CombatFormation GetTeam(CombatSide side) =>
+        side switch
+        {
+            CombatSide.Attackers => Attackers,
+            CombatSide.Defenders => Defenders,
+            _ => throw new ArgumentOutOfRangeException(nameof(side), side, null)
+        };
+
+    void TickInPreparation()
     {
         Turn++;
 
-        List<EntityState> alive = Alive.ToList();
-
-        foreach (EntityState entityState in alive)
+        if (_attackersOptionsToSet != null)
         {
-            entityState.Lead += entityState.Entity.CombatStatistics.Speed;
+            Attackers.SetOptions(Attackers.Owner, _attackersOptionsToSet);
+            _attackersOptionsToSet = null;
         }
 
-        int subTurn = 1;
+        if (_defendersOptionsToSet != null)
+        {
+            Defenders.SetOptions(Defenders.Owner, _defendersOptionsToSet);
+            _defendersOptionsToSet = null;
+        }
+
+        if (Turn >= Options.PreparationPhaseDuration)
+        {
+            Start();
+        }
+    }
+
+    void TickInCombat()
+    {
+        Turn++;
+
+        List<EntityState> attackerEntities = Attackers.Entities.SelectMany(a => _entities[a]).Where(a => a.Entity.Health > 0).OrderBy(c => c.Position).ToList();
+        List<EntityState> defenderEntities = Defenders.Entities.SelectMany(a => _entities[a]).Where(a => a.Entity.Health > 0).OrderBy(c => c.Position).ToList();
+
+        foreach (EntityState entityState in attackerEntities.Concat(defenderEntities))
+        {
+            entityState.Lead += entityState.Entity.Speed;
+        }
+
+        int subTurn = 0;
         while (true)
         {
-            EntityState? next = Alive.Where(s => s.Lead > 0).MaxBy(s => s.Lead);
+            EntityState? next = attackerEntities.Concat(defenderEntities).Where(s => s.Lead > 0).MaxBy(s => s.Lead);
             if (next == null)
             {
                 break;
             }
 
-            CombatFormation otherFormation = GetTeam(next.Team.OtherSide());
-            IGameEntityWithCombatStatistics target = otherFormation.Entities.First(e => e.CombatStatistics.Health > 0);
-
-            await ResolveAttackAsync(subTurn, next.Entity, target);
-
-            foreach (EntityState entity in alive.ToArray())
+            List<EntityState> otherTeam = next.Side switch
             {
-                if (entity.Entity.CombatStatistics.Health > 0)
+                CombatSide.Attackers => defenderEntities,
+                CombatSide.Defenders => attackerEntities,
+                _ => throw new ArgumentOutOfRangeException()
+            };
+
+            EntityState target = otherTeam.First();
+
+            CombatEntityAttack damageToDeal = next.Entity.DealAttack();
+            CombatEntityAttack damageReceived = target.Entity.ReceiveAttack(damageToDeal);
+
+            CombatEntityAttacked?.Invoke(
+                this,
+                new CombatEntityAttackedEvent { SubTurn = subTurn, Attacker = next.Entity, Target = target.Entity, AttackDealt = damageToDeal, AttackReceived = damageReceived }
+            );
+
+            foreach (EntityState entity in attackerEntities.ToArray())
+            {
+                if (entity.Entity.Health <= 0)
                 {
-                    continue;
+                    attackerEntities.Remove(entity);
+                    CombatEntityDied?.Invoke(this, new CombatEntityDiedEvent { SubTurn = subTurn, Attacker = next.Entity, Entity = entity.Entity });
                 }
-
-                Died?.Invoke(this, new CombatEntityDiedEvent { SubTurn = subTurn, Attacker = next.Entity, Entity = entity.Entity });
-                alive.Remove(entity);
             }
 
-            if (EvaluateWinCondition())
+            if (attackerEntities.Count == 0)
             {
-                return;
+                End(CombatSide.Defenders);
+                break;
             }
 
-            next.Lead -= _settings.Combat.CombatTurnDuration;
+            foreach (EntityState entity in defenderEntities.ToArray())
+            {
+                if (entity.Entity.Health <= 0)
+                {
+                    defenderEntities.Remove(entity);
+                    CombatEntityDied?.Invoke(this, new CombatEntityDiedEvent { SubTurn = subTurn, Attacker = next.Entity, Entity = entity.Entity });
+                }
+            }
+            if (defenderEntities.Count == 0)
+            {
+                End(CombatSide.Attackers);
+                break;
+            }
 
+            next.Lead -= Options.CombatTurnDuration;
             subTurn++;
         }
-
     }
 
-    public CombatFormation GetTeam(CombatSide team) =>
-        team switch
-        {
-            CombatSide.Attackers => Attackers,
-            CombatSide.Defenders => Defenders,
-            _ => throw new ArgumentOutOfRangeException(nameof(team), team, null)
-        };
-
-    Task ResolveAttackAsync(int subTurn, IGameEntityWithCombatStatistics attacker, IGameEntityWithCombatStatistics target)
+    void Start()
     {
-        EntityAttack damageToDeal = attacker.CombatStatistics.DealAttack();
-        EntityAttack damageReceived = target.CombatStatistics.ReceiveAttack(damageToDeal);
-
-        Attacked?.Invoke(
-            this,
-            new CombatEntityAttackedEvent { SubTurn = subTurn, Attacker = attacker, Target = target, AttackDealt = damageToDeal, AttackReceived = damageReceived }
-        );
-
-        return Task.CompletedTask;
-    }
-
-    bool EvaluateWinCondition()
-    {
-        if (HasLost(Attackers))
+        foreach (IGameEntityWithCombatCapabilities gameEntity in Attackers.Entities)
         {
-            Winner = CombatSide.Defenders;
-            Over = true;
-            return true;
+            IEnumerable<ICombatEntity> combatEntities = gameEntity.SpawnCombatEntities();
+            _entities[gameEntity] = combatEntities.Select(e => new EntityState(e, CombatSide.Attackers)).ToList();
         }
 
-        if (HasLost(Defenders))
+        foreach (IGameEntityWithCombatCapabilities gameEntity in Defenders.Entities)
         {
-            Winner = CombatSide.Attackers;
-            Over = true;
-            return true;
+            IEnumerable<ICombatEntity> combatEntities = gameEntity.SpawnCombatEntities();
+            _entities[gameEntity] = combatEntities.Select(e => new EntityState(e, CombatSide.Defenders)).ToList();
         }
 
-        return false;
+        Phase = CombatPhase.Combat;
+        Turn = 0;
+
+        Started?.Invoke(this, EventArgs.Empty);
     }
 
-    static bool HasLost(CombatFormation team) => team.Entities.All(c => c.CombatStatistics.Health <= 0);
+    void End(CombatSide winner)
+    {
+        Winner = winner;
+        Phase = CombatPhase.End;
+
+        foreach ((IGameEntityWithCombatCapabilities gameEntity, IReadOnlyCollection<EntityState> entities) in _entities)
+        {
+            gameEntity.DestroyCombatEntities(entities.Select(e => e.Entity));
+        }
+
+        Ended?.Invoke(this, EventArgs.Empty);
+    }
 
     class EntityState
     {
-        public EntityState(IGameEntityWithCombatStatistics entity, CombatSide team)
+        public EntityState(ICombatEntity entity, CombatSide side)
         {
             Entity = entity;
-            Team = team;
+            Side = side;
         }
 
-        public IGameEntityWithCombatStatistics Entity { get; }
-        public CombatSide Team { get; }
+        public ICombatEntity Entity { get; }
+        public CombatSide Side { get; }
+        public int Position { get; set; }
         public int Lead { get; set; }
-    }
-
-    public void Dispose()
-    {
-        Attacked = null;
-        GC.SuppressFinalize(this);
     }
 }
 
 public class CombatEntityAttackedEvent
 {
     public required int SubTurn { get; init; }
-    public required IGameEntityWithCombatStatistics Attacker { get; init; }
-    public required IGameEntityWithCombatStatistics Target { get; init; }
-    public required EntityAttack AttackDealt { get; init; }
-    public required EntityAttack AttackReceived { get; init; }
+    public required ICombatEntity Attacker { get; init; }
+    public required ICombatEntity Target { get; init; }
+    public required CombatEntityAttack AttackDealt { get; init; }
+    public required CombatEntityAttack AttackReceived { get; init; }
 }
 
 public class CombatEntityDiedEvent
 {
     public required int SubTurn { get; init; }
-    public required IGameEntityWithCombatStatistics Attacker { get; init; }
-    public required IGameEntityWithCombatStatistics Entity { get; init; }
+    public required ICombatEntity Attacker { get; init; }
+    public required ICombatEntity Entity { get; init; }
 }

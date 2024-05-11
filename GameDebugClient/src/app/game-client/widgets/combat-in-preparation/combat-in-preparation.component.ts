@@ -17,8 +17,8 @@ export class CombatInPreparationComponent {
   }
   public set combat(value: CombatInPreparation) {
     this._combat = value;
-    this.attackers = [...value.attackers.entities].reverse();
-    this.defenders = value.defenders.entities;
+    this.attackers = [...value.attackers].reverse();
+    this.defenders = value.defenders;
   }
   private _combat: CombatInPreparation = null!;
 

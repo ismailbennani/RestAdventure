@@ -9,7 +9,7 @@
         @for (accessibilityOption of accessiblityOptions; track accessibilityOption.id) {
           <button
             class="btn"
-            [ngClass]="combat.attackers.options.accessibility === accessibilityOption.value ? 'btn-secondary' : 'btn-outline-secondary'"
+            [ngClass]="combat.attackersOptions.accessibility === accessibilityOption.value ? 'btn-secondary' : 'btn-outline-secondary'"
             (click)="setAccessibility(accessibilityOption.value)"
           >
             {{ accessibilityOption.displayValue }}

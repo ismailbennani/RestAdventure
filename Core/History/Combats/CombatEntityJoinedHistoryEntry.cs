@@ -1,13 +1,14 @@
 ﻿using MediatR;
 using RestAdventure.Core.Combat;
 using RestAdventure.Core.Combat.Notifications;
+using RestAdventure.Core.Combat.Old;
 using RestAdventure.Core.Entities;
 
 namespace RestAdventure.Core.History.Combats;
 
 public class CombatEntityJoinedHistoryEntry : CombatHistoryEntry
 {
-    public CombatEntityJoinedHistoryEntry(CombatInPreparation combat, IGameEntityWithCombatStatistics entity, CombatSide side, long tick) : base(combat, tick)
+    public CombatEntityJoinedHistoryEntry(CombatInstance combat, IGameEntityWithCombatCapabilities entity, CombatSide side, long tick) : base(combat, tick)
     {
         EntityId = entity.Id;
         EntityName = entity.Name;
@@ -19,7 +20,7 @@ public class CombatEntityJoinedHistoryEntry : CombatHistoryEntry
     public CombatSide Side { get; }
 }
 
-public class CreateCombatEntityJoinedHistoryEntry : INotificationHandler<CombatInPreparationEntityAdded>
+public class CreateCombatEntityJoinedHistoryEntry : INotificationHandler<EntityJoinedCombat>
 {
     readonly GameService _gameService;
 
@@ -28,10 +29,10 @@ public class CreateCombatEntityJoinedHistoryEntry : INotificationHandler<CombatI
         _gameService = gameService;
     }
 
-    public Task Handle(CombatInPreparationEntityAdded notification, CancellationToken cancellationToken)
+    public Task Handle(EntityJoinedCombat notification, CancellationToken cancellationToken)
     {
         GameState state = _gameService.RequireGameState();
-        CombatEntityJoinedHistoryEntry entry = new(notification.CombatInPreparation, notification.Entity, notification.Side, state.Tick);
+        CombatEntityJoinedHistoryEntry entry = new(notification.Combat, notification.Entity, notification.Side, state.Tick);
         state.History.Record(entry);
         return Task.CompletedTask;
     }

@@ -29,10 +29,10 @@ public class CombatsController : GameApiController
     ///     Get combats
     /// </summary>
     [HttpGet]
-    [ProducesResponseType<IReadOnlyCollection<CombatInstanceDto>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<IReadOnlyCollection<CombatDto>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
-    public ActionResult<IReadOnlyCollection<CombatInstanceDto>> GetCombats(Guid characterGuid)
+    public ActionResult<IReadOnlyCollection<CombatDto>> GetCombats(Guid characterGuid)
     {
         GameState state = _gameService.RequireGameState();
         Player player = ControllerContext.RequirePlayer(state);

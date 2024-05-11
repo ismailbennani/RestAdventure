@@ -7,7 +7,7 @@ namespace RestAdventure.Game.Apis.Common.Dtos.Combats;
 /// <summary>
 ///     Entity in combat
 /// </summary>
-public class EntityInCombatDto : EntityMinimalDto
+public class CombatEntityDto : EntityMinimalDto
 {
     /// <summary>
     ///     The level of the character
@@ -16,20 +16,27 @@ public class EntityInCombatDto : EntityMinimalDto
     public required int Level { get; init; }
 
     /// <summary>
-    ///     The combat statistics of the character
+    ///     The health of the entity
     /// </summary>
     [Required]
-    public required EntityCombatStatisticsDto Combat { get; init; }
+    public required int Health { get; init; }
+
+    /// <summary>
+    ///     The max health of the entity
+    /// </summary>
+    [Required]
+    public required int MaxHealth { get; init; }
 }
 
 static class EntityInCombatMappingExtensions
 {
-    public static EntityInCombatDto ToEntityInCombatDto(this IGameEntityWithCombatStatistics entity) =>
+    public static CombatEntityDto ToDto(this ICombatEntity entity) =>
         new()
         {
             Id = entity.Id.Guid,
             Name = entity.Name,
             Level = entity.Level,
-            Combat = entity.CombatStatistics.ToDto()
+            Health = entity.Health,
+            MaxHealth = entity.MaxHealth
         };
 }

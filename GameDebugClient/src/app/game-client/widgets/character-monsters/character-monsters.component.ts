@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { ReplaySubject, switchMap, tap } from 'rxjs';
-import { Action, IMonsterGroup, PveApiClient, PveCombatAction, TeamCharacter } from '../../../../api/game-api-client.generated';
+import { Action, IMonsterGroup, JoinPveCombatAction, PveApiClient, StartPveCombatAction, TeamCharacter } from '../../../../api/game-api-client.generated';
 import { GameService } from '../../services/game.service';
 
 @Component({
@@ -46,17 +46,24 @@ export class CharacterMonstersComponent implements OnInit {
   }
 
   attack(monsterGroup: IMonsterGroup) {
-    if (!this.character || !monsterGroup.canAttack) {
+    if (!this.character || !monsterGroup.canAttackOrJoin) {
       return;
     }
 
-    this.pveApiClient
-      .attackMonsters(this.character.id, monsterGroup.id)
-      .pipe(switchMap(_ => this.gameService.refreshNow(true)))
-      .subscribe();
+    if (monsterGroup.attacked) {
+      this.pveApiClient
+        .joinCombat(this.character.id, monsterGroup.id)
+        .pipe(switchMap(_ => this.gameService.refreshNow(true)))
+        .subscribe();
+    } else {
+      this.pveApiClient
+        .attackMonsters(this.character.id, monsterGroup.id)
+        .pipe(switchMap(_ => this.gameService.refreshNow(true)))
+        .subscribe();
+    }
   }
 
-  plansToAttack(monsterGroup?: IMonsterGroup) {
+  plansToAttackOrJoin(monsterGroup?: IMonsterGroup) {
     return this.character?.plannedAction && this.isCombatAction(this.character.plannedAction, monsterGroup);
   }
 
@@ -65,7 +72,7 @@ export class CharacterMonstersComponent implements OnInit {
   }
 
   private isCombatAction(action: Action, monsterGroup?: IMonsterGroup) {
-    if (!(action instanceof PveCombatAction)) {
+    if (!(action instanceof StartPveCombatAction) && !(action instanceof JoinPveCombatAction)) {
       return false;
     }
 

@@ -2,6 +2,20 @@
 
 public class CombatFormationOptions
 {
-    public static CombatFormationOptions Default { get; } = new();
-    public CombatFormationAccessibility Accessibility { get; init; } = CombatFormationAccessibility.Everyone;
+    public required CombatFormationAccessibility Accessibility { get; init; }
+    public required int MaxCount { get; init; }
+
+    public static CombatFormationOptions DefaultCharacterTeamOptions(GameState state) =>
+        new()
+        {
+            Accessibility = CombatFormationAccessibility.Everyone,
+            MaxCount = state.Settings.Combat.MaxCharacterTeamSize
+        };
+
+    public static CombatFormationOptions DefaultMonsterTeamOptions(GameState state) =>
+        new()
+        {
+            Accessibility = CombatFormationAccessibility.Everyone,
+            MaxCount = state.Settings.Combat.MaxMonsterTeamSize
+        };
 }

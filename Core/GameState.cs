@@ -50,7 +50,6 @@ public class GameState : IDisposable
     {
         Players.Dispose();
         Entities.Dispose();
-        Combats.Dispose();
         GC.SuppressFinalize(this);
     }
 }

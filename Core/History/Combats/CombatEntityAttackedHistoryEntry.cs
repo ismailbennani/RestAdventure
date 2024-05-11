@@ -1,19 +1,14 @@
 ﻿using MediatR;
 using RestAdventure.Core.Combat;
 using RestAdventure.Core.Combat.Notifications;
-using RestAdventure.Core.Entities;
+using RestAdventure.Core.Combat.Old;
+using CombatInstance = RestAdventure.Core.Combat.CombatInstance;
 
 namespace RestAdventure.Core.History.Combats;
 
 public class CombatEntityAttackedHistoryEntry : CombatHistoryEntry
 {
-    public CombatEntityAttackedHistoryEntry(
-        CombatInstance combat,
-        IGameEntityWithCombatStatistics attacker,
-        EntityAttack attack,
-        IGameEntityWithCombatStatistics target,
-        long tick
-    ) : base(combat, tick)
+    public CombatEntityAttackedHistoryEntry(CombatInstance combat, ICombatEntity attacker, CombatEntityAttack attack, ICombatEntity target, long tick) : base(combat, tick)
     {
         AttackerId = attacker.Id;
         AttackerName = attacker.Name;
@@ -22,9 +17,9 @@ public class CombatEntityAttackedHistoryEntry : CombatHistoryEntry
         Damage = attack.Damage;
     }
 
-    public GameEntityId AttackerId { get; }
+    public CombatEntityId AttackerId { get; }
     public string AttackerName { get; }
-    public GameEntityId TargetId { get; }
+    public CombatEntityId TargetId { get; }
     public string TargetName { get; }
     public int Damage { get; }
 }

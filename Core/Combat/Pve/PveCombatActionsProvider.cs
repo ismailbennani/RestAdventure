@@ -12,7 +12,14 @@ public class PveCombatActionsProvider : IActionsProvider
         IEnumerable<MonsterGroup> groups = state.Entities.AtLocation<MonsterGroup>(character.Location);
         foreach (MonsterGroup group in groups)
         {
-            yield return group.CombatAction;
+            if (group.JoinCombatAction != null)
+            {
+                yield return group.JoinCombatAction;
+            }
+            else
+            {
+                yield return group.StartCombatAction;
+            }
         }
     }
 }

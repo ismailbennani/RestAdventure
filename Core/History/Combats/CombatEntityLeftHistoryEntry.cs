@@ -1,13 +1,14 @@
 ﻿using MediatR;
 using RestAdventure.Core.Combat;
 using RestAdventure.Core.Combat.Notifications;
+using RestAdventure.Core.Combat.Old;
 using RestAdventure.Core.Entities;
 
 namespace RestAdventure.Core.History.Combats;
 
 public class CombatEntityLeftHistoryEntry : CombatHistoryEntry
 {
-    public CombatEntityLeftHistoryEntry(CombatInPreparation combat, IGameEntityWithCombatStatistics entity, CombatSide side, long tick) : base(combat, tick)
+    public CombatEntityLeftHistoryEntry(CombatInstance combat, IGameEntityWithCombatCapabilities entity, CombatSide side, long tick) : base(combat, tick)
     {
         EntityId = entity.Id;
         EntityName = entity.Name;
@@ -19,7 +20,7 @@ public class CombatEntityLeftHistoryEntry : CombatHistoryEntry
     public CombatSide Side { get; }
 }
 
-public class CreateCombatEntityLeftHistoryEntry : INotificationHandler<CombatInPreparationEntityRemoved>
+public class CreateCombatEntityLeftHistoryEntry : INotificationHandler<EntityLeftCombat>
 {
     readonly GameService _gameService;
 
@@ -28,10 +29,10 @@ public class CreateCombatEntityLeftHistoryEntry : INotificationHandler<CombatInP
         _gameService = gameService;
     }
 
-    public Task Handle(CombatInPreparationEntityRemoved notification, CancellationToken cancellationToken)
+    public Task Handle(EntityLeftCombat notification, CancellationToken cancellationToken)
     {
         GameState state = _gameService.RequireGameState();
-        CombatEntityLeftHistoryEntry entry = new(notification.CombatInPreparation, notification.Entity, notification.Side, state.Tick);
+        CombatEntityLeftHistoryEntry entry = new(notification.Combat, notification.Entity, notification.Side, state.Tick);
         state.History.Record(entry);
         return Task.CompletedTask;
     }

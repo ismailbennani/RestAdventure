@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0-alpha.0.208+f37702603027ed40466718ed8074c5c1589b4f41"
+    "version": "0.0.0-alpha.0.211+1d544e399e998d4a07ec41cd613b74b2620e3710"
   },
   "servers": [
     {
@@ -241,7 +241,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/CombatInstance"
+                    "$ref": "#/components/schemas/Combat"
                   }
                 }
               }
@@ -499,74 +499,13 @@
         ]
       }
     },
-    "/game/team/characters/{characterGuid}/combats/in-preparation": {
-      "get": {
-        "tags": [
-          "Combats"
-        ],
-        "summary": "Get combats in preparation",
-        "operationId": "CombatsInPreparation_GetCombatsInPreparation",
-        "parameters": [
-          {
-            "name": "characterGuid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CombatInPreparation"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "api-key": []
-          }
-        ]
-      }
-    },
-    "/game/team/characters/{characterGuid}/combats/in-preparation/{combatGuid}/{side}/options": {
+    "/game/team/characters/{characterGuid}/combats/preparation/{combatGuid}/{side}/options/accessibility": {
       "post": {
         "tags": [
           "Combats"
         ],
         "summary": "Set combat in preparation options",
-        "operationId": "CombatsInPreparation_SetCombatInPreparationOptions",
+        "operationId": "CombatsInPreparation_SetCombatInPreparationAccessibility",
         "parameters": [
           {
             "name": "characterGuid",
@@ -596,20 +535,16 @@
               "$ref": "#/components/schemas/CombatSide"
             },
             "x-position": 3
+          },
+          {
+            "name": "value",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/CombatFormationAccessibility"
+            },
+            "x-position": 4
           }
         ],
-        "requestBody": {
-          "x-name": "options",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CombatFormationOptions"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 4
-        },
         "responses": {
           "204": {
             "description": ""
@@ -1296,17 +1231,6 @@
             "x-position": 2
           }
         ],
-        "requestBody": {
-          "x-name": "options",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CombatFormationOptions"
-              }
-            }
-          },
-          "x-position": 3
-        },
         "responses": {
           "204": {
             "description": ""
@@ -1339,13 +1263,13 @@
         ]
       }
     },
-    "/game/team/characters/{characterGuid}/pve/{combatGuid}/join": {
+    "/game/team/characters/{characterGuid}/pve/{monsterGroupGuid}/join": {
       "post": {
         "tags": [
           "Pve"
         ],
-        "summary": "Join combat in preparation",
-        "operationId": "Pve_JoinCombatInPreparation",
+        "summary": "Join combat",
+        "operationId": "Pve_JoinCombat",
         "parameters": [
           {
             "name": "characterGuid",
@@ -1358,7 +1282,7 @@
             "x-position": 1
           },
           {
-            "name": "combatGuid",
+            "name": "monsterGroupGuid",
             "in": "path",
             "required": true,
             "schema": {
@@ -1437,11 +1361,12 @@
           "id",
           "name",
           "class",
+          "health",
+          "maxHealth",
           "progression",
           "location",
           "inventory",
-          "jobs",
-          "combat"
+          "jobs"
         ],
         "properties": {
           "id": {
@@ -1462,6 +1387,16 @@
                 "$ref": "#/components/schemas/CharacterClassMinimal"
               }
             ]
+          },
+          "health": {
+            "type": "integer",
+            "description": "The health of the character\n            ",
+            "format": "int32"
+          },
+          "maxHealth": {
+            "type": "integer",
+            "description": "The health of the character\n            ",
+            "format": "int32"
           },
           "progression": {
             "description": "The progression of the character\n            ",
@@ -1493,14 +1428,6 @@
             "items": {
               "$ref": "#/components/schemas/JobInstance"
             }
-          },
-          "combat": {
-            "description": "The combat statistics of the entity\n            ",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/EntityCombatStatistics"
-              }
-            ]
           },
           "ongoingAction": {
             "description": "The interaction being performed by the character\n            ",
@@ -1785,39 +1712,6 @@
           }
         }
       },
-      "EntityCombatStatistics": {
-        "type": "object",
-        "description": "Entity combat statistics\n            ",
-        "additionalProperties": false,
-        "required": [
-          "health",
-          "maxHealth",
-          "speed",
-          "attack"
-        ],
-        "properties": {
-          "health": {
-            "type": "integer",
-            "description": "The health of the entity\n            ",
-            "format": "int32"
-          },
-          "maxHealth": {
-            "type": "integer",
-            "description": "The max health of the entity\n            ",
-            "format": "int32"
-          },
-          "speed": {
-            "type": "integer",
-            "description": "The speed of the entity\n            ",
-            "format": "int32"
-          },
-          "attack": {
-            "type": "integer",
-            "description": "The attack of the entity\n            ",
-            "format": "int32"
-          }
-        }
-      },
       "Action": {
         "type": "object",
         "discriminator": {
@@ -1825,7 +1719,8 @@
           "mapping": {
             "move": "#/components/schemas/MoveAction",
             "harvest": "#/components/schemas/HarvestAction",
-            "combat-pve": "#/components/schemas/PveCombatAction"
+            "combat-pve-start": "#/components/schemas/StartPveCombatAction",
+            "combat-pve-join": "#/components/schemas/JoinPveCombatAction"
           }
         },
         "description": "An action performed by a character\n            ",
@@ -2026,7 +1921,7 @@
           }
         }
       },
-      "PveCombatAction": {
+      "StartPveCombatAction": {
         "allOf": [
           {
             "$ref": "#/components/schemas/Action"
@@ -2036,24 +1931,9 @@
             "description": "PVE combat action\n            ",
             "additionalProperties": false,
             "required": [
-              "combatId",
-              "attackers",
               "monsterGroup"
             ],
             "properties": {
-              "combatId": {
-                "type": "string",
-                "description": "The unique ID of the combat\n            ",
-                "format": "guid",
-                "minLength": 1
-              },
-              "attackers": {
-                "type": "array",
-                "description": "The attackers in the combat instance\n            ",
-                "items": {
-                  "$ref": "#/components/schemas/EntityMinimal"
-                }
-              },
               "monsterGroup": {
                 "description": "The group of monsters\n            ",
                 "oneOf": [
@@ -2065,28 +1945,6 @@
             }
           }
         ]
-      },
-      "EntityMinimal": {
-        "type": "object",
-        "description": "Entity (minimal)\n            ",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "name"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "The unique ID of the entity\n            ",
-            "format": "guid",
-            "minLength": 1
-          },
-          "name": {
-            "type": "string",
-            "description": "The name of the entity\n            ",
-            "minLength": 1
-          }
-        }
       },
       "MonsterGroupMinimal": {
         "type": "object",
@@ -2190,6 +2048,248 @@
             "nullable": true
           }
         }
+      },
+      "JoinPveCombatAction": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Action"
+          },
+          {
+            "type": "object",
+            "description": "PVE combat action\n            ",
+            "additionalProperties": false,
+            "required": [
+              "monsterGroup",
+              "combat"
+            ],
+            "properties": {
+              "monsterGroup": {
+                "description": "The group of monsters\n            ",
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/MonsterGroupMinimal"
+                  }
+                ]
+              },
+              "combat": {
+                "description": "The combat to join\n            ",
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/CombatInPreparation"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "CombatInPreparation": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Combat"
+          },
+          {
+            "type": "object",
+            "description": "Combat in preparation\n            ",
+            "additionalProperties": false,
+            "required": [
+              "attackers",
+              "attackersOptions",
+              "defenders",
+              "defendersOptions"
+            ],
+            "properties": {
+              "attackers": {
+                "type": "array",
+                "description": "The attackers in the combat instance\n            ",
+                "items": {
+                  "$ref": "#/components/schemas/EntityMinimal"
+                }
+              },
+              "attackersOptions": {
+                "description": "The options of the attacker side\n            ",
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/CombatFormationOptions"
+                  }
+                ]
+              },
+              "defenders": {
+                "type": "array",
+                "description": "The defenders in the combat instance\n            ",
+                "items": {
+                  "$ref": "#/components/schemas/EntityMinimal"
+                }
+              },
+              "defendersOptions": {
+                "description": "The options of the defender side\n            ",
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/CombatFormationOptions"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "EntityMinimal": {
+        "type": "object",
+        "description": "Entity (minimal)\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the entity\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the entity\n            ",
+            "minLength": 1
+          }
+        }
+      },
+      "CombatFormationOptions": {
+        "type": "object",
+        "description": "Combat formation options\n            ",
+        "additionalProperties": false,
+        "required": [
+          "accessibility",
+          "slots"
+        ],
+        "properties": {
+          "accessibility": {
+            "description": "The accessibility of the combat formation\n            ",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CombatFormationAccessibility"
+              }
+            ]
+          },
+          "slots": {
+            "type": "integer",
+            "description": "The max number of entities in the formation\n            ",
+            "format": "int32"
+          }
+        }
+      },
+      "CombatFormationAccessibility": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "Everyone",
+          "TeamOnly"
+        ],
+        "enum": [
+          "everyone",
+          "teamOnly"
+        ]
+      },
+      "Combat": {
+        "type": "object",
+        "discriminator": {
+          "propertyName": "$phase",
+          "mapping": {
+            "ongoing": "#/components/schemas/OngoingCombat",
+            "preparation": "#/components/schemas/CombatInPreparation"
+          }
+        },
+        "description": "Combat base\n            ",
+        "x-abstract": true,
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "$phase"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the combat instance\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "$phase": {
+            "type": "string"
+          }
+        }
+      },
+      "OngoingCombat": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Combat"
+          },
+          {
+            "type": "object",
+            "description": "Combat instance\n            ",
+            "additionalProperties": false,
+            "required": [
+              "turn",
+              "attackers",
+              "defenders"
+            ],
+            "properties": {
+              "turn": {
+                "type": "integer",
+                "description": "The current turn of the combat instance\n            ",
+                "format": "int32"
+              },
+              "attackers": {
+                "type": "array",
+                "description": "The attackers in the combat instance\n            ",
+                "items": {
+                  "$ref": "#/components/schemas/CombatEntity"
+                }
+              },
+              "defenders": {
+                "type": "array",
+                "description": "The defenders in the combat instance\n            ",
+                "items": {
+                  "$ref": "#/components/schemas/CombatEntity"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "CombatEntity": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/EntityMinimal"
+          },
+          {
+            "type": "object",
+            "description": "Entity in combat\n            ",
+            "additionalProperties": false,
+            "required": [
+              "level",
+              "health",
+              "maxHealth"
+            ],
+            "properties": {
+              "level": {
+                "type": "integer",
+                "description": "The level of the character\n            ",
+                "format": "int32"
+              },
+              "health": {
+                "type": "integer",
+                "description": "The health of the entity\n            ",
+                "format": "int32"
+              },
+              "maxHealth": {
+                "type": "integer",
+                "description": "The max health of the entity\n            ",
+                "format": "int32"
+              }
+            }
+          }
+        ]
       },
       "ProblemDetails": {
         "type": "object",
@@ -2923,75 +3023,6 @@
           "defenders"
         ]
       },
-      "CombatInstance": {
-        "type": "object",
-        "description": "Combat instance\n            ",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "attackers",
-          "defenders",
-          "turn"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "The unique ID of the combat instance\n            ",
-            "format": "guid",
-            "minLength": 1
-          },
-          "attackers": {
-            "type": "array",
-            "description": "The attackers in the combat instance\n            ",
-            "items": {
-              "$ref": "#/components/schemas/EntityInCombat"
-            }
-          },
-          "defenders": {
-            "type": "array",
-            "description": "The defenders in the combat instance\n            ",
-            "items": {
-              "$ref": "#/components/schemas/EntityInCombat"
-            }
-          },
-          "turn": {
-            "type": "integer",
-            "description": "The current turn of the combat instance\n            ",
-            "format": "int32"
-          }
-        }
-      },
-      "EntityInCombat": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/EntityMinimal"
-          },
-          {
-            "type": "object",
-            "description": "Entity in combat\n            ",
-            "additionalProperties": false,
-            "required": [
-              "level",
-              "combat"
-            ],
-            "properties": {
-              "level": {
-                "type": "integer",
-                "description": "The level of the character\n            ",
-                "format": "int32"
-              },
-              "combat": {
-                "description": "The combat statistics of the character\n            ",
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/EntityCombatStatistics"
-                  }
-                ]
-              }
-            }
-          }
-        ]
-      },
       "SearchResultOfCombatHistoryEntry": {
         "type": "object",
         "description": "Search result\n            ",
@@ -3373,107 +3404,6 @@
           }
         }
       },
-      "CombatInPreparation": {
-        "type": "object",
-        "description": "Combat instance\n            ",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "attackers",
-          "defenders",
-          "canJoin",
-          "whyCannotJoin"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "The unique ID of the combat instance\n            ",
-            "format": "guid",
-            "minLength": 1
-          },
-          "attackers": {
-            "description": "The attackers in the combat instance\n            ",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/CombatFormationInPreparation"
-              }
-            ]
-          },
-          "defenders": {
-            "description": "The defenders in the combat instance\n            ",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/CombatFormationInPreparation"
-              }
-            ]
-          },
-          "canJoin": {
-            "type": "boolean",
-            "description": "Can the character join the combat\n            "
-          },
-          "whyCannotJoin": {
-            "type": "string",
-            "description": "Why cannot the character join the combat\n            ",
-            "minLength": 1
-          }
-        }
-      },
-      "CombatFormationInPreparation": {
-        "type": "object",
-        "description": "Combat formation\n            ",
-        "additionalProperties": false,
-        "required": [
-          "entities",
-          "options"
-        ],
-        "properties": {
-          "entities": {
-            "type": "array",
-            "description": "The entities in the formation\n            ",
-            "items": {
-              "$ref": "#/components/schemas/EntityMinimal"
-            }
-          },
-          "options": {
-            "description": "The options of the formation\n            ",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/CombatFormationOptions"
-              }
-            ]
-          }
-        }
-      },
-      "CombatFormationOptions": {
-        "type": "object",
-        "description": "Combat formation options\n            ",
-        "additionalProperties": false,
-        "required": [
-          "accessibility"
-        ],
-        "properties": {
-          "accessibility": {
-            "description": "The accessibility of the formation\n            ",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/CombatFormationAccessibility"
-              }
-            ]
-          }
-        }
-      },
-      "CombatFormationAccessibility": {
-        "type": "string",
-        "description": "",
-        "x-enumNames": [
-          "Everyone",
-          "TeamOnly"
-        ],
-        "enum": [
-          "everyone",
-          "teamOnly"
-        ]
-      },
       "CharacterClass": {
         "allOf": [
           {
@@ -3742,14 +3672,19 @@
             "description": "Monster group\n            ",
             "additionalProperties": false,
             "required": [
-              "canAttack"
+              "attacked",
+              "canAttackOrJoin"
             ],
             "properties": {
-              "canAttack": {
+              "attacked": {
+                "type": "boolean",
+                "description": "Is the monster group being attacked\n            "
+              },
+              "canAttackOrJoin": {
                 "type": "boolean",
                 "description": "Can the character attack the monsters\n            "
               },
-              "whyCannotAttack": {
+              "whyCannotAttackOrJoin": {
                 "type": "string",
                 "description": "Why cannot the character attack the monsters\n            ",
                 "nullable": true

@@ -20,6 +20,6 @@
 <ng-template #entityTpl let-entity="entity">
   <div class="col-sm-1 text-center">
     <div>{{ entity.name }} lv. {{ entity.level }}</div>
-    <app-progression-bar color="danger" label="HP" [value]="entity.combat.health" [maxValue]="entity.combat.maxHealth" displayValue="absolute"></app-progression-bar>
+    <app-progression-bar color="danger" label="HP" [value]="entity.health" [maxValue]="entity.maxHealth" displayValue="absolute"></app-progression-bar>
   </div>
 </ng-template>

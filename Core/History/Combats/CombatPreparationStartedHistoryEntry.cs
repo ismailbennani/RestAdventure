@@ -6,7 +6,7 @@ namespace RestAdventure.Core.History.Combats;
 
 public class CombatPreparationStartedHistoryEntry : CombatHistoryEntry
 {
-    public CombatPreparationStartedHistoryEntry(CombatInPreparation combat, long tick) : base(combat, tick)
+    public CombatPreparationStartedHistoryEntry(CombatInstance combat, long tick) : base(combat, tick)
     {
     }
 }

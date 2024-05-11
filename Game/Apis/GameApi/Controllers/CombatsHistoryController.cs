@@ -10,6 +10,7 @@ using RestAdventure.Game.Apis.Common.Dtos.History.Combats;
 using RestAdventure.Game.Apis.Common.Dtos.Queries;
 using RestAdventure.Game.Authentication;
 using RestAdventure.Kernel.Queries;
+using CombatInstance = RestAdventure.Core.Combat.CombatInstance;
 
 namespace RestAdventure.Game.Apis.GameApi.Controllers;
 
@@ -49,31 +50,10 @@ public class CombatsHistoryController : GameApiController
         }
 
         CombatInstanceId combatId = new(combatGuid);
-        CombatInPreparation? combatInPreparation = state.Combats.GetCombatInPreparation(combatId);
-        if (combatInPreparation != null)
+        CombatInstance? combat = state.Combats.GetCombat(combatId);
+        if (combat == null || combat.Location != character.Location)
         {
-            // The combat is in preparation at the character's location
-            if (combatInPreparation.Location != character.Location)
-            {
-                return NotFound();
-            }
-        }
-        else
-        {
-            // The combat is ongoing at the character's location
-            CombatInstance? combat = state.Combats.GetCombat(combatId);
-            if (combat != null)
-            {
-                if (combat.Location != character.Location)
-                {
-                    return NotFound();
-                }
-            }
-            else
-            {
-                // The combat is neither in preparation nor ongoing 
-                return NotFound();
-            }
+            return NotFound();
         }
 
         IOrderedEnumerable<CombatHistoryEntry> allEntries = state.History.Combat(combatId).OrderByDescending(he => he.Tick);

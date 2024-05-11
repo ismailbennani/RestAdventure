@@ -18,14 +18,7 @@
               <div class="flex-grow-1"></div>
               lv.{{ character.progression.level }}
             </div>
-            <app-progression-bar
-              color="danger"
-              label="HP"
-              labelSize="3"
-              [value]="character.combat.health"
-              [maxValue]="character.combat.maxHealth"
-              displayValue="absolute"
-            ></app-progression-bar>
+            <app-progression-bar color="danger" label="HP" labelSize="3" [value]="character.health" [maxValue]="character.maxHealth" displayValue="absolute"></app-progression-bar>
             <app-progression-bar
               color="info"
               label="Exp"

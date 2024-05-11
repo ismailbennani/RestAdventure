@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit, numberAttribute } from '@angular/core';
-import { ReplaySubject, combineLatest, debounceTime, map, switchMap, tap } from 'rxjs';
+import { ReplaySubject, catchError, combineLatest, debounceTime, map, of, switchMap, tap } from 'rxjs';
 import {
   ArchivedCombat,
   CombatEndedHistoryEntry,
@@ -10,10 +10,11 @@ import {
   CombatEntityLeftHistoryEntry,
   CombatHistoryEntry,
   CombatInPreparation,
-  CombatInstance,
   CombatPreparationStartedHistoryEntry,
   CombatStartedHistoryEntry,
   CombatsHistoryApiClient,
+  OngoingCombat,
+  SearchResultOfCombatHistoryEntry,
   TeamCharacter,
 } from '../../../../api/game-api-client.generated';
 import { GameService } from '../../services/game.service';
@@ -31,7 +32,7 @@ export class CombatHistoryComponent implements OnInit {
   }
 
   @Input({ required: true })
-  public set combat(value: CombatInPreparation | CombatInstance | ArchivedCombat) {
+  public set combat(value: CombatInPreparation | OngoingCombat | ArchivedCombat) {
     this.combatSubject.next(value);
   }
 
@@ -41,7 +42,7 @@ export class CombatHistoryComponent implements OnInit {
   protected history: { turn: number; preparation: boolean; entries: CombatHistoryEntry[] }[] = [];
 
   private characterSubject: ReplaySubject<TeamCharacter> = new ReplaySubject<TeamCharacter>(1);
-  private combatSubject: ReplaySubject<CombatInPreparation | CombatInstance | ArchivedCombat> = new ReplaySubject<CombatInPreparation | CombatInstance | ArchivedCombat>(1);
+  private combatSubject: ReplaySubject<CombatInPreparation | OngoingCombat | ArchivedCombat> = new ReplaySubject<CombatInPreparation | OngoingCombat | ArchivedCombat>(1);
 
   constructor(
     private gameService: GameService,
@@ -59,9 +60,19 @@ export class CombatHistoryComponent implements OnInit {
         debounceTime(10),
         switchMap(({ character, combat }) => {
           if (combat instanceof ArchivedCombat) {
-            return this.combatsHistoryApiClient.searchArchivedCombatHistory(character.id, combat.id, 1, this.nEntries);
+            return this.combatsHistoryApiClient.searchArchivedCombatHistory(character.id, combat.id, 1, this.nEntries).pipe(
+              catchError(e => {
+                console.error(e);
+                return of(new SearchResultOfCombatHistoryEntry({ items: [], pageNumber: 1, pageSize: this.nEntries, totalItemsCount: 0, totalPagesCount: 0 }));
+              }),
+            );
           } else {
-            return this.combatsHistoryApiClient.searchCombatHistory(character.id, combat.id, 1, this.nEntries);
+            return this.combatsHistoryApiClient.searchCombatHistory(character.id, combat.id, 1, this.nEntries).pipe(
+              catchError(e => {
+                console.error(e);
+                return of(new SearchResultOfCombatHistoryEntry({ items: [], pageNumber: 1, pageSize: this.nEntries, totalItemsCount: 0, totalPagesCount: 0 }));
+              }),
+            );
           }
         }),
         map(history => {

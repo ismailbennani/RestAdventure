@@ -9,10 +9,7 @@
         <div class="text-secondary text-center py-2">None</div>
       } @else {
         @for (combat of combatsInPreparation; track combat.id) {
-          <ng-container
-            [ngTemplateOutlet]="combatInPreparationListItem"
-            [ngTemplateOutletContext]="{ combat, plansToJoinCombat: plansToJoinCombat(combat), isInCombat: isInCombat(combat) }"
-          ></ng-container>
+          <ng-container [ngTemplateOutlet]="combatInPreparationListItem" [ngTemplateOutletContext]="{ combat, isInCombat: isInCombat(combat) }"></ng-container>
         }
 
         @for (combat of combats; track combat.id) {
@@ -64,35 +61,16 @@
   </a>
 </ng-template>
 
-<ng-template #combatInPreparationListItem let-combat="combat" let-plansToJoinCombat="plansToJoinCombat" let-isInCombat="isInCombat">
+<ng-template #combatInPreparationListItem let-combat="combat" let-isInCombat="isInCombat">
   <a
     role="button"
     class="list-group-item list-group-item-action text-secondary"
     [ngClass]="combat.id === selectedCombatInPreparation?.id ? 'active text-light' : undefined"
     (click)="selectCombatInPreparation(combat)"
   >
-    <div class="d-flex gap-2">
-      <div class="flex-grow-1 overflow-hidden">
-        <ng-container [ngTemplateOutlet]="combatPreview" [ngTemplateOutletContext]="{ combat }"></ng-container>
-      </div>
-      <div>
-        @if (plansToJoinCombat || isInCombat) {
-          <button class="btn btn-outline-light disabled">Joined</button>
-        } @else {
-          <a
-            class="btn small"
-            [ngClass]="combat.id === selectedCombatInPreparation?.id ? 'btn-light' : 'btn-outline-secondary'"
-            [class.disabled]="!combat.canJoin"
-            (click)="joinCombat(combat)"
-          >
-            Join
-          </a>
-        }
-      </div>
+    <div class="overflow-hidden">
+      <ng-container [ngTemplateOutlet]="combatPreview" [ngTemplateOutletContext]="{ combat }"></ng-container>
     </div>
-    @if (!plansToJoinCombat && !isInCombat && !combat.canJoin) {
-      <div class="text-danger">{{ combat.whyCannotJoin }}</div>
-    }
   </a>
 </ng-template>
 

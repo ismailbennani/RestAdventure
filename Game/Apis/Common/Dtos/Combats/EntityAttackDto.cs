@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using RestAdventure.Core.Combat;
+using RestAdventure.Core.Combat.Old;
 
 namespace RestAdventure.Game.Apis.Common.Dtos.Combats;
 
@@ -17,7 +17,7 @@ public class EntityAttackDto
 
 static class EntityAttackMappingExtensions
 {
-    public static EntityAttackDto ToDto(this EntityAttack attack) =>
+    public static EntityAttackDto ToDto(this CombatEntityAttack attack) =>
         new()
         {
             Damage = attack.Damage
