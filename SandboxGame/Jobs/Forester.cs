@@ -75,10 +75,10 @@ public class Forester
         {
             Name = "cut-maple",
             Level = 20,
-            HarvestDuration = 15,
+            HarvestDuration = 5,
             Targets = [MapleTree],
             Items = [new ItemStack(MapleWood, 1)],
-            Experience = 5
+            Experience = 15
         };
 
         CutBirch = new JobHarvest

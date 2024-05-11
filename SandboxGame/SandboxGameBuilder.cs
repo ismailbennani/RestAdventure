@@ -31,6 +31,7 @@ public class SandboxGameBuilder
     {
         Rattlings = new Rattlings();
         Forester = new Forester();
+        Herbalist = new Herbalist();
 
         MapGenerator = new MapGenerator(
             new ErodedIslandGenerator(100, 100, 0.6),
@@ -61,7 +62,33 @@ public class SandboxGameBuilder
                         new ForestResourceAllocationGenerator.WeightedResource { Object = Forester.BirchTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 1 } } },
                         new ForestResourceAllocationGenerator.WeightedResource { Object = Forester.WalnutTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 1 } } }
                     ]
-                ) { ForestDensity = 1, ForestSize = 10, DistanceCutoff = 30 }
+                ) { ForestDensity = 1, ForestSize = 10, DistanceCutoff = 30 },
+                new ForestResourceAllocationGenerator(
+                    [
+                        new ForestResourceAllocationGenerator.WeightedResource
+                            { Object = Herbalist.PeppermintPlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0.01 }, { 9, 0 }, { 10, 1 } } },
+                        new ForestResourceAllocationGenerator.WeightedResource
+                            { Object = Herbalist.LavenderPlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0.01 }, { 9, 0 }, { 20, 1 } } },
+                        new ForestResourceAllocationGenerator.WeightedResource
+                            { Object = Herbalist.GinsengPlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0.01 }, { 9, 0 }, { 30, 1 } } },
+                        new ForestResourceAllocationGenerator.WeightedResource
+                            { Object = Herbalist.ChamomilePlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0.01 }, { 9, 0 }, { 40, 1 } } },
+                        new ForestResourceAllocationGenerator.WeightedResource
+                        {
+                            Object = Herbalist.EchinaceaPlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0.01 }, { 9, 0 }, { 50, 1 } }
+                        }
+                    ]
+                ) { ForestDensity = 5, ForestSize = 1 },
+                new ForestResourceAllocationGenerator(
+                    [
+                        new ForestResourceAllocationGenerator.WeightedResource
+                            { Object = Herbalist.PeppermintPlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 1 } } },
+                        new ForestResourceAllocationGenerator.WeightedResource { Object = Herbalist.LavenderPlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 1 } } },
+                        new ForestResourceAllocationGenerator.WeightedResource { Object = Herbalist.GinsengPlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 1 } } },
+                        new ForestResourceAllocationGenerator.WeightedResource { Object = Herbalist.ChamomilePlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 1 } } },
+                        new ForestResourceAllocationGenerator.WeightedResource { Object = Herbalist.EchinaceaPlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 1 } } }
+                    ]
+                ) { ForestDensity = 0.5, ForestSize = 10, DistanceCutoff = 50 }
             ],
             loggerFactory.CreateLogger<MapGenerator>()
         );
@@ -86,6 +113,7 @@ public class SandboxGameBuilder
     public CharacterClasses CharacterClasses { get; }
     public Rattlings Rattlings { get; }
     public Forester Forester { get; }
+    public Herbalist Herbalist { get; }
 
     public Scenario Build()
     {
@@ -94,6 +122,7 @@ public class SandboxGameBuilder
         ExtractContent(scenario, CharacterClasses);
         ExtractContent(scenario, Rattlings);
         ExtractContent(scenario, Forester);
+        ExtractContent(scenario, Herbalist);
         ExtractContent(scenario, MapGeneratorResult.GeneratedMaps);
 
         scenario.Spawners.Add(

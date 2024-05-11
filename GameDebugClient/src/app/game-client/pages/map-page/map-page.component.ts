@@ -102,6 +102,21 @@ export class MapPageComponent implements OnInit {
             return { shape: 'circle', color: '#483C32', borderColor: undefined };
         }
 
+        return { shape: 'circle', color: 'brown', borderColor: undefined };
+      case 'herbalist':
+        switch (object.name.toLowerCase()) {
+          case 'peppermint plant':
+            return { shape: 'circle', color: '#228B22', borderColor: undefined };
+          case 'lavender plant':
+            return { shape: 'circle', color: '#6A5ACD', borderColor: undefined };
+          case 'ginseng plant':
+            return { shape: 'circle', color: '#8B4513', borderColor: undefined };
+          case 'chamomile plant':
+            return { shape: 'circle', color: '#F0E68C', borderColor: undefined };
+          case 'echinacea plant':
+            return { shape: 'circle', color: '#D2691E', borderColor: undefined };
+        }
+
         return { shape: 'circle', color: 'green', borderColor: undefined };
       default:
         return { shape: 'circle', color: 'darkgrey', borderColor: 'black' };
