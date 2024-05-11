@@ -11,11 +11,14 @@ public class RandomSpawner : Spawner
     long _lastTickWhenMaxCountWasReached;
     readonly SpawnerLocationSelector _locationSelector;
     readonly EntitySpawner _entitySpawner;
+    int _totalCount;
+    readonly Dictionary<Location, int> _countPerLocation;
 
     public RandomSpawner(SpawnerLocationSelector locationSelector, EntitySpawner entitySpawner)
     {
         _locationSelector = locationSelector;
         _entitySpawner = entitySpawner;
+        _countPerLocation = new Dictionary<Location, int>();
     }
 
     /// <summary>
@@ -44,13 +47,21 @@ public class RandomSpawner : Spawner
     ///     Fill the area with entities. The <see cref="MaxCount" /> and <see cref="MaxCountPerLocation" /> constraints will be enforced
     ///     but the <see cref="RespawnDelay" /> and <see cref="MaxCountPerLocation" /> will not.
     /// </summary>
-    public override IEnumerable<GameEntity> GetInitialEntities(GameState state) => GetEntitiesToSpawnInternal(state, null, null);
+    protected override IEnumerable<GameEntity> GetInitialEntitiesInternal(GameState state)
+    {
+        foreach (Location location in _locationSelector.GetLocations(state))
+        {
+            _countPerLocation[location] = 0;
+        }
+
+        return GetEntitiesToSpawnInternal(state, null, null);
+    }
 
     /// <summary>
     ///     Spawn entities while enforcing the <see cref="MaxCount" />, <see cref="MaxCountPerLocation" />, <see cref="RespawnDelay" /> and <see cref="MaxCountPerLocation" />
     ///     constraints
     /// </summary>
-    public override IEnumerable<GameEntity> GetEntitiesToSpawn(GameState state) => GetEntitiesToSpawnInternal(state, RespawnDelay, MaxSpawnPerExecution);
+    protected override IEnumerable<GameEntity> GetEntitiesToSpawnInternal(GameState state) => GetEntitiesToSpawnInternal(state, RespawnDelay, MaxSpawnPerExecution);
 
     IEnumerable<GameEntity> GetEntitiesToSpawnInternal(GameState state, int? respawnDelay, int? maxSpawn)
     {
@@ -59,45 +70,49 @@ public class RandomSpawner : Spawner
             yield break;
         }
 
-        IEnumerable<Location> locations = _locationSelector.GetLocations(state);
-        Dictionary<Location, int> suitableLocationsWithCounts = locations.ToDictionary(l => l, l => _entitySpawner.Count(state.Entities.AtLocation<GameEntity>(l)));
-
-        int currentCount = suitableLocationsWithCounts.Values.Sum();
-        if (currentCount >= MaxCount)
+        if (_totalCount >= MaxCount)
         {
             _lastTickWhenMaxCountWasReached = state.Tick;
             yield break;
         }
 
+        HashSet<Location> suitableLocations = _locationSelector.GetLocations(state).ToHashSet();
+
         if (MaxCountPerLocation.HasValue)
         {
-            suitableLocationsWithCounts = new Dictionary<Location, int>(suitableLocationsWithCounts.Where(kv => kv.Value < MaxCountPerLocation));
+            suitableLocations.RemoveWhere(l => _countPerLocation.GetValueOrDefault(l) >= MaxCountPerLocation);
         }
 
-        Dictionary<Location, int> spawned = new();
-        int totalSpawned = 0;
-        while (suitableLocationsWithCounts.Count != 0 && (!maxSpawn.HasValue || totalSpawned < maxSpawn) && (!MaxCount.HasValue || currentCount + totalSpawned < MaxCount))
+        if (suitableLocations.Count == 0)
         {
-            KeyValuePair<Location, int> randomLocationWithCount = Random.Shared.Choose(suitableLocationsWithCounts);
+            yield break;
+        }
 
-            if (!spawned.TryAdd(randomLocationWithCount.Key, 1))
+        int totalSpawned = 0;
+        while (suitableLocations.Count > 0 && (!maxSpawn.HasValue || totalSpawned < maxSpawn) && (!MaxCount.HasValue || _totalCount < MaxCount))
+        {
+            Location randomLocation = Random.Shared.Choose(suitableLocations);
+
+            if (!_countPerLocation.TryAdd(randomLocation, 1))
             {
-                spawned[randomLocationWithCount.Key] += 1;
+                _countPerLocation[randomLocation] += 1;
             }
             totalSpawned++;
+            _totalCount++;
 
-            foreach (GameEntity entity in _entitySpawner.Spawn(randomLocationWithCount.Key))
+
+            foreach (GameEntity entity in _entitySpawner.Spawn(randomLocation))
             {
                 yield return entity;
             }
 
-            if (MaxCountPerLocation.HasValue && randomLocationWithCount.Value + spawned[randomLocationWithCount.Key] >= MaxCountPerLocation)
+            if (MaxCountPerLocation.HasValue && _countPerLocation[randomLocation] >= MaxCountPerLocation)
             {
-                suitableLocationsWithCounts.Remove(randomLocationWithCount.Key);
+                suitableLocations.Remove(randomLocation);
             }
         }
 
-        if (suitableLocationsWithCounts.Count == 0)
+        if (suitableLocations.Count == 0)
         {
             _lastTickWhenMaxCountWasReached = state.Tick;
         }
@@ -111,6 +126,5 @@ public abstract class SpawnerLocationSelector
 
 public abstract class EntitySpawner
 {
-    public abstract int Count(IEnumerable<GameEntity> entities);
     public abstract IEnumerable<GameEntity> Spawn(Location location);
 }

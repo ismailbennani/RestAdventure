@@ -67,12 +67,10 @@ public class SandboxGameBuilder
         ExtractContent(scenario, Gatherer);
         ExtractContent(scenario, MapGeneratorResult.GeneratedMaps);
 
-        scenario.Spawners.Add(
-            new RandomSpawner(new MapAreaSpawnerLocationSelector { Area = _startLocation.Area }, new StaticObjectSpawner { StaticObject = Gatherer.AppleTree }) { MaxCount = 500 }
-        );
+        scenario.Spawners.Add(new RandomSpawner(new WholeMapSpawnerLocationSelector(), new StaticObjectSpawner { StaticObject = Gatherer.AppleTree }) { MaxCount = 5000 });
         scenario.Spawners.Add(
             new RandomSpawner(
-                new MapAreaSpawnerLocationSelector { Area = _startLocation.Area },
+                new WholeMapSpawnerLocationSelector(),
                 new MonsterGroupSpawner
                 {
                     Species = [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat],
@@ -83,7 +81,7 @@ public class SandboxGameBuilder
         );
         scenario.Spawners.Add(
             new RandomSpawner(
-                new MapAreaSpawnerLocationSelector { Area = _startLocation.Area },
+                new WholeMapSpawnerLocationSelector(),
                 new MonsterGroupSpawner
                 {
                     Species = [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat],
@@ -94,7 +92,7 @@ public class SandboxGameBuilder
         );
         scenario.Spawners.Add(
             new RandomSpawner(
-                new MapAreaSpawnerLocationSelector { Area = _startLocation.Area },
+                new WholeMapSpawnerLocationSelector(),
                 new MonsterGroupSpawner
                 {
                     Species = [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat],

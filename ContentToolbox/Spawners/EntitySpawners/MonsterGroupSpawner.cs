@@ -22,8 +22,6 @@ public class MonsterGroupSpawner : EntitySpawner, IGameEntitySource
     /// </summary>
     public required (int Min, int Max) LevelBounds { get; init; }
 
-    public override int Count(IEnumerable<GameEntity> entities) => entities.Count(e => e.Source != null && e.Source.Equals(this));
-
     public override IEnumerable<GameEntity> Spawn(Location location)
     {
         Random random = Random.Shared;
