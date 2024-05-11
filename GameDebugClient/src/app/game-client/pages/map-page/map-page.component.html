@@ -1,1 +1,33 @@
-<app-map [locations]="locations" [markers]="markers"></app-map>
+<div class="w-100 h-100 d-flex flex-column">
+  <div class="flex-grow-1">
+    <app-map [locations]="locations" [markers]="markers"></app-map>
+  </div>
+  <hr class="m-0" />
+  <div class="w-100 p-2" style="height: 10%">
+    <div class="h-100 d-flex gap-4">
+      @for (category of markerDescriptions; track category.category) {
+        <div>
+          <h6>{{ category.category | titlecase }}</h6>
+          <div class="h-100 d-flex flex-column flex-wrap">
+            @for (marker of category.markers; track marker.marker) {
+              <div class="d-flex gap-2 align-items-center">
+                <div class="form-check flex-grow-1">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    [checked]="markerConfiguration[marker.marker]"
+                    [id]="marker.marker"
+                    (change)="setEnabled(marker.marker, $any($event.target).checked)"
+                  />
+                  <label class="form-check-label text-nowrap" [for]="marker.marker"> {{ marker.display }} </label>
+                </div>
+                <div [class.invisible]="!markerConfiguration[marker.marker]" style="width: 16px; height: 16px; background-color: {{ marker.color }}"></div>
+              </div>
+            }
+          </div>
+        </div>
+        <div class="vr"></div>
+      }
+    </div>
+  </div>
+</div>

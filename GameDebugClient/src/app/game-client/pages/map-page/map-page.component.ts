@@ -4,11 +4,13 @@ import { forkJoin, map, switchMap } from 'rxjs';
 import {
   AdminGameContentApiClient,
   AdminGameStateApiClient,
+  Entity,
   HarvestableEntityHarvestMinimal,
   Job,
   LocationMinimal,
   StaticObject,
 } from '../../../../api/admin-api-client.generated';
+import { Team } from '../../../../api/game-api-client.generated';
 import { TeamService } from '../../services/team/team.service';
 import { MapComponent, MapMarker } from '../../widgets/map/map.component';
 
@@ -20,9 +22,12 @@ import { MapComponent, MapMarker } from '../../widgets/map/map.component';
 })
 export class MapPageComponent implements OnInit {
   protected locations: LocationMinimal[] = [];
-  protected harvestable: StaticObject[] = [];
-  protected harvestableMarkers: MapMarker[] = [];
   protected markers: MapMarker[] = [];
+  protected markerDescriptions: { category: string; markers: { marker: string; display: string; color: string }[] }[] = [];
+  protected markerConfiguration: { [name: string]: boolean } = {};
+
+  private team: Team | undefined;
+  private harvestables: { job: Job; harvest: HarvestableEntityHarvestMinimal; target: StaticObject; instances: Entity[] }[] = [];
 
   constructor(
     private adminGameContentApiClient: AdminGameContentApiClient,
@@ -35,13 +40,17 @@ export class MapPageComponent implements OnInit {
       .pipe(
         switchMap(() => this.teamService.team$),
         map(team => {
-          this.markers = [
-            ...(team?.characters.map((c): MapMarker => ({ shape: 'circle', color: 'cyan', positionX: c.location.positionX, positionY: c.location.positionY })) ?? []),
-            ...this.harvestableMarkers,
-          ];
+          this.team = team;
+          this.refreshMarkerDescriptions();
+          this.refreshMarkers();
         }),
       )
       .subscribe();
+  }
+
+  protected setEnabled(marker: string, enabled: boolean) {
+    this.markerConfiguration[marker] = enabled;
+    this.refreshMarkers();
   }
 
   private loadLocations() {
@@ -65,33 +74,9 @@ export class MapPageComponent implements OnInit {
         return forkJoin(work);
       }),
       map(harvestables => {
-        const markers: { [staticObjectId: string]: { [x: number]: { [y: number]: MapMarker } } } = {};
-        for (const harvestable of harvestables) {
-          if (!markers[harvestable.target.id]) {
-            markers[harvestable.target.id] = {};
-          }
-
-          for (const instance of harvestable.instances) {
-            if (!markers[harvestable.target.id][instance.location.positionX]) {
-              markers[harvestable.target.id][instance.location.positionX] = {};
-            }
-
-            if (!markers[harvestable.target.id][instance.location.positionX][instance.location.positionY]) {
-              markers[harvestable.target.id][instance.location.positionX][instance.location.positionY] = {
-                shape: 'circle',
-                color: this.getColor(harvestable.job, harvestable.harvest, harvestable.target),
-                alpha: 0,
-                positionX: instance.location.positionX,
-                positionY: instance.location.positionY,
-              };
-            }
-
-            markers[harvestable.target.id][instance.location.positionX][instance.location.positionY].alpha =
-              (markers[harvestable.target.id][instance.location.positionX][instance.location.positionY].alpha ?? 0) + 0.2;
-          }
-        }
-
-        this.harvestableMarkers = Object.values(markers).flatMap(x => Object.values(x).flatMap(x => Object.values(x)));
+        this.harvestables = harvestables;
+        this.refreshMarkerDescriptions();
+        this.refreshMarkers();
       }),
     );
   }
@@ -110,5 +95,101 @@ export class MapPageComponent implements OnInit {
       default:
         return 'darkgrey';
     }
+  }
+
+  private refreshMarkers() {
+    this.markers = [];
+
+    if (this.team) {
+      const description = this.markerDescriptions.find(d => d.category == 'Team');
+      for (const character of this.team.characters) {
+        if (!this.markerConfiguration[character.id]) {
+          continue;
+        }
+
+        this.markers.push({
+          shape: 'circle',
+          color: description?.markers.find(c => c.marker === character.id)?.color ?? 'cyan',
+          positionX: character.location.positionX,
+          positionY: character.location.positionY,
+        });
+      }
+    }
+
+    const markers: { [staticObjectId: string]: { [x: number]: { [y: number]: MapMarker } } } = {};
+    for (const harvestable of this.harvestables) {
+      if (!this.markerConfiguration[harvestable.target.id]) {
+        continue;
+      }
+
+      const description = this.markerDescriptions.find(c => c.category === harvestable.job.name)?.markers.find(m => m.marker === harvestable.target.id);
+
+      if (!markers[harvestable.target.id]) {
+        markers[harvestable.target.id] = {};
+      }
+
+      for (const instance of harvestable.instances) {
+        if (!markers[harvestable.target.id][instance.location.positionX]) {
+          markers[harvestable.target.id][instance.location.positionX] = {};
+        }
+
+        if (!markers[harvestable.target.id][instance.location.positionX][instance.location.positionY]) {
+          markers[harvestable.target.id][instance.location.positionX][instance.location.positionY] = {
+            shape: 'circle',
+            color: description?.color ?? 'grey',
+            alpha: 0,
+            positionX: instance.location.positionX,
+            positionY: instance.location.positionY,
+          };
+        }
+
+        markers[harvestable.target.id][instance.location.positionX][instance.location.positionY].alpha =
+          (markers[harvestable.target.id][instance.location.positionX][instance.location.positionY].alpha ?? 0) + 0.2;
+      }
+    }
+
+    for (const marker of Object.values(markers).flatMap(x => Object.values(x).flatMap(x => Object.values(x)))) {
+      this.markers.push(marker);
+    }
+  }
+
+  private refreshMarkerDescriptions() {
+    const markerDescriptions = [];
+
+    if (this.team) {
+      const markers: { marker: string; display: string; color: string }[] = [];
+      for (const character of this.team.characters) {
+        markers.push({ marker: character.id, display: character.name, color: 'cyan' });
+      }
+      markerDescriptions.push({ category: 'Team', markers });
+    }
+
+    const jobCategories: { [category: string]: { marker: string; display: string; color: string }[] } = {};
+    for (const harvestable of this.harvestables) {
+      if (!jobCategories[harvestable.job.name]) {
+        jobCategories[harvestable.job.name] = [];
+      }
+
+      jobCategories[harvestable.job.name].push({
+        marker: harvestable.target.id,
+        display: harvestable.target.name,
+        color: this.getColor(harvestable.job, harvestable.harvest, harvestable.target),
+      });
+    }
+
+    for (const category of Object.keys(jobCategories)) {
+      markerDescriptions.push({ category, markers: jobCategories[category] });
+    }
+
+    for (const category of markerDescriptions) {
+      for (const marker of category.markers) {
+        const existingCategory = this.markerDescriptions.find(c => c.category === category.category);
+        if (!existingCategory || !existingCategory.markers.find(m => m.marker === marker.marker)) {
+          this.markerConfiguration[marker.marker] = true;
+        }
+      }
+    }
+
+    this.markerDescriptions = markerDescriptions;
   }
 }
