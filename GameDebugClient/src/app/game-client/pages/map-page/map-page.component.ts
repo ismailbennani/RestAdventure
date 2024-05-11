@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { forkJoin, map, switchMap } from 'rxjs';
+import { Observable, forkJoin, map, switchMap } from 'rxjs';
 import {
   AdminGameContentApiClient,
   AdminGameStateApiClient,
@@ -12,7 +12,7 @@ import {
 } from '../../../../api/admin-api-client.generated';
 import { Team } from '../../../../api/game-api-client.generated';
 import { TeamService } from '../../services/team/team.service';
-import { MapComponent, MapMarker } from '../../widgets/map/map.component';
+import { MapComponent, MapMarker, MapMarkerShape } from '../../widgets/map/map.component';
 
 @Component({
   selector: 'app-map-page',
@@ -23,7 +23,7 @@ import { MapComponent, MapMarker } from '../../widgets/map/map.component';
 export class MapPageComponent implements OnInit {
   protected locations: LocationMinimal[] = [];
   protected markers: MapMarker[] = [];
-  protected markerDescriptions: { category: string; markers: { marker: string; display: string; color: string }[] }[] = [];
+  protected markerDescriptions: { category: string; markers: { name: string; display: string; marker: { shape: MapMarkerShape; color: string; borderColor?: string } }[] }[] = [];
   protected markerConfiguration: { [name: string]: boolean } = {};
 
   private team: Team | undefined;
@@ -60,7 +60,12 @@ export class MapPageComponent implements OnInit {
   private loadHarvestableInstances() {
     return this.adminGameContentApiClient.searchJobs(1, 99999999).pipe(
       switchMap(jobs => {
-        const work = [];
+        const work: Observable<{
+          job: Job;
+          harvest: HarvestableEntityHarvestMinimal;
+          target: StaticObject;
+          instances: Entity[];
+        }>[] = [];
         for (const job of jobs.items) {
           for (const harvest of job.harvests) {
             for (const target of harvest.targets) {
@@ -81,19 +86,25 @@ export class MapPageComponent implements OnInit {
     );
   }
 
-  private getColor(job: Job, harvest: HarvestableEntityHarvestMinimal, object: StaticObject) {
-    switch (job.name) {
-      case 'gatherer':
-        switch (object.name) {
-          case 'Apple Tree':
-            return 'crimson';
-          case 'Pear Tree':
-            return 'orange';
+  private getMarker(job: Job, harvest: HarvestableEntityHarvestMinimal, object: StaticObject): { shape: MapMarkerShape; color: string; borderColor?: string } {
+    switch (job.name.toLowerCase()) {
+      case 'forester':
+        switch (object.name.toLowerCase()) {
+          case 'oak tree':
+            return { shape: 'circle', color: '#8B4513', borderColor: undefined };
+          case 'pine tree':
+            return { shape: 'circle', color: '#228B22', borderColor: undefined };
+          case 'maple tree':
+            return { shape: 'circle', color: '#FFA500', borderColor: undefined };
+          case 'birch tree':
+            return { shape: 'circle', color: '#F5F5DC', borderColor: '#483C32' };
+          case 'walnut tree':
+            return { shape: 'circle', color: '#483C32', borderColor: undefined };
         }
 
-        return 'green';
+        return { shape: 'circle', color: 'green', borderColor: undefined };
       default:
-        return 'darkgrey';
+        return { shape: 'circle', color: 'darkgrey', borderColor: 'black' };
     }
   }
 
@@ -101,54 +112,58 @@ export class MapPageComponent implements OnInit {
     this.markers = [];
 
     if (this.team) {
-      const description = this.markerDescriptions.find(d => d.category == 'Team');
+      const teamDescription = this.markerDescriptions.find(d => d.category == 'Team');
       for (const character of this.team.characters) {
         if (!this.markerConfiguration[character.id]) {
           continue;
         }
 
+        const description = teamDescription?.markers.find(c => c.name === character.id);
+
         this.markers.push({
-          shape: 'circle',
-          color: description?.markers.find(c => c.marker === character.id)?.color ?? 'cyan',
+          shape: description?.marker.shape ?? 'circle',
+          color: description?.marker.color ?? 'grey',
+          borderColor: description?.marker.borderColor,
           positionX: character.location.positionX,
           positionY: character.location.positionY,
         });
       }
     }
 
-    const markers: { [staticObjectId: string]: { [x: number]: { [y: number]: MapMarker } } } = {};
+    const harvestableMarkers: { [staticObjectId: string]: { [x: number]: { [y: number]: MapMarker } } } = {};
     for (const harvestable of this.harvestables) {
       if (!this.markerConfiguration[harvestable.target.id]) {
         continue;
       }
 
-      const description = this.markerDescriptions.find(c => c.category === harvestable.job.name)?.markers.find(m => m.marker === harvestable.target.id);
+      const description = this.markerDescriptions.find(c => c.category === harvestable.job.name)?.markers.find(m => m.name === harvestable.target.id);
 
-      if (!markers[harvestable.target.id]) {
-        markers[harvestable.target.id] = {};
+      if (!harvestableMarkers[harvestable.target.id]) {
+        harvestableMarkers[harvestable.target.id] = {};
       }
 
       for (const instance of harvestable.instances) {
-        if (!markers[harvestable.target.id][instance.location.positionX]) {
-          markers[harvestable.target.id][instance.location.positionX] = {};
+        if (!harvestableMarkers[harvestable.target.id][instance.location.positionX]) {
+          harvestableMarkers[harvestable.target.id][instance.location.positionX] = {};
         }
 
-        if (!markers[harvestable.target.id][instance.location.positionX][instance.location.positionY]) {
-          markers[harvestable.target.id][instance.location.positionX][instance.location.positionY] = {
-            shape: 'circle',
-            color: description?.color ?? 'grey',
+        if (!harvestableMarkers[harvestable.target.id][instance.location.positionX][instance.location.positionY]) {
+          harvestableMarkers[harvestable.target.id][instance.location.positionX][instance.location.positionY] = {
+            shape: description?.marker.shape ?? 'circle',
+            color: description?.marker.color ?? 'grey',
+            borderColor: description?.marker.borderColor,
             alpha: 0,
             positionX: instance.location.positionX,
             positionY: instance.location.positionY,
           };
         }
 
-        markers[harvestable.target.id][instance.location.positionX][instance.location.positionY].alpha =
-          (markers[harvestable.target.id][instance.location.positionX][instance.location.positionY].alpha ?? 0) + 0.2;
+        harvestableMarkers[harvestable.target.id][instance.location.positionX][instance.location.positionY].alpha =
+          (harvestableMarkers[harvestable.target.id][instance.location.positionX][instance.location.positionY].alpha ?? 0) + 0.2;
       }
     }
 
-    for (const marker of Object.values(markers).flatMap(x => Object.values(x).flatMap(x => Object.values(x)))) {
+    for (const marker of Object.values(harvestableMarkers).flatMap(x => Object.values(x).flatMap(x => Object.values(x)))) {
       this.markers.push(marker);
     }
   }
@@ -157,23 +172,23 @@ export class MapPageComponent implements OnInit {
     const markerDescriptions = [];
 
     if (this.team) {
-      const markers: { marker: string; display: string; color: string }[] = [];
+      const markers: { name: string; display: string; marker: { shape: MapMarkerShape; color: string; borderColor?: string } }[] = [];
       for (const character of this.team.characters) {
-        markers.push({ marker: character.id, display: character.name, color: 'cyan' });
+        markers.push({ name: character.id, display: character.name, marker: { shape: 'circle', color: 'cyan' } });
       }
       markerDescriptions.push({ category: 'Team', markers });
     }
 
-    const jobCategories: { [category: string]: { marker: string; display: string; color: string }[] } = {};
+    const jobCategories: { [category: string]: { name: string; display: string; marker: { shape: MapMarkerShape; color: string; borderColor?: string } }[] } = {};
     for (const harvestable of this.harvestables) {
       if (!jobCategories[harvestable.job.name]) {
         jobCategories[harvestable.job.name] = [];
       }
 
       jobCategories[harvestable.job.name].push({
-        marker: harvestable.target.id,
+        name: harvestable.target.id,
         display: harvestable.target.name,
-        color: this.getColor(harvestable.job, harvestable.harvest, harvestable.target),
+        marker: this.getMarker(harvestable.job, harvestable.harvest, harvestable.target),
       });
     }
 
@@ -184,8 +199,8 @@ export class MapPageComponent implements OnInit {
     for (const category of markerDescriptions) {
       for (const marker of category.markers) {
         const existingCategory = this.markerDescriptions.find(c => c.category === category.category);
-        if (!existingCategory || !existingCategory.markers.find(m => m.marker === marker.marker)) {
-          this.markerConfiguration[marker.marker] = true;
+        if (!existingCategory || !existingCategory.markers.find(m => m.name === marker.name)) {
+          this.markerConfiguration[marker.name] = true;
         }
       }
     }

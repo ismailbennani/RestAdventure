@@ -30,7 +30,7 @@ public class SandboxGameBuilder
     public SandboxGameBuilder(ILoggerFactory loggerFactory)
     {
         Rattlings = new Rattlings();
-        Gatherer = new Gatherer();
+        Forester = new Forester();
 
         MapGenerator = new MapGenerator(
             new ErodedIslandGenerator(100, 100, 0.6),
@@ -40,15 +40,26 @@ public class SandboxGameBuilder
                 new ForestResourceAllocationGenerator(
                     [
                         new ForestResourceAllocationGenerator.WeightedResource
-                            { Object = Gatherer.AppleTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0.01 }, { 10, 2 } } },
+                            { Object = Forester.OakTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0.01 }, { 9, 0 }, { 10, 1 } } },
                         new ForestResourceAllocationGenerator.WeightedResource
-                            { Object = Gatherer.PearTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0.01 }, { 10, 0 }, { 20, 1 } } }
+                            { Object = Forester.PineTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0.01 }, { 9, 0 }, { 20, 1 } } },
+                        new ForestResourceAllocationGenerator.WeightedResource
+                            { Object = Forester.MapleTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0.01 }, { 9, 0 }, { 30, 1 } } },
+                        new ForestResourceAllocationGenerator.WeightedResource
+                            { Object = Forester.BirchTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0.01 }, { 9, 0 }, { 40, 1 } } },
+                        new ForestResourceAllocationGenerator.WeightedResource
+                        {
+                            Object = Forester.WalnutTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0.01 }, { 9, 0 }, { 50, 1 } }
+                        }
                     ]
                 ) { ForestDensity = 5, ForestSize = 4 },
                 new ForestResourceAllocationGenerator(
                     [
-                        new ForestResourceAllocationGenerator.WeightedResource { Object = Gatherer.AppleTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 1 } } },
-                        new ForestResourceAllocationGenerator.WeightedResource { Object = Gatherer.PearTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 1 } } }
+                        new ForestResourceAllocationGenerator.WeightedResource { Object = Forester.OakTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 1 } } },
+                        new ForestResourceAllocationGenerator.WeightedResource { Object = Forester.PineTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 1 } } },
+                        new ForestResourceAllocationGenerator.WeightedResource { Object = Forester.MapleTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 1 } } },
+                        new ForestResourceAllocationGenerator.WeightedResource { Object = Forester.BirchTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 1 } } },
+                        new ForestResourceAllocationGenerator.WeightedResource { Object = Forester.WalnutTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 1 } } }
                     ]
                 ) { ForestDensity = 1, ForestSize = 10, DistanceCutoff = 30 }
             ],
@@ -74,7 +85,7 @@ public class SandboxGameBuilder
     public MapGenerator.Result MapGeneratorResult { get; }
     public CharacterClasses CharacterClasses { get; }
     public Rattlings Rattlings { get; }
-    public Gatherer Gatherer { get; }
+    public Forester Forester { get; }
 
     public Scenario Build()
     {
@@ -82,7 +93,7 @@ public class SandboxGameBuilder
 
         ExtractContent(scenario, CharacterClasses);
         ExtractContent(scenario, Rattlings);
-        ExtractContent(scenario, Gatherer);
+        ExtractContent(scenario, Forester);
         ExtractContent(scenario, MapGeneratorResult.GeneratedMaps);
 
         scenario.Spawners.Add(

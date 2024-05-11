@@ -409,6 +409,12 @@ export class MapComponent implements OnInit {
         ctx.fillStyle = marker.color;
         ctx.fill();
 
+        if (marker.borderColor) {
+          ctx.lineWidth = 1;
+          ctx.strokeStyle = marker.borderColor;
+          ctx.stroke();
+        }
+
         ctx.globalAlpha = 1;
         break;
     }
@@ -643,10 +649,13 @@ export class MapComponent implements OnInit {
   }
 }
 
+export type MapMarkerShape = 'circle';
+
 export interface MapMarker {
-  shape: 'circle';
+  shape: MapMarkerShape;
   color: string;
   alpha?: number;
+  borderColor?: string;
   positionX: number;
   positionY: number;
 }
