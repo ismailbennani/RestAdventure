@@ -51,7 +51,7 @@ public class MapGenerator
 
         _logger.LogDebug("Zones generation complete: {zones}", string.Join(", ", zones.Select(z => $"{z.Name} (lv. {z.Level})")));
 
-        IReadOnlyDictionary<(int X, int Y), IReadOnlyCollection<(StaticObject Object, int Count)>>[] resourceAllocation =
+        IReadOnlyDictionary<(int X, int Y), IReadOnlyCollection<(StaticObject Object, double Count)>>[] resourceAllocation =
             ResourceAllocationGenerators.Select(g => g.Generate(land, partition, zones)).ToArray();
 
         _logger.LogDebug("Resource allocation complete");
@@ -69,7 +69,7 @@ public class MapGenerator
         Land land,
         Partition partition,
         IReadOnlyList<Zone> zones,
-        IReadOnlyDictionary<(int X, int Y), IReadOnlyCollection<(StaticObject Object, int Count)>>[] resourceAllocation
+        IReadOnlyDictionary<(int X, int Y), IReadOnlyCollection<(StaticObject Object, double Count)>>[] resourceAllocation
     )
     {
         MapArea noArea = new() { Name = "Void", Level = 0 };
@@ -142,25 +142,25 @@ public class MapGenerator
     }
 
     IReadOnlyCollection<Spawner> GenerateResourceSpawners(
-        IEnumerable<IReadOnlyDictionary<(int X, int Y), IReadOnlyCollection<(StaticObject Object, int Count)>>> resourceAllocation,
+        IEnumerable<IReadOnlyDictionary<(int X, int Y), IReadOnlyCollection<(StaticObject Object, double Count)>>> resourceAllocation,
         IReadOnlyCollection<Location> locations,
         IReadOnlyList<MapArea> areas
     )
     {
         List<Spawner> result = [];
 
-        foreach (IReadOnlyDictionary<(int X, int Y), IReadOnlyCollection<(StaticObject Object, int Count)>> allocation in resourceAllocation)
+        foreach (IReadOnlyDictionary<(int X, int Y), IReadOnlyCollection<(StaticObject Object, double Count)>> allocation in resourceAllocation)
         {
-            Dictionary<MapAreaId, Dictionary<StaticObject, int>> countByArea = areas.ToDictionary(a => a.Id, a => new Dictionary<StaticObject, int>());
+            Dictionary<MapAreaId, Dictionary<StaticObject, double>> countByArea = areas.ToDictionary(a => a.Id, a => new Dictionary<StaticObject, double>());
             foreach (Location location in locations)
             {
-                IReadOnlyCollection<(StaticObject Object, int Count)>? resources = allocation.GetValueOrDefault((location.PositionX, location.PositionY));
+                IReadOnlyCollection<(StaticObject Object, double Count)>? resources = allocation.GetValueOrDefault((location.PositionX, location.PositionY));
                 if (resources == null)
                 {
                     continue;
                 }
 
-                foreach ((StaticObject Object, int Count) entry in resources)
+                foreach ((StaticObject Object, double Count) entry in resources)
                 {
                     if (!countByArea[location.Area.Id].TryAdd(entry.Object, entry.Count))
                     {
@@ -171,9 +171,14 @@ public class MapGenerator
 
             foreach (MapArea area in areas)
             {
-                foreach ((StaticObject? obj, int count) in countByArea[area.Id])
+                foreach ((StaticObject? obj, double count) in countByArea[area.Id])
                 {
-                    result.Add(new RandomSpawner(new MapAreaSpawnerLocationSelector { Area = area }, new StaticObjectSpawner { StaticObject = obj }) { MaxCount = count });
+                    if (count < 1)
+                    {
+                        continue;
+                    }
+
+                    result.Add(new RandomSpawner(new MapAreaSpawnerLocationSelector { Area = area }, new StaticObjectSpawner { StaticObject = obj }) { MaxCount = (int)count });
                 }
             }
         }

@@ -39,16 +39,18 @@ public class SandboxGameBuilder
             [
                 new ForestResourceAllocationGenerator(
                     [
-                        new ForestResourceAllocationGenerator.WeightedResource { Object = Gatherer.AppleTree, Weight = 1 },
-                        new ForestResourceAllocationGenerator.WeightedResource { Object = Gatherer.PearTree, Weight = 0.5 }
+                        new ForestResourceAllocationGenerator.WeightedResource
+                            { Object = Gatherer.AppleTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0.01 }, { 10, 2 } } },
+                        new ForestResourceAllocationGenerator.WeightedResource
+                            { Object = Gatherer.PearTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0.01 }, { 10, 0 }, { 20, 1 } } }
                     ]
                 ) { ForestDensity = 5, ForestSize = 4 },
                 new ForestResourceAllocationGenerator(
                     [
-                        new ForestResourceAllocationGenerator.WeightedResource { Object = Gatherer.AppleTree, Weight = 1 },
-                        new ForestResourceAllocationGenerator.WeightedResource { Object = Gatherer.PearTree, Weight = 1 }
+                        new ForestResourceAllocationGenerator.WeightedResource { Object = Gatherer.AppleTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 1 } } },
+                        new ForestResourceAllocationGenerator.WeightedResource { Object = Gatherer.PearTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 1 } } }
                     ]
-                ) { ForestDensity = 2, ForestSize = 10, Cutoff = 50 }
+                ) { ForestDensity = 1, ForestSize = 10, DistanceCutoff = 30 }
             ],
             loggerFactory.CreateLogger<MapGenerator>()
         );

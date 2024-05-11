@@ -27,33 +27,40 @@ public class ForestResourceAllocationGenerator : ResourceAllocationGenerator
     public required double ForestDensity { get; init; }
 
     /// <summary>
-    ///     Hint: For a density of 1 and a resource weight of 1, this is the distance to center at which spawning should stop
+    ///     Hint: Distance at which spawning stops
     /// </summary>
-    public int Cutoff { get; init; } = 10;
+    public int DistanceCutoff { get; init; } = 10;
 
-    public override IReadOnlyDictionary<(int X, int Y), IReadOnlyCollection<(StaticObject Object, int Count)>> Generate(Land land, Partition partition, IReadOnlyList<Zone> zones)
+    public override IReadOnlyDictionary<(int X, int Y), IReadOnlyCollection<(StaticObject Object, double Count)>> Generate(
+        Land land,
+        Partition partition,
+        IReadOnlyList<Zone> zones
+    )
     {
         (int X, int Y) forestCenter = Random.Shared.Choose(land.Locations);
 
-        Dictionary<(int, int), IReadOnlyCollection<(StaticObject, int)>> result = new();
-
-        double cutoffWeight = 1.0 / (1 + Cutoff / ForestSize);
+        Dictionary<(int, int), IReadOnlyCollection<(StaticObject, double)>> result = new();
 
         foreach ((int X, int Y) location in land.Locations)
         {
-            double distanceWeight = 1.0 / (1 + Distance.L1(location, forestCenter) / ForestSize);
+            int distance = Distance.L1(location, forestCenter);
+            if (distance > DistanceCutoff)
+            {
+                continue;
+            }
+
+            double distanceWeight = 1.0 / (1 + distance / ForestSize);
             double forestWeight = ForestDensity * distanceWeight;
 
-            List<(StaticObject, int)> locationResult = [];
+            int zoneLevel = GetZoneLevel(location, partition, zones);
+            Dictionary<StaticObject, double> weights = WeightedResources.ToDictionary(r => r.Object, r => ComputeRelativeWeightForLevel(r.WeightsByZoneLevel, zoneLevel));
+            double sumRelativeWeights = weights.Values.Sum();
+
+            List<(StaticObject, double)> locationResult = [];
             foreach (WeightedResource weightedResource in WeightedResources)
             {
-                double weight = forestWeight * weightedResource.Weight;
-                if (weight < cutoffWeight)
-                {
-                    continue;
-                }
-
-                locationResult.Add((weightedResource.Object, (int)weight));
+                double weight = forestWeight * weights[weightedResource.Object] / sumRelativeWeights;
+                locationResult.Add((weightedResource.Object, weight));
             }
 
             result[location] = locationResult;
@@ -62,9 +69,60 @@ public class ForestResourceAllocationGenerator : ResourceAllocationGenerator
         return result;
     }
 
+    static int GetZoneLevel((int X, int Y) location, Partition partition, IReadOnlyList<Zone> zones) =>
+        partition.TryGetSubset(location, out int subsetIndex) ? zones.SingleOrDefault(z => z.PartitionIndex == subsetIndex)?.Level ?? 0 : 0;
+
+    static double ComputeRelativeWeightForLevel(Dictionary<int, double> relativeWeightsByLevel, int zoneLevel)
+    {
+        switch (relativeWeightsByLevel.Count)
+        {
+            case 0:
+                return 0;
+            case 1:
+                return relativeWeightsByLevel.Single().Value;
+        }
+
+        if (relativeWeightsByLevel.TryGetValue(zoneLevel, out double value))
+        {
+            return value;
+        }
+
+        KeyValuePair<int, double>? biggestLower = null;
+        KeyValuePair<int, double>? next = null;
+
+        foreach (KeyValuePair<int, double> entry in relativeWeightsByLevel)
+        {
+            if (entry.Key < zoneLevel)
+            {
+                biggestLower = entry;
+            }
+            else if (!next.HasValue)
+            {
+                next = entry;
+            }
+        }
+
+        if (biggestLower.HasValue && next.HasValue)
+        {
+            return Interpolate.LinearUnclamped(biggestLower.Value.Key, biggestLower.Value.Value, next.Value.Key, next.Value.Value, zoneLevel);
+        }
+
+        if (biggestLower.HasValue)
+        {
+            return biggestLower.Value.Value;
+        }
+
+        if (next.HasValue)
+        {
+            return next.Value.Value;
+        }
+
+        throw new InvalidOperationException("SHOULD NOT HAPPEN");
+    }
+
     public class WeightedResource
     {
         public required StaticObject Object { get; init; }
-        public required double Weight { get; init; }
+        public required Dictionary<int, double> WeightsByZoneLevel { get; init; }
     }
 }

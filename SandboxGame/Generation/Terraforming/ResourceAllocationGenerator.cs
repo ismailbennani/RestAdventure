@@ -7,5 +7,9 @@ namespace SandboxGame.Generation.Terraforming;
 
 public abstract class ResourceAllocationGenerator
 {
-    public abstract IReadOnlyDictionary<(int X, int Y), IReadOnlyCollection<(StaticObject Object, int Count)>> Generate(Land land, Partition partition, IReadOnlyList<Zone> zones);
+    public abstract IReadOnlyDictionary<(int X, int Y), IReadOnlyCollection<(StaticObject Object, double Count)>> Generate(
+        Land land,
+        Partition partition,
+        IReadOnlyList<Zone> zones
+    );
 }
