@@ -121,11 +121,11 @@ public class Herbalist
     public Item Chamomile { get; set; }
     public Item Echinacea { get; set; }
     public Item Peppermint { get; set; }
+    public StaticObject PeppermintPlant { get; }
     public StaticObject LavenderPlant { get; }
     public StaticObject GinsengPlant { get; }
     public StaticObject ChamomilePlant { get; }
     public StaticObject EchinaceaPlant { get; }
-    public StaticObject PeppermintPlant { get; }
     public JobHarvest GatherLavender { get; }
     public JobHarvest GatherGinseng { get; }
     public JobHarvest GatherChamomile { get; }

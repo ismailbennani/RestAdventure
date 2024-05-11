@@ -22,7 +22,7 @@ import { MapComponent, MapMarker, MapMarkerShape } from '../../widgets/map/map.c
 })
 export class MapPageComponent implements OnInit {
   protected locations: LocationMinimal[] = [];
-  protected markers: MapMarker[] = [];
+  protected markerGroups: { [group: string]: MapMarker[] } = {};
   protected markerDescriptions: { category: string; markers: { name: string; display: string; marker: { shape: MapMarkerShape; color: string; borderColor?: string } }[] }[] = [];
   protected markerConfiguration: { [name: string]: boolean } = {};
   protected markerCategoryConfiguration: { [category: string]: boolean | 'indeterminate' } = {};
@@ -141,7 +141,7 @@ export class MapPageComponent implements OnInit {
   }
 
   private refreshMarkers() {
-    this.markers = [];
+    this.markerGroups = {};
 
     if (this.team) {
       const teamDescription = this.markerDescriptions.find(d => d.category == 'Team');
@@ -152,20 +152,26 @@ export class MapPageComponent implements OnInit {
 
         const description = teamDescription?.markers.find(c => c.name === character.id);
 
-        this.markers.push({
-          shape: description?.marker.shape ?? 'circle',
-          color: description?.marker.color ?? 'grey',
-          borderColor: description?.marker.borderColor,
-          positionX: character.location.positionX,
-          positionY: character.location.positionY,
-        });
+        this.markerGroups[character.id] = [
+          {
+            shape: description?.marker.shape ?? 'circle',
+            color: description?.marker.color ?? 'grey',
+            borderColor: description?.marker.borderColor,
+            positionX: character.location.positionX,
+            positionY: character.location.positionY,
+          },
+        ];
       }
     }
 
-    const harvestableMarkers: { [staticObjectId: string]: { [x: number]: { [y: number]: MapMarker } } } = {};
+    const harvestableMarkers: { [staticObjectId: string]: { [x: number]: { [y: number]: { job: string; marker: MapMarker } } } } = {};
     for (const harvestable of this.harvestables) {
       if (!this.markerConfiguration[harvestable.target.id]) {
         continue;
+      }
+
+      if (!this.markerGroups[harvestable.job.id]) {
+        this.markerGroups[harvestable.job.id] = [];
       }
 
       const description = this.markerDescriptions.find(c => c.category === harvestable.job.name)?.markers.find(m => m.name === harvestable.target.id);
@@ -181,22 +187,25 @@ export class MapPageComponent implements OnInit {
 
         if (!harvestableMarkers[harvestable.target.id][instance.location.positionX][instance.location.positionY]) {
           harvestableMarkers[harvestable.target.id][instance.location.positionX][instance.location.positionY] = {
-            shape: description?.marker.shape ?? 'circle',
-            color: description?.marker.color ?? 'grey',
-            borderColor: description?.marker.borderColor,
-            alpha: 0,
-            positionX: instance.location.positionX,
-            positionY: instance.location.positionY,
+            job: harvestable.job.id,
+            marker: {
+              shape: description?.marker.shape ?? 'circle',
+              color: description?.marker.color ?? 'grey',
+              borderColor: description?.marker.borderColor,
+              alpha: 0.3,
+              positionX: instance.location.positionX,
+              positionY: instance.location.positionY,
+            },
           };
         }
 
-        harvestableMarkers[harvestable.target.id][instance.location.positionX][instance.location.positionY].alpha =
-          (harvestableMarkers[harvestable.target.id][instance.location.positionX][instance.location.positionY].alpha ?? 0) + 0.2;
+        harvestableMarkers[harvestable.target.id][instance.location.positionX][instance.location.positionY].marker.alpha =
+          (harvestableMarkers[harvestable.target.id][instance.location.positionX][instance.location.positionY].marker.alpha ?? 0) + 0.1;
       }
     }
 
     for (const marker of Object.values(harvestableMarkers).flatMap(x => Object.values(x).flatMap(x => Object.values(x)))) {
-      this.markers.push(marker);
+      this.markerGroups[marker.job].push(marker.marker);
     }
   }
 

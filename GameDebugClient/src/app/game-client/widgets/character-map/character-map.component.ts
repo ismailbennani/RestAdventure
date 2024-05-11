@@ -31,7 +31,7 @@ export class CharacterMapComponent implements OnInit {
   protected currentCharacterId: string | undefined;
   protected locations: LocationMinimal[] = [];
   protected centerAt: [number, number] | undefined;
-  protected markers: MapMarker[] = [];
+  protected markerGroups: { [characterId: string]: MapMarker[] } = {};
 
   private characterSubject: ReplaySubject<TeamCharacter> = new ReplaySubject<TeamCharacter>(1);
 
@@ -52,12 +52,14 @@ export class CharacterMapComponent implements OnInit {
     }).subscribe(({ character, team }) => {
       this.centerAt = [character.location.positionX, character.location.positionY];
       this.currentCharacterId = character.id;
-      this.markers = [
-        { shape: 'circle', color: 'blue', positionX: character.location.positionX, positionY: character.location.positionY },
-        ...(team?.characters
-          .filter(c => c.id !== character.id)
-          .map((c): MapMarker => ({ shape: 'circle', color: 'cyan', positionX: c.location.positionX, positionY: c.location.positionY })) ?? []),
-      ];
+      this.markerGroups = {};
+      this.markerGroups[character.id] = [{ shape: 'circle', color: 'blue', positionX: character.location.positionX, positionY: character.location.positionY }];
+
+      if (team) {
+        for (const c of team.characters.filter(c => c.id !== character.id)) {
+          this.markerGroups[c.id] = [{ shape: 'circle', color: 'cyan', positionX: c.location.positionX, positionY: c.location.positionY }];
+        }
+      }
     });
   }
 }

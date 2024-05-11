@@ -27,7 +27,7 @@ export class MapComponent implements OnInit {
   private static readonly GRID_LINE_COLOR = 'lightgrey';
   private static readonly GRID_LINE_WIDTH = 1;
 
-  private static readonly MARKER_SIZE = 8;
+  private static readonly MARKER_SIZE = 12;
 
   private static readonly ZOOM_MIN = 0.1;
   private static readonly ZOOM_MAX = 5;
@@ -66,15 +66,15 @@ export class MapComponent implements OnInit {
   private _centerAt: [number, number] | undefined = undefined;
 
   @Input()
-  public get markers(): MapMarker[] {
-    return this._markers;
+  public get markerGroups(): { [group: string]: MapMarker[] } {
+    return this._markerGroups;
   }
-  public set markers(value: MapMarker[]) {
-    this._markers = value;
+  public set markerGroups(value: { [group: string]: MapMarker[] }) {
+    this._markerGroups = value;
     this.updateMarkerCaches();
     this.redrawSubject.next();
   }
-  private _markers: MapMarker[] = [];
+  private _markerGroups: { [group: string]: MapMarker[] } = {};
 
   @Input() gridPosition: 'below' | 'above' = 'below';
 
@@ -95,7 +95,7 @@ export class MapComponent implements OnInit {
   private locationAreaAdjacencies: { [locationId: string]: CellAdjacency } = {};
   private areas: { [areaId: string]: MapArea } = {};
   private areaCenters: { [areaId: string]: [number, number] } = {};
-  private markersByPosition: { [x: number]: { [y: number]: MapMarker[] } } = {};
+  private markersByPosition: { [x: number]: { [y: number]: { [group: string]: MapMarker[] } } } = {};
 
   ngOnInit(): void {
     if (this.parent) {
@@ -202,10 +202,11 @@ export class MapComponent implements OnInit {
     for (const cell of this.cells) {
       const markers = this.markersByPosition[cell.location.positionX] ? this.markersByPosition[cell.location.positionX][cell.location.positionY] ?? [] : [];
 
-      if (markers.length > 0) {
-        const step = 1 / (markers.length + 1);
-        for (let i = 0; i < markers.length; i++) {
-          this.drawMarker(ctx, markers[i], (i + 1) * step);
+      const markerGroups = Object.values(markers);
+      if (markerGroups.length > 0) {
+        const step = 1 / (markerGroups.length + 1);
+        for (let i = 0; i < markerGroups.length; i++) {
+          this.drawMarker(ctx, markerGroups[i], (i + 1) * step);
         }
       }
     }
@@ -390,29 +391,40 @@ export class MapComponent implements OnInit {
     }
   }
 
-  private drawMarker(ctx: CanvasRenderingContext2D, marker: MapMarker, xRelativePos: number = 0.5) {
+  private drawMarker(ctx: CanvasRenderingContext2D, markers: MapMarker[], xRelativePos: number = 0.5) {
     if (!this.grid) {
       return;
     }
 
-    const coords = this.computeViewCoords(this.center, [this.grid.size[0], this.grid.size[1]], [marker.positionX, marker.positionY]);
+    const coords = this.computeViewCoords(this.center, [this.grid.size[0], this.grid.size[1]], [markers[0].positionX, markers[0].positionY]);
 
     const x = this.grid.xMin + coords[0] * this.grid.cellWidth + xRelativePos * this.grid.cellWidth;
     const y = (coords[1] + 0.5) * this.grid.cellHeight + this.grid.yMin;
+    const arcStep = (2 * Math.PI) / markers.length;
 
-    switch (marker.shape) {
+    switch (markers[0].shape) {
       case 'circle':
-        ctx.globalAlpha = marker.alpha ?? 1;
+        for (let i = 0; i < markers.length; i++) {
+          const marker = markers[i];
+          ctx.globalAlpha = marker.alpha ?? 1;
 
-        ctx.beginPath();
-        ctx.arc(x, y, MapComponent.MARKER_SIZE / 2, 0, 2 * Math.PI);
-        ctx.fillStyle = marker.color;
-        ctx.fill();
+          ctx.beginPath();
+          if (markers.length > 1) {
+            ctx.moveTo(x, y);
+          }
+          ctx.arc(x, y, MapComponent.MARKER_SIZE / 2, i * arcStep + Math.PI / 2, (i + 1) * arcStep + Math.PI / 2);
+          if (markers.length > 1) {
+            ctx.moveTo(x, y);
+          }
+          ctx.fillStyle = marker.color;
+          ctx.closePath();
+          ctx.fill();
 
-        if (marker.borderColor) {
-          ctx.lineWidth = 1;
-          ctx.strokeStyle = marker.borderColor;
-          ctx.stroke();
+          if (marker.borderColor) {
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = marker.borderColor;
+            ctx.stroke();
+          }
         }
 
         ctx.globalAlpha = 1;
@@ -563,21 +575,22 @@ export class MapComponent implements OnInit {
 
   private updateMarkerCaches() {
     this.markersByPosition = {};
-    for (const marker of this._markers) {
-      let x = this.markersByPosition[marker.positionX];
-      if (!x) {
-        this.markersByPosition[marker.positionX] = {};
-        this.markersByPosition[marker.positionX][marker.positionY] = [marker];
-        continue;
-      }
+    for (const group of Object.keys(this._markerGroups)) {
+      for (const marker of this._markerGroups[group]) {
+        if (!this.markersByPosition[marker.positionX]) {
+          this.markersByPosition[marker.positionX] = {};
+        }
 
-      let y = this.markersByPosition[marker.positionX][marker.positionY];
-      if (!y) {
-        this.markersByPosition[marker.positionX][marker.positionY] = [marker];
-        continue;
-      }
+        if (!this.markersByPosition[marker.positionX][marker.positionY]) {
+          this.markersByPosition[marker.positionX][marker.positionY] = {};
+        }
 
-      this.markersByPosition[marker.positionX][marker.positionY].push(marker);
+        if (!this.markersByPosition[marker.positionX][marker.positionY][group]) {
+          this.markersByPosition[marker.positionX][marker.positionY][group] = [];
+        }
+
+        this.markersByPosition[marker.positionX][marker.positionY][group].push(marker);
+      }
     }
   }
 
