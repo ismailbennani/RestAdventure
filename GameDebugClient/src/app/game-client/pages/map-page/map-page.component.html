@@ -7,7 +7,17 @@
     <div class="h-100 d-flex gap-4">
       @for (category of markerDescriptions; track category.category) {
         <div class="d-flex flex-column">
-          <h6>{{ category.category | titlecase }}</h6>
+          <div class="form-check flex-grow-1">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              [indeterminate]="markerCategoryConfiguration[category.category] === 'indeterminate'"
+              [checked]="markerCategoryConfiguration[category.category]"
+              [id]="category.category"
+              (change)="setCategoryEnabled(category.category, $any($event.target).checked)"
+            />
+            <label class="form-check-label text-nowrap" [for]="category.category"> {{ category.category | titlecase }} </label>
+          </div>
           <div class="flex-grow-1">
             @for (marker of category.markers; track marker.name) {
               <div class="d-flex gap-2 align-items-center px-2">
@@ -19,7 +29,7 @@
                     [id]="marker.name"
                     (change)="setEnabled(marker.name, $any($event.target).checked)"
                   />
-                  <label class="form-check-label text-nowrap" [for]="marker.name"> {{ marker.display }} </label>
+                  <label class="form-check-label text-nowrap" [for]="marker.name"> {{ marker.display | titlecase }} </label>
                 </div>
                 <div
                   [class.invisible]="!markerConfiguration[marker.name]"

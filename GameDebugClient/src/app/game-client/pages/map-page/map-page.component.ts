@@ -25,6 +25,7 @@ export class MapPageComponent implements OnInit {
   protected markers: MapMarker[] = [];
   protected markerDescriptions: { category: string; markers: { name: string; display: string; marker: { shape: MapMarkerShape; color: string; borderColor?: string } }[] }[] = [];
   protected markerConfiguration: { [name: string]: boolean } = {};
+  protected markerCategoryConfiguration: { [category: string]: boolean | 'indeterminate' } = {};
 
   private team: Team | undefined;
   private harvestables: { job: Job; harvest: HarvestableEntityHarvestMinimal; target: StaticObject; instances: Entity[] }[] = [];
@@ -50,6 +51,22 @@ export class MapPageComponent implements OnInit {
 
   protected setEnabled(marker: string, enabled: boolean) {
     this.markerConfiguration[marker] = enabled;
+    this.refreshCategoryConfiguration();
+    this.refreshMarkers();
+  }
+
+  protected setCategoryEnabled(category: string, enabled: boolean) {
+    const markers = this.markerDescriptions.find(c => c.category === category)?.markers;
+    if (!markers) {
+      return;
+    }
+
+    for (const marker of markers) {
+      this.markerConfiguration[marker.name] = enabled;
+    }
+
+    this.markerCategoryConfiguration[category] = enabled;
+
     this.refreshMarkers();
   }
 
@@ -221,5 +238,22 @@ export class MapPageComponent implements OnInit {
     }
 
     this.markerDescriptions = markerDescriptions;
+    this.refreshCategoryConfiguration();
+  }
+
+  private refreshCategoryConfiguration() {
+    for (const category of this.markerDescriptions) {
+      let allTrue = true;
+      let allFalse = true;
+      for (const marker of category.markers) {
+        if (this.markerConfiguration[marker.name]) {
+          allFalse = false;
+        } else {
+          allTrue = false;
+        }
+      }
+
+      this.markerCategoryConfiguration[category.category] = allTrue ? true : allFalse ? false : 'indeterminate';
+    }
   }
 }

@@ -37,7 +37,8 @@ public class ForestResourceAllocationGenerator : ResourceAllocationGenerator
         IReadOnlyList<Zone> zones
     )
     {
-        (int X, int Y) forestCenter = Random.Shared.Choose(land.Locations);
+        Random shared = Random.Shared;
+        (int X, int Y) forestCenter = shared.Choose(land.Locations);
 
         Dictionary<(int, int), IReadOnlyCollection<(StaticObject, double)>> result = new();
 

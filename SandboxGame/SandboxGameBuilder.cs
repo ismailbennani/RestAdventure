@@ -63,26 +63,32 @@ public class SandboxGameBuilder
                         new ForestResourceAllocationGenerator.WeightedResource { Object = Forester.WalnutTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 1 } } }
                     ]
                 ) { ForestDensity = 1, ForestSize = 10, DistanceCutoff = 30 },
+                new MultiForestResourceAllocationGenerator(
+                    new ForestResourceAllocationGenerator(
+                        [
+                            new ForestResourceAllocationGenerator.WeightedResource
+                                { Object = Herbalist.PeppermintPlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0.01 }, { 9, 0 }, { 10, 1 } } },
+                            new ForestResourceAllocationGenerator.WeightedResource
+                                { Object = Herbalist.LavenderPlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0.01 }, { 9, 0 }, { 20, 1 } } },
+                            new ForestResourceAllocationGenerator.WeightedResource
+                                { Object = Herbalist.GinsengPlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0.01 }, { 9, 0 }, { 30, 1 } } },
+                            new ForestResourceAllocationGenerator.WeightedResource
+                                { Object = Herbalist.ChamomilePlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0.01 }, { 9, 0 }, { 40, 1 } } },
+                            new ForestResourceAllocationGenerator.WeightedResource
+                            {
+                                Object = Herbalist.EchinaceaPlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0.01 }, { 9, 0 }, { 50, 1 } }
+                            }
+                        ]
+                    ) { ForestDensity = 5, ForestSize = 5, DistanceCutoff = 10 },
+                    3
+                ),
                 new ForestResourceAllocationGenerator(
                     [
-                        new ForestResourceAllocationGenerator.WeightedResource
-                            { Object = Herbalist.PeppermintPlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0.01 }, { 9, 0 }, { 10, 1 } } },
-                        new ForestResourceAllocationGenerator.WeightedResource
-                            { Object = Herbalist.LavenderPlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0.01 }, { 9, 0 }, { 20, 1 } } },
-                        new ForestResourceAllocationGenerator.WeightedResource
-                            { Object = Herbalist.GinsengPlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0.01 }, { 9, 0 }, { 30, 1 } } },
-                        new ForestResourceAllocationGenerator.WeightedResource
-                            { Object = Herbalist.ChamomilePlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0.01 }, { 9, 0 }, { 40, 1 } } },
                         new ForestResourceAllocationGenerator.WeightedResource
                         {
-                            Object = Herbalist.EchinaceaPlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0.01 }, { 9, 0 }, { 50, 1 } }
-                        }
-                    ]
-                ) { ForestDensity = 5, ForestSize = 1 },
-                new ForestResourceAllocationGenerator(
-                    [
-                        new ForestResourceAllocationGenerator.WeightedResource
-                            { Object = Herbalist.PeppermintPlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 1 } } },
+                            Object = Herbalist.PeppermintPlant,
+                            WeightsByZoneLevel = new Dictionary<int, double> { { 0, 1 } }
+                        },
                         new ForestResourceAllocationGenerator.WeightedResource { Object = Herbalist.LavenderPlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 1 } } },
                         new ForestResourceAllocationGenerator.WeightedResource { Object = Herbalist.GinsengPlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 1 } } },
                         new ForestResourceAllocationGenerator.WeightedResource { Object = Herbalist.ChamomilePlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 1 } } },
