@@ -14,6 +14,7 @@ using RestAdventure.Core.Spawners;
 using SandboxGame.Characters;
 using SandboxGame.Generation;
 using SandboxGame.Generation.Partitioning;
+using SandboxGame.Generation.Shaping;
 using SandboxGame.Generation.Terraforming;
 using SandboxGame.Generation.Zoning;
 using SandboxGame.Jobs;
@@ -28,10 +29,27 @@ public class SandboxGameBuilder
 
     public SandboxGameBuilder(ILoggerFactory loggerFactory)
     {
+        Rattlings = new Rattlings();
+        Gatherer = new Gatherer();
+
         MapGenerator = new MapGenerator(
-            new ErodedIslandGenerator(20, 20, 0.6),
-            new VoronoiPartitionGenerator(5, loggerFactory.CreateLogger<VoronoiPartitionGenerator>()),
+            new ErodedIslandGenerator(100, 100, 0.6),
+            new VoronoiPartitionGenerator(50, loggerFactory.CreateLogger<VoronoiPartitionGenerator>()),
             new KingdomZonesGenerator(),
+            [
+                new ForestResourceAllocationGenerator(
+                    [
+                        new ForestResourceAllocationGenerator.WeightedResource { Object = Gatherer.AppleTree, Weight = 1 },
+                        new ForestResourceAllocationGenerator.WeightedResource { Object = Gatherer.PearTree, Weight = 0.5 }
+                    ]
+                ) { ForestDensity = 5, ForestSize = 4 },
+                new ForestResourceAllocationGenerator(
+                    [
+                        new ForestResourceAllocationGenerator.WeightedResource { Object = Gatherer.AppleTree, Weight = 1 },
+                        new ForestResourceAllocationGenerator.WeightedResource { Object = Gatherer.PearTree, Weight = 1 }
+                    ]
+                ) { ForestDensity = 2, ForestSize = 10, Cutoff = 50 }
+            ],
             loggerFactory.CreateLogger<MapGenerator>()
         );
         MapGeneratorResult = MapGenerator.Generate();
@@ -48,8 +66,6 @@ public class SandboxGameBuilder
         _startLocation = startLocation!;
 
         CharacterClasses = new CharacterClasses(MapGeneratorResult.GeneratedMaps, _startLocation);
-        Rattlings = new Rattlings();
-        Gatherer = new Gatherer();
     }
 
     public MapGenerator MapGenerator { get; }
@@ -67,10 +83,9 @@ public class SandboxGameBuilder
         ExtractContent(scenario, Gatherer);
         ExtractContent(scenario, MapGeneratorResult.GeneratedMaps);
 
-        scenario.Spawners.Add(new RandomSpawner(new WholeMapSpawnerLocationSelector(), new StaticObjectSpawner { StaticObject = Gatherer.AppleTree }) { MaxCount = 500 });
         scenario.Spawners.Add(
             new RandomSpawner(
-                new WholeMapSpawnerLocationSelector(),
+                new MapAreaSpawnerLocationSelector { Area = _startLocation.Area },
                 new MonsterGroupSpawner
                 {
                     Species = [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat],
@@ -81,7 +96,7 @@ public class SandboxGameBuilder
         );
         scenario.Spawners.Add(
             new RandomSpawner(
-                new WholeMapSpawnerLocationSelector(),
+                new MapAreaSpawnerLocationSelector { Area = _startLocation.Area },
                 new MonsterGroupSpawner
                 {
                     Species = [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat],
@@ -92,7 +107,7 @@ public class SandboxGameBuilder
         );
         scenario.Spawners.Add(
             new RandomSpawner(
-                new WholeMapSpawnerLocationSelector(),
+                new MapAreaSpawnerLocationSelector { Area = _startLocation.Area },
                 new MonsterGroupSpawner
                 {
                     Species = [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat],

@@ -1,5 +1,5 @@
 ﻿using SandboxGame.Generation.Partitioning;
-using SandboxGame.Generation.Terraforming;
+using SandboxGame.Generation.Shaping;
 using SandboxGame.MyMath;
 
 namespace SandboxGame.Generation.Zoning;

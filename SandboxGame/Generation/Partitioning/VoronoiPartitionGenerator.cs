@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
 using RestAdventure.Core.Extensions;
-using SandboxGame.Generation.Terraforming;
+using SandboxGame.Generation.Shaping;
 
 namespace SandboxGame.Generation.Partitioning;
 

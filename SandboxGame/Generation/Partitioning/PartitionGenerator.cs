@@ -1,4 +1,4 @@
-﻿using SandboxGame.Generation.Terraforming;
+﻿using SandboxGame.Generation.Shaping;
 
 namespace SandboxGame.Generation.Partitioning;
 

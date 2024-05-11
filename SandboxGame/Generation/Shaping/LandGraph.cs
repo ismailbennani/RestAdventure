@@ -1,6 +1,6 @@
 ﻿using SandboxGame.MyMath;
 
-namespace SandboxGame.Generation.Terraforming;
+namespace SandboxGame.Generation.Shaping;
 
 public static class LandGraph
 {

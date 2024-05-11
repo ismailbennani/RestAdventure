@@ -104,7 +104,7 @@ public class RandomSpawner : Spawner
 
         if (RespawnDelay.HasValue && suitableLocations.Count == 0)
         {
-            _globalRespawnDelay = random.Next(RespawnDelay.Value.Min, RespawnDelay.Value.Max);
+            _globalRespawnDelay = random.Next(RespawnDelay.Value.Min, RespawnDelay.Value.Max + 1);
         }
     }
 
@@ -121,7 +121,7 @@ public class RandomSpawner : Spawner
 
             if (_globalRespawnDelay <= 0)
             {
-                _globalRespawnDelay = random.Next(RespawnDelay.Value.Min, RespawnDelay.Value.Max);
+                _globalRespawnDelay = random.Next(RespawnDelay.Value.Min, RespawnDelay.Value.Max + 1);
             }
 
             if (_locationRespawnDelays.TryGetValue(entity.Location, out long value) && value <= 0)

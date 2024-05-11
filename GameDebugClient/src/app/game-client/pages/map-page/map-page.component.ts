@@ -79,7 +79,7 @@ export class MapPageComponent implements OnInit {
             if (!markers[harvestable.target.id][instance.location.positionX][instance.location.positionY]) {
               markers[harvestable.target.id][instance.location.positionX][instance.location.positionY] = {
                 shape: 'circle',
-                color: 'green',
+                color: this.getColor(harvestable.job, harvestable.harvest, harvestable.target),
                 alpha: 0,
                 positionX: instance.location.positionX,
                 positionY: instance.location.positionY,
@@ -87,7 +87,7 @@ export class MapPageComponent implements OnInit {
             }
 
             markers[harvestable.target.id][instance.location.positionX][instance.location.positionY].alpha =
-              (markers[harvestable.target.id][instance.location.positionX][instance.location.positionY].alpha ?? 0) + 0.1;
+              (markers[harvestable.target.id][instance.location.positionX][instance.location.positionY].alpha ?? 0) + 0.2;
           }
         }
 
@@ -99,6 +99,13 @@ export class MapPageComponent implements OnInit {
   private getColor(job: Job, harvest: HarvestableEntityHarvestMinimal, object: StaticObject) {
     switch (job.name) {
       case 'gatherer':
+        switch (object.name) {
+          case 'Apple Tree':
+            return 'crimson';
+          case 'Pear Tree':
+            return 'orange';
+        }
+
         return 'green';
       default:
         return 'darkgrey';
