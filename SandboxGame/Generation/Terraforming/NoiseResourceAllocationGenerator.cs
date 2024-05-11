@@ -1,5 +1,5 @@
-﻿using RestAdventure.Core.Entities.StaticObjects;
-using RestAdventure.Core.Extensions;
+﻿using ContentToolbox.Noise;
+using RestAdventure.Core.Entities.StaticObjects;
 using SandboxGame.Generation.Partitioning;
 using SandboxGame.Generation.Shaping;
 using SandboxGame.Generation.Zoning;
@@ -7,29 +7,26 @@ using SandboxGame.MyMath;
 
 namespace SandboxGame.Generation.Terraforming;
 
-public class ForestResourceAllocationGenerator : ResourceAllocationGenerator
+public class NoiseResourceAllocationGenerator : ResourceAllocationGenerator
 {
-    public ForestResourceAllocationGenerator(IEnumerable<WeightedResource> weightedResources)
+    public NoiseResourceAllocationGenerator(IEnumerable<WeightedResource> weightedResources, Noise2D noise)
     {
+        Noise = noise;
         WeightedResources = weightedResources.ToArray();
     }
 
     public IReadOnlyCollection<WeightedResource> WeightedResources { get; }
+    public Noise2D Noise { get; }
 
     /// <summary>
-    ///     Hint: distance from center at which density is divided by half
+    ///     Hint: max expected number of objects per location
     /// </summary>
-    public required double ForestSize { get; init; }
+    public required double Coefficient { get; init; }
 
     /// <summary>
-    ///     Hint: expected number of objects at center position
+    ///     Noise values under this will be ignored
     /// </summary>
-    public required double ForestDensity { get; init; }
-
-    /// <summary>
-    ///     Hint: Distance at which spawning stops
-    /// </summary>
-    public int DistanceCutoff { get; init; } = 10;
+    public double NoiseCutoff { get; init; } = 0.5;
 
     public override IReadOnlyDictionary<(int X, int Y), IReadOnlyCollection<(StaticObject Object, double Count)>> Generate(
         Land land,
@@ -38,20 +35,17 @@ public class ForestResourceAllocationGenerator : ResourceAllocationGenerator
     )
     {
         Random shared = Random.Shared;
-        (int X, int Y) forestCenter = shared.Choose(land.Locations);
-
         Dictionary<(int, int), IReadOnlyCollection<(StaticObject, double)>> result = new();
 
         foreach ((int X, int Y) location in land.Locations)
         {
-            int distance = Distance.L1(location, forestCenter);
-            if (distance > DistanceCutoff)
+            double noise = Noise.Get(location.X, location.Y);
+            if (noise < NoiseCutoff)
             {
                 continue;
             }
 
-            double distanceWeight = 1.0 / (1 + distance / ForestSize);
-            double forestWeight = ForestDensity * distanceWeight;
+            double forestWeight = Coefficient * noise;
 
             int zoneLevel = GetZoneLevel(location, partition, zones);
             Dictionary<StaticObject, double> weights = WeightedResources.ToDictionary(r => r.Object, r => ComputeRelativeWeightForLevel(r.WeightsByZoneLevel, zoneLevel));

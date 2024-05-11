@@ -1,4 +1,5 @@
-﻿using ContentToolbox.Spawners;
+﻿using ContentToolbox.Noise;
+using ContentToolbox.Spawners;
 using ContentToolbox.Spawners.EntitySpawners;
 using ContentToolbox.Spawners.LocationSelectors;
 using Microsoft.Extensions.Logging;
@@ -33,68 +34,38 @@ public class SandboxGameBuilder
         Forester = new Forester();
         Herbalist = new Herbalist();
 
+        IReadOnlyCollection<NoiseResourceAllocationGenerator.WeightedResource> herbalistLeveledRepartition =
+        [
+            new NoiseResourceAllocationGenerator.WeightedResource { Object = Herbalist.PeppermintPlant, WeightsByZoneLevel = new Dictionary<int, double> { { 10, 5 } } },
+            new NoiseResourceAllocationGenerator.WeightedResource { Object = Herbalist.LavenderPlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0 }, { 20, 4 } } },
+            new NoiseResourceAllocationGenerator.WeightedResource { Object = Herbalist.GinsengPlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0 }, { 30, 3 } } },
+            new NoiseResourceAllocationGenerator.WeightedResource { Object = Herbalist.ChamomilePlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0 }, { 40, 2 } } },
+            new NoiseResourceAllocationGenerator.WeightedResource
+            {
+                Object = Herbalist.EchinaceaPlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0 }, { 50, 1 } }
+            }
+        ];
+
+        IReadOnlyCollection<NoiseResourceAllocationGenerator.WeightedResource> foresterLeveledRepartition =
+        [
+            new NoiseResourceAllocationGenerator.WeightedResource { Object = Forester.OakTree, WeightsByZoneLevel = new Dictionary<int, double> { { 10, 16 } } },
+            new NoiseResourceAllocationGenerator.WeightedResource { Object = Forester.PineTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0 }, { 20, 8 } } },
+            new NoiseResourceAllocationGenerator.WeightedResource { Object = Forester.MapleTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0 }, { 30, 4 } } },
+            new NoiseResourceAllocationGenerator.WeightedResource { Object = Forester.BirchTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0 }, { 40, 2 } } },
+            new NoiseResourceAllocationGenerator.WeightedResource
+            {
+                Object = Forester.WalnutTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0 }, { 50, 1 } }
+            }
+        ];
+
         MapGenerator = new MapGenerator(
             new ErodedIslandGenerator(100, 100, 0.6),
-            new VoronoiPartitionGenerator(50, loggerFactory.CreateLogger<VoronoiPartitionGenerator>()),
+            new VoronoiPartitionGenerator(100, loggerFactory.CreateLogger<VoronoiPartitionGenerator>()),
             new KingdomZonesGenerator(),
             [
-                new ForestResourceAllocationGenerator(
-                    [
-                        new ForestResourceAllocationGenerator.WeightedResource
-                            { Object = Forester.OakTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0.01 }, { 9, 0 }, { 10, 1 } } },
-                        new ForestResourceAllocationGenerator.WeightedResource
-                            { Object = Forester.PineTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0.01 }, { 9, 0 }, { 20, 1 } } },
-                        new ForestResourceAllocationGenerator.WeightedResource
-                            { Object = Forester.MapleTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0.01 }, { 9, 0 }, { 30, 1 } } },
-                        new ForestResourceAllocationGenerator.WeightedResource
-                            { Object = Forester.BirchTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0.01 }, { 9, 0 }, { 40, 1 } } },
-                        new ForestResourceAllocationGenerator.WeightedResource
-                        {
-                            Object = Forester.WalnutTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0.01 }, { 9, 0 }, { 50, 1 } }
-                        }
-                    ]
-                ) { ForestDensity = 5, ForestSize = 4 },
-                new ForestResourceAllocationGenerator(
-                    [
-                        new ForestResourceAllocationGenerator.WeightedResource { Object = Forester.OakTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 1 } } },
-                        new ForestResourceAllocationGenerator.WeightedResource { Object = Forester.PineTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 1 } } },
-                        new ForestResourceAllocationGenerator.WeightedResource { Object = Forester.MapleTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 1 } } },
-                        new ForestResourceAllocationGenerator.WeightedResource { Object = Forester.BirchTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 1 } } },
-                        new ForestResourceAllocationGenerator.WeightedResource { Object = Forester.WalnutTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 1 } } }
-                    ]
-                ) { ForestDensity = 1, ForestSize = 10, DistanceCutoff = 30 },
-                new MultiForestResourceAllocationGenerator(
-                    new ForestResourceAllocationGenerator(
-                        [
-                            new ForestResourceAllocationGenerator.WeightedResource
-                                { Object = Herbalist.PeppermintPlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0.01 }, { 9, 0 }, { 10, 1 } } },
-                            new ForestResourceAllocationGenerator.WeightedResource
-                                { Object = Herbalist.LavenderPlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0.01 }, { 9, 0 }, { 20, 1 } } },
-                            new ForestResourceAllocationGenerator.WeightedResource
-                                { Object = Herbalist.GinsengPlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0.01 }, { 9, 0 }, { 30, 1 } } },
-                            new ForestResourceAllocationGenerator.WeightedResource
-                                { Object = Herbalist.ChamomilePlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0.01 }, { 9, 0 }, { 40, 1 } } },
-                            new ForestResourceAllocationGenerator.WeightedResource
-                            {
-                                Object = Herbalist.EchinaceaPlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0.01 }, { 9, 0 }, { 50, 1 } }
-                            }
-                        ]
-                    ) { ForestDensity = 5, ForestSize = 5, DistanceCutoff = 10 },
-                    3
-                ),
-                new ForestResourceAllocationGenerator(
-                    [
-                        new ForestResourceAllocationGenerator.WeightedResource
-                        {
-                            Object = Herbalist.PeppermintPlant,
-                            WeightsByZoneLevel = new Dictionary<int, double> { { 0, 1 } }
-                        },
-                        new ForestResourceAllocationGenerator.WeightedResource { Object = Herbalist.LavenderPlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 1 } } },
-                        new ForestResourceAllocationGenerator.WeightedResource { Object = Herbalist.GinsengPlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 1 } } },
-                        new ForestResourceAllocationGenerator.WeightedResource { Object = Herbalist.ChamomilePlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 1 } } },
-                        new ForestResourceAllocationGenerator.WeightedResource { Object = Herbalist.EchinaceaPlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 1 } } }
-                    ]
-                ) { ForestDensity = 0.5, ForestSize = 10, DistanceCutoff = 50 }
+                new NoiseResourceAllocationGenerator(herbalistLeveledRepartition, new SimplexNoise2D(0.05f)) { Coefficient = 1 },
+                new NoiseResourceAllocationGenerator(foresterLeveledRepartition, new PerlinNoise2D(0.05f)) { Coefficient = 0.5f, NoiseCutoff = 0.6 },
+                new NoiseResourceAllocationGenerator(foresterLeveledRepartition, new PerlinNoise2D(0.1f)) { Coefficient = 2, NoiseCutoff = 0.7 }
             ],
             loggerFactory.CreateLogger<MapGenerator>()
         );
