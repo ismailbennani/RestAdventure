@@ -192,10 +192,6 @@ export class MapPageComponent implements OnInit {
         this.markerCounts[harvestable.target.id] = harvestable.instances.length;
       }
 
-      for (const instance of harvestable.instances) {
-        this.markerCounts[harvestable.target.id] += 1;
-      }
-
       if (!this.markerConfiguration[harvestable.target.id]) {
         continue;
       }
