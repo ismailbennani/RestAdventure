@@ -15,6 +15,7 @@ namespace SandboxGame.Generation;
 
 public class MapGenerator
 {
+    readonly ILoggerFactory _loggerFactory;
     readonly ILogger<MapGenerator> _logger;
 
     public MapGenerator(
@@ -22,10 +23,11 @@ public class MapGenerator
         PartitionGenerator partitionGenerator,
         ZonesGenerator zonesGenerator,
         IEnumerable<ResourceAllocationGenerator> resourceAllocationGenerators,
-        ILogger<MapGenerator> logger
+        ILoggerFactory loggerFactory
     )
     {
-        _logger = logger;
+        _loggerFactory = loggerFactory;
+        _logger = loggerFactory.CreateLogger<MapGenerator>();
         LandGenerator = landGenerator;
         ResourceAllocationGenerators = resourceAllocationGenerators.ToArray();
         PartitionGenerator = partitionGenerator;
@@ -178,7 +180,13 @@ public class MapGenerator
                         continue;
                     }
 
-                    result.Add(new RandomSpawner(new MapAreaSpawnerLocationSelector { Area = area }, new StaticObjectSpawner { StaticObject = obj }) { MaxCount = (int)count });
+                    result.Add(
+                        new RandomSpawner(
+                            new MapAreaSpawnerLocationSelector { Area = area },
+                            new ConstantStaticObjectSpawner { StaticObject = obj },
+                            _loggerFactory.CreateLogger<RandomSpawner>()
+                        ) { MaxCount = (int)count }
+                    );
                 }
             }
         }

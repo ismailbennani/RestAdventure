@@ -12,6 +12,7 @@ using RestAdventure.Core.Maps.Areas;
 using RestAdventure.Core.Maps.Locations;
 using RestAdventure.Core.Plugins;
 using RestAdventure.Core.Spawners;
+using RestAdventure.Core.Utils;
 using SandboxGame.Characters;
 using SandboxGame.Generation;
 using SandboxGame.Generation.Partitioning;
@@ -26,10 +27,12 @@ namespace SandboxGame;
 
 public class SandboxGameBuilder
 {
+    readonly ILoggerFactory _loggerFactory;
     readonly Location _startLocation;
 
     public SandboxGameBuilder(ILoggerFactory loggerFactory)
     {
+        _loggerFactory = loggerFactory;
         Rattlings = new Rattlings();
         Forester = new Forester();
         Herbalist = new Herbalist();
@@ -64,12 +67,8 @@ public class SandboxGameBuilder
             new ErodedIslandGenerator(100, 100, 0.6),
             new VoronoiPartitionGenerator(20, loggerFactory.CreateLogger<VoronoiPartitionGenerator>()),
             new KingdomZonesGenerator(),
-            [
-                new NoiseResourceAllocationGenerator(herbalistLeveledRepartition, new SimplexNoise2D(0.05f)) { Coefficient = 1 },
-                new NoiseResourceAllocationGenerator(foresterLeveledRepartition, new PerlinNoise2D(0.05f)) { Coefficient = 0.5f, NoiseCutoff = 0.6 },
-                new NoiseResourceAllocationGenerator(foresterLeveledRepartition, new PerlinNoise2D(0.1f)) { Coefficient = 2, NoiseCutoff = 0.7 }
-            ],
-            loggerFactory.CreateLogger<MapGenerator>()
+            [],
+            loggerFactory
         );
         MapGeneratorResult = MapGenerator.Generate();
 
@@ -112,7 +111,8 @@ public class SandboxGameBuilder
                     Species = [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat],
                     TeamSize = (1, 3),
                     LevelBounds = (1, 9)
-                }
+                },
+                _loggerFactory.CreateLogger<RandomSpawner>()
             ) { MaxCountPerLocation = 1, RespawnDelay = (5, 10) }
         );
         scenario.Spawners.Add(
@@ -123,7 +123,8 @@ public class SandboxGameBuilder
                     Species = [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat],
                     TeamSize = (4, 6),
                     LevelBounds = (1, 9)
-                }
+                },
+                _loggerFactory.CreateLogger<RandomSpawner>()
             ) { MaxCountPerLocation = 1, RespawnDelay = (5, 10) }
         );
         scenario.Spawners.Add(
@@ -134,8 +135,103 @@ public class SandboxGameBuilder
                     Species = [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat],
                     TeamSize = (7, 8),
                     LevelBounds = (1, 9)
-                }
+                },
+                _loggerFactory.CreateLogger<RandomSpawner>()
             ) { MaxCountPerLocation = 1, RespawnDelay = (5, 10) }
+        );
+
+        scenario.Spawners.Add(
+            new RandomSpawner(
+                new PerlinNoise2D(0.05f) { LowCutoff = 0.2 },
+                new RandomByAreaLevelStaticObjectSpawner(
+                    new Dictionary<int, IReadOnlyCollection<Weighted<StaticObject>>>
+                    {
+                        {
+                            0, [
+                                new Weighted<StaticObject>(Herbalist.PeppermintPlant, 1)
+                            ]
+                        },
+                        {
+                            10, [
+                                new Weighted<StaticObject>(Herbalist.PeppermintPlant, 2),
+                                new Weighted<StaticObject>(Herbalist.LavenderPlant, 1)
+                            ]
+                        },
+                        {
+                            20, [
+                                new Weighted<StaticObject>(Herbalist.PeppermintPlant, 3),
+                                new Weighted<StaticObject>(Herbalist.LavenderPlant, 2),
+                                new Weighted<StaticObject>(Herbalist.GinsengPlant, 1)
+                            ]
+                        },
+                        {
+                            30, [
+                                new Weighted<StaticObject>(Herbalist.PeppermintPlant, 4),
+                                new Weighted<StaticObject>(Herbalist.LavenderPlant, 3),
+                                new Weighted<StaticObject>(Herbalist.GinsengPlant, 2),
+                                new Weighted<StaticObject>(Herbalist.ChamomilePlant, 1)
+                            ]
+                        },
+                        {
+                            40, [
+                                new Weighted<StaticObject>(Herbalist.PeppermintPlant, 5),
+                                new Weighted<StaticObject>(Herbalist.LavenderPlant, 4),
+                                new Weighted<StaticObject>(Herbalist.GinsengPlant, 3),
+                                new Weighted<StaticObject>(Herbalist.ChamomilePlant, 2),
+                                new Weighted<StaticObject>(Herbalist.EchinaceaPlant, 1)
+                            ]
+                        }
+                    }
+                ),
+                _loggerFactory.CreateLogger<RandomSpawner>()
+            ) { MaxCount = 1000, MaxCountPerLocation = 10 }
+        );
+
+        scenario.Spawners.Add(
+            new RandomSpawner(
+                new SimplexNoise2D(0.1f) { LowCutoff = 0.75 },
+                new RandomByAreaLevelStaticObjectSpawner(
+                    new Dictionary<int, IReadOnlyCollection<Weighted<StaticObject>>>
+                    {
+                        {
+                            0, [
+                                new Weighted<StaticObject>(Forester.OakTree, 1)
+                            ]
+                        },
+                        {
+                            10, [
+                                new Weighted<StaticObject>(Forester.OakTree, 2),
+                                new Weighted<StaticObject>(Forester.PineTree, 1)
+                            ]
+                        },
+                        {
+                            20, [
+                                new Weighted<StaticObject>(Forester.OakTree, 4),
+                                new Weighted<StaticObject>(Forester.PineTree, 2),
+                                new Weighted<StaticObject>(Forester.MapleTree, 1)
+                            ]
+                        },
+                        {
+                            30, [
+                                new Weighted<StaticObject>(Forester.OakTree, 8),
+                                new Weighted<StaticObject>(Forester.PineTree, 4),
+                                new Weighted<StaticObject>(Forester.MapleTree, 2),
+                                new Weighted<StaticObject>(Forester.BirchTree, 1)
+                            ]
+                        },
+                        {
+                            40, [
+                                new Weighted<StaticObject>(Forester.OakTree, 16),
+                                new Weighted<StaticObject>(Forester.PineTree, 8),
+                                new Weighted<StaticObject>(Forester.MapleTree, 4),
+                                new Weighted<StaticObject>(Forester.BirchTree, 2),
+                                new Weighted<StaticObject>(Forester.WalnutTree, 1)
+                            ]
+                        }
+                    }
+                ),
+                _loggerFactory.CreateLogger<RandomSpawner>()
+            ) { MaxCount = 500, MaxCountPerLocation = 5 }
         );
 
         return scenario;

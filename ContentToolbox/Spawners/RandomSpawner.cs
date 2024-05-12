@@ -1,4 +1,5 @@
 ﻿using ContentToolbox.Noise;
+using Microsoft.Extensions.Logging;
 using RestAdventure.Core;
 using RestAdventure.Core.Entities;
 using RestAdventure.Core.Extensions;
@@ -12,28 +13,30 @@ public class RandomSpawner : Spawner
     readonly Noise2D? _noise;
     readonly SpawnerLocationSelector? _locationSelector;
     readonly EntitySpawner _entitySpawner;
+    readonly ILogger<RandomSpawner> _logger;
     int _totalCount;
     readonly Dictionary<Location, int> _countPerLocation = new();
     long _globalRespawnDelay;
     readonly Dictionary<Location, long> _locationRespawnDelays = new();
 
-    public RandomSpawner(EntitySpawner entitySpawner) : this(null, null, entitySpawner)
+    public RandomSpawner(EntitySpawner entitySpawner, ILogger<RandomSpawner> logger) : this(null, null, entitySpawner, logger)
     {
     }
 
-    public RandomSpawner(Noise2D noise, EntitySpawner entitySpawner) : this(noise, null, entitySpawner)
+    public RandomSpawner(Noise2D noise, EntitySpawner entitySpawner, ILogger<RandomSpawner> logger) : this(noise, null, entitySpawner, logger)
     {
     }
 
-    public RandomSpawner(SpawnerLocationSelector locationSelector, EntitySpawner entitySpawner) : this(null, locationSelector, entitySpawner)
+    public RandomSpawner(SpawnerLocationSelector locationSelector, EntitySpawner entitySpawner, ILogger<RandomSpawner> logger) : this(null, locationSelector, entitySpawner, logger)
     {
     }
 
-    public RandomSpawner(Noise2D? noise, SpawnerLocationSelector? locationSelector, EntitySpawner entitySpawner)
+    public RandomSpawner(Noise2D? noise, SpawnerLocationSelector? locationSelector, EntitySpawner entitySpawner, ILogger<RandomSpawner> logger)
     {
         _noise = noise;
         _locationSelector = locationSelector;
         _entitySpawner = entitySpawner;
+        _logger = logger;
     }
 
     /// <summary>
@@ -94,9 +97,23 @@ public class RandomSpawner : Spawner
         }
 
         int totalSpawned = 0;
-        while (suitableLocations.Count > 0 && (!maxSpawn.HasValue || totalSpawned < maxSpawn) && (!MaxCount.HasValue || _totalCount < MaxCount))
+        int fuel = 10000;
+        while (suitableLocations.Count > 0 && (!maxSpawn.HasValue || totalSpawned < maxSpawn) && (!MaxCount.HasValue || _totalCount < MaxCount) && fuel > 0)
         {
             Location randomLocation = ChooseLocation(random, suitableLocations);
+
+            bool wasEmpty = true;
+            foreach (GameEntity entity in _entitySpawner.Spawn(randomLocation))
+            {
+                wasEmpty = false;
+                yield return entity;
+            }
+
+            if (wasEmpty)
+            {
+                fuel--;
+                continue;
+            }
 
             if (!_countPerLocation.TryAdd(randomLocation, 1))
             {
@@ -105,16 +122,15 @@ public class RandomSpawner : Spawner
             totalSpawned++;
             _totalCount++;
 
-
-            foreach (GameEntity entity in _entitySpawner.Spawn(randomLocation))
-            {
-                yield return entity;
-            }
-
             if (MaxCountPerLocation.HasValue && _countPerLocation[randomLocation] >= MaxCountPerLocation)
             {
                 suitableLocations.Remove(randomLocation);
             }
+        }
+
+        if (fuel <= 0)
+        {
+            _logger.LogWarning("Spawner ran out of fuel");
         }
 
         if (RespawnDelay.HasValue && suitableLocations.Count == 0)

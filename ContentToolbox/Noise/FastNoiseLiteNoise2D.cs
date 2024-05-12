@@ -9,6 +9,7 @@ public class FastNoiseLiteNoise2D : Noise2D
         _noise = new FastNoiseLite();
         _noise.SetNoiseType(noiseType);
         _noise.SetFrequency(frequency);
+        _noise.SetSeed(Random.Shared.Next());
     }
 
     public double HighCutoff { get; init; } = 1;

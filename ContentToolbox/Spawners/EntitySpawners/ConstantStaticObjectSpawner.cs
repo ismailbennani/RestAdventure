@@ -4,7 +4,7 @@ using RestAdventure.Core.Maps.Locations;
 
 namespace ContentToolbox.Spawners.EntitySpawners;
 
-public class StaticObjectSpawner : EntitySpawner
+public class ConstantStaticObjectSpawner : EntitySpawner
 {
     public required StaticObject StaticObject { get; init; }
 
