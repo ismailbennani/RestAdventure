@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using RestAdventure.Core.Combat;
+using RestAdventure.Core.Serialization.Combats;
 
 namespace RestAdventure.Game.Apis.Common.Dtos.Combats;
 
@@ -21,7 +22,7 @@ public abstract class CombatDto
 
 static class CombatMappingExtensions
 {
-    public static CombatDto ToDto(this CombatInstance combat)
+    public static CombatDto ToDto(this CombatInstanceSnapshot combat)
     {
         switch (combat.Phase)
         {

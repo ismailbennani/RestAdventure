@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using RestAdventure.Core.Entities;
+using RestAdventure.Core.Serialization.Entities;
 
 namespace RestAdventure.Game.Apis.Common.Dtos.Entities;
 
@@ -23,5 +23,5 @@ public class EntityMinimalDto
 
 static class EntityMinimalMappingExtensions
 {
-    public static EntityMinimalDto ToMinimalDto(this IGameEntity entity) => new() { Id = entity.Id.Guid, Name = entity.Name };
+    public static EntityMinimalDto ToMinimalDto(this GameEntitySnapshot entity) => new() { Id = entity.Id.Guid, Name = entity.Name };
 }

@@ -8,16 +8,16 @@ namespace RestAdventure.Core.Jobs;
 
 public class HarvestAction : Action
 {
-    public HarvestAction(Job job, JobHarvest harvest, StaticObjectInstance target) : base($"{harvest.Name}")
+    public HarvestAction(Job job, JobHarvest harvest, StaticObjectInstanceId targetId) : base($"{harvest.Name}")
     {
         Job = job;
         Harvest = harvest;
-        Target = target;
+        TargetId = targetId;
     }
 
     public Job Job { get; }
     public JobHarvest Harvest { get; }
-    public StaticObjectInstance Target { get; }
+    public StaticObjectInstanceId TargetId { get; }
 
     protected override Maybe CanPerformInternal(Game state, Character character)
     {
@@ -38,7 +38,8 @@ public class HarvestAction : Action
             return "Job level too low";
         }
 
-        if (!Harvest.Match(Target) || Target.Busy)
+        StaticObjectInstance? target = state.Entities.Get<StaticObjectInstance>(TargetId);
+        if (target == null || !Harvest.Match(target) || target.Busy)
         {
             return "Entity cannot be harvested";
         }
@@ -50,7 +51,8 @@ public class HarvestAction : Action
 
     protected override Task OnStartAsync(Game state, Character character)
     {
-        Target.Busy = true;
+        StaticObjectInstance target = state.Entities.Get<StaticObjectInstance>(TargetId)!;
+        target.Busy = true;
         return Task.CompletedTask;
     }
 
@@ -59,8 +61,12 @@ public class HarvestAction : Action
         character.Inventory.Add(Harvest.Items);
         character.Jobs.Get(Job)?.Progression.Progress(Harvest.Experience);
 
-        await Target.KillAsync(state);
+        StaticObjectInstance? target = state.Entities.Get<StaticObjectInstance>(TargetId);
+        if (target != null)
+        {
+            await target.KillAsync(state);
+        }
     }
 
-    public override string ToString() => $"{Harvest} | {Target}";
+    public override string ToString() => $"{Harvest} | {TargetId}";
 }

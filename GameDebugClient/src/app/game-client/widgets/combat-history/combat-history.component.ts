@@ -3,6 +3,7 @@ import { Component, Input, OnInit, numberAttribute } from '@angular/core';
 import { ReplaySubject, catchError, combineLatest, debounceTime, map, of, switchMap, tap } from 'rxjs';
 import {
   ArchivedCombat,
+  Character,
   CombatEndedHistoryEntry,
   CombatEntityAttackedHistoryEntry,
   CombatEntityDiedHistoryEntry,
@@ -15,7 +16,6 @@ import {
   CombatsHistoryApiClient,
   OngoingCombat,
   SearchResultOfCombatHistoryEntry,
-  TeamCharacter,
 } from '../../../../api/game-api-client.generated';
 import { GameService } from '../../services/game.service';
 
@@ -27,7 +27,7 @@ import { GameService } from '../../services/game.service';
 })
 export class CombatHistoryComponent implements OnInit {
   @Input({ required: true })
-  public set character(value: TeamCharacter) {
+  public set character(value: Character) {
     this.characterSubject.next(value);
   }
 
@@ -41,7 +41,7 @@ export class CombatHistoryComponent implements OnInit {
   protected loading: boolean = false;
   protected history: { turn: number; preparation: boolean; entries: CombatHistoryEntry[] }[] = [];
 
-  private characterSubject: ReplaySubject<TeamCharacter> = new ReplaySubject<TeamCharacter>(1);
+  private characterSubject: ReplaySubject<Character> = new ReplaySubject<Character>(1);
   private combatSubject: ReplaySubject<CombatInPreparation | OngoingCombat | ArchivedCombat> = new ReplaySubject<CombatInPreparation | OngoingCombat | ArchivedCombat>(1);
 
   constructor(

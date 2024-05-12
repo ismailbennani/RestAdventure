@@ -4,6 +4,7 @@ import { ReplaySubject, forkJoin, map, switchMap } from 'rxjs';
 import {
   Action,
   ArchivedCombat,
+  Character,
   CombatFormationAccessibility,
   CombatInPreparation,
   CombatSide,
@@ -14,7 +15,6 @@ import {
   OngoingCombat,
   PveApiClient,
   StartPveCombatAction,
-  TeamCharacter,
 } from '../../../../api/game-api-client.generated';
 import { GameService } from '../../services/game.service';
 import { CombatHistoryComponent } from '../combat-history/combat-history.component';
@@ -29,10 +29,10 @@ import { CombatComponent } from '../combat/combat.component';
 })
 export class CharacterCombatsComponent implements OnInit {
   @Input({ required: true })
-  public get character(): TeamCharacter {
+  public get character(): Character {
     return this._character;
   }
-  public set character(value: TeamCharacter) {
+  public set character(value: Character) {
     this._character = value;
     this.characterSubject.next(value);
   }
@@ -46,8 +46,8 @@ export class CharacterCombatsComponent implements OnInit {
 
   protected cachedValues: { [combatId: string]: { attackersDisplay: string; defendersDisplay: string } } = {};
 
-  private _character: TeamCharacter = null!;
-  private characterSubject: ReplaySubject<TeamCharacter> = new ReplaySubject<TeamCharacter>(1);
+  private _character: Character = null!;
+  private characterSubject: ReplaySubject<Character> = new ReplaySubject<Character>(1);
 
   constructor(
     private gameService: GameService,
@@ -122,7 +122,7 @@ export class CharacterCombatsComponent implements OnInit {
   }
 
   private isCombatAction(action: Action, combat: CombatInPreparation | OngoingCombat) {
-    return action instanceof StartPveCombatAction || (action instanceof JoinPveCombatAction && action.combat.id === combat.id);
+    return action instanceof StartPveCombatAction || (action instanceof JoinPveCombatAction && action.combatId === combat.id);
   }
 
   private autoSelectCombatAfterRefresh() {

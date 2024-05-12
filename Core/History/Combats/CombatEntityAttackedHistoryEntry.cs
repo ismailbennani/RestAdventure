@@ -35,7 +35,7 @@ public class CreateCombatEntityAttackedHistoryEntry : INotificationHandler<Comba
 
     public Task Handle(CombatEntityAttacked notification, CancellationToken cancellationToken)
     {
-        Game state = _gameService.RequireGameState();
+        Game state = _gameService.RequireGame();
         CombatEntityAttackedHistoryEntry entry = new(notification.Combat, notification.Attacker, notification.AttackReceived, notification.Target, state.Tick);
         state.History.Record(entry);
         return Task.CompletedTask;

@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using RestAdventure.Core;
-using RestAdventure.Core.Combat;
 using RestAdventure.Core.Entities.Characters;
-using RestAdventure.Core.Players;
+using RestAdventure.Core.Serialization;
+using RestAdventure.Core.Serialization.Combats;
+using RestAdventure.Core.Serialization.Entities;
 using RestAdventure.Game.Apis.Common.Dtos.Combats;
 using RestAdventure.Game.Authentication;
 
@@ -34,17 +35,16 @@ public class CombatsController : GameApiController
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public ActionResult<IReadOnlyCollection<CombatDto>> GetCombats(Guid characterGuid)
     {
-        Core.Game state = _gameService.RequireGameState();
-        Player player = ControllerContext.RequirePlayer(state);
+        GameSnapshot state = _gameService.GetLastSnapshot();
+        PlayerSnapshot player = ControllerContext.RequirePlayer(state);
 
         CharacterId characterId = new(characterGuid);
-        Character? character = state.Entities.Get<Character>(characterId);
-        if (character == null || character.Player != player)
+        if (state.Entities.GetValueOrDefault(characterId) is not CharacterSnapshot character || character.PlayerId != player.UserId)
         {
             return BadRequest();
         }
 
-        IEnumerable<CombatInstance> combats = state.Combats.GetCombatAtLocation(character.Location);
+        IEnumerable<CombatInstanceSnapshot> combats = state.Combats.Values.Where(c => c.Location == character.Location);
         return combats.Select(c => c.ToDto()).ToArray();
     }
 }

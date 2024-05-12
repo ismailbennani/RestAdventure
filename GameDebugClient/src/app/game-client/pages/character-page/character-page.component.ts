@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ReplaySubject, combineLatest, map, switchMap, tap } from 'rxjs';
-import { Action, CharactersApiClient, Team, TeamCharacter } from '../../../../api/game-api-client.generated';
+import { Action, Character, CharactersApiClient, Team } from '../../../../api/game-api-client.generated';
 import { SpinnerComponent } from '../../../common/spinner/spinner.component';
 import { CurrentPageService } from '../../services/current-page.service';
 import { GameService } from '../../services/game.service';
@@ -45,7 +45,7 @@ import { JobsComponent } from '../../widgets/jobs/jobs.component';
 export class CharacterPageComponent implements OnInit {
   protected loading: boolean = false;
   protected characterId: string | undefined;
-  protected character: TeamCharacter | undefined;
+  protected character: Character | undefined;
 
   private team: Team | undefined;
   private refreshSubject: ReplaySubject<void> = new ReplaySubject<void>(1);

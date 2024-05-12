@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { ReplaySubject, switchMap, tap } from 'rxjs';
-import { Action, IMonsterGroup, JoinPveCombatAction, PveApiClient, StartPveCombatAction, TeamCharacter } from '../../../../api/game-api-client.generated';
+import { Action, Character, IMonsterGroup, JoinPveCombatAction, PveApiClient, StartPveCombatAction } from '../../../../api/game-api-client.generated';
 import { GameService } from '../../services/game.service';
 
 @Component({
@@ -12,18 +12,18 @@ import { GameService } from '../../services/game.service';
 })
 export class CharacterMonstersComponent implements OnInit {
   @Input({ required: true })
-  public get character(): TeamCharacter {
+  public get character(): Character {
     return this._character;
   }
-  public set character(value: TeamCharacter) {
+  public set character(value: Character) {
     this._character = value;
     this.characterSubject.next(value);
   }
 
   protected monsterGroups: (IMonsterGroup & { display: string; totalLevel: number })[] = [];
 
-  private _character: TeamCharacter = null!;
-  private characterSubject: ReplaySubject<TeamCharacter> = new ReplaySubject<TeamCharacter>(1);
+  private _character: Character = null!;
+  private characterSubject: ReplaySubject<Character> = new ReplaySubject<Character>(1);
 
   constructor(
     private gameService: GameService,
@@ -80,6 +80,6 @@ export class CharacterMonstersComponent implements OnInit {
       return true;
     }
 
-    return action.monsterGroup.id === monsterGroup.id;
+    return action.monsterGroupId === monsterGroup.id;
   }
 }

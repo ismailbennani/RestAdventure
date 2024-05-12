@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { ReplaySubject, combineLatest, map } from 'rxjs';
 import { AdminGameContentApiClient, LocationMinimal } from '../../../../api/admin-api-client.generated';
-import { TeamCharacter } from '../../../../api/game-api-client.generated';
+import { Character } from '../../../../api/game-api-client.generated';
 import { TeamService } from '../../services/team/team.service';
 import { MapComponent, MapMarker } from '../map/map.component';
 
@@ -19,21 +19,21 @@ export class CharacterMapComponent implements OnInit {
   }
 
   @Input({ required: true })
-  public get character(): TeamCharacter {
+  public get character(): Character {
     return this._character;
   }
-  public set character(value: TeamCharacter) {
+  public set character(value: Character) {
     this._character = value;
     this.characterSubject.next(value);
   }
-  private _character: TeamCharacter = null!;
+  private _character: Character = null!;
 
   protected currentCharacterId: string | undefined;
   protected locations: LocationMinimal[] = [];
   protected centerAt: [number, number] | undefined;
   protected markerGroups: { [characterId: string]: MapMarker[] } = {};
 
-  private characterSubject: ReplaySubject<TeamCharacter> = new ReplaySubject<TeamCharacter>(1);
+  private characterSubject: ReplaySubject<Character> = new ReplaySubject<Character>(1);
 
   constructor(
     private adminGameContentApiClient: AdminGameContentApiClient,

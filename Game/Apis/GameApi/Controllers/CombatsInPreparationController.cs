@@ -36,7 +36,7 @@ public class CombatsInPreparationController : GameApiController
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public ActionResult SetCombatInPreparationAccessibility(Guid characterGuid, Guid combatGuid, CombatSide side, CombatFormationAccessibility value)
     {
-        Core.Game state = _gameService.RequireGameState();
+        Core.Game state = _gameService.RequireGame();
         Player player = ControllerContext.RequirePlayer(state);
 
         CharacterId characterId = new(characterGuid);

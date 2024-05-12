@@ -44,7 +44,7 @@ public class CreateCharacterStartedCombatHistoryEntry : INotificationHandler<Com
 
     public Task Handle(CombatStarted notification, CancellationToken cancellationToken)
     {
-        Game state = _gameService.RequireGameState();
+        Game state = _gameService.RequireGame();
 
         foreach (IGameEntityWithCombatCapabilities entity in notification.Combat.Attackers.Entities.Concat(notification.Combat.Defenders.Entities))
         {

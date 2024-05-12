@@ -14,7 +14,7 @@ public class CharactersService
 
     public async Task<Maybe<Character>> CreateCharacterAsync(Player player, string name, CharacterClass cls)
     {
-        Game state = _gameService.RequireGameState();
+        Game state = _gameService.RequireGame();
 
         int maxTeamSize = state.Settings.MaxTeamSize;
         IEnumerable<Character> characters = state.Entities.GetCharactersOfPlayer(player);

@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
-import { Action, TeamCharacter } from '../../../../api/game-api-client.generated';
+import { Action, Character } from '../../../../api/game-api-client.generated';
 import { ProgressionBarComponent } from '../../../common/spinner/progression-bar/progression-bar.component';
 import { CharacterActionUtils } from '../../utils/character-action-utils';
 
@@ -11,7 +11,7 @@ import { CharacterActionUtils } from '../../utils/character-action-utils';
   imports: [CommonModule, ProgressionBarComponent],
 })
 export class CharacterComponent {
-  @Input({ required: true }) character: TeamCharacter = null!;
+  @Input({ required: true }) character: Character = null!;
 
   protected healthPercent: number = 0;
 

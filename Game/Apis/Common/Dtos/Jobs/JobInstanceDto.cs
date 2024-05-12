@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using RestAdventure.Core.Jobs;
+using RestAdventure.Core.Serialization.Entities;
 using RestAdventure.Game.Apis.Common.Dtos.Utils;
 
 namespace RestAdventure.Game.Apis.Common.Dtos.Jobs;
@@ -25,6 +26,13 @@ public class JobInstanceDto
 static class JobInstanceMappingExtensions
 {
     public static JobInstanceDto ToDto(this JobInstance jobInstance) =>
+        new()
+        {
+            Job = jobInstance.Job.ToDto(),
+            Progression = jobInstance.Progression.ToMinimalDto()
+        };
+
+    public static JobInstanceDto ToDto(this JobInstanceSnapshot jobInstance) =>
         new()
         {
             Job = jobInstance.Job.ToDto(),

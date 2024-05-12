@@ -6,8 +6,8 @@ using RestAdventure.Core.Entities.StaticObjects;
 using RestAdventure.Core.Items;
 using RestAdventure.Core.Jobs;
 using RestAdventure.Core.Maps.Locations;
-using RestAdventure.Core.Players;
 using RestAdventure.Core.Resources;
+using RestAdventure.Core.Serialization;
 using RestAdventure.Game.Apis.Common.Dtos.Characters;
 using RestAdventure.Game.Apis.Common.Dtos.Items;
 using RestAdventure.Game.Apis.Common.Dtos.Jobs;
@@ -79,10 +79,10 @@ public class GameContentController : GameApiController
 
     ActionResult<TDto> GetResource<TResource, TDto>(Func<GameContent, TResource?> findResource, Func<GameContent, TResource, TDto> map) where TResource: GameResource
     {
-        Core.Game state = _gameService.RequireGameState();
+        GameSnapshot state = _gameService.GetLastSnapshot();
 
         UserId userId = ControllerContext.RequireUserId();
-        Player? player = state.Players.GetPlayer(userId);
+        PlayerSnapshot? player = state.Players.GetValueOrDefault(userId);
         if (player == null)
         {
             return BadRequest();
@@ -95,7 +95,7 @@ public class GameContentController : GameApiController
             return NotFound();
         }
 
-        if (!player.Knowledge.Knows(resource))
+        if (!player.Knowledge.Contains(resource.Id))
         {
             return NotFound();
         }

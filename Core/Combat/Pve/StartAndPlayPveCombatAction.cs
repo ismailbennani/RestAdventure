@@ -9,13 +9,24 @@ namespace RestAdventure.Core.Combat.Pve;
 
 public class StartAndPlayPveCombatAction : Action
 {
-    public StartAndPlayPveCombatAction(MonsterGroup monsterGroup) : base("combat-started")
+    public StartAndPlayPveCombatAction(MonsterGroupId monsterGroupId) : base("combat-started")
     {
-        MonsterGroup = monsterGroup;
+        MonsterGroupId = monsterGroupId;
     }
 
-    public MonsterGroup MonsterGroup { get; }
+    public MonsterGroupId MonsterGroupId { get; }
     public CombatInstance? CombatInstance { get; private set; }
+
+    protected override Maybe CanPerformInternal(Game state, Character character)
+    {
+        MonsterGroup? monsterGroup = state.Entities.Get<MonsterGroup>(MonsterGroupId);
+        if (monsterGroup == null)
+        {
+            return "Could not find monster group";
+        }
+
+        return state.Combats.CanStartCombat([character], [monsterGroup]);
+    }
 
     public override bool IsOver(Game state, Character character) => state.Combats.GetCombatInvolving(character) == null;
 
@@ -23,16 +34,17 @@ public class StartAndPlayPveCombatAction : Action
     {
         ILogger<StartAndPlayPveCombatAction> logger = state.LoggerFactory.CreateLogger<StartAndPlayPveCombatAction>();
 
-        if (CombatInstance != null)
+        MonsterGroup? monsterGroup = state.Entities.Get<MonsterGroup>(MonsterGroupId);
+        if (monsterGroup == null)
         {
-            logger.LogError("Combat started already");
+            logger.LogError("Could not find monster group");
             return;
         }
 
         Maybe<CombatInstance> combat = await state.Combats.StartCombatAsync(
             [character],
             CombatFormationOptions.DefaultCharacterTeamOptions(state),
-            [MonsterGroup],
+            [monsterGroup],
             CombatFormationOptions.DefaultMonsterTeamOptions(state)
         );
         if (!combat.Success)
@@ -42,13 +54,18 @@ public class StartAndPlayPveCombatAction : Action
         }
 
         CombatInstance = combat.Value;
-        MonsterGroup.JoinCombatAction = new JoinAndPlayPveCombatAction(MonsterGroup, CombatInstance);
+        monsterGroup.OngoingCombat = CombatInstance;
     }
 
     protected override Task OnEndAsync(Game state, Character character)
     {
         CombatInstance = null;
-        MonsterGroup.JoinCombatAction = null;
+
+        MonsterGroup? monsterGroup = state.Entities.Get<MonsterGroup>(MonsterGroupId);
+        if (monsterGroup != null)
+        {
+            monsterGroup.OngoingCombat = null;
+        }
 
         return Task.CompletedTask;
     }

@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using RestAdventure.Core.Combat;
+using RestAdventure.Core.Serialization.Combats;
 using RestAdventure.Game.Apis.Common.Dtos.Entities;
 
 namespace RestAdventure.Game.Apis.Common.Dtos.Combats;
@@ -36,7 +36,7 @@ public class CombatInPreparationDto : CombatDto
 
 static class CombatInPreparationMappingExtensions
 {
-    public static CombatInPreparationDto ToCombatInPreparation(this CombatInstance instance) =>
+    public static CombatInPreparationDto ToCombatInPreparation(this CombatInstanceSnapshot instance) =>
         new()
         {
             Id = instance.Id.Guid,

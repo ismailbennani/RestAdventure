@@ -28,7 +28,7 @@ public class CreateEntityLearnedJobHistoryEntry : INotificationHandler<GameEntit
 
     public Task Handle(GameEntityLearnedJob notification, CancellationToken cancellationToken)
     {
-        Game state = _gameService.RequireGameState();
+        Game state = _gameService.RequireGame();
         EntityLearnedJobHistoryEntry entry = new(notification.Entity, notification.Job, state.Tick);
         state.History.Record(entry);
         return Task.CompletedTask;

@@ -32,7 +32,7 @@ public class CreateCombatEntityDiedHistoryEntry : INotificationHandler<CombatEnt
 
     public Task Handle(CombatEntityDied notification, CancellationToken cancellationToken)
     {
-        Game state = _gameService.RequireGameState();
+        Game state = _gameService.RequireGame();
         CombatEntityDiedHistoryEntry entry = new(notification.Combat, notification.Entity, notification.Attacker, state.Tick);
         state.History.Record(entry);
         return Task.CompletedTask;

@@ -11,5 +11,5 @@ public class TeamDto
     ///     The characters in the team
     /// </summary>
     [Required]
-    public required IReadOnlyCollection<TeamCharacterDto> Characters { get; init; }
+    public required IReadOnlyCollection<CharacterDto> Characters { get; init; }
 }

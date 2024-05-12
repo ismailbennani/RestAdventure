@@ -1,7 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using RestAdventure.Core.Combat.Pve;
-using RestAdventure.Game.Apis.Common.Dtos.Combats;
-using RestAdventure.Game.Apis.Common.Dtos.Monsters;
 
 namespace RestAdventure.Game.Apis.Common.Dtos.Characters.Actions;
 
@@ -14,13 +12,13 @@ public class JoinPveCombatActionDto : ActionDto
     ///     The group of monsters
     /// </summary>
     [Required]
-    public required MonsterGroupMinimalDto MonsterGroup { get; init; }
+    public required Guid MonsterGroupId { get; init; }
 
     /// <summary>
     ///     The combat to join
     /// </summary>
     [Required]
-    public required CombatInPreparationDto Combat { get; init; }
+    public required Guid CombatId { get; init; }
 }
 
 static class JoinPveCombatActionMappingExtensions
@@ -29,7 +27,7 @@ static class JoinPveCombatActionMappingExtensions
         new()
         {
             Name = action.Name,
-            MonsterGroup = action.MonsterGroup.ToMonsterGroupMinimalDto(),
-            Combat = action.Combat.ToCombatInPreparation()
+            MonsterGroupId = action.MonsterGroupId.Guid,
+            CombatId = action.CombatId.Guid
         };
 }

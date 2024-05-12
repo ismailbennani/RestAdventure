@@ -1,24 +1,24 @@
 ﻿using RestAdventure.Core.Actions;
-using RestAdventure.Core.Entities.Characters;
-using RestAdventure.Core.Entities.Monsters;
+using RestAdventure.Core.Serialization;
+using RestAdventure.Core.Serialization.Entities;
 using Action = RestAdventure.Core.Actions.Action;
 
 namespace RestAdventure.Core.Combat.Pve;
 
 public class PveCombatActionsProvider : IActionsProvider
 {
-    public IEnumerable<Action> GetActions(Game state, Character character)
+    public IEnumerable<Action> GetActions(GameSnapshot state, CharacterSnapshot character)
     {
-        IEnumerable<MonsterGroup> groups = state.Entities.AtLocation<MonsterGroup>(character.Location);
-        foreach (MonsterGroup group in groups)
+        IEnumerable<MonsterGroupSnapshot> groups = state.Entities.Values.OfType<MonsterGroupSnapshot>().Where(group => group.Location == character.Location);
+        foreach (MonsterGroupSnapshot group in groups)
         {
-            if (group.JoinCombatAction != null)
+            if (group.OngoingCombatId != null)
             {
-                yield return group.JoinCombatAction;
+                yield return new JoinAndPlayPveCombatAction(group.Id, group.OngoingCombatId);
             }
             else
             {
-                yield return group.StartCombatAction;
+                yield return new StartAndPlayPveCombatAction(group.Id);
             }
         }
     }

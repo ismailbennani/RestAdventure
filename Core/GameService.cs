@@ -2,6 +2,7 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
 using RestAdventure.Core.Plugins;
+using RestAdventure.Core.Serialization;
 
 namespace RestAdventure.Core;
 
@@ -11,7 +12,9 @@ public class GameService
     readonly ILoggerFactory _loggerFactory;
     readonly ILogger<GameService> _logger;
 
-    Game? _gameState;
+    Game? _game;
+    GameSnapshot? _snapshot;
+    readonly object _snapshotLock = new();
 
     public GameService(IPublisher publisher, ILoggerFactory loggerFactory)
     {
@@ -23,34 +26,56 @@ public class GameService
     public async Task<Game> NewGameAsync(Scenario scenario, GameSettings settings)
     {
         GameContent gameContent = scenario.ToGameContent();
-        _gameState = new Game(settings, gameContent, _publisher, _loggerFactory);
-        await _gameState.Simulation.StartAsync();
+        _game = new Game(settings, gameContent, _publisher, _loggerFactory);
+        await _game.Simulation.StartAsync();
 
         _logger.LogInformation("Game state has been initialized with settings: {settingsJson}.", JsonSerializer.Serialize(settings));
 
-        return _gameState;
+        lock (_snapshotLock)
+        {
+            _snapshot = GameSnapshot.Take(_game);
+        }
+
+        return _game;
     }
 
     public Game LoadGame() => throw new NotImplementedException();
 
-    public Game RequireGameState()
+    public Game RequireGame()
     {
-        if (_gameState == null)
+        if (_game == null)
         {
             throw new InvalidOperationException($"No game has been loaded. Please call {nameof(NewGameAsync)} or {nameof(LoadGame)}.");
         }
 
-        return _gameState;
+        return _game;
     }
 
-    public GameContent RequireGameContent() => RequireGameState().Content;
+    public GameContent RequireGameContent() => RequireGame().Content;
+
+    public GameSnapshot GetLastSnapshot()
+    {
+        lock (_snapshotLock)
+        {
+            if (_snapshot == null)
+            {
+                throw new InvalidOperationException($"No game has been loaded. Please call {nameof(NewGameAsync)} or {nameof(LoadGame)}.");
+            }
+
+            return _snapshot;
+        }
+    }
 
     public async Task<long> TickAsync()
     {
-        Game state = RequireGameState();
+        Game game = RequireGame();
+        await game.Simulation.TickAsync();
 
-        await state.Simulation.TickAsync();
+        lock (_snapshotLock)
+        {
+            _snapshot = GameSnapshot.Take(game);
+        }
 
-        return state.Tick;
+        return game.Tick;
     }
 }

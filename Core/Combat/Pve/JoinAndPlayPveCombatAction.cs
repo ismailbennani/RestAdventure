@@ -8,18 +8,24 @@ namespace RestAdventure.Core.Combat.Pve;
 
 public class JoinAndPlayPveCombatAction : Action
 {
-    public JoinAndPlayPveCombatAction(MonsterGroup monsterGroup, CombatInstance combat) : base("combat-started")
+    public JoinAndPlayPveCombatAction(MonsterGroupId monsterGroupId, CombatInstanceId combatId) : base("combat-started")
     {
-        MonsterGroup = monsterGroup;
-        Combat = combat;
+        MonsterGroupId = monsterGroupId;
+        CombatId = combatId;
     }
 
-    public MonsterGroup MonsterGroup { get; }
-    public CombatInstance Combat { get; }
+    public MonsterGroupId MonsterGroupId { get; }
+    public CombatInstanceId CombatId { get; set; }
 
     protected override Maybe CanPerformInternal(Game state, Character character)
     {
-        CombatInstance? combat = state.Combats.GetCombatInvolving(MonsterGroup);
+        MonsterGroup? monsterGroup = state.Entities.Get<MonsterGroup>(MonsterGroupId);
+        if (monsterGroup == null)
+        {
+            return "Could not find monster group";
+        }
+
+        CombatInstance? combat = state.Combats.GetCombatInvolving(monsterGroup);
         if (combat == null)
         {
             return "Combat not started";
@@ -34,10 +40,17 @@ public class JoinAndPlayPveCombatAction : Action
     {
         ILogger<StartAndPlayPveCombatAction> logger = state.LoggerFactory.CreateLogger<StartAndPlayPveCombatAction>();
 
-        CombatInstance? combat = state.Combats.GetCombatInvolving(MonsterGroup);
+        MonsterGroup? monsterGroup = state.Entities.Get<MonsterGroup>(MonsterGroupId);
+        if (monsterGroup == null)
+        {
+            logger.LogError("Could not find monster group");
+            return Task.CompletedTask;
+        }
+
+        CombatInstance? combat = state.Combats.GetCombatInvolving(monsterGroup);
         if (combat == null)
         {
-            logger.LogError("Could not find combat involving monsters {monsters}", MonsterGroup);
+            logger.LogError("Could not find combat involving monsters {monsters}", monsterGroup);
             return Task.CompletedTask;
         }
 

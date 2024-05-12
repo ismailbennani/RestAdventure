@@ -49,7 +49,7 @@ public class CreateCharacterEndedCombatHistoryEntry : INotificationHandler<Comba
 
     public Task Handle(CombatEnded notification, CancellationToken cancellationToken)
     {
-        Game state = _gameService.RequireGameState();
+        Game state = _gameService.RequireGame();
 
         foreach (IGameEntityWithCombatCapabilities entity in notification.Combat.Attackers.Entities.Concat(notification.Combat.Defenders.Entities))
         {

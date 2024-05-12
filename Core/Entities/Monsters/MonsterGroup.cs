@@ -1,5 +1,4 @@
 ﻿using RestAdventure.Core.Combat;
-using RestAdventure.Core.Combat.Pve;
 using RestAdventure.Core.Maps.Locations;
 
 namespace RestAdventure.Core.Entities.Monsters;
@@ -14,12 +13,10 @@ public class MonsterGroup : GameEntity<MonsterGroupId>, IGameEntityWithCombatCap
     public MonsterGroup(IReadOnlyList<MonsterInGroup> monsters, Location location) : base(new MonsterGroupId(Guid.NewGuid()), GetName(monsters), location)
     {
         Monsters = monsters;
-        StartCombatAction = new StartAndPlayPveCombatAction(this);
     }
 
     public IReadOnlyList<MonsterInGroup> Monsters { get; }
-    public StartAndPlayPveCombatAction StartCombatAction { get; }
-    public JoinAndPlayPveCombatAction? JoinCombatAction { get; set; }
+    public CombatInstance? OngoingCombat { get; set; }
 
     static string GetName(IEnumerable<MonsterInGroup> monsters) =>
         string.Join(

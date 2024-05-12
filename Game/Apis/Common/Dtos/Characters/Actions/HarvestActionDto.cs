@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using RestAdventure.Core.Jobs;
 using RestAdventure.Game.Apis.Common.Dtos.Jobs;
-using RestAdventure.Game.Apis.Common.Dtos.StaticObjects;
 
 namespace RestAdventure.Game.Apis.Common.Dtos.Characters.Actions;
 
@@ -20,7 +19,7 @@ public class HarvestActionDto : ActionDto
     ///     The target of the harvest
     /// </summary>
     [Required]
-    public required StaticObjectInstanceDto Target { get; init; }
+    public required Guid TargetId { get; init; }
 }
 
 static class HarvestActionMappingExtensions
@@ -30,6 +29,6 @@ static class HarvestActionMappingExtensions
         {
             Name = action.Name,
             Harvest = action.Harvest.ToMinimalDto(action.Job),
-            Target = action.Target.ToDto()
+            TargetId = action.TargetId.Guid
         };
 }

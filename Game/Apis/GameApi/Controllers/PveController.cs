@@ -4,7 +4,8 @@ using RestAdventure.Core;
 using RestAdventure.Core.Combat.Pve;
 using RestAdventure.Core.Entities.Characters;
 using RestAdventure.Core.Entities.Monsters;
-using RestAdventure.Core.Players;
+using RestAdventure.Core.Serialization;
+using RestAdventure.Core.Serialization.Entities;
 using RestAdventure.Game.Apis.Common.Dtos.Monsters;
 using RestAdventure.Game.Authentication;
 using RestAdventure.Kernel.Errors;
@@ -39,18 +40,16 @@ public class PveController : GameApiController
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public ActionResult<IReadOnlyCollection<MonsterGroupDto>> GetMonsters(Guid characterGuid)
     {
-        Core.Game state = _gameService.RequireGameState();
-        Player player = ControllerContext.RequirePlayer(state);
+        GameSnapshot state = _gameService.GetLastSnapshot();
+        PlayerSnapshot player = ControllerContext.RequirePlayer(state);
 
         CharacterId characterId = new(characterGuid);
-        Character? character = state.Entities.Get<Character>(characterId);
-
-        if (character == null || character.Player != player)
+        if (state.Entities.GetValueOrDefault(characterId) is not CharacterSnapshot character || character.PlayerId != player.UserId)
         {
             return BadRequest();
         }
 
-        IReadOnlyCollection<Action> actions = state.Actions.GetAvailableActions(character);
+        IReadOnlyCollection<Action> actions = state.Actions.GetAvailableActions(state, character);
         IEnumerable<StartAndPlayPveCombatAction> startCombatActions = actions.OfType<StartAndPlayPveCombatAction>();
         IEnumerable<JoinAndPlayPveCombatAction> joinCombatActions = actions.OfType<JoinAndPlayPveCombatAction>();
 
@@ -58,13 +57,18 @@ public class PveController : GameApiController
 
         foreach (JoinAndPlayPveCombatAction action in joinCombatActions)
         {
-            Maybe canStartCombat = action.CanPerform(state, character);
+            if (state.Entities.GetValueOrDefault(action.MonsterGroupId) is not MonsterGroupSnapshot monsterGroup)
+            {
+                continue;
+            }
+
+            Maybe canStartCombat = character.Busy ? "Character is busy" : true;
             result.Add(
                 new MonsterGroupDto
                 {
-                    Id = action.MonsterGroup.Id.Guid,
-                    Monsters = action.MonsterGroup.Monsters.Select(m => m.ToDto()).ToArray(),
-                    ExpectedExperience = action.MonsterGroup.Monsters.Sum(m => m.Species.Experience),
+                    Id = monsterGroup.Id.Guid,
+                    Monsters = monsterGroup.Monsters.Select(m => m.ToDto()).ToArray(),
+                    ExpectedExperience = monsterGroup.Monsters.Sum(m => m.Species.Experience),
                     Attacked = true,
                     CanAttackOrJoin = canStartCombat.Success,
                     WhyCannotAttackOrJoin = canStartCombat.WhyNot
@@ -74,13 +78,25 @@ public class PveController : GameApiController
 
         foreach (StartAndPlayPveCombatAction action in startCombatActions)
         {
-            Maybe canStartCombat = action.CanPerform(state, character);
+            if (state.Entities.GetValueOrDefault(action.MonsterGroupId) is not MonsterGroupSnapshot monsterGroup)
+            {
+                continue;
+            }
+
+            Maybe canStartCombat = character.Busy
+                ? "Character is busy"
+                : monsterGroup.OngoingCombatId != null
+                    ? "Target is in combat"
+                    : monsterGroup.Busy
+                        ? "Target is busy"
+                        : true;
+
             result.Add(
                 new MonsterGroupDto
                 {
-                    Id = action.MonsterGroup.Id.Guid,
-                    Monsters = action.MonsterGroup.Monsters.Select(m => m.ToDto()).ToArray(),
-                    ExpectedExperience = action.MonsterGroup.Monsters.Sum(m => m.Species.Experience),
+                    Id = monsterGroup.Id.Guid,
+                    Monsters = monsterGroup.Monsters.Select(m => m.ToDto()).ToArray(),
+                    ExpectedExperience = monsterGroup.Monsters.Sum(m => m.Species.Experience),
                     Attacked = false,
                     CanAttackOrJoin = canStartCombat.Success,
                     WhyCannotAttackOrJoin = canStartCombat.WhyNot
@@ -100,27 +116,32 @@ public class PveController : GameApiController
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public ActionResult AttackMonsters(Guid characterGuid, Guid groupId)
     {
-        Core.Game state = _gameService.RequireGameState();
-        Player player = ControllerContext.RequirePlayer(state);
+        GameSnapshot state = _gameService.GetLastSnapshot();
+        PlayerSnapshot player = ControllerContext.RequirePlayer(state);
 
         CharacterId characterId = new(characterGuid);
-        Character? character = state.Entities.Get<Character>(characterId);
-
-        if (character == null || character.Player != player)
+        if (state.Entities.GetValueOrDefault(characterId) is not CharacterSnapshot character || character.PlayerId != player.UserId)
         {
             return BadRequest();
         }
 
         MonsterGroupId monsterGroupId = new(groupId);
-        StartAndPlayPveCombatAction? action = state.Actions.GetAvailableActions(character)
+        StartAndPlayPveCombatAction? action = state.Actions.GetAvailableActions(state, character)
             .OfType<StartAndPlayPveCombatAction>()
-            .SingleOrDefault(a => a.MonsterGroup.Id == monsterGroupId);
+            .SingleOrDefault(a => a.MonsterGroupId == monsterGroupId);
         if (action == null)
         {
             return NotFound();
         }
 
-        state.Actions.QueueAction(character, action);
+        Core.Game game = _gameService.RequireGame();
+        Character? gameCharacter = game.Entities.Get<Character>(characterId);
+        if (gameCharacter == null)
+        {
+            return BadRequest();
+        }
+
+        game.Actions.QueueAction(gameCharacter, action);
 
         return NoContent();
     }
@@ -134,28 +155,33 @@ public class PveController : GameApiController
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public ActionResult JoinCombat(Guid characterGuid, Guid monsterGroupGuid)
     {
-        Core.Game state = _gameService.RequireGameState();
-        Player player = ControllerContext.RequirePlayer(state);
+        GameSnapshot state = _gameService.GetLastSnapshot();
+        PlayerSnapshot player = ControllerContext.RequirePlayer(state);
 
         CharacterId characterId = new(characterGuid);
-        Character? character = state.Entities.Get<Character>(characterId);
-
-        if (character == null || character.Player != player)
+        if (state.Entities.GetValueOrDefault(characterId) is not CharacterSnapshot character || character.PlayerId != player.UserId)
         {
             return BadRequest();
         }
 
         MonsterGroupId monsterGroupId = new(monsterGroupGuid);
-        JoinAndPlayPveCombatAction? action = state.Actions.GetAvailableActions(character)
+        JoinAndPlayPveCombatAction? action = state.Actions.GetAvailableActions(state, character)
             .OfType<JoinAndPlayPveCombatAction>()
-            .SingleOrDefault(a => a.MonsterGroup.Id == monsterGroupId);
+            .SingleOrDefault(a => a.MonsterGroupId == monsterGroupId);
 
-        if (action == null || action.Combat.Location != character.Location)
+        if (action == null)
         {
             return NotFound();
         }
 
-        state.Actions.QueueAction(character, action);
+        Core.Game game = _gameService.RequireGame();
+        Character? gameCharacter = game.Entities.Get<Character>(characterId);
+        if (gameCharacter == null)
+        {
+            return BadRequest();
+        }
+
+        game.Actions.QueueAction(gameCharacter, action);
 
         return NoContent();
     }

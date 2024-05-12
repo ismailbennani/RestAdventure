@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using RestAdventure.Core.Combat.Pve;
-using RestAdventure.Game.Apis.Common.Dtos.Monsters;
 
 namespace RestAdventure.Game.Apis.Common.Dtos.Characters.Actions;
 
@@ -13,7 +12,7 @@ public class StartPveCombatActionDto : ActionDto
     ///     The group of monsters
     /// </summary>
     [Required]
-    public required MonsterGroupMinimalDto MonsterGroup { get; init; }
+    public required Guid MonsterGroupId { get; init; }
 }
 
 static class StartPveCombatActionMappingExtensions
@@ -22,6 +21,6 @@ static class StartPveCombatActionMappingExtensions
         new()
         {
             Name = action.Name,
-            MonsterGroup = action.MonsterGroup.ToMonsterGroupMinimalDto()
+            MonsterGroupId = action.MonsterGroupId.Guid
         };
 }

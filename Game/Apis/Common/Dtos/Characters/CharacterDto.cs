@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using RestAdventure.Core.Entities.Characters;
+using RestAdventure.Core.Serialization.Entities;
 using RestAdventure.Game.Apis.Common.Dtos.Characters.Actions;
 using RestAdventure.Game.Apis.Common.Dtos.Items;
 using RestAdventure.Game.Apis.Common.Dtos.Jobs;
@@ -12,7 +13,7 @@ namespace RestAdventure.Game.Apis.Common.Dtos.Characters;
 /// <summary>
 ///     Character
 /// </summary>
-public class TeamCharacterDto
+public class CharacterDto
 {
     /// <summary>
     ///     The unique ID of the character
@@ -81,7 +82,23 @@ public class TeamCharacterDto
 
 static class TeamCharacterMappingExtensions
 {
-    public static TeamCharacterDto ToDto(this Character character, CharacterMappingOptions? options = null) =>
+    public static CharacterDto ToDto(this Character character, CharacterMappingOptions? options = null) =>
+        new()
+        {
+            Id = character.Id.Guid,
+            Name = character.Name,
+            Class = character.Class.ToMinimalDto(),
+            Health = character.Health,
+            MaxHealth = character.Class.Health,
+            Progression = character.Progression.ToMinimalDto(),
+            Location = character.Location.ToMinimalDto(),
+            Inventory = character.Inventory.ToDto(),
+            Jobs = character.Jobs.Select(j => j.ToDto()).ToArray(),
+            OngoingAction = options?.OngoingAction?.ToDto(),
+            PlannedAction = options?.PlannedAction?.ToDto()
+        };
+
+    public static CharacterDto ToDto(this CharacterSnapshot character, CharacterMappingOptions? options = null) =>
         new()
         {
             Id = character.Id.Guid,

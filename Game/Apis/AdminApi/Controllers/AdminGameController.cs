@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using RestAdventure.Core;
+using RestAdventure.Core.Serialization;
 using RestAdventure.Game.Apis.Common.Dtos;
 using RestAdventure.Game.Services;
 
@@ -28,7 +29,7 @@ public class AdminGameController : AdminApiController
     ///     Get game settings
     /// </summary>
     [HttpGet("settings")]
-    public GameSettingsDto GetGameSettings() => _gameService.RequireGameState().Settings.ToDto();
+    public GameSettingsDto GetGameSettings() => _gameService.GetLastSnapshot().Settings.ToDto();
 
     /// <summary>
     ///     Get game state
@@ -36,7 +37,7 @@ public class AdminGameController : AdminApiController
     [HttpGet("state")]
     public GameStateDto GetGameState()
     {
-        Core.Game state = _gameService.RequireGameState();
+        GameSnapshot state = _gameService.GetLastSnapshot();
         return state.ToDto(_gameSimulation);
     }
 

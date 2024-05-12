@@ -32,7 +32,7 @@ public class CreateEntityJobLeveledUpHistoryEntry : INotificationHandler<GameEnt
 
     public Task Handle(GameEntityJobLeveledUp notification, CancellationToken cancellationToken)
     {
-        Game state = _gameService.RequireGameState();
+        Game state = _gameService.RequireGame();
         EntityJobLeveledUpHistoryEntry entry = new(notification.Entity, notification.Job, notification.OldLevel, notification.NewLevel, state.Tick);
         state.History.Record(entry);
         return Task.CompletedTask;

@@ -34,7 +34,7 @@ public class CreateEntityInventoryChangedHistoryEntry : INotificationHandler<Gam
 
     public Task Handle(GameEntityInventoryChanged notification, CancellationToken cancellationToken)
     {
-        Game state = _gameService.RequireGameState();
+        Game state = _gameService.RequireGame();
         EntityInventoryChangedHistoryEntry entry = new(notification.Entity, notification.ItemInstance, notification.OldCount, notification.NewCount, state.Tick);
         state.History.Record(entry);
         return Task.CompletedTask;

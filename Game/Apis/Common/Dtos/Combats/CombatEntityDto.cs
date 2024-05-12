@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using RestAdventure.Core.Combat;
+using RestAdventure.Core.Serialization.Combats;
 using RestAdventure.Game.Apis.Common.Dtos.Entities;
 
 namespace RestAdventure.Game.Apis.Common.Dtos.Combats;
@@ -30,7 +30,7 @@ public class CombatEntityDto : EntityMinimalDto
 
 static class EntityInCombatMappingExtensions
 {
-    public static CombatEntityDto ToDto(this ICombatEntity entity) =>
+    public static CombatEntityDto ToDto(this CombatEntitySnapshot entity) =>
         new()
         {
             Id = entity.Id.Guid,

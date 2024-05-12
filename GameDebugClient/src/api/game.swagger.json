@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0-alpha.0.220+1b5d7cb215c09776b330aea5fef03d6f5270f9e9"
+    "version": "0.0.0-alpha.0.233+2a1139010fada7f6864f85e7bd96490563a587b1"
   },
   "servers": [
     {
@@ -36,7 +36,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TeamCharacter"
+                  "$ref": "#/components/schemas/Character"
                 }
               }
             }
@@ -84,7 +84,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TeamCharacter"
+                  "$ref": "#/components/schemas/Character"
                 }
               }
             }
@@ -1353,7 +1353,7 @@
   },
   "components": {
     "schemas": {
-      "TeamCharacter": {
+      "Character": {
         "type": "object",
         "description": "Character\n            ",
         "additionalProperties": false,
@@ -1776,7 +1776,7 @@
             "additionalProperties": false,
             "required": [
               "harvest",
-              "target"
+              "targetId"
             ],
             "properties": {
               "harvest": {
@@ -1787,13 +1787,11 @@
                   }
                 ]
               },
-              "target": {
+              "targetId": {
+                "type": "string",
                 "description": "The target of the harvest\n            ",
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/StaticObjectInstance"
-                  }
-                ]
+                "format": "guid",
+                "minLength": 1
               }
             }
           }
@@ -1902,31 +1900,6 @@
           }
         }
       },
-      "StaticObjectInstance": {
-        "type": "object",
-        "description": "Static object instance\n            ",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "staticObject"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "The unique ID of the entity\n            ",
-            "format": "guid",
-            "minLength": 1
-          },
-          "staticObject": {
-            "description": "The static object association with the entity\n            ",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/StaticObject"
-              }
-            ]
-          }
-        }
-      },
       "StartPveCombatAction": {
         "allOf": [
           {
@@ -1937,123 +1910,18 @@
             "description": "PVE combat action\n            ",
             "additionalProperties": false,
             "required": [
-              "monsterGroup"
+              "monsterGroupId"
             ],
             "properties": {
-              "monsterGroup": {
+              "monsterGroupId": {
+                "type": "string",
                 "description": "The group of monsters\n            ",
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/MonsterGroupMinimal"
-                  }
-                ]
+                "format": "guid",
+                "minLength": 1
               }
             }
           }
         ]
-      },
-      "MonsterGroupMinimal": {
-        "type": "object",
-        "description": "Monster group (minimal)\n            ",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "monsters",
-          "expectedExperience"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "The unique ID of the group\n            ",
-            "format": "guid",
-            "minLength": 1
-          },
-          "monsters": {
-            "type": "array",
-            "description": "The monsters in the group\n            ",
-            "items": {
-              "$ref": "#/components/schemas/MonsterInGroup"
-            }
-          },
-          "expectedExperience": {
-            "type": "integer",
-            "description": "The expected experience gain if the character defeats the monster group\n            ",
-            "format": "int32"
-          }
-        }
-      },
-      "MonsterInGroup": {
-        "type": "object",
-        "description": "Monster in group\n            ",
-        "additionalProperties": false,
-        "required": [
-          "species",
-          "level"
-        ],
-        "properties": {
-          "species": {
-            "description": "The species of the monster\n            ",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/MonsterSpecies"
-              }
-            ]
-          },
-          "level": {
-            "type": "integer",
-            "description": "The level of the monster\n            ",
-            "format": "int32"
-          }
-        }
-      },
-      "MonsterSpecies": {
-        "type": "object",
-        "description": "Monster species\n            ",
-        "additionalProperties": false,
-        "required": [
-          "family",
-          "name"
-        ],
-        "properties": {
-          "family": {
-            "description": "The family of monsters\n            ",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/MonsterFamily"
-              }
-            ]
-          },
-          "name": {
-            "type": "string",
-            "description": "The name of the species\n            ",
-            "minLength": 1
-          },
-          "description": {
-            "type": "string",
-            "description": "The description of the species\n            ",
-            "nullable": true
-          }
-        }
-      },
-      "MonsterFamily": {
-        "type": "object",
-        "description": "Monster family\n            ",
-        "additionalProperties": false,
-        "required": [
-          "name"
-        ],
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "The name of the family\n            ",
-            "minLength": 1
-          },
-          "description": {
-            "type": "string",
-            "description": "The description of the family\n            ",
-            "nullable": true
-          }
-        }
       },
       "JoinPveCombatAction": {
         "allOf": [
@@ -2065,233 +1933,21 @@
             "description": "PVE combat action\n            ",
             "additionalProperties": false,
             "required": [
-              "monsterGroup",
-              "combat"
+              "monsterGroupId",
+              "combatId"
             ],
             "properties": {
-              "monsterGroup": {
+              "monsterGroupId": {
+                "type": "string",
                 "description": "The group of monsters\n            ",
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/MonsterGroupMinimal"
-                  }
-                ]
+                "format": "guid",
+                "minLength": 1
               },
-              "combat": {
+              "combatId": {
+                "type": "string",
                 "description": "The combat to join\n            ",
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/CombatInPreparation"
-                  }
-                ]
-              }
-            }
-          }
-        ]
-      },
-      "CombatInPreparation": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Combat"
-          },
-          {
-            "type": "object",
-            "description": "Combat in preparation\n            ",
-            "additionalProperties": false,
-            "required": [
-              "attackers",
-              "attackersOptions",
-              "defenders",
-              "defendersOptions"
-            ],
-            "properties": {
-              "attackers": {
-                "type": "array",
-                "description": "The attackers in the combat instance\n            ",
-                "items": {
-                  "$ref": "#/components/schemas/EntityMinimal"
-                }
-              },
-              "attackersOptions": {
-                "description": "The options of the attacker side\n            ",
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/CombatFormationOptions"
-                  }
-                ]
-              },
-              "defenders": {
-                "type": "array",
-                "description": "The defenders in the combat instance\n            ",
-                "items": {
-                  "$ref": "#/components/schemas/EntityMinimal"
-                }
-              },
-              "defendersOptions": {
-                "description": "The options of the defender side\n            ",
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/CombatFormationOptions"
-                  }
-                ]
-              }
-            }
-          }
-        ]
-      },
-      "EntityMinimal": {
-        "type": "object",
-        "description": "Entity (minimal)\n            ",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "name"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "The unique ID of the entity\n            ",
-            "format": "guid",
-            "minLength": 1
-          },
-          "name": {
-            "type": "string",
-            "description": "The name of the entity\n            ",
-            "minLength": 1
-          }
-        }
-      },
-      "CombatFormationOptions": {
-        "type": "object",
-        "description": "Combat formation options\n            ",
-        "additionalProperties": false,
-        "required": [
-          "accessibility",
-          "slots"
-        ],
-        "properties": {
-          "accessibility": {
-            "description": "The accessibility of the combat formation\n            ",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/CombatFormationAccessibility"
-              }
-            ]
-          },
-          "slots": {
-            "type": "integer",
-            "description": "The max number of entities in the formation\n            ",
-            "format": "int32"
-          }
-        }
-      },
-      "CombatFormationAccessibility": {
-        "type": "string",
-        "description": "",
-        "x-enumNames": [
-          "Everyone",
-          "TeamOnly"
-        ],
-        "enum": [
-          "everyone",
-          "teamOnly"
-        ]
-      },
-      "Combat": {
-        "type": "object",
-        "discriminator": {
-          "propertyName": "$phase",
-          "mapping": {
-            "ongoing": "#/components/schemas/OngoingCombat",
-            "preparation": "#/components/schemas/CombatInPreparation"
-          }
-        },
-        "description": "Combat base\n            ",
-        "x-abstract": true,
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "$phase"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "The unique ID of the combat instance\n            ",
-            "format": "guid",
-            "minLength": 1
-          },
-          "$phase": {
-            "type": "string"
-          }
-        }
-      },
-      "OngoingCombat": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Combat"
-          },
-          {
-            "type": "object",
-            "description": "Combat instance\n            ",
-            "additionalProperties": false,
-            "required": [
-              "turn",
-              "attackers",
-              "defenders"
-            ],
-            "properties": {
-              "turn": {
-                "type": "integer",
-                "description": "The current turn of the combat instance\n            ",
-                "format": "int32"
-              },
-              "attackers": {
-                "type": "array",
-                "description": "The attackers in the combat instance\n            ",
-                "items": {
-                  "$ref": "#/components/schemas/CombatEntity"
-                }
-              },
-              "defenders": {
-                "type": "array",
-                "description": "The defenders in the combat instance\n            ",
-                "items": {
-                  "$ref": "#/components/schemas/CombatEntity"
-                }
-              }
-            }
-          }
-        ]
-      },
-      "CombatEntity": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/EntityMinimal"
-          },
-          {
-            "type": "object",
-            "description": "Entity in combat\n            ",
-            "additionalProperties": false,
-            "required": [
-              "level",
-              "health",
-              "maxHealth"
-            ],
-            "properties": {
-              "level": {
-                "type": "integer",
-                "description": "The level of the character\n            ",
-                "format": "int32"
-              },
-              "health": {
-                "type": "integer",
-                "description": "The health of the entity\n            ",
-                "format": "int32"
-              },
-              "maxHealth": {
-                "type": "integer",
-                "description": "The max health of the entity\n            ",
-                "format": "int32"
+                "format": "guid",
+                "minLength": 1
               }
             }
           }
@@ -3029,6 +2685,214 @@
           "defenders"
         ]
       },
+      "Combat": {
+        "type": "object",
+        "discriminator": {
+          "propertyName": "$phase",
+          "mapping": {
+            "preparation": "#/components/schemas/CombatInPreparation",
+            "ongoing": "#/components/schemas/OngoingCombat"
+          }
+        },
+        "description": "Combat base\n            ",
+        "x-abstract": true,
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "$phase"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the combat instance\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "$phase": {
+            "type": "string"
+          }
+        }
+      },
+      "CombatInPreparation": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Combat"
+          },
+          {
+            "type": "object",
+            "description": "Combat in preparation\n            ",
+            "additionalProperties": false,
+            "required": [
+              "attackers",
+              "attackersOptions",
+              "defenders",
+              "defendersOptions"
+            ],
+            "properties": {
+              "attackers": {
+                "type": "array",
+                "description": "The attackers in the combat instance\n            ",
+                "items": {
+                  "$ref": "#/components/schemas/EntityMinimal"
+                }
+              },
+              "attackersOptions": {
+                "description": "The options of the attacker side\n            ",
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/CombatFormationOptions"
+                  }
+                ]
+              },
+              "defenders": {
+                "type": "array",
+                "description": "The defenders in the combat instance\n            ",
+                "items": {
+                  "$ref": "#/components/schemas/EntityMinimal"
+                }
+              },
+              "defendersOptions": {
+                "description": "The options of the defender side\n            ",
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/CombatFormationOptions"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "EntityMinimal": {
+        "type": "object",
+        "description": "Entity (minimal)\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the entity\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the entity\n            ",
+            "minLength": 1
+          }
+        }
+      },
+      "CombatFormationOptions": {
+        "type": "object",
+        "description": "Combat formation options\n            ",
+        "additionalProperties": false,
+        "required": [
+          "accessibility",
+          "slots"
+        ],
+        "properties": {
+          "accessibility": {
+            "description": "The accessibility of the combat formation\n            ",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CombatFormationAccessibility"
+              }
+            ]
+          },
+          "slots": {
+            "type": "integer",
+            "description": "The max number of entities in the formation\n            ",
+            "format": "int32"
+          }
+        }
+      },
+      "CombatFormationAccessibility": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "Everyone",
+          "TeamOnly"
+        ],
+        "enum": [
+          "everyone",
+          "teamOnly"
+        ]
+      },
+      "OngoingCombat": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Combat"
+          },
+          {
+            "type": "object",
+            "description": "Combat instance\n            ",
+            "additionalProperties": false,
+            "required": [
+              "turn",
+              "attackers",
+              "defenders"
+            ],
+            "properties": {
+              "turn": {
+                "type": "integer",
+                "description": "The current turn of the combat instance\n            ",
+                "format": "int32"
+              },
+              "attackers": {
+                "type": "array",
+                "description": "The attackers in the combat instance\n            ",
+                "items": {
+                  "$ref": "#/components/schemas/CombatEntity"
+                }
+              },
+              "defenders": {
+                "type": "array",
+                "description": "The defenders in the combat instance\n            ",
+                "items": {
+                  "$ref": "#/components/schemas/CombatEntity"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "CombatEntity": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/EntityMinimal"
+          },
+          {
+            "type": "object",
+            "description": "Entity in combat\n            ",
+            "additionalProperties": false,
+            "required": [
+              "level",
+              "health",
+              "maxHealth"
+            ],
+            "properties": {
+              "level": {
+                "type": "integer",
+                "description": "The level of the character\n            ",
+                "format": "int32"
+              },
+              "health": {
+                "type": "integer",
+                "description": "The health of the entity\n            ",
+                "format": "int32"
+              },
+              "maxHealth": {
+                "type": "integer",
+                "description": "The max health of the entity\n            ",
+                "format": "int32"
+              }
+            }
+          }
+        ]
+      },
       "SearchResultOfCombatHistoryEntry": {
         "type": "object",
         "description": "Search result\n            ",
@@ -3699,6 +3563,109 @@
           }
         ]
       },
+      "MonsterGroupMinimal": {
+        "type": "object",
+        "description": "Monster group (minimal)\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "monsters",
+          "expectedExperience"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique ID of the group\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "monsters": {
+            "type": "array",
+            "description": "The monsters in the group\n            ",
+            "items": {
+              "$ref": "#/components/schemas/MonsterInGroup"
+            }
+          },
+          "expectedExperience": {
+            "type": "integer",
+            "description": "The expected experience gain if the character defeats the monster group\n            ",
+            "format": "int32"
+          }
+        }
+      },
+      "MonsterInGroup": {
+        "type": "object",
+        "description": "Monster in group\n            ",
+        "additionalProperties": false,
+        "required": [
+          "species",
+          "level"
+        ],
+        "properties": {
+          "species": {
+            "description": "The species of the monster\n            ",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/MonsterSpecies"
+              }
+            ]
+          },
+          "level": {
+            "type": "integer",
+            "description": "The level of the monster\n            ",
+            "format": "int32"
+          }
+        }
+      },
+      "MonsterSpecies": {
+        "type": "object",
+        "description": "Monster species\n            ",
+        "additionalProperties": false,
+        "required": [
+          "family",
+          "name"
+        ],
+        "properties": {
+          "family": {
+            "description": "The family of monsters\n            ",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/MonsterFamily"
+              }
+            ]
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the species\n            ",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "description": "The description of the species\n            ",
+            "nullable": true
+          }
+        }
+      },
+      "MonsterFamily": {
+        "type": "object",
+        "description": "Monster family\n            ",
+        "additionalProperties": false,
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the family\n            ",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "description": "The description of the family\n            ",
+            "nullable": true
+          }
+        }
+      },
       "Team": {
         "type": "object",
         "description": "Team of characters\n            ",
@@ -3711,7 +3678,7 @@
             "type": "array",
             "description": "The characters in the team\n            ",
             "items": {
-              "$ref": "#/components/schemas/TeamCharacter"
+              "$ref": "#/components/schemas/Character"
             }
           }
         }

@@ -1,12 +1,17 @@
-﻿using RestAdventure.Core.Resources;
+﻿using System.Collections;
+using RestAdventure.Core.Resources;
 
 namespace RestAdventure.Core.Players;
 
-public class PlayerKnowledge : IDisposable
+public class PlayerKnowledge : IReadOnlyCollection<ResourceId>, IDisposable
 {
     readonly HashSet<ResourceId> _discoveredResources = [];
 
     public event EventHandler<GameResource>? Discovered;
+
+    public int Count => _discoveredResources.Count;
+    public IEnumerator<ResourceId> GetEnumerator() => _discoveredResources.GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_discoveredResources).GetEnumerator();
 
     public void Discover(GameResource resource)
     {

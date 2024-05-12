@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRoute, EventType, Router } from '@angular/router';
 import { tap } from 'rxjs';
-import { TeamCharacter } from '../../../api/game-api-client.generated';
+import { Character } from '../../../api/game-api-client.generated';
 
 @Injectable()
 export class CurrentPageService {
@@ -43,7 +43,7 @@ export class CurrentPageService {
     this.router.navigate(['maps'], { relativeTo: this.route });
   }
 
-  openCharacter(character: TeamCharacter) {
+  openCharacter(character: Character) {
     this.router.navigate(['characters', character.id], { relativeTo: this.route });
   }
 
@@ -55,7 +55,7 @@ export class CurrentPageService {
     return !!this.characterId;
   }
 
-  isCharacterOpened(character: TeamCharacter) {
+  isCharacterOpened(character: Character) {
     return this.characterId === character.id;
   }
 

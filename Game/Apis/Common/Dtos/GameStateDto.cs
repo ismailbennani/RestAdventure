@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using RestAdventure.Core;
+using RestAdventure.Core.Serialization;
 using RestAdventure.Game.Services;
 
 namespace RestAdventure.Game.Apis.Common.Dtos;
@@ -47,7 +47,7 @@ public class GameStateDto
 
 static class GameStateMappingExtensions
 {
-    public static GameStateDto ToDto(this Core.Game state, GameSimulation simulation) =>
+    public static GameStateDto ToDto(this GameSnapshot state, GameSimulation simulation) =>
         new()
         {
             Title = state.Content.Title,

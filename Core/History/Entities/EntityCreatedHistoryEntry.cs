@@ -22,7 +22,7 @@ public class CreateEntityCreatedHistoryEntry : INotificationHandler<GameEntityCr
 
     public Task Handle(GameEntityCreated notification, CancellationToken cancellationToken)
     {
-        Game state = _gameService.RequireGameState();
+        Game state = _gameService.RequireGame();
         EntityCreatedHistoryEntry entry = new(notification.Entity, state.Tick);
         state.History.Record(entry);
         return Task.CompletedTask;

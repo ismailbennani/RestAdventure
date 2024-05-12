@@ -1,5 +1,4 @@
-﻿using System.Collections.Concurrent;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using RestAdventure.Core.Entities.Characters;
 using RestAdventure.Kernel.Errors;
 
@@ -9,23 +8,20 @@ public class GameActions
 {
     readonly Game _state;
     readonly ILogger<GameActions> _logger;
-    readonly ConcurrentDictionary<CharacterId, IReadOnlyCollection<Action>> _availableActions = new();
     readonly Dictionary<CharacterId, Action> _queuedActions = new();
     readonly Dictionary<CharacterId, Action> _ongoingActions = new();
-    readonly IReadOnlyCollection<IActionsProvider> _actionProviders;
 
     public GameActions(Game state, IReadOnlyCollection<IActionsProvider> actionProviders)
     {
         _state = state;
-        _actionProviders = actionProviders;
+        ActionProviders = actionProviders;
         _logger = state.LoggerFactory.CreateLogger<GameActions>();
     }
 
+    internal IReadOnlyCollection<IActionsProvider> ActionProviders { get; }
+
     public IEnumerable<KeyValuePair<CharacterId, Action>> Queued => _queuedActions;
     public IEnumerable<KeyValuePair<CharacterId, Action>> Ongoing => _ongoingActions;
-
-    public IReadOnlyCollection<Action> GetAvailableActions(Character character) =>
-        _availableActions.GetOrAdd(character.Id, _ => _actionProviders.SelectMany(p => p.GetActions(_state, character)).ToArray());
 
     public Maybe QueueAction(Character character, Action action)
     {
@@ -98,9 +94,5 @@ public class GameActions
         return true;
     }
 
-    public void ClearTickCache()
-    {
-        _availableActions.Clear();
-        _queuedActions.Clear();
-    }
+    public void ClearTickCache() => _queuedActions.Clear();
 }

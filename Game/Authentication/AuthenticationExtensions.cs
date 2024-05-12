@@ -1,7 +1,7 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
-using RestAdventure.Core;
 using RestAdventure.Core.Players;
+using RestAdventure.Core.Serialization;
 using RestAdventure.Kernel.Security;
 
 namespace RestAdventure.Game.Authentication;
@@ -27,6 +27,15 @@ static class AuthenticationExtensions
         return userId == null ? null : state.Players.GetPlayer(userId);
     }
 
+    public static PlayerSnapshot? GetPlayer(this ControllerContext context, GameSnapshot snapshot)
+    {
+        UserId? userId = GetUserId(context);
+        return userId == null ? null : snapshot.Players.GetValueOrDefault(userId);
+    }
+
     public static Player RequirePlayer(this ControllerContext context, Core.Game state) =>
         GetPlayer(context, state) ?? throw new InvalidOperationException("Could not determine current player");
+
+    public static PlayerSnapshot RequirePlayer(this ControllerContext context, GameSnapshot snapshot) =>
+        GetPlayer(context, snapshot) ?? throw new InvalidOperationException("Could not determine current player");
 }

@@ -31,7 +31,7 @@ public class CreateCombatEntityLeftHistoryEntry : INotificationHandler<EntityLef
 
     public Task Handle(EntityLeftCombat notification, CancellationToken cancellationToken)
     {
-        Game state = _gameService.RequireGameState();
+        Game state = _gameService.RequireGame();
         CombatEntityLeftHistoryEntry entry = new(notification.Combat, notification.Entity, notification.Side, state.Tick);
         state.History.Record(entry);
         return Task.CompletedTask;

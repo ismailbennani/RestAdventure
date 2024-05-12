@@ -2,6 +2,8 @@
 using NSwag.Annotations;
 using RestAdventure.Core;
 using RestAdventure.Core.Entities.StaticObjects;
+using RestAdventure.Core.Serialization;
+using RestAdventure.Core.Serialization.Entities;
 using RestAdventure.Game.Apis.Common.Dtos.Entities;
 using RestAdventure.Game.Apis.Common.Dtos.Queries;
 using RestAdventure.Kernel.Queries;
@@ -30,10 +32,10 @@ public class AdminGameStateController : AdminApiController
     [HttpGet("static-objects/{staticObjectGuid:guid}")]
     public SearchResultDto<EntityDto> SearchStaticObjectInstances(Guid staticObjectGuid, [FromQuery] SearchRequestDto request)
     {
-        Core.Game state = _gameService.RequireGameState();
+        GameSnapshot state = _gameService.GetLastSnapshot();
 
         StaticObjectId staticObjectId = new(staticObjectGuid);
-        IEnumerable<StaticObjectInstance> instances = state.Entities.OfType<StaticObjectInstance>().Where(o => o.Object.Id == staticObjectId);
+        IEnumerable<StaticObjectInstanceSnapshot> instances = state.Entities.Values.OfType<StaticObjectInstanceSnapshot>().Where(o => o.Object.Id == staticObjectId);
 
         return Search.Paginate(instances, request.ToPaginationParameters()).ToDto(instance => instance.ToDto());
     }

@@ -17,7 +17,7 @@ class PlayerAuthenticationService
 
     public AuthenticationResult Authenticate(ApiKey apiKey)
     {
-        Player? playerState = _gameService.RequireGameState().Players.GetPlayerByApiKey(apiKey);
+        Player? playerState = _gameService.RequireGame().Players.GetPlayerByApiKey(apiKey);
         if (playerState == null)
         {
             return AuthenticationResult.Failure();

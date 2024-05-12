@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using RestAdventure.Core.Combat.Options;
+using RestAdventure.Core.Serialization.Combats;
 
 namespace RestAdventure.Game.Apis.Common.Dtos.Combats;
 
@@ -23,7 +24,7 @@ public class CombatFormationOptionsDto
 
 static class CombatFormationOptionsMappingExtensions
 {
-    public static CombatFormationOptionsDto ToDto(this CombatFormationOptions options) =>
+    public static CombatFormationOptionsDto ToDto(this CombatFormationOptionsSnapshot options) =>
         new()
         {
             Accessibility = options.Accessibility,

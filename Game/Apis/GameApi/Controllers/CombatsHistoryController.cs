@@ -4,13 +4,14 @@ using RestAdventure.Core;
 using RestAdventure.Core.Combat;
 using RestAdventure.Core.Entities.Characters;
 using RestAdventure.Core.History.Combats;
-using RestAdventure.Core.Players;
+using RestAdventure.Core.Serialization;
+using RestAdventure.Core.Serialization.Combats;
+using RestAdventure.Core.Serialization.Entities;
 using RestAdventure.Game.Apis.Common.Dtos.Combats;
 using RestAdventure.Game.Apis.Common.Dtos.History.Combats;
 using RestAdventure.Game.Apis.Common.Dtos.Queries;
 using RestAdventure.Game.Authentication;
 using RestAdventure.Kernel.Queries;
-using CombatInstance = RestAdventure.Core.Combat.CombatInstance;
 
 namespace RestAdventure.Game.Apis.GameApi.Controllers;
 
@@ -38,25 +39,24 @@ public class CombatsHistoryController : GameApiController
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public ActionResult<SearchResultDto<CombatHistoryEntryDto>> SearchCombatHistory(Guid characterGuid, Guid combatGuid, [FromQuery] SearchRequestDto request)
     {
-        Core.Game state = _gameService.RequireGameState();
+        GameSnapshot state = _gameService.GetLastSnapshot();
 
-        Player player = ControllerContext.RequirePlayer(state);
+        PlayerSnapshot player = ControllerContext.RequirePlayer(state);
 
         CharacterId characterId = new(characterGuid);
-        Character? character = state.Entities.Get<Character>(characterId);
-        if (character == null || character.Player != player)
+        if (state.Entities.GetValueOrDefault(characterId) is not CharacterSnapshot character || character.PlayerId != player.UserId)
         {
             return BadRequest();
         }
 
         CombatInstanceId combatId = new(combatGuid);
-        CombatInstance? combat = state.Combats.GetCombat(combatId);
+        CombatInstanceSnapshot? combat = state.Combats.GetValueOrDefault(combatId);
         if (combat == null || combat.Location != character.Location)
         {
             return NotFound();
         }
 
-        IOrderedEnumerable<CombatHistoryEntry> allEntries = state.History.Combat(combatId).OrderByDescending(he => he.Tick);
+        IOrderedEnumerable<CombatHistoryEntry> allEntries = GetCombatHistory(state, combat.Id);
 
         return Search.Paginate(allEntries, request.ToPaginationParameters()).ToDto(c => c.ToDto());
     }
@@ -69,18 +69,17 @@ public class CombatsHistoryController : GameApiController
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public ActionResult<SearchResultDto<ArchivedCombatDto>> SearchArchivedCombats(Guid characterGuid, [FromQuery] SearchRequestDto request)
     {
-        Core.Game state = _gameService.RequireGameState();
+        GameSnapshot state = _gameService.GetLastSnapshot();
 
-        Player player = ControllerContext.RequirePlayer(state);
+        PlayerSnapshot player = ControllerContext.RequirePlayer(state);
 
         CharacterId characterId = new(characterGuid);
-        Character? character = state.Entities.Get<Character>(characterId);
-        if (character == null || character.Player != player)
+        if (state.Entities.GetValueOrDefault(characterId) is not CharacterSnapshot character || character.PlayerId != player.UserId)
         {
             return BadRequest();
         }
 
-        IEnumerable<CombatEndedHistoryEntry> archivedCombats = state.History.Combat(character.Id).OfType<CombatEndedHistoryEntry>().OrderByDescending(he => he.Tick);
+        IEnumerable<CombatEndedHistoryEntry> archivedCombats = GetArchivedCombatsOfCharacter(state, characterId);
 
         return Search.Paginate(archivedCombats, request.ToPaginationParameters()).ToDto(c => c.ToArchivedCombatDto());
     }
@@ -93,25 +92,38 @@ public class CombatsHistoryController : GameApiController
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public ActionResult<SearchResultDto<CombatHistoryEntryDto>> SearchArchivedCombatHistory(Guid characterGuid, Guid combatGuid, [FromQuery] SearchRequestDto request)
     {
-        Core.Game state = _gameService.RequireGameState();
+        GameSnapshot state = _gameService.GetLastSnapshot();
 
-        Player player = ControllerContext.RequirePlayer(state);
+        PlayerSnapshot player = ControllerContext.RequirePlayer(state);
 
         CharacterId characterId = new(characterGuid);
-        Character? character = state.Entities.Get<Character>(characterId);
-        if (character == null || character.Player != player)
+        if (state.Entities.GetValueOrDefault(characterId) is not CharacterSnapshot character || character.PlayerId != player.UserId)
         {
             return BadRequest();
         }
 
         CombatInstanceId combatId = new(combatGuid);
-        CombatEndedHistoryEntry? archivedCombat = state.History.Combat(character.Id).OfType<CombatEndedHistoryEntry>().SingleOrDefault(c => c.CombatInstanceId == combatId);
+        CombatEndedHistoryEntry? archivedCombat = GetArchivedCombatsOfCharacter(state, character.Id).SingleOrDefault(c => c.CombatInstanceId == combatId);
         if (archivedCombat == null)
         {
             return NotFound();
         }
 
-        IOrderedEnumerable<CombatHistoryEntry> history = state.History.Combat(combatId).OrderByDescending(he => he.Tick);
+        IOrderedEnumerable<CombatHistoryEntry> history = GetCombatHistory(state, archivedCombat.CombatInstanceId);
         return Search.Paginate(history, request.ToPaginationParameters()).ToDto(c => c.ToDto());
+    }
+
+    static IOrderedEnumerable<CombatHistoryEntry> GetCombatHistory(GameSnapshot state, CombatInstanceId combatId)
+    {
+        IOrderedEnumerable<CombatHistoryEntry> allEntries = state.History.OfType<CombatHistoryEntry>().Where(c => c.CombatInstanceId == combatId).OrderByDescending(he => he.Tick);
+        return allEntries;
+    }
+
+    static IEnumerable<CombatEndedHistoryEntry> GetArchivedCombatsOfCharacter(GameSnapshot state, CharacterId characterId)
+    {
+        IEnumerable<CombatEndedHistoryEntry> archivedCombats = state.History.OfType<CombatEndedHistoryEntry>()
+            .Where(c => c.Attackers.Any(a => a.Id == characterId) || c.Defenders.Any(a => a.Id == characterId))
+            .OrderByDescending(he => he.Tick);
+        return archivedCombats;
     }
 }

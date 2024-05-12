@@ -20,7 +20,7 @@ public class DiscoverStaticObjectsOnCharacterMovedToLocation : INotificationHand
             return Task.CompletedTask;
         }
 
-        Game state = _gameService.RequireGameState();
+        Game state = _gameService.RequireGame();
 
         IEnumerable<StaticObjectInstance> staticObjects = state.Entities.AtLocation<StaticObjectInstance>(notification.NewLocation);
         foreach (StaticObjectInstance staticObject in staticObjects)

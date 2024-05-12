@@ -29,6 +29,13 @@ public class GameCombats : IEnumerable<CombatInstance>
 
     public Maybe CanStartCombat(IReadOnlyCollection<IGameEntityWithCombatCapabilities> attackers, IReadOnlyCollection<IGameEntityWithCombatCapabilities> defenders)
     {
+        Location location = defenders.First().Location;
+
+        if (attackers.Any(a => a.Location != location) || defenders.Any(d => d.Location != location))
+        {
+            return "Some entities are not at the correct location";
+        }
+
         if (defenders.Any(target => target.Busy))
         {
             return "Target is busy";

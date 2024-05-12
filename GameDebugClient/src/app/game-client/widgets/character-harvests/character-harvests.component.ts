@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { ReplaySubject, switchMap, tap } from 'rxjs';
-import { Action, HarvestAction, IHarvestableEntity, IHarvestableEntityHarvest, ItemStack, JobsHarvestApiClient, TeamCharacter } from '../../../../api/game-api-client.generated';
+import { Action, Character, HarvestAction, IHarvestableEntity, IHarvestableEntityHarvest, ItemStack, JobsHarvestApiClient } from '../../../../api/game-api-client.generated';
 import { GameService } from '../../services/game.service';
 
 @Component({
@@ -12,18 +12,18 @@ import { GameService } from '../../services/game.service';
 })
 export class CharacterHarvestsComponent implements OnInit {
   @Input({ required: true })
-  public get character(): TeamCharacter {
+  public get character(): Character {
     return this._character;
   }
-  public set character(value: TeamCharacter) {
+  public set character(value: Character) {
     this._character = value;
     this.characterSubject.next(value);
   }
 
   protected harvestables: (IHarvestableEntity & { count: number })[] = [];
 
-  private _character: TeamCharacter = null!;
-  private characterSubject: ReplaySubject<TeamCharacter> = new ReplaySubject<TeamCharacter>(1);
+  private _character: Character = null!;
+  private characterSubject: ReplaySubject<Character> = new ReplaySubject<Character>(1);
 
   constructor(
     private gameService: GameService,
@@ -79,11 +79,11 @@ export class CharacterHarvestsComponent implements OnInit {
   }
 
   private isHarvestingAction(action: Action, harvestable?: IHarvestableEntity, harvest?: IHarvestableEntityHarvest) {
-    if (!(action instanceof HarvestAction) || !this.harvestables.find(h => h.id === (action as HarvestAction).target.id)) {
+    if (!(action instanceof HarvestAction) || !this.harvestables.find(h => h.id === (action as HarvestAction).targetId)) {
       return false;
     }
 
-    if (harvestable && action.target.id !== harvestable.id) {
+    if (harvestable && action.targetId !== harvestable.id) {
       return false;
     }
 

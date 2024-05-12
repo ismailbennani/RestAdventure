@@ -26,7 +26,7 @@ public class CreateCharacterEndedMonsterCombatHistoryEntry : INotificationHandle
 
     public Task Handle(CombatEnded notification, CancellationToken cancellationToken)
     {
-        Game state = _gameService.RequireGameState();
+        Game state = _gameService.RequireGame();
         CombatEndedHistoryEntry entry = new(notification.Combat, state.Tick);
         state.History.Record(entry);
         return Task.CompletedTask;

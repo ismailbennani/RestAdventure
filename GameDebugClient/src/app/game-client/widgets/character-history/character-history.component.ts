@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { ReplaySubject, combineLatest, map, switchMap, tap } from 'rxjs';
 import {
+  Character,
   CharacterCombatEndedHistoryEntry,
   CharacterCombatStartedHistoryEntry,
   CharacterCreatedHistoryEntry,
@@ -17,7 +18,6 @@ import {
   CharactersApiClient,
   CombatEntityInHistoryEntry,
   CombatSide,
-  TeamCharacter,
 } from '../../../../api/game-api-client.generated';
 import { GameService } from '../../services/game.service';
 
@@ -29,7 +29,7 @@ import { GameService } from '../../services/game.service';
 })
 export class CharacterHistoryComponent implements OnInit {
   @Input({ required: true })
-  public set character(value: TeamCharacter) {
+  public set character(value: Character) {
     this.characterSubject.next(value);
   }
 
@@ -38,7 +38,7 @@ export class CharacterHistoryComponent implements OnInit {
   protected loading: boolean = false;
   protected history: { tick: number; entries: CharacterHistoryEntry[] }[] = [];
 
-  private characterSubject: ReplaySubject<TeamCharacter> = new ReplaySubject<TeamCharacter>(1);
+  private characterSubject: ReplaySubject<Character> = new ReplaySubject<Character>(1);
 
   constructor(
     private gameService: GameService,

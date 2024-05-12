@@ -1,5 +1,6 @@
 ﻿using RestAdventure.Core.Entities.StaticObjects;
 using RestAdventure.Core.Items;
+using RestAdventure.Core.Serialization.Entities;
 
 namespace RestAdventure.Core.Jobs;
 
@@ -41,4 +42,5 @@ public class JobHarvest
 public static class JobHarvestMappingExtensions
 {
     public static bool Match(this JobHarvest harvest, StaticObjectInstance instance) => harvest.Targets.Contains(instance.Object);
+    public static bool Match(this JobHarvest harvest, StaticObjectInstanceSnapshot instance) => harvest.Targets.Contains(instance.Object);
 }

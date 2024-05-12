@@ -7,15 +7,15 @@ export class CharacterActionUtils {
     }
 
     if (action instanceof HarvestAction) {
-      return `harvest ${action.target.staticObject.name} (${action.name})`;
+      return `harvest: ${action.name}`;
     }
 
     if (action instanceof StartPveCombatAction) {
-      return `start combat against ${action.monsterGroup.monsters.map(a => a.species.name).join(', ')}`;
+      return `start combat (against:${action.monsterGroupId})`;
     }
 
     if (action instanceof JoinPveCombatAction) {
-      return `join combat ${action.combat.attackers.map(a => a.name).join(', ')} vs. ${action.monsterGroup.monsters.map(a => a.species.name).join(', ')}`;
+      return `join combat (combat:${action.combatId}, against:${action.monsterGroupId})`;
     }
 
     return '???';
