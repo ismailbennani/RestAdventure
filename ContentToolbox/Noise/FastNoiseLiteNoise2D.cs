@@ -4,12 +4,12 @@ public class FastNoiseLiteNoise2D : Noise2D
 {
     readonly FastNoiseLite _noise;
 
-    public FastNoiseLiteNoise2D(FastNoiseLite.NoiseType noiseType, float frequency)
+    public FastNoiseLiteNoise2D(FastNoiseLite.NoiseType noiseType, int seed, float frequency)
     {
         _noise = new FastNoiseLite();
         _noise.SetNoiseType(noiseType);
         _noise.SetFrequency(frequency);
-        _noise.SetSeed(Random.Shared.Next());
+        _noise.SetSeed(seed);
     }
 
     public double HighCutoff { get; init; } = 1;

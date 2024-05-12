@@ -36,10 +36,11 @@ public class SandboxGameBuilder
         Rattlings = new Rattlings();
         Forester = new Forester();
         Herbalist = new Herbalist();
+        Miner = new Miner();
 
         MapGenerator = new MapGenerator(
-            new ErodedIslandGenerator(40, 40, 0.6),
-            new VoronoiPartitionGenerator(20, loggerFactory.CreateLogger<VoronoiPartitionGenerator>()),
+            new ErodedIslandGenerator(60, 60, 0.6),
+            new VoronoiPartitionGenerator(25, loggerFactory.CreateLogger<VoronoiPartitionGenerator>()),
             new KingdomZonesGenerator(),
             loggerFactory
         );
@@ -66,6 +67,7 @@ public class SandboxGameBuilder
     public Rattlings Rattlings { get; }
     public Forester Forester { get; }
     public Herbalist Herbalist { get; }
+    public Miner Miner { get; }
 
     public Scenario Build()
     {
@@ -76,7 +78,10 @@ public class SandboxGameBuilder
         ExtractContent(scenario, Rattlings);
         ExtractContent(scenario, Forester);
         ExtractContent(scenario, Herbalist);
+        ExtractContent(scenario, Miner);
         ExtractContent(scenario, MapGeneratorResult.GeneratedMaps);
+
+        Random random = Random.Shared;
 
         foreach (MapArea area in scenario.Areas)
         {
@@ -93,8 +98,9 @@ public class SandboxGameBuilder
             }
         }
 
-        scenario.Spawners.AddRange(GetHerbalistSpawners());
-        scenario.Spawners.AddRange(GetForesterSpawners());
+        scenario.Spawners.AddRange(GetHerbalistSpawners(random));
+        scenario.Spawners.AddRange(GetForesterSpawners(random));
+        scenario.Spawners.AddRange(GetMinerSpawners(random));
 
         return scenario;
     }
@@ -113,10 +119,10 @@ public class SandboxGameBuilder
         scenario.MonsterSpecies.AddRange(ObjectExplorer.FindValuesOfType<T, MonsterSpecies>(instance).ToArray());
     }
 
-    IEnumerable<RandomSpawner> GetHerbalistSpawners()
+    IEnumerable<RandomSpawner> GetHerbalistSpawners(Random random)
     {
         yield return new RandomSpawner(
-            new PerlinNoise2D(0.05f) { LowCutoff = 0.2 },
+            new PerlinNoise2D(random.Next(), 0.01f) { LowCutoff = 0.5 },
             new RandomByAreaLevelStaticObjectSpawner(
                 new Dictionary<int, IReadOnlyCollection<Weighted<StaticObject>>>
                 {
@@ -161,10 +167,10 @@ public class SandboxGameBuilder
         ) { MaxCount = 1000, MaxCountPerLocation = 10, MaxSpawnPerExecution = 10 };
     }
 
-    IEnumerable<RandomSpawner> GetForesterSpawners()
+    IEnumerable<RandomSpawner> GetForesterSpawners(Random random)
     {
         yield return new RandomSpawner(
-            new SimplexNoise2D(0.1f) { LowCutoff = 0.75 },
+            new SimplexNoise2D(random.Next(), 0.1f) { LowCutoff = 0.75 },
             new RandomByAreaLevelStaticObjectSpawner(
                 new Dictionary<int, IReadOnlyCollection<Weighted<StaticObject>>>
                 {
@@ -207,6 +213,54 @@ public class SandboxGameBuilder
             ),
             _loggerFactory.CreateLogger<RandomSpawner>()
         ) { MaxCount = 500, MaxCountPerLocation = 5, MaxSpawnPerExecution = 10 };
+    }
+
+    IEnumerable<RandomSpawner> GetMinerSpawners(Random random)
+    {
+        yield return new RandomSpawner(
+            new PerlinNoise2D(random.Next(), 0.05f) { LowCutoff = 0.75 },
+            new RandomByAreaLevelStaticObjectSpawner(
+                new Dictionary<int, IReadOnlyCollection<Weighted<StaticObject>>>
+                {
+                    {
+                        0, [
+                            new Weighted<StaticObject>(Miner.IronOre, 1)
+                        ]
+                    },
+                    {
+                        10, [
+                            new Weighted<StaticObject>(Miner.IronOre, 2),
+                            new Weighted<StaticObject>(Miner.CopperOre, 1)
+                        ]
+                    },
+                    {
+                        20, [
+                            new Weighted<StaticObject>(Miner.IronOre, 4),
+                            new Weighted<StaticObject>(Miner.CopperOre, 2),
+                            new Weighted<StaticObject>(Miner.SilverOre, 1)
+                        ]
+                    },
+                    {
+                        30, [
+                            new Weighted<StaticObject>(Miner.IronOre, 8),
+                            new Weighted<StaticObject>(Miner.CopperOre, 4),
+                            new Weighted<StaticObject>(Miner.SilverOre, 2),
+                            new Weighted<StaticObject>(Miner.GoldOre, 1)
+                        ]
+                    },
+                    {
+                        40, [
+                            new Weighted<StaticObject>(Miner.IronOre, 16),
+                            new Weighted<StaticObject>(Miner.CopperOre, 8),
+                            new Weighted<StaticObject>(Miner.SilverOre, 4),
+                            new Weighted<StaticObject>(Miner.GoldOre, 2),
+                            new Weighted<StaticObject>(Miner.MithrilOre, 1)
+                        ]
+                    }
+                }
+            ),
+            _loggerFactory.CreateLogger<RandomSpawner>()
+        ) { MaxCount = 100, MaxCountPerLocation = 3, MaxSpawnPerExecution = 10 };
     }
 
     RandomSpawner GetMonsterSpawners(MapArea area, int level, (int, int) teamSize, IReadOnlyList<MonsterSpecies> monsters)

@@ -13,28 +13,28 @@ public class Forester
         {
             Name = "Oak Wood",
             Description = "Oak wood is sturdy and commonly used in construction, furniture making, and shipbuilding. It's known for its strength and durability.",
-            Weight = 10
+            Weight = 5
         };
 
         PineWood = new Item
         {
             Name = "Pine Wood",
             Description = "Pine trees provide softwood that's often used for construction, furniture, and paper production. They are fast-growing and widely distributed.",
-            Weight = 10
+            Weight = 5
         };
 
         MapleWood = new Item
         {
             Name = "Maple Wood",
             Description = "Maple wood is prized for its beauty and versatility. It's commonly used in furniture making, flooring, and musical instruments.",
-            Weight = 10
+            Weight = 5
         };
 
         BirchWood = new Item
         {
             Name = "Birch Wood",
             Description = "Birch trees have distinctive white or silver bark and provide lightweight wood that's used for furniture, plywood, and decorative items.",
-            Weight = 10
+            Weight = 5
         };
 
         WalnutWood = new Item
@@ -42,7 +42,7 @@ public class Forester
             Name = "Walnut Wood",
             Description =
                 "Walnut trees produce hardwood with a rich, dark color and attractive grain patterns. Walnut wood is highly valued for furniture making, cabinetry, and woodworking crafts.",
-            Weight = 10
+            Weight = 5
         };
 
         OakTree = new StaticObject { Name = "Oak Tree" };

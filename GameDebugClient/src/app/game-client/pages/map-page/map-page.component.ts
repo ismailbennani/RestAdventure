@@ -154,6 +154,21 @@ export class MapPageComponent implements OnInit {
         }
 
         return { shape: 'circle', color: 'green', borderColor: undefined };
+      case 'miner':
+        switch (object.name.toLowerCase()) {
+          case 'iron ore':
+            return { shape: 'circle', color: '#43464B', borderColor: undefined };
+          case 'copper ore':
+            return { shape: 'circle', color: '#B87333', borderColor: undefined };
+          case 'silver ore':
+            return { shape: 'circle', color: '#C0C0C0', borderColor: undefined };
+          case 'gold ore':
+            return { shape: 'circle', color: '#FFD700', borderColor: undefined };
+          case 'mithril ore':
+            return { shape: 'circle', color: '#00FFFF', borderColor: undefined };
+        }
+
+        return { shape: 'circle', color: 'black', borderColor: undefined };
       default:
         return { shape: 'circle', color: 'darkgrey', borderColor: 'black' };
     }
@@ -181,8 +196,6 @@ export class MapPageComponent implements OnInit {
             positionY: character.location.positionY,
           },
         ];
-
-        this.markerCounts[character.id] = 1;
       }
     }
 
