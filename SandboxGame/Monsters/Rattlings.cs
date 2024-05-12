@@ -19,15 +19,15 @@ public class Rattlings
             Weight = 5
         };
 
-        Claw = new Item
+        PhantomTail = new Item
         {
-            Name = "Claw - Rattlings",
+            Name = "Phantom tail - Rattlings",
             Weight = 1
         };
 
-        Tail = new Item
+        SpectralCheese = new Item
         {
-            Name = "Tail - Rattlings",
+            Name = "Spectral cheese - Rattlings",
             Weight = 1
         };
 
@@ -77,13 +77,13 @@ public class Rattlings
             Items = [new ItemStack(Fur, 1), new ItemStack(Skull, 1)]
         };
 
-        PetitPaw = new MonsterSpecies
+        Fantorat = new MonsterSpecies
         {
             Family = Family,
-            Name = "Petit Paw",
-            Description = "These tiny speedsters may lack in size, but they make up for it with their lightning-fast reflexes. "
-                          + "Quick, nimble, and always one step ahead, Petit Paws are the epitome of agility, darting through the shadows with grace and precision.",
-            Items = [new ItemStack(Claw, 1), new ItemStack(Tail, 1)],
+            Name = "Fantorat",
+            Description = "These spectral rodents haunt the shadowy corners of ancient catacombs. "
+                          + "Their ethereal forms flitting through the darkness as they search for lost treasures whispered about in ghostly legends.",
+            Items = [new ItemStack(PhantomTail, 1), new ItemStack(SpectralCheese, 1)],
             Experience = 1,
             Health = 2,
             Speed = 180,
@@ -133,18 +133,18 @@ public class Rattlings
 
     public MonsterFamily Family;
 
-    public Item Fur { get; set; }
-    public Item Skull { get; set; }
-    public Item Claw { get; set; }
-    public Item Tail { get; set; }
-    public Item Handkerchief { get; set; }
-    public Item SwordBlade { get; set; }
-    public Item DirtyShirt { get; set; }
-    public Item BellyFat { get; set; }
-    public Item SparklingWand { get; set; }
-    public Item AncientTomeOfMagic { get; set; }
+    public Item Fur { get; }
+    public Item Skull { get; }
+    public Item SpectralCheese { get; }
+    public Item PhantomTail { get; }
+    public Item Handkerchief { get; }
+    public Item SwordBlade { get; }
+    public Item DirtyShirt { get; }
+    public Item BellyFat { get; }
+    public Item SparklingWand { get; }
+    public Item AncientTomeOfMagic { get; }
 
-    public MonsterSpecies PetitPaw;
+    public MonsterSpecies Fantorat;
     public MonsterSpecies Rapierat;
     public MonsterSpecies Biggaud;
     public MonsterSpecies Melurat;

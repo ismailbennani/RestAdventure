@@ -32,12 +32,13 @@ public class SandboxGameBuilder
     public SandboxGameBuilder(ILoggerFactory loggerFactory)
     {
         _loggerFactory = loggerFactory;
+        Whimsicals = new Whimsicals();
         Rattlings = new Rattlings();
         Forester = new Forester();
         Herbalist = new Herbalist();
 
         MapGenerator = new MapGenerator(
-            new ErodedIslandGenerator(100, 100, 0.6),
+            new ErodedIslandGenerator(40, 40, 0.6),
             new VoronoiPartitionGenerator(20, loggerFactory.CreateLogger<VoronoiPartitionGenerator>()),
             new KingdomZonesGenerator(),
             loggerFactory
@@ -61,6 +62,7 @@ public class SandboxGameBuilder
     public MapGenerator MapGenerator { get; }
     public MapGenerator.Result MapGeneratorResult { get; }
     public CharacterClasses CharacterClasses { get; }
+    public Whimsicals Whimsicals { get; }
     public Rattlings Rattlings { get; }
     public Forester Forester { get; }
     public Herbalist Herbalist { get; }
@@ -70,6 +72,7 @@ public class SandboxGameBuilder
         Scenario scenario = new() { Name = "Rat Attack" };
 
         ExtractContent(scenario, CharacterClasses);
+        ExtractContent(scenario, Whimsicals);
         ExtractContent(scenario, Rattlings);
         ExtractContent(scenario, Forester);
         ExtractContent(scenario, Herbalist);
@@ -77,9 +80,17 @@ public class SandboxGameBuilder
 
         foreach (MapArea area in scenario.Areas)
         {
-            scenario.Spawners.Add(GetRattlingsSpawner(area, area.Level, (1, 3)));
-            scenario.Spawners.Add(GetRattlingsSpawner(area, area.Level, (4, 6)));
-            scenario.Spawners.Add(GetRattlingsSpawner(area, area.Level, (7, 8)));
+            if (_startLocation.Area == area)
+            {
+                scenario.Spawners.Add(GetMonsterSpawners(area, area.Level, (1, 2), [Whimsicals.PetitPaw, Whimsicals.Bumblebun, Whimsicals.Flutterfly, Whimsicals.Chirpchirp]));
+                scenario.Spawners.Add(GetMonsterSpawners(area, area.Level, (2, 4), [Whimsicals.PetitPaw, Whimsicals.Bumblebun, Whimsicals.Flutterfly, Whimsicals.Chirpchirp]));
+            }
+            else
+            {
+                scenario.Spawners.Add(GetMonsterSpawners(area, area.Level, (1, 3), [Rattlings.Fantorat, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat]));
+                scenario.Spawners.Add(GetMonsterSpawners(area, area.Level, (4, 6), [Rattlings.Fantorat, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat]));
+                scenario.Spawners.Add(GetMonsterSpawners(area, area.Level, (7, 8), [Rattlings.Fantorat, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat]));
+            }
         }
 
         scenario.Spawners.AddRange(GetHerbalistSpawners());
@@ -198,7 +209,7 @@ public class SandboxGameBuilder
         ) { MaxCount = 500, MaxCountPerLocation = 5, MaxSpawnPerExecution = 10 };
     }
 
-    RandomSpawner GetRattlingsSpawner(MapArea area, int level, (int, int) teamSize)
+    RandomSpawner GetMonsterSpawners(MapArea area, int level, (int, int) teamSize, IReadOnlyList<MonsterSpecies> monsters)
     {
         (int, int) respawnDelay = (5, 10);
 
@@ -209,9 +220,9 @@ public class SandboxGameBuilder
                     new MapAreaSpawnerLocationSelector { Area = area },
                     new MonsterGroupSpawner
                     {
-                        Species = [Rattlings.PetitPaw],
+                        Species = monsters,
                         TeamSize = teamSize,
-                        LevelBounds = (1, 9)
+                        LevelBounds = (0, 9)
                     },
                     _loggerFactory.CreateLogger<RandomSpawner>()
                 ) { MaxCountPerLocation = 1, RespawnDelay = respawnDelay };
@@ -220,7 +231,7 @@ public class SandboxGameBuilder
                     new MapAreaSpawnerLocationSelector { Area = area },
                     new MonsterGroupSpawner
                     {
-                        Species = [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat],
+                        Species = monsters,
                         TeamSize = teamSize,
                         LevelBounds = (10, 19)
                     },
@@ -231,7 +242,7 @@ public class SandboxGameBuilder
                     new MapAreaSpawnerLocationSelector { Area = area },
                     new MonsterGroupSpawner
                     {
-                        Species = [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat],
+                        Species = monsters,
                         TeamSize = teamSize,
                         LevelBounds = (20, 29)
                     },
@@ -242,7 +253,7 @@ public class SandboxGameBuilder
                     new MapAreaSpawnerLocationSelector { Area = area },
                     new MonsterGroupSpawner
                     {
-                        Species = [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat],
+                        Species = monsters,
                         TeamSize = teamSize,
                         LevelBounds = (30, 39)
                     },
@@ -253,7 +264,7 @@ public class SandboxGameBuilder
                     new MapAreaSpawnerLocationSelector { Area = area },
                     new MonsterGroupSpawner
                     {
-                        Species = [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat],
+                        Species = monsters,
                         TeamSize = teamSize,
                         LevelBounds = (40, 49)
                     },
@@ -264,7 +275,7 @@ public class SandboxGameBuilder
                     new MapAreaSpawnerLocationSelector { Area = area },
                     new MonsterGroupSpawner
                     {
-                        Species = [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat],
+                        Species = monsters,
                         TeamSize = teamSize,
                         LevelBounds = (50, 59)
                     },
