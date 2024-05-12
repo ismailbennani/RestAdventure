@@ -23,6 +23,8 @@ export class GameService {
   private stateInternal: GameState | undefined;
   private stateSubject: ReplaySubject<GameState> = new ReplaySubject<GameState>(1);
 
+  private maxScheduledRefresh: number = 0;
+
   constructor(private adminGameApiClient: AdminGameApiClient) {}
 
   public get connected(): boolean {
@@ -122,6 +124,8 @@ export class GameService {
   }
 
   refreshIn(delayMs: number) {
+    this.registerPlannedRefreshTime(Date.now() + delayMs);
+
     of({})
       .pipe(
         delay(delayMs),
@@ -132,6 +136,8 @@ export class GameService {
   }
 
   refreshAt(date: Date) {
+    this.registerPlannedRefreshTime(date.getTime());
+
     of({})
       .pipe(
         delay(date),
@@ -158,6 +164,16 @@ export class GameService {
       return;
     }
 
+    if (this.maxScheduledRefresh > now) {
+      return;
+    }
+
     this.refreshIn(GameService.TICKING_DELAY);
+  }
+
+  private registerPlannedRefreshTime(time: number) {
+    if (this.maxScheduledRefresh < time) {
+      this.maxScheduledRefresh = time;
+    }
   }
 }

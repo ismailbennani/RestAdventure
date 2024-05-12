@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using RestAdventure.Core;
+using RestAdventure.Core.Entities.Characters;
 using RestAdventure.Core.Serialization;
 using RestAdventure.Core.Serialization.Entities;
 using RestAdventure.Game.Apis.Common.Dtos.Characters;
@@ -30,6 +31,7 @@ public class TeamController : GameApiController
     [HttpGet]
     public ActionResult<TeamDto> GetTeam()
     {
+        Core.Game game = _gameService.RequireGame();
         GameSnapshot state = _gameService.GetLastSnapshot();
         PlayerSnapshot player = ControllerContext.RequirePlayer(state);
 
@@ -39,13 +41,17 @@ public class TeamController : GameApiController
         {
             Characters = characters.ToList()
                 .Select(
-                    c => c.ToDto(
-                        new CharacterMappingOptions
-                        {
-                            OngoingAction = state.Actions.OngoingAction.GetValueOrDefault(c.Id),
-                            PlannedAction = state.Actions.QueuedAction.GetValueOrDefault(c.Id)
-                        }
-                    )
+                    c =>
+                    {
+                        Character? character = game.Entities.Get<Character>(c.Id);
+                        return c.ToDto(
+                            new CharacterMappingOptions
+                            {
+                                OngoingAction = state.Actions.OngoingAction.GetValueOrDefault(c.Id),
+                                PlannedAction = character == null ? null : game.Actions.GetQueuedAction(character)
+                            }
+                        );
+                    }
                 )
                 .ToArray()
         };
