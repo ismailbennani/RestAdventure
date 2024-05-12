@@ -77,134 +77,25 @@ public class SandboxGameBuilder
 
         scenario.Spawners.Add(
             new RandomSpawner(
-                new MapAreaSpawnerLocationSelector { Area = _startLocation.Area },
-                new MonsterGroupSpawner
+                new MonsterGroupByAreaLevelSpawner
                 {
-                    Species = [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat],
-                    TeamSize = (1, 3),
-                    LevelBounds = (1, 9)
+                    SpeciesByLevelRange =
+                    [
+                        (0, 9, [Rattlings.PetitPaw]),
+                        (10, 19, [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat]),
+                        (20, 29, [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat]),
+                        (30, 39, [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat]),
+                        (40, 49, [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat]),
+                        (50, 59, [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat])
+                    ],
+                    TeamSize = (1, 3)
                 },
                 _loggerFactory.CreateLogger<RandomSpawner>()
-            ) { MaxCountPerLocation = 1, RespawnDelay = (5, 10) }
-        );
-        scenario.Spawners.Add(
-            new RandomSpawner(
-                new MapAreaSpawnerLocationSelector { Area = _startLocation.Area },
-                new MonsterGroupSpawner
-                {
-                    Species = [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat],
-                    TeamSize = (4, 6),
-                    LevelBounds = (1, 9)
-                },
-                _loggerFactory.CreateLogger<RandomSpawner>()
-            ) { MaxCountPerLocation = 1, RespawnDelay = (5, 10) }
-        );
-        scenario.Spawners.Add(
-            new RandomSpawner(
-                new MapAreaSpawnerLocationSelector { Area = _startLocation.Area },
-                new MonsterGroupSpawner
-                {
-                    Species = [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat],
-                    TeamSize = (7, 8),
-                    LevelBounds = (1, 9)
-                },
-                _loggerFactory.CreateLogger<RandomSpawner>()
-            ) { MaxCountPerLocation = 1, RespawnDelay = (5, 10) }
+            ){ MaxCountPerLocation = 1, RespawnDelay = (5, 10) }
         );
 
-        scenario.Spawners.Add(
-            new RandomSpawner(
-                new PerlinNoise2D(0.05f) { LowCutoff = 0.2 },
-                new RandomByAreaLevelStaticObjectSpawner(
-                    new Dictionary<int, IReadOnlyCollection<Weighted<StaticObject>>>
-                    {
-                        {
-                            0, [
-                                new Weighted<StaticObject>(Herbalist.PeppermintPlant, 1)
-                            ]
-                        },
-                        {
-                            10, [
-                                new Weighted<StaticObject>(Herbalist.PeppermintPlant, 2),
-                                new Weighted<StaticObject>(Herbalist.LavenderPlant, 1)
-                            ]
-                        },
-                        {
-                            20, [
-                                new Weighted<StaticObject>(Herbalist.PeppermintPlant, 3),
-                                new Weighted<StaticObject>(Herbalist.LavenderPlant, 2),
-                                new Weighted<StaticObject>(Herbalist.GinsengPlant, 1)
-                            ]
-                        },
-                        {
-                            30, [
-                                new Weighted<StaticObject>(Herbalist.PeppermintPlant, 4),
-                                new Weighted<StaticObject>(Herbalist.LavenderPlant, 3),
-                                new Weighted<StaticObject>(Herbalist.GinsengPlant, 2),
-                                new Weighted<StaticObject>(Herbalist.ChamomilePlant, 1)
-                            ]
-                        },
-                        {
-                            40, [
-                                new Weighted<StaticObject>(Herbalist.PeppermintPlant, 5),
-                                new Weighted<StaticObject>(Herbalist.LavenderPlant, 4),
-                                new Weighted<StaticObject>(Herbalist.GinsengPlant, 3),
-                                new Weighted<StaticObject>(Herbalist.ChamomilePlant, 2),
-                                new Weighted<StaticObject>(Herbalist.EchinaceaPlant, 1)
-                            ]
-                        }
-                    }
-                ),
-                _loggerFactory.CreateLogger<RandomSpawner>()
-            ) { MaxCount = 1000, MaxCountPerLocation = 10 }
-        );
-
-        scenario.Spawners.Add(
-            new RandomSpawner(
-                new SimplexNoise2D(0.1f) { LowCutoff = 0.75 },
-                new RandomByAreaLevelStaticObjectSpawner(
-                    new Dictionary<int, IReadOnlyCollection<Weighted<StaticObject>>>
-                    {
-                        {
-                            0, [
-                                new Weighted<StaticObject>(Forester.OakTree, 1)
-                            ]
-                        },
-                        {
-                            10, [
-                                new Weighted<StaticObject>(Forester.OakTree, 2),
-                                new Weighted<StaticObject>(Forester.PineTree, 1)
-                            ]
-                        },
-                        {
-                            20, [
-                                new Weighted<StaticObject>(Forester.OakTree, 4),
-                                new Weighted<StaticObject>(Forester.PineTree, 2),
-                                new Weighted<StaticObject>(Forester.MapleTree, 1)
-                            ]
-                        },
-                        {
-                            30, [
-                                new Weighted<StaticObject>(Forester.OakTree, 8),
-                                new Weighted<StaticObject>(Forester.PineTree, 4),
-                                new Weighted<StaticObject>(Forester.MapleTree, 2),
-                                new Weighted<StaticObject>(Forester.BirchTree, 1)
-                            ]
-                        },
-                        {
-                            40, [
-                                new Weighted<StaticObject>(Forester.OakTree, 16),
-                                new Weighted<StaticObject>(Forester.PineTree, 8),
-                                new Weighted<StaticObject>(Forester.MapleTree, 4),
-                                new Weighted<StaticObject>(Forester.BirchTree, 2),
-                                new Weighted<StaticObject>(Forester.WalnutTree, 1)
-                            ]
-                        }
-                    }
-                ),
-                _loggerFactory.CreateLogger<RandomSpawner>()
-            ) { MaxCount = 500, MaxCountPerLocation = 5 }
-        );
+        scenario.Spawners.AddRange(GetHerbalistSpawners());
+        scenario.Spawners.AddRange(GetForesterSpawners());
 
         return scenario;
     }
@@ -221,5 +112,101 @@ public class SandboxGameBuilder
         scenario.Spawners.AddRange(ObjectExplorer.FindValuesOfType<T, Spawner>(instance).ToArray());
         scenario.MonsterFamilies.AddRange(ObjectExplorer.FindValuesOfType<T, MonsterFamily>(instance).ToArray());
         scenario.MonsterSpecies.AddRange(ObjectExplorer.FindValuesOfType<T, MonsterSpecies>(instance).ToArray());
+    }
+
+    IEnumerable<RandomSpawner> GetHerbalistSpawners()
+    {
+        yield return new RandomSpawner(
+            new PerlinNoise2D(0.05f) { LowCutoff = 0.2 },
+            new RandomByAreaLevelStaticObjectSpawner(
+                new Dictionary<int, IReadOnlyCollection<Weighted<StaticObject>>>
+                {
+                    {
+                        0, [
+                            new Weighted<StaticObject>(Herbalist.PeppermintPlant, 1)
+                        ]
+                    },
+                    {
+                        10, [
+                            new Weighted<StaticObject>(Herbalist.PeppermintPlant, 2),
+                            new Weighted<StaticObject>(Herbalist.LavenderPlant, 1)
+                        ]
+                    },
+                    {
+                        20, [
+                            new Weighted<StaticObject>(Herbalist.PeppermintPlant, 3),
+                            new Weighted<StaticObject>(Herbalist.LavenderPlant, 2),
+                            new Weighted<StaticObject>(Herbalist.GinsengPlant, 1)
+                        ]
+                    },
+                    {
+                        30, [
+                            new Weighted<StaticObject>(Herbalist.PeppermintPlant, 4),
+                            new Weighted<StaticObject>(Herbalist.LavenderPlant, 3),
+                            new Weighted<StaticObject>(Herbalist.GinsengPlant, 2),
+                            new Weighted<StaticObject>(Herbalist.ChamomilePlant, 1)
+                        ]
+                    },
+                    {
+                        40, [
+                            new Weighted<StaticObject>(Herbalist.PeppermintPlant, 5),
+                            new Weighted<StaticObject>(Herbalist.LavenderPlant, 4),
+                            new Weighted<StaticObject>(Herbalist.GinsengPlant, 3),
+                            new Weighted<StaticObject>(Herbalist.ChamomilePlant, 2),
+                            new Weighted<StaticObject>(Herbalist.EchinaceaPlant, 1)
+                        ]
+                    }
+                }
+            ),
+            _loggerFactory.CreateLogger<RandomSpawner>()
+        ) { MaxCount = 1000, MaxCountPerLocation = 10 };
+    }
+
+    IEnumerable<RandomSpawner> GetForesterSpawners()
+    {
+        yield return new RandomSpawner(
+            new SimplexNoise2D(0.1f) { LowCutoff = 0.75 },
+            new RandomByAreaLevelStaticObjectSpawner(
+                new Dictionary<int, IReadOnlyCollection<Weighted<StaticObject>>>
+                {
+                    {
+                        0, [
+                            new Weighted<StaticObject>(Forester.OakTree, 1)
+                        ]
+                    },
+                    {
+                        10, [
+                            new Weighted<StaticObject>(Forester.OakTree, 2),
+                            new Weighted<StaticObject>(Forester.PineTree, 1)
+                        ]
+                    },
+                    {
+                        20, [
+                            new Weighted<StaticObject>(Forester.OakTree, 4),
+                            new Weighted<StaticObject>(Forester.PineTree, 2),
+                            new Weighted<StaticObject>(Forester.MapleTree, 1)
+                        ]
+                    },
+                    {
+                        30, [
+                            new Weighted<StaticObject>(Forester.OakTree, 8),
+                            new Weighted<StaticObject>(Forester.PineTree, 4),
+                            new Weighted<StaticObject>(Forester.MapleTree, 2),
+                            new Weighted<StaticObject>(Forester.BirchTree, 1)
+                        ]
+                    },
+                    {
+                        40, [
+                            new Weighted<StaticObject>(Forester.OakTree, 16),
+                            new Weighted<StaticObject>(Forester.PineTree, 8),
+                            new Weighted<StaticObject>(Forester.MapleTree, 4),
+                            new Weighted<StaticObject>(Forester.BirchTree, 2),
+                            new Weighted<StaticObject>(Forester.WalnutTree, 1)
+                        ]
+                    }
+                }
+            ),
+            _loggerFactory.CreateLogger<RandomSpawner>()
+        ) { MaxCount = 500, MaxCountPerLocation = 5 };
     }
 }

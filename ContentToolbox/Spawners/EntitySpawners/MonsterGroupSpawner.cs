@@ -5,7 +5,7 @@ using RestAdventure.Core.Maps.Locations;
 
 namespace ContentToolbox.Spawners.EntitySpawners;
 
-public class MonsterGroupSpawner : EntitySpawner, IGameEntitySource
+public class MonsterGroupSpawner : EntitySpawner
 {
     /// <summary>
     ///     The species that should be sampled for each instance
@@ -35,6 +35,6 @@ public class MonsterGroupSpawner : EntitySpawner, IGameEntitySource
             group.Add(new MonsterInGroup { Species = species, Level = level });
         }
 
-        yield return new MonsterGroup(group, location) { Source = this };
+        yield return new MonsterGroup(group, location);
     }
 }
