@@ -55,7 +55,7 @@ public class SandboxGameBuilder
 
         _startLocation = startLocation!;
 
-        CharacterClasses = new CharacterClasses(MapGeneratorResult.GeneratedMaps, _startLocation);
+        CharacterClasses = new CharacterClasses(_startLocation);
     }
 
     public MapGenerator MapGenerator { get; }

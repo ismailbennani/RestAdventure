@@ -1,12 +1,12 @@
 ﻿using RestAdventure.Core.Entities.Characters;
 using RestAdventure.Core.Maps.Locations;
-using SandboxGame.Generation;
+using SandboxGame.Experience;
 
 namespace SandboxGame.Characters;
 
 public class CharacterClasses
 {
-    public CharacterClasses(GeneratedMaps maps, Location startLocation)
+    public CharacterClasses(Location startLocation)
     {
         Knight = new CharacterClass
         {
@@ -17,7 +17,7 @@ public class CharacterClasses
             Health = 100,
             Speed = 100,
             Attack = 10,
-            LevelCaps = [2, 5, 10]
+            LevelCaps = KnownExperienceFormulas.CharacterLevelCaps1To50
         };
 
         Mage = new CharacterClass
@@ -29,7 +29,7 @@ public class CharacterClasses
             Health = 100,
             Speed = 100,
             Attack = 10,
-            LevelCaps = [2, 5, 10]
+            LevelCaps = KnownExperienceFormulas.CharacterLevelCaps1To50
         };
 
         Scout = new CharacterClass
@@ -43,7 +43,7 @@ public class CharacterClasses
             Health = 100,
             Speed = 100,
             Attack = 10,
-            LevelCaps = [2, 5, 10]
+            LevelCaps = KnownExperienceFormulas.CharacterLevelCaps1To50
         };
 
         Dealer = new CharacterClass
@@ -55,7 +55,7 @@ public class CharacterClasses
             Health = 100,
             Speed = 100,
             Attack = 10,
-            LevelCaps = [2, 5, 10]
+            LevelCaps = KnownExperienceFormulas.CharacterLevelCaps1To50
         };
     }
 
