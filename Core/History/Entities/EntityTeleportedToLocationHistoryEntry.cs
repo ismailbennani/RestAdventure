@@ -47,7 +47,7 @@ public class CreateEntityTeleportedToLocationHistoryEntry : INotificationHandler
 
     public Task Handle(GameEntityTeleportedToLocation notification, CancellationToken cancellationToken)
     {
-        GameState state = _gameService.RequireGameState();
+        Game state = _gameService.RequireGameState();
         EntityTeleportedToLocationHistoryEntry entry = new(notification.Entity, notification.OldLocation, notification.NewLocation, state.Tick);
         state.History.Record(entry);
         return Task.CompletedTask;

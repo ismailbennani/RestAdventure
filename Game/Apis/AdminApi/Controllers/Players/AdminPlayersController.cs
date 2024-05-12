@@ -29,7 +29,7 @@ public class AdminPlayersController : AdminApiController
     [HttpGet]
     public ActionResult<IReadOnlyCollection<PlayerDto>> GetPlayers()
     {
-        GameState state = _gameService.RequireGameState();
+        Core.Game state = _gameService.RequireGameState();
         return state.Players.All.Select(p => p.ToDto()).ToArray();
     }
 
@@ -41,7 +41,7 @@ public class AdminPlayersController : AdminApiController
     {
         UserId userId = new(userGuid);
 
-        GameState state = _gameService.RequireGameState();
+        Core.Game state = _gameService.RequireGameState();
 
         Player? existingPlayer = state.Players.GetPlayer(userId);
         if (existingPlayer != null)
@@ -63,7 +63,7 @@ public class AdminPlayersController : AdminApiController
     {
         UserId userId = new(userGuid);
 
-        GameState state = _gameService.RequireGameState();
+        Core.Game state = _gameService.RequireGameState();
         Player? player = state.Players.GetPlayer(userId);
         if (player == null)
         {
@@ -81,7 +81,7 @@ public class AdminPlayersController : AdminApiController
     {
         UserId userId = new(userGuid);
 
-        GameState state = _gameService.RequireGameState();
+        Core.Game state = _gameService.RequireGameState();
         Player? player = state.Players.GetPlayer(userId);
         if (player == null)
         {

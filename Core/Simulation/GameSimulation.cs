@@ -4,10 +4,10 @@ namespace RestAdventure.Core.Simulation;
 
 public class GameSimulation
 {
-    readonly GameState _state;
+    readonly Game _state;
     readonly IReadOnlyCollection<SimulationWorkProvider> _providers;
 
-    public GameSimulation(GameState state, IReadOnlyCollection<SimulationWorkProvider> providers)
+    public GameSimulation(Game state, IReadOnlyCollection<SimulationWorkProvider> providers)
     {
         _state = state;
         _providers = providers;
@@ -25,7 +25,7 @@ public class GameSimulation
         await ExecuteWorkAsync(p => p.Late());
         await ExecuteWorkAsync(p => p.PostTick());
 
-        await _state.Publisher.Publish(new GameTick { GameState = _state });
+        await _state.Publisher.Publish(new GameTick { Game = _state });
     }
 
     async Task ExecuteWorkAsync(Func<SimulationWorkProvider, IEnumerable<Work>> getWork)

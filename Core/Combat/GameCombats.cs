@@ -11,11 +11,11 @@ namespace RestAdventure.Core.Combat;
 
 public class GameCombats : IEnumerable<CombatInstance>
 {
-    readonly GameState _state;
+    readonly Game _state;
     readonly ILogger<GameCombats> _logger;
     readonly Dictionary<CombatInstanceId, CombatInstance> _combats = new();
 
-    public GameCombats(GameState state)
+    public GameCombats(Game state)
     {
         _state = state;
         _logger = state.LoggerFactory.CreateLogger<GameCombats>();

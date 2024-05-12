@@ -7,14 +7,14 @@ namespace RestAdventure.Core.Actions;
 
 public class GameActions
 {
-    readonly GameState _state;
+    readonly Game _state;
     readonly ILogger<GameActions> _logger;
     readonly ConcurrentDictionary<CharacterId, IReadOnlyCollection<Action>> _availableActions = new();
     readonly Dictionary<CharacterId, Action> _queuedActions = new();
     readonly Dictionary<CharacterId, Action> _ongoingActions = new();
     readonly IReadOnlyCollection<IActionsProvider> _actionProviders;
 
-    public GameActions(GameState state, IReadOnlyCollection<IActionsProvider> actionProviders)
+    public GameActions(Game state, IReadOnlyCollection<IActionsProvider> actionProviders)
     {
         _state = state;
         _actionProviders = actionProviders;

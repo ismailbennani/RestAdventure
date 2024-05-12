@@ -47,7 +47,7 @@ public class GameStateDto
 
 static class GameStateMappingExtensions
 {
-    public static GameStateDto ToDto(this GameState state, GameSimulation simulation) =>
+    public static GameStateDto ToDto(this Core.Game state, GameSimulation simulation) =>
         new()
         {
             Title = state.Content.Title,

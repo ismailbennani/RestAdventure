@@ -38,7 +38,7 @@ public class CombatsHistoryController : GameApiController
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public ActionResult<SearchResultDto<CombatHistoryEntryDto>> SearchCombatHistory(Guid characterGuid, Guid combatGuid, [FromQuery] SearchRequestDto request)
     {
-        GameState state = _gameService.RequireGameState();
+        Core.Game state = _gameService.RequireGameState();
 
         Player player = ControllerContext.RequirePlayer(state);
 
@@ -69,7 +69,7 @@ public class CombatsHistoryController : GameApiController
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public ActionResult<SearchResultDto<ArchivedCombatDto>> SearchArchivedCombats(Guid characterGuid, [FromQuery] SearchRequestDto request)
     {
-        GameState state = _gameService.RequireGameState();
+        Core.Game state = _gameService.RequireGameState();
 
         Player player = ControllerContext.RequirePlayer(state);
 
@@ -93,7 +93,7 @@ public class CombatsHistoryController : GameApiController
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public ActionResult<SearchResultDto<CombatHistoryEntryDto>> SearchArchivedCombatHistory(Guid characterGuid, Guid combatGuid, [FromQuery] SearchRequestDto request)
     {
-        GameState state = _gameService.RequireGameState();
+        Core.Game state = _gameService.RequireGameState();
 
         Player player = ControllerContext.RequirePlayer(state);
 

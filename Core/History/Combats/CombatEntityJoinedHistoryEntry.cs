@@ -31,7 +31,7 @@ public class CreateCombatEntityJoinedHistoryEntry : INotificationHandler<EntityJ
 
     public Task Handle(EntityJoinedCombat notification, CancellationToken cancellationToken)
     {
-        GameState state = _gameService.RequireGameState();
+        Game state = _gameService.RequireGameState();
         CombatEntityJoinedHistoryEntry entry = new(notification.Combat, notification.Entity, notification.Side, state.Tick);
         state.History.Record(entry);
         return Task.CompletedTask;

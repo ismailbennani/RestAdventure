@@ -79,7 +79,7 @@ public class GameContentController : GameApiController
 
     ActionResult<TDto> GetResource<TResource, TDto>(Func<GameContent, TResource?> findResource, Func<GameContent, TResource, TDto> map) where TResource: GameResource
     {
-        GameState state = _gameService.RequireGameState();
+        Core.Game state = _gameService.RequireGameState();
 
         UserId userId = ControllerContext.RequireUserId();
         Player? player = state.Players.GetPlayer(userId);

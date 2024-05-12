@@ -58,7 +58,7 @@ public class Character : GameEntity<CharacterId>, IGameEntityWithInventory, IGam
     /// </summary>
     public EntityMovement Movement { get; }
 
-    public override async Task KillAsync(GameState state) => await TeleportAsync(state, Class.StartLocation);
+    public override async Task KillAsync(Game state) => await TeleportAsync(state, Class.StartLocation);
 
     public IEnumerable<ICombatEntity> SpawnCombatEntities() => [new CharacterCombatEntity(this)];
 

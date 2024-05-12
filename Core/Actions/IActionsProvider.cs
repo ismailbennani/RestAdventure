@@ -4,5 +4,5 @@ namespace RestAdventure.Core.Actions;
 
 public interface IActionsProvider
 {
-    IEnumerable<Action> GetActions(GameState state, Character character);
+    IEnumerable<Action> GetActions(Game state, Character character);
 }

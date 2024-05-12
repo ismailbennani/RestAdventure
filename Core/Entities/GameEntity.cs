@@ -39,7 +39,7 @@ public abstract class GameEntity : IEquatable<GameEntity>, IGameEntity
     /// <inheritdoc />
     public bool Busy { get; set; }
 
-    public async Task TeleportAsync(GameState state, Location location)
+    public async Task TeleportAsync(Game state, Location location)
     {
         Location oldLocation = Location;
         Location = location;
@@ -47,7 +47,7 @@ public abstract class GameEntity : IEquatable<GameEntity>, IGameEntity
         await state.Publisher.Publish(new GameEntityTeleportedToLocation { Entity = this, OldLocation = oldLocation, NewLocation = Location });
     }
 
-    public virtual async Task KillAsync(GameState state) => await state.Entities.DestroyAsync(this);
+    public virtual async Task KillAsync(Game state) => await state.Entities.DestroyAsync(this);
 
     public override string ToString() => Name;
 

@@ -39,7 +39,7 @@ public class PveController : GameApiController
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public ActionResult<IReadOnlyCollection<MonsterGroupDto>> GetMonsters(Guid characterGuid)
     {
-        GameState state = _gameService.RequireGameState();
+        Core.Game state = _gameService.RequireGameState();
         Player player = ControllerContext.RequirePlayer(state);
 
         CharacterId characterId = new(characterGuid);
@@ -100,7 +100,7 @@ public class PveController : GameApiController
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public ActionResult AttackMonsters(Guid characterGuid, Guid groupId)
     {
-        GameState state = _gameService.RequireGameState();
+        Core.Game state = _gameService.RequireGameState();
         Player player = ControllerContext.RequirePlayer(state);
 
         CharacterId characterId = new(characterGuid);
@@ -134,7 +134,7 @@ public class PveController : GameApiController
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public ActionResult JoinCombat(Guid characterGuid, Guid monsterGroupGuid)
     {
-        GameState state = _gameService.RequireGameState();
+        Core.Game state = _gameService.RequireGameState();
         Player player = ControllerContext.RequirePlayer(state);
 
         CharacterId characterId = new(characterGuid);

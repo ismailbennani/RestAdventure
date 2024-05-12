@@ -17,9 +17,9 @@ public class StartAndPlayPveCombatAction : Action
     public MonsterGroup MonsterGroup { get; }
     public CombatInstance? CombatInstance { get; private set; }
 
-    public override bool IsOver(GameState state, Character character) => state.Combats.GetCombatInvolving(character) == null;
+    public override bool IsOver(Game state, Character character) => state.Combats.GetCombatInvolving(character) == null;
 
-    protected override async Task OnStartAsync(GameState state, Character character)
+    protected override async Task OnStartAsync(Game state, Character character)
     {
         ILogger<StartAndPlayPveCombatAction> logger = state.LoggerFactory.CreateLogger<StartAndPlayPveCombatAction>();
 
@@ -45,7 +45,7 @@ public class StartAndPlayPveCombatAction : Action
         MonsterGroup.JoinCombatAction = new JoinAndPlayPveCombatAction(MonsterGroup, CombatInstance);
     }
 
-    protected override Task OnEndAsync(GameState state, Character character)
+    protected override Task OnEndAsync(Game state, Character character)
     {
         CombatInstance = null;
         MonsterGroup.JoinCombatAction = null;

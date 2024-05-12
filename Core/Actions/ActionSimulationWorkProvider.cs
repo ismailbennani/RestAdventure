@@ -7,10 +7,10 @@ namespace RestAdventure.Core.Actions;
 
 public class ActionSimulationWorkProvider : SimulationWorkProvider
 {
-    readonly GameState _state;
+    readonly Game _state;
     readonly ILogger<ActionSimulationWorkProvider> _logger;
 
-    public ActionSimulationWorkProvider(GameState state)
+    public ActionSimulationWorkProvider(Game state)
     {
         _state = state;
         _logger = state.LoggerFactory.CreateLogger<ActionSimulationWorkProvider>();

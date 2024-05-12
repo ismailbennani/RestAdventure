@@ -23,7 +23,7 @@ public abstract class Action : IEquatable<Action>
     /// <summary>
     ///     Can the action be performed
     /// </summary>
-    public Maybe CanPerform(GameState state, Character character)
+    public Maybe CanPerform(Game state, Character character)
     {
         if (character.Busy)
         {
@@ -34,11 +34,11 @@ public abstract class Action : IEquatable<Action>
     }
 
     /// <inheritdoc cref="CanPerform" />
-    protected virtual Maybe CanPerformInternal(GameState state, Character character) => true;
+    protected virtual Maybe CanPerformInternal(Game state, Character character) => true;
 
-    public abstract bool IsOver(GameState state, Character character);
+    public abstract bool IsOver(Game state, Character character);
 
-    public async Task StartAsync(GameState state, Character character)
+    public async Task StartAsync(Game state, Character character)
     {
         StartTick = state.Tick;
         Started = true;
@@ -49,9 +49,9 @@ public abstract class Action : IEquatable<Action>
         await state.Publisher.Publish(new ActionStarted { Character = character, Action = this });
     }
 
-    public async Task TickAsync(GameState state, Character character) => await OnTickAsync(state, character);
+    public async Task TickAsync(Game state, Character character) => await OnTickAsync(state, character);
 
-    public async Task EndAsync(GameState state, Character character)
+    public async Task EndAsync(Game state, Character character)
     {
         Ended = true;
         character.Busy = false;
@@ -65,7 +65,7 @@ public abstract class Action : IEquatable<Action>
     ///     Called on the first tick, even if <see cref="Over" /> is true. It is guaranteed to be called exactly once per interaction.
     ///     When this hook is called on the same tick as <see cref="OnStartAsync" /> or <see cref="OnTickAsync" />, it is always called first.
     /// </summary>
-    protected virtual Task OnStartAsync(GameState state, Character character) => Task.CompletedTask;
+    protected virtual Task OnStartAsync(Game state, Character character) => Task.CompletedTask;
 
     /// <summary>
     ///     Called once per tick.
@@ -73,7 +73,7 @@ public abstract class Action : IEquatable<Action>
     ///     When this hook is called on the same tick as <see cref="OnStartAsync" />, it will be called AFTER it.
     ///     When this hook is called on the same tick as <see cref="OnEndAsync" />, it will be called BEFORE it.
     /// </summary>
-    protected virtual Task OnTickAsync(GameState state, Character character) => Task.CompletedTask;
+    protected virtual Task OnTickAsync(Game state, Character character) => Task.CompletedTask;
 
     /// <summary>
     ///     Called on the last tick, even if it is the first one. It is guaranteed to be called exactly once per interaction.
@@ -81,7 +81,7 @@ public abstract class Action : IEquatable<Action>
     ///     This means that this hook MIGHT be called on the same tick as <see cref="OnStartAsync" />, if <see cref="Over" /> is true on the first tick.
     ///     When this hook is called on the same tick as <see cref="OnStartAsync" /> or <see cref="OnTickAsync" />, it is always called last.
     /// </summary>
-    protected virtual Task OnEndAsync(GameState state, Character character) => Task.CompletedTask;
+    protected virtual Task OnEndAsync(Game state, Character character) => Task.CompletedTask;
 
     public bool Equals(Action? other)
     {

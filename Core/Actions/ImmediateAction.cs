@@ -8,11 +8,11 @@ public abstract class ImmediateAction : Action
     {
     }
 
-    public override bool IsOver(GameState state, Character character) => true;
+    public override bool IsOver(Game state, Character character) => true;
 
-    protected override sealed Task OnStartAsync(GameState state, Character character) => Task.CompletedTask;
-    protected override sealed Task OnTickAsync(GameState state, Character character) => PerformAsync(state, character);
-    protected override sealed Task OnEndAsync(GameState state, Character character) => Task.CompletedTask;
+    protected override sealed Task OnStartAsync(Game state, Character character) => Task.CompletedTask;
+    protected override sealed Task OnTickAsync(Game state, Character character) => PerformAsync(state, character);
+    protected override sealed Task OnEndAsync(Game state, Character character) => Task.CompletedTask;
 
-    protected abstract Task PerformAsync(GameState state, Character character);
+    protected abstract Task PerformAsync(Game state, Character character);
 }

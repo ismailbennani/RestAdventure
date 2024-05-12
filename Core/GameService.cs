@@ -11,7 +11,7 @@ public class GameService
     readonly ILoggerFactory _loggerFactory;
     readonly ILogger<GameService> _logger;
 
-    GameState? _gameState;
+    Game? _gameState;
 
     public GameService(IPublisher publisher, ILoggerFactory loggerFactory)
     {
@@ -20,10 +20,10 @@ public class GameService
         _logger = loggerFactory.CreateLogger<GameService>();
     }
 
-    public async Task<GameState> NewGameAsync(Scenario scenario, GameSettings settings)
+    public async Task<Game> NewGameAsync(Scenario scenario, GameSettings settings)
     {
         GameContent gameContent = scenario.ToGameContent();
-        _gameState = new GameState(settings, gameContent, _publisher, _loggerFactory);
+        _gameState = new Game(settings, gameContent, _publisher, _loggerFactory);
         await _gameState.Simulation.StartAsync();
 
         _logger.LogInformation("Game state has been initialized with settings: {settingsJson}.", JsonSerializer.Serialize(settings));
@@ -31,9 +31,9 @@ public class GameService
         return _gameState;
     }
 
-    public GameState LoadGame() => throw new NotImplementedException();
+    public Game LoadGame() => throw new NotImplementedException();
 
-    public GameState RequireGameState()
+    public Game RequireGameState()
     {
         if (_gameState == null)
         {
@@ -47,7 +47,7 @@ public class GameService
 
     public async Task<long> TickAsync()
     {
-        GameState state = RequireGameState();
+        Game state = RequireGameState();
 
         await state.Simulation.TickAsync();
 

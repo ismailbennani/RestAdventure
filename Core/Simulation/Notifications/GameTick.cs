@@ -4,7 +4,7 @@ namespace RestAdventure.Core.Simulation.Notifications;
 
 public class GameTick : INotification
 {
-    public required GameState GameState { get; init; }
+    public required Game Game { get; init; }
 
-    public override string ToString() => $"Tick: {GameState.Tick}";
+    public override string ToString() => $"Tick: {Game.Tick}";
 }

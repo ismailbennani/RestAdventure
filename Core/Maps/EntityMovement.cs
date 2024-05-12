@@ -14,7 +14,7 @@ public class EntityMovement
         _entity = entity;
     }
 
-    public Maybe CanMoveTo(GameState state, Location location)
+    public Maybe CanMoveTo(Game state, Location location)
     {
         bool isAccessible = state.Content.Maps.Locations.AreConnected(_entity.Location, location);
         if (!isAccessible)
@@ -25,7 +25,7 @@ public class EntityMovement
         return true;
     }
 
-    public async Task<Maybe> MoveToAsync(GameState state, Location location)
+    public async Task<Maybe> MoveToAsync(Game state, Location location)
     {
         Maybe canMove = CanMoveTo(state, location);
         if (!canMove)

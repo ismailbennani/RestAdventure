@@ -37,5 +37,5 @@ public interface IGameEntity : IDisposable
     /// <summary>
     ///     Kill the entity
     /// </summary>
-    Task KillAsync(GameState state);
+    Task KillAsync(Game state);
 }

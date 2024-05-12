@@ -7,7 +7,7 @@ namespace RestAdventure.Core.Combat.Pve;
 
 public class PveCombatActionsProvider : IActionsProvider
 {
-    public IEnumerable<Action> GetActions(GameState state, Character character)
+    public IEnumerable<Action> GetActions(Game state, Character character)
     {
         IEnumerable<MonsterGroup> groups = state.Entities.AtLocation<MonsterGroup>(character.Location);
         foreach (MonsterGroup group in groups)

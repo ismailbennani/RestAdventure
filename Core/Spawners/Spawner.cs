@@ -17,7 +17,7 @@ public abstract class Spawner : GameResource<SpawnerId>, IEquatable<Spawner>, IG
     }
 
 
-    public IEnumerable<GameEntity> GetInitialEntities(GameState state)
+    public IEnumerable<GameEntity> GetInitialEntities(Game state)
     {
         IEnumerable<GameEntity> entities = GetInitialEntitiesInternal(state);
         foreach (GameEntity entity in entities)
@@ -28,7 +28,7 @@ public abstract class Spawner : GameResource<SpawnerId>, IEquatable<Spawner>, IG
         }
     }
 
-    public IEnumerable<GameEntity> GetEntitiesToSpawn(GameState state)
+    public IEnumerable<GameEntity> GetEntitiesToSpawn(Game state)
     {
         IEnumerable<GameEntity> entities = GetEntitiesToSpawnInternal(state);
         foreach (GameEntity entity in entities)
@@ -48,8 +48,8 @@ public abstract class Spawner : GameResource<SpawnerId>, IEquatable<Spawner>, IG
     void Remember(IGameEntity entity) => _entities.Add(entity);
     void Forget(IGameEntity entity) => _entities.Remove(entity);
 
-    protected virtual IEnumerable<GameEntity> GetInitialEntitiesInternal(GameState state) => Enumerable.Empty<GameEntity>();
-    protected abstract IEnumerable<GameEntity> GetEntitiesToSpawnInternal(GameState state);
+    protected virtual IEnumerable<GameEntity> GetInitialEntitiesInternal(Game state) => Enumerable.Empty<GameEntity>();
+    protected abstract IEnumerable<GameEntity> GetEntitiesToSpawnInternal(Game state);
     protected virtual void OnEntityDeletedInternal(IGameEntity entity) { }
 
     public bool Equals(Spawner? other)

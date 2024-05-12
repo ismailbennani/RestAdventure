@@ -65,15 +65,15 @@ public class RandomSpawner : Spawner
     ///     Fill the area with entities. The <see cref="MaxCount" /> and <see cref="MaxCountPerLocation" /> constraints will be enforced
     ///     but the <see cref="RespawnDelay" /> and <see cref="MaxCountPerLocation" /> will not.
     /// </summary>
-    protected override IEnumerable<GameEntity> GetInitialEntitiesInternal(GameState state) => GetEntitiesToSpawnInternal(state, true, null);
+    protected override IEnumerable<GameEntity> GetInitialEntitiesInternal(Game state) => GetEntitiesToSpawnInternal(state, true, null);
 
     /// <summary>
     ///     Spawn entities while enforcing the <see cref="MaxCount" />, <see cref="MaxCountPerLocation" />, <see cref="RespawnDelay" /> and <see cref="MaxCountPerLocation" />
     ///     constraints
     /// </summary>
-    protected override IEnumerable<GameEntity> GetEntitiesToSpawnInternal(GameState state) => GetEntitiesToSpawnInternal(state, false, MaxSpawnPerExecution);
+    protected override IEnumerable<GameEntity> GetEntitiesToSpawnInternal(Game state) => GetEntitiesToSpawnInternal(state, false, MaxSpawnPerExecution);
 
-    IEnumerable<GameEntity> GetEntitiesToSpawnInternal(GameState state, bool ignoreRespawnDelays, int? maxSpawn)
+    IEnumerable<GameEntity> GetEntitiesToSpawnInternal(Game state, bool ignoreRespawnDelays, int? maxSpawn)
     {
         Random random = Random.Shared;
 
@@ -162,7 +162,7 @@ public class RandomSpawner : Spawner
         }
     }
 
-    IEnumerable<Location> GetSuitableLocations(GameState state, bool ignoreRespawnDelays)
+    IEnumerable<Location> GetSuitableLocations(Game state, bool ignoreRespawnDelays)
     {
         IEnumerable<Location> locations = _locationSelector?.GetLocations(state) ?? state.Content.Maps.Locations;
 

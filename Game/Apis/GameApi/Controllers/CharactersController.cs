@@ -42,7 +42,7 @@ public class CharactersController : GameApiController
     public async Task<ActionResult<TeamCharacterDto>> CreateCharacterAsync(CreateCharacterRequestDto request)
     {
         GameContent content = _gameService.RequireGameContent();
-        GameState state = _gameService.RequireGameState();
+        Core.Game state = _gameService.RequireGameState();
 
         Player player = ControllerContext.RequirePlayer(state);
 
@@ -71,7 +71,7 @@ public class CharactersController : GameApiController
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public ActionResult<TeamCharacterDto> GetCharacter(Guid characterGuid)
     {
-        GameState state = _gameService.RequireGameState();
+        Core.Game state = _gameService.RequireGameState();
 
         Player player = ControllerContext.RequirePlayer(state);
 
@@ -93,7 +93,7 @@ public class CharactersController : GameApiController
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public ActionResult<SearchResultDto<CharacterHistoryEntryDto>> SearchCharacterHistory(Guid characterGuid, [FromQuery] SearchRequestDto request)
     {
-        GameState state = _gameService.RequireGameState();
+        Core.Game state = _gameService.RequireGameState();
 
         Player player = ControllerContext.RequirePlayer(state);
 
@@ -117,7 +117,7 @@ public class CharactersController : GameApiController
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> DeleteCharacterAsync(Guid characterGuid)
     {
-        GameState state = _gameService.RequireGameState();
+        Core.Game state = _gameService.RequireGameState();
         Player player = ControllerContext.RequirePlayer(state);
 
         CharacterId characterId = new(characterGuid);

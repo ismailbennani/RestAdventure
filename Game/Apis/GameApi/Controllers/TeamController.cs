@@ -30,7 +30,7 @@ public class TeamController : GameApiController
     [HttpGet]
     public ActionResult<TeamDto> GetTeam()
     {
-        GameState state = _gameService.RequireGameState();
+        Core.Game state = _gameService.RequireGameState();
         Player player = ControllerContext.RequirePlayer(state);
 
         IEnumerable<Character> characters = state.Entities.GetCharactersOfPlayer(player);

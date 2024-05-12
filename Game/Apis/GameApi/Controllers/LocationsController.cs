@@ -36,7 +36,7 @@ public class LocationsController : GameApiController
     public ActionResult<IReadOnlyCollection<LocationWithAccessDto>> GetAccessibleLocations(Guid characterGuid)
     {
         GameContent content = _gameService.RequireGameContent();
-        GameState state = _gameService.RequireGameState();
+        Core.Game state = _gameService.RequireGameState();
         Player player = ControllerContext.RequirePlayer(state);
 
         CharacterId characterId = new(characterGuid);
@@ -76,7 +76,7 @@ public class LocationsController : GameApiController
     public ActionResult MoveToLocation(Guid characterGuid, Guid locationGuid)
     {
         GameContent content = _gameService.RequireGameContent();
-        GameState state = _gameService.RequireGameState();
+        Core.Game state = _gameService.RequireGameState();
         Player player = ControllerContext.RequirePlayer(state);
 
         CharacterId characterId = new(characterGuid);

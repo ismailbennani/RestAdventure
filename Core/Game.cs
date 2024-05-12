@@ -15,9 +15,9 @@ namespace RestAdventure.Core;
 
 public record GameId(Guid Guid);
 
-public class GameState : IDisposable
+public class Game : IDisposable
 {
-    public GameState(GameSettings settings, GameContent content, IPublisher publisher, ILoggerFactory loggerFactory)
+    public Game(GameSettings settings, GameContent content, IPublisher publisher, ILoggerFactory loggerFactory)
     {
         Content = content;
         Publisher = publisher;

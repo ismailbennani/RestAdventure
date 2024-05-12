@@ -145,13 +145,13 @@ void SetupOpenApiDocuments(WebApplicationBuilder builder)
     );
 }
 
-async Task<GameState> LoadGameAsync(WebApplication app)
+async Task<Game> LoadGameAsync(WebApplication app)
 {
     SandboxGameBuilder sandboxGameBuilder = new(loggerFactory);
     Scenario scenario = sandboxGameBuilder.Build();
 
     GameService gameService = app.Services.GetRequiredService<GameService>();
-    GameState state = await gameService.NewGameAsync(scenario, new GameSettings { GenerateEntitiesOnInitialization = false });
+    Game state = await gameService.NewGameAsync(scenario, new GameSettings { GenerateEntitiesOnInitialization = false });
 
     Player player = await state.Players.RegisterPlayerAsync(new User(new UserId(Guid.NewGuid()), "PLAYER"));
     await state.Entities.AddAsync(new Character(player, sandboxGameBuilder.CharacterClasses.Dealer, "Deadea"));

@@ -34,7 +34,7 @@ public class CombatsController : GameApiController
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public ActionResult<IReadOnlyCollection<CombatDto>> GetCombats(Guid characterGuid)
     {
-        GameState state = _gameService.RequireGameState();
+        Core.Game state = _gameService.RequireGameState();
         Player player = ControllerContext.RequirePlayer(state);
 
         CharacterId characterId = new(characterGuid);

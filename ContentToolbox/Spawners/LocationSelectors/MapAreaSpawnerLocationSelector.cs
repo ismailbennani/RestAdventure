@@ -8,5 +8,5 @@ public class MapAreaSpawnerLocationSelector : SpawnerLocationSelector
 {
     public required MapArea Area { get; init; }
 
-    public override IEnumerable<Location> GetLocations(GameState state) => state.Content.Maps.Locations.InArea(Area);
+    public override IEnumerable<Location> GetLocations(Game state) => state.Content.Maps.Locations.InArea(Area);
 }

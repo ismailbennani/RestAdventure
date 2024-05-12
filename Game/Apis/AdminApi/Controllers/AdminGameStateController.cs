@@ -30,7 +30,7 @@ public class AdminGameStateController : AdminApiController
     [HttpGet("static-objects/{staticObjectGuid:guid}")]
     public SearchResultDto<EntityDto> SearchStaticObjectInstances(Guid staticObjectGuid, [FromQuery] SearchRequestDto request)
     {
-        GameState state = _gameService.RequireGameState();
+        Core.Game state = _gameService.RequireGameState();
 
         StaticObjectId staticObjectId = new(staticObjectGuid);
         IEnumerable<StaticObjectInstance> instances = state.Entities.OfType<StaticObjectInstance>().Where(o => o.Object.Id == staticObjectId);

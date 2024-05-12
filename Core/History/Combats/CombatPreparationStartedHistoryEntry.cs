@@ -22,7 +22,7 @@ public class CreateCharacterPreparationStartedMonsterCombatHistoryEntry : INotif
 
     public Task Handle(CombatPreparationStarted notification, CancellationToken cancellationToken)
     {
-        GameState state = _gameService.RequireGameState();
+        Game state = _gameService.RequireGameState();
         CombatPreparationStartedHistoryEntry entry = new(notification.Combat, state.Tick);
         state.History.Record(entry);
         return Task.CompletedTask;

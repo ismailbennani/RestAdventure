@@ -19,7 +19,7 @@ public class HarvestAction : Action
     public JobHarvest Harvest { get; }
     public StaticObjectInstance Target { get; }
 
-    protected override Maybe CanPerformInternal(GameState state, Character character)
+    protected override Maybe CanPerformInternal(Game state, Character character)
     {
         if (character.Busy)
         {
@@ -46,15 +46,15 @@ public class HarvestAction : Action
         return true;
     }
 
-    public override bool IsOver(GameState state, Character character) => state.Tick - StartTick >= Harvest.HarvestDuration;
+    public override bool IsOver(Game state, Character character) => state.Tick - StartTick >= Harvest.HarvestDuration;
 
-    protected override Task OnStartAsync(GameState state, Character character)
+    protected override Task OnStartAsync(Game state, Character character)
     {
         Target.Busy = true;
         return Task.CompletedTask;
     }
 
-    protected override async Task OnEndAsync(GameState state, Character character)
+    protected override async Task OnEndAsync(Game state, Character character)
     {
         character.Inventory.Add(Harvest.Items);
         character.Jobs.Get(Job)?.Progression.Progress(Harvest.Experience);

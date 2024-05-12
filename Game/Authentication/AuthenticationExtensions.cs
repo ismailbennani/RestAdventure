@@ -21,12 +21,12 @@ static class AuthenticationExtensions
 
     public static UserId RequireUserId(this ControllerContext context) => GetUserId(context) ?? throw new InvalidOperationException("Could not determine current user");
 
-    public static Player? GetPlayer(this ControllerContext context, GameState state)
+    public static Player? GetPlayer(this ControllerContext context, Core.Game state)
     {
         UserId? userId = GetUserId(context);
         return userId == null ? null : state.Players.GetPlayer(userId);
     }
 
-    public static Player RequirePlayer(this ControllerContext context, GameState state) =>
+    public static Player RequirePlayer(this ControllerContext context, Core.Game state) =>
         GetPlayer(context, state) ?? throw new InvalidOperationException("Could not determine current player");
 }

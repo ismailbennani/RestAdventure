@@ -7,7 +7,7 @@ namespace RestAdventure.Core.Jobs;
 
 public class HarvestActionsProvider : IActionsProvider
 {
-    public IEnumerable<Action> GetActions(GameState state, Character character)
+    public IEnumerable<Action> GetActions(Game state, Character character)
     {
         IEnumerable<StaticObjectInstance> staticObjects = state.Entities.AtLocation<StaticObjectInstance>(character.Location);
         foreach (StaticObjectInstance staticObject in staticObjects)

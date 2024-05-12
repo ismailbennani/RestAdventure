@@ -5,9 +5,9 @@ namespace RestAdventure.Core.Spawners;
 
 public class SpawnerSimulationWorkProvider : SimulationWorkProvider
 {
-    readonly GameState _state;
+    readonly Game _state;
 
-    public SpawnerSimulationWorkProvider(GameState state)
+    public SpawnerSimulationWorkProvider(Game state)
     {
         _state = state;
     }

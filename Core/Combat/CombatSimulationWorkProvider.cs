@@ -5,10 +5,10 @@ namespace RestAdventure.Core.Combat;
 
 public class CombatSimulationWorkProvider : SimulationWorkProvider
 {
-    readonly GameState _state;
+    readonly Game _state;
     readonly ILogger<CombatSimulationWorkProvider> _logger;
 
-    public CombatSimulationWorkProvider(GameState state)
+    public CombatSimulationWorkProvider(Game state)
     {
         _state = state;
         _logger = state.LoggerFactory.CreateLogger<CombatSimulationWorkProvider>();

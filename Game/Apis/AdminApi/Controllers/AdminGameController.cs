@@ -36,7 +36,7 @@ public class AdminGameController : AdminApiController
     [HttpGet("state")]
     public GameStateDto GetGameState()
     {
-        GameState state = _gameService.RequireGameState();
+        Core.Game state = _gameService.RequireGameState();
         return state.ToDto(_gameSimulation);
     }
 

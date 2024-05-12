@@ -5,5 +5,5 @@ namespace ContentToolbox.Spawners;
 
 public abstract class SpawnerLocationSelector
 {
-    public abstract IEnumerable<Location> GetLocations(GameState state);
+    public abstract IEnumerable<Location> GetLocations(Game state);
 }

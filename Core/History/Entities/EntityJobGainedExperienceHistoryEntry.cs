@@ -32,7 +32,7 @@ public class CreateEntityJobGainedExperienceHistoryEntry : INotificationHandler<
 
     public Task Handle(GameEntityJobGainedExperience notification, CancellationToken cancellationToken)
     {
-        GameState state = _gameService.RequireGameState();
+        Game state = _gameService.RequireGameState();
         EntityJobGainedExperienceHistoryEntry entry = new(notification.Entity, notification.Job, notification.OldExperience, notification.NewExperience, state.Tick);
         state.History.Record(entry);
         return Task.CompletedTask;

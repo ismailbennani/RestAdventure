@@ -17,7 +17,7 @@ public class JoinAndPlayPveCombatAction : Action
     public MonsterGroup MonsterGroup { get; }
     public CombatInstance Combat { get; }
 
-    protected override Maybe CanPerformInternal(GameState state, Character character)
+    protected override Maybe CanPerformInternal(Game state, Character character)
     {
         CombatInstance? combat = state.Combats.GetCombatInvolving(MonsterGroup);
         if (combat == null)
@@ -28,9 +28,9 @@ public class JoinAndPlayPveCombatAction : Action
         return combat.Attackers.CanAdd(character);
     }
 
-    public override bool IsOver(GameState state, Character character) => state.Combats.GetCombatInvolving(character) == null;
+    public override bool IsOver(Game state, Character character) => state.Combats.GetCombatInvolving(character) == null;
 
-    protected override Task OnStartAsync(GameState state, Character character)
+    protected override Task OnStartAsync(Game state, Character character)
     {
         ILogger<StartAndPlayPveCombatAction> logger = state.LoggerFactory.CreateLogger<StartAndPlayPveCombatAction>();
 
