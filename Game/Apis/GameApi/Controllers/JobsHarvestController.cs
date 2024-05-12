@@ -66,7 +66,7 @@ public class JobsHarvestController : GameApiController
                     continue;
                 }
 
-                Maybe canHarvest = character.CanHarvest(harvest, staticObject);
+                Maybe canHarvest = character.CanHarvestWithCorrectTool(harvest, staticObject);
                 resultActions.Add(
                     new AvailableHarvestActionDto
                     {

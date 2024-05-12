@@ -6,10 +6,7 @@ namespace RestAdventure.Core.Jobs;
 
 public static class Harvest
 {
-    public static IEnumerable<JobHarvest> GetAvailableHarvests(this IJobInstance jobInstance, StaticObject staticObject, Item? tool = null) =>
-        jobInstance.Job.Harvests.Where(h => CanHarvest(jobInstance, h, staticObject, tool));
-
-    public static Maybe CanHarvest(this IJobInstance jobInstance, JobHarvest harvest, StaticObject staticObject, Item? tool = null)
+    public static Maybe CanHarvestWithCorrectTool(this IJobInstance jobInstance, JobHarvest harvest, StaticObject staticObject)
     {
         if (!harvest.Targets.Contains(staticObject))
         {
@@ -19,6 +16,17 @@ public static class Harvest
         if (harvest.Level > jobInstance.Progression.Level)
         {
             return "Job level too low";
+        }
+
+        return true;
+    }
+
+    public static Maybe CanHarvest(this IJobInstance jobInstance, JobHarvest harvest, StaticObject staticObject, Item? tool = null)
+    {
+        Maybe canHarvest = CanHarvestWithCorrectTool(jobInstance, harvest, staticObject);
+        if (!canHarvest.Success)
+        {
+            return canHarvest.WhyNot;
         }
 
         if (harvest.Tool != null)
