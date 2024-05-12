@@ -21,7 +21,13 @@ export class CharacterMovementsComponent implements OnInit {
     this.characterSubject.next(value);
   }
 
-  protected locations: LocationWithAccess[] = [];
+  protected locations: { top: LocationWithAccess[]; bottom: LocationWithAccess[]; left: LocationWithAccess[]; right: LocationWithAccess[]; other: LocationWithAccess[] } = {
+    top: [],
+    bottom: [],
+    left: [],
+    right: [],
+    other: [],
+  };
 
   private _character: TeamCharacter = null!;
   private characterSubject: ReplaySubject<TeamCharacter> = new ReplaySubject<TeamCharacter>(1);
@@ -35,7 +41,31 @@ export class CharacterMovementsComponent implements OnInit {
     this.characterSubject
       .pipe(
         switchMap(character => this.locationsApiClient.getAccessibleLocations(character.id)),
-        tap(locations => (this.locations = locations)),
+        tap(locations => {
+          this.locations = { top: [], bottom: [], left: [], right: [], other: [] };
+
+          for (const location of locations) {
+            if (location.location.positionX == this.character.location.positionX) {
+              if (location.location.positionY == this.character.location.positionY + 1) {
+                this.locations.top.push(location);
+              } else if (location.location.positionY == this.character.location.positionY - 1) {
+                this.locations.bottom.push(location);
+              } else {
+                this.locations.other.push(location);
+              }
+            } else if (location.location.positionY == this.character.location.positionY) {
+              if (location.location.positionX == this.character.location.positionX + 1) {
+                this.locations.right.push(location);
+              } else if (location.location.positionX == this.character.location.positionX - 1) {
+                this.locations.left.push(location);
+              } else {
+                this.locations.other.push(location);
+              }
+            } else {
+              this.locations.other.push(location);
+            }
+          }
+        }),
       )
       .subscribe();
   }

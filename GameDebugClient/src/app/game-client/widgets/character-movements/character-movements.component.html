@@ -1,33 +1,72 @@
-<div class="w-100 h-100 border">
+<div class="w-100 h-100 d-flex flex-column border">
   <div class="p-2">
     <h6 class="m-0" [class.fw-bold]="plansToMove()">Movements</h6>
   </div>
   <hr class="m-0" />
-  <div class="list-group list-group-flush">
-    @if (locations.length > 0) {
+
+  <div class="flex-grow-1 d-flex flex-column">
+    <div class="flex-grow-1 d-flex flex-column justify-content-center p-2">
+      <div class="row">
+        <div class="col-sm-4"></div>
+        <div class="col-sm-4 d-flex flex-column align-items-stretch justify-content-center">
+          <ng-container [ngTemplateOutlet]="locationsTpl" [ngTemplateOutletContext]="{ locations: locations.top }"></ng-container>
+        </div>
+        <div class="col-sm-4"></div>
+      </div>
+      <div class="row">
+        <div class="col-sm-4 d-flex flex-column align-items-stretch justify-content-center">
+          <ng-container [ngTemplateOutlet]="locationsTpl" [ngTemplateOutletContext]="{ locations: locations.left }"></ng-container>
+        </div>
+        <div class="col-sm-4 position-relative" style="aspect-ratio: 1">
+          <div class="position-absolute top-0 start-0 end-0 d-flex justify-content-center"><i class="bi bi-chevron-up"></i></div>
+          <div class="position-absolute start-0 top-0 bottom-0 d-flex flex-column justify-content-center"><i class="bi bi-chevron-left"></i></div>
+          <div class="position-absolute end-0 top-0 bottom-0 d-flex flex-column justify-content-center"><i class="bi bi-chevron-right"></i></div>
+          <div class="position-absolute bottom-0 start-0 end-0 d-flex justify-content-center"><i class="bi bi-chevron-down"></i></div>
+        </div>
+        <div class="col-sm-4 d-flex flex-column align-items-stretch justify-content-center">
+          <ng-container [ngTemplateOutlet]="locationsTpl" [ngTemplateOutletContext]="{ locations: locations.right }"></ng-container>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-4"></div>
+        <div class="col-sm-4 d-flex flex-column align-items-stretch justify-content-center">
+          <ng-container [ngTemplateOutlet]="locationsTpl" [ngTemplateOutletContext]="{ locations: locations.bottom }"></ng-container>
+        </div>
+        <div class="col-sm-4"></div>
+      </div>
+    </div>
+
+    @if (locations.other.length > 0) {
+      <hr class="m-0" />
+      <div>
+        <ng-container [ngTemplateOutlet]="locationsTpl" [ngTemplateOutletContext]="{ locations: locations.other }"></ng-container>
+      </div>
+    }
+  </div>
+</div>
+
+<ng-template #locationsTpl let-locations="locations">
+  @if (locations && locations.length > 0) {
+    <div class="list-group list-group-flush">
       @for (locationWithAccess of locations; track locationWithAccess.location.id) {
         <a
           role="button"
           class="list-group-item list-group-item-action"
+          [class.active]="plansToMove(locationWithAccess.location)"
           [class.disabled]="!locationWithAccess.isAccessible"
           [class.text-danger]="!locationWithAccess.isAccessible"
           (click)="moveToLocation(locationWithAccess)"
         >
-          <div class="d-flex align-items-center">
-            <div class="flex-grow-1">
-              <div>{{ locationWithAccess.location.area.name }} [{{ locationWithAccess.location.positionX }}, {{ locationWithAccess.location.positionY }}]</div>
-              @if (!locationWithAccess.isAccessible) {
-                <div class="small">{{ locationWithAccess.whyIsNotAccessible }}</div>
-              }
-            </div>
-            <div>
-              <a role="button" class="btn stretched-link" [ngClass]="plansToMove(locationWithAccess.location) ? 'btn-primary' : 'btn-outline-secondary'"> Move </a>
-            </div>
+          <div class="small text-truncate">
+            {{ locationWithAccess.location.area.name }} [{{ locationWithAccess.location.positionX }}, {{ locationWithAccess.location.positionY }}]
           </div>
+          @if (!locationWithAccess.isAccessible) {
+            <div class="text-truncate small">{{ locationWithAccess.whyIsNotAccessible }}</div>
+          }
         </a>
       }
-    } @else {
-      <div class="list-group-item text-center text-secondary">None</div>
-    }
-  </div>
-</div>
+    </div>
+  } @else {
+    <div class="list-group-item text-center text-secondary">None</div>
+  }
+</ng-template>
