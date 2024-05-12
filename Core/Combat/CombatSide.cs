@@ -1,4 +1,4 @@
-﻿namespace RestAdventure.Core.Combat.Old;
+﻿namespace RestAdventure.Core.Combat;
 
 public enum CombatSide
 {

@@ -1,69 +1,80 @@
 ﻿using RestAdventure.Core.Entities.Monsters;
 using RestAdventure.Core.Items;
+using SandboxGame.Items;
 
 namespace SandboxGame.Monsters;
 
 public class Rattlings
 {
-    public Rattlings()
+    public Rattlings(GenericItemCategories categories)
     {
         Fur = new Item
         {
             Name = "Fur - Rattlings",
+            Category = categories.CommonResource,
             Weight = 1
         };
 
         Skull = new Item
         {
             Name = "Skull - Rattlings",
+            Category = categories.CommonResource,
             Weight = 5
         };
 
         PhantomTail = new Item
         {
             Name = "Phantom tail - Rattlings",
+            Category = categories.CommonResource,
             Weight = 1
         };
 
         SpectralCheese = new Item
         {
             Name = "Spectral cheese - Rattlings",
+            Category = categories.CommonResource,
             Weight = 1
         };
 
         Handkerchief = new Item
         {
             Name = "Handkerchief - Rattlings",
+            Category = categories.CommonResource,
             Weight = 1
         };
 
         SwordBlade = new Item
         {
             Name = "Sword blade - Rattlings",
+            Category = categories.CommonResource,
             Weight = 1
         };
 
         DirtyShirt = new Item
         {
             Name = "Dirty shirt - Rattlings",
+            Category = categories.CommonResource,
             Weight = 1
         };
 
         BellyFat = new Item
         {
             Name = "Belly fat - Rattlings",
+            Category = categories.CommonResource,
             Weight = 1
         };
 
         SparklingWand = new Item
         {
             Name = "Sparkling wand - Rattlings",
+            Category = categories.CommonResource,
             Weight = 1
         };
 
         AncientTomeOfMagic = new Item
         {
             Name = "Ancient tome of magic - Rattlings",
+            Category = categories.CommonResource,
             Weight = 1
         };
 

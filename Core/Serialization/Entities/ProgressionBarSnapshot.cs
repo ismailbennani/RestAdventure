@@ -2,7 +2,7 @@
 
 namespace RestAdventure.Core.Serialization.Entities;
 
-public class ProgressionBarSnapshot
+public class ProgressionBarSnapshot : IProgressionBar
 {
     public required int Level { get; init; }
     public required int Experience { get; init; }

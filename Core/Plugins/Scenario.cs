@@ -25,6 +25,7 @@ public class Scenario
 
     public List<CharacterClass> CharacterClasses { get; } = new();
 
+    public List<ItemCategory> ItemCategories { get; } = new();
     public List<Item> Items { get; } = new();
 
     public List<Job> Jobs { get; } = new();
@@ -45,6 +46,7 @@ public class Scenario
 
         content.Characters.Classes.Register(CharacterClasses);
 
+        content.ItemCategories.Register(ItemCategories);
         content.Items.Register(Items);
 
         content.Jobs.Register(Jobs);

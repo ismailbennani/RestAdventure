@@ -9,10 +9,16 @@ public class Forester
 {
     public Forester()
     {
+        WoodCategory = new ItemCategory
+        {
+            Name = "Wood"
+        };
+
         OakWood = new Item
         {
             Name = "Oak Wood",
             Description = "Oak wood is sturdy and commonly used in construction, furniture making, and shipbuilding. It's known for its strength and durability.",
+            Category = WoodCategory,
             Weight = 5
         };
 
@@ -20,6 +26,7 @@ public class Forester
         {
             Name = "Pine Wood",
             Description = "Pine trees provide softwood that's often used for construction, furniture, and paper production. They are fast-growing and widely distributed.",
+            Category = WoodCategory,
             Weight = 5
         };
 
@@ -27,6 +34,7 @@ public class Forester
         {
             Name = "Maple Wood",
             Description = "Maple wood is prized for its beauty and versatility. It's commonly used in furniture making, flooring, and musical instruments.",
+            Category = WoodCategory,
             Weight = 5
         };
 
@@ -34,6 +42,7 @@ public class Forester
         {
             Name = "Birch Wood",
             Description = "Birch trees have distinctive white or silver bark and provide lightweight wood that's used for furniture, plywood, and decorative items.",
+            Category = WoodCategory,
             Weight = 5
         };
 
@@ -42,6 +51,7 @@ public class Forester
             Name = "Walnut Wood",
             Description =
                 "Walnut trees produce hardwood with a rich, dark color and attractive grain patterns. Walnut wood is highly valued for furniture making, cabinetry, and woodworking crafts.",
+            Category = WoodCategory,
             Weight = 5
         };
 
@@ -57,6 +67,7 @@ public class Forester
             Level = 1,
             HarvestDuration = 5,
             Targets = [OakTree],
+            Tool = null,
             Items = [new ItemStack(OakWood, 1)],
             Experience = 1
         };
@@ -67,6 +78,7 @@ public class Forester
             Level = 10,
             HarvestDuration = 5,
             Targets = [PineTree],
+            Tool = null,
             Items = [new ItemStack(PineWood, 1)],
             Experience = 5
         };
@@ -77,6 +89,7 @@ public class Forester
             Level = 20,
             HarvestDuration = 5,
             Targets = [MapleTree],
+            Tool = null,
             Items = [new ItemStack(MapleWood, 1)],
             Experience = 15
         };
@@ -87,6 +100,7 @@ public class Forester
             Level = 30,
             HarvestDuration = 5,
             Targets = [BirchTree],
+            Tool = null,
             Items = [new ItemStack(BirchWood, 1)],
             Experience = 30
         };
@@ -97,6 +111,7 @@ public class Forester
             Level = 40,
             HarvestDuration = 5,
             Targets = [WalnutTree],
+            Tool = null,
             Items = [new ItemStack(WalnutWood, 1)],
             Experience = 50
         };
@@ -108,8 +123,8 @@ public class Forester
         };
     }
 
-
     public Job Job { get; }
+    public ItemCategory WoodCategory { get; set; }
     public Item OakWood { get; }
     public Item PineWood { get; }
     public Item MapleWood { get; set; }

@@ -18,9 +18,9 @@ using SandboxGame.Generation;
 using SandboxGame.Generation.Partitioning;
 using SandboxGame.Generation.Shaping;
 using SandboxGame.Generation.Zoning;
+using SandboxGame.Items;
 using SandboxGame.Jobs;
 using SandboxGame.Monsters;
-using SandboxGame.MyMath;
 
 namespace SandboxGame;
 
@@ -32,8 +32,9 @@ public class SandboxGameBuilder
     public SandboxGameBuilder(ILoggerFactory loggerFactory)
     {
         _loggerFactory = loggerFactory;
-        Whimsicals = new Whimsicals();
-        Rattlings = new Rattlings();
+        GenericItemCategories = new GenericItemCategories();
+        Whimsicals = new Whimsicals(GenericItemCategories);
+        Rattlings = new Rattlings(GenericItemCategories);
         Forester = new Forester();
         Herbalist = new Herbalist();
         Miner = new Miner();
@@ -62,6 +63,7 @@ public class SandboxGameBuilder
 
     public MapGenerator MapGenerator { get; }
     public MapGenerator.Result MapGeneratorResult { get; }
+    public GenericItemCategories GenericItemCategories { get; }
     public CharacterClasses CharacterClasses { get; }
     public Whimsicals Whimsicals { get; }
     public Rattlings Rattlings { get; }
@@ -109,6 +111,7 @@ public class SandboxGameBuilder
     {
         scenario.CharacterClasses.AddRange(ObjectExplorer.FindValuesOfType<T, CharacterClass>(instance).ToArray());
         scenario.StaticObjects.AddRange(ObjectExplorer.FindValuesOfType<T, StaticObject>(instance).ToArray());
+        scenario.ItemCategories.AddRange(ObjectExplorer.FindValuesOfType<T, ItemCategory>(instance).ToArray());
         scenario.Items.AddRange(ObjectExplorer.FindValuesOfType<T, Item>(instance).ToArray());
         scenario.Jobs.AddRange(ObjectExplorer.FindValuesOfType<T, Job>(instance).ToArray());
         scenario.Areas.AddRange(ObjectExplorer.FindValuesOfType<T, MapArea>(instance).ToArray());

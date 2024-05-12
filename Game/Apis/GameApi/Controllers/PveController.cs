@@ -6,6 +6,7 @@ using RestAdventure.Core.Entities.Characters;
 using RestAdventure.Core.Entities.Monsters;
 using RestAdventure.Core.Serialization;
 using RestAdventure.Core.Serialization.Entities;
+using RestAdventure.Core.Serialization.Players;
 using RestAdventure.Game.Apis.Common.Dtos.Monsters;
 using RestAdventure.Game.Authentication;
 using RestAdventure.Kernel.Errors;

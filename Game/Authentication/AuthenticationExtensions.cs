@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using RestAdventure.Core.Players;
 using RestAdventure.Core.Serialization;
+using RestAdventure.Core.Serialization.Players;
 using RestAdventure.Kernel.Security;
 
 namespace RestAdventure.Game.Authentication;

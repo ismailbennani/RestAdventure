@@ -6,6 +6,7 @@ using RestAdventure.Core.Entities.Characters;
 using RestAdventure.Core.History;
 using RestAdventure.Core.Serialization.Combats;
 using RestAdventure.Core.Serialization.Entities;
+using RestAdventure.Core.Serialization.Players;
 using RestAdventure.Kernel.Security;
 using Action = RestAdventure.Core.Actions.Action;
 

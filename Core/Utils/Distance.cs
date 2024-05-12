@@ -1,4 +1,4 @@
-﻿namespace SandboxGame.MyMath;
+﻿namespace RestAdventure.Core.Utils;
 
 public static class Distance
 {

@@ -2,7 +2,7 @@
 
 namespace RestAdventure.Core.Serialization.Entities;
 
-public class StaticObjectInstanceSnapshot : GameEntitySnapshot<StaticObjectInstanceId>
+public class StaticObjectInstanceSnapshot : GameEntitySnapshot<StaticObjectInstanceId>, IStaticObjectInstance
 {
     public StaticObjectInstanceSnapshot(StaticObjectInstanceId id) : base(id)
     {

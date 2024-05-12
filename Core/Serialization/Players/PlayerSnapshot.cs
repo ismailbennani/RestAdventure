@@ -3,7 +3,7 @@ using RestAdventure.Core.Resources;
 using RestAdventure.Core.Serialization.Entities;
 using RestAdventure.Kernel.Security;
 
-namespace RestAdventure.Core.Serialization;
+namespace RestAdventure.Core.Serialization.Players;
 
 public class PlayerSnapshot
 {

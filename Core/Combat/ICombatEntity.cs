@@ -1,6 +1,4 @@
-﻿using RestAdventure.Core.Combat.Old;
-
-namespace RestAdventure.Core.Combat;
+﻿namespace RestAdventure.Core.Combat;
 
 public record CombatEntityId(Guid Guid);
 

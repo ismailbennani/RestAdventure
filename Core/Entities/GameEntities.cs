@@ -52,7 +52,10 @@ public class GameEntities : IEnumerable<IGameEntity>, IDisposable
 
         await _publisher.Publish(new GameEntityDeleted { Entity = entity });
 
-        entity.Dispose();
+        if (entity is IDisposable disposable)
+        {
+            disposable.Dispose();
+        }
     }
 
     public IGameEntity? Get(GameEntityId id) => _entities.SingleOrDefault(kv => kv.Key.Guid == id.Guid).Value;
@@ -86,7 +89,7 @@ public class GameEntities : IEnumerable<IGameEntity>, IDisposable
 
     public void Dispose()
     {
-        foreach (IGameEntity entity in _entities.Values)
+        foreach (IDisposable entity in _entities.Values.OfType<IDisposable>())
         {
             entity.Dispose();
         }

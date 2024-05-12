@@ -17,7 +17,7 @@ public class ProgressionBarDto : ProgressionBarMinimalDto
 
 static class ProgressionBarMappingExtensions
 {
-    public static ProgressionBarDto ToDto(this ProgressionBar bar) =>
+    public static ProgressionBarDto ToDto(this IProgressionBar bar) =>
         new()
         {
             Level = bar.Level,

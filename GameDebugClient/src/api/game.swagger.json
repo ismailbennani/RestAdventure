@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Game API",
-    "version": "0.0.0-alpha.0.233+2a1139010fada7f6864f85e7bd96490563a587b1"
+    "version": "0.0.0-alpha.0.238+657a8c483dabb728bef55ebef2fe4c03c2d95e9b"
   },
   "servers": [
     {
@@ -915,7 +915,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/HarvestableEntity"
+                    "$ref": "#/components/schemas/AvailableHarvestTarget"
                   }
                 }
               }
@@ -1642,6 +1642,7 @@
         "required": [
           "id",
           "name",
+          "itemCategoryId",
           "weight"
         ],
         "properties": {
@@ -1654,6 +1655,12 @@
           "name": {
             "type": "string",
             "description": "The name of the item\n            ",
+            "minLength": 1
+          },
+          "itemCategoryId": {
+            "type": "string",
+            "description": "The category of the item\n            ",
+            "format": "guid",
             "minLength": 1
           },
           "weight": {
@@ -1828,6 +1835,15 @@
             "description": "The level of the harvest\n            ",
             "format": "int32"
           },
+          "tool": {
+            "description": "If set, the tool required for the harvest\n            ",
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ItemCategory"
+              }
+            ]
+          },
           "targets": {
             "type": "array",
             "description": "The targets compatible with the harvest\n            ",
@@ -1846,6 +1862,28 @@
             "type": "integer",
             "description": "The expected experience gain from the harvest\n            ",
             "format": "int32"
+          }
+        }
+      },
+      "ItemCategory": {
+        "type": "object",
+        "description": "Item category\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The id of the category\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the category\n            ",
+            "minLength": 1
           }
         }
       },
@@ -3454,55 +3492,93 @@
           }
         }
       },
-      "HarvestableEntity": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/EntityMinimal"
+      "AvailableHarvestTarget": {
+        "type": "object",
+        "description": "Available harvest target\n            ",
+        "additionalProperties": false,
+        "required": [
+          "objectId",
+          "objectInstanceId",
+          "actions"
+        ],
+        "properties": {
+          "objectId": {
+            "type": "string",
+            "description": "The object of the harvest\n            ",
+            "format": "guid",
+            "minLength": 1
           },
-          {
-            "type": "object",
-            "description": "Harvestable entity\n            ",
-            "additionalProperties": false,
-            "required": [
-              "harvests"
-            ],
-            "properties": {
-              "harvests": {
-                "type": "array",
-                "description": "The harvests available on the entity\n            ",
-                "items": {
-                  "$ref": "#/components/schemas/HarvestableEntityHarvest"
-                }
-              }
+          "objectInstanceId": {
+            "type": "string",
+            "description": "The instance of the object that is the target of the harvest\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "actions": {
+            "type": "array",
+            "description": "The available harvest actions\n            ",
+            "items": {
+              "$ref": "#/components/schemas/AvailableHarvestAction"
             }
           }
-        ]
+        }
       },
-      "HarvestableEntityHarvest": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/HarvestableEntityHarvestMinimal"
-          },
-          {
-            "type": "object",
-            "description": "Harvestable entity harvest\n            ",
-            "additionalProperties": false,
-            "required": [
-              "canHarvest"
-            ],
-            "properties": {
-              "canHarvest": {
-                "type": "boolean",
-                "description": "Can the harvest be performed\n            "
-              },
-              "whyCannotHarvest": {
-                "type": "string",
-                "description": "Why cannot the harvest be performed\n            ",
-                "nullable": true
+      "AvailableHarvestAction": {
+        "type": "object",
+        "description": "Available harvest action\n            ",
+        "additionalProperties": false,
+        "required": [
+          "job",
+          "name",
+          "expectedHarvest",
+          "expectedExperience",
+          "canHarvest"
+        ],
+        "properties": {
+          "job": {
+            "description": "The job providing the harvest\n            ",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/JobMinimal"
               }
+            ]
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the harvest\n            ",
+            "minLength": 1
+          },
+          "tool": {
+            "description": "If set, the tool required for the harvest\n            ",
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ItemCategory"
+              }
+            ]
+          },
+          "expectedHarvest": {
+            "type": "array",
+            "description": "The expected result of the harvest\n            ",
+            "items": {
+              "$ref": "#/components/schemas/ItemStack"
             }
+          },
+          "expectedExperience": {
+            "type": "integer",
+            "description": "The expected experience gain from the harvest\n            ",
+            "format": "int32"
+          },
+          "canHarvest": {
+            "type": "boolean",
+            "description": "Can the harvest be performed\n            "
+          },
+          "whyCannotHarvest": {
+            "type": "string",
+            "description": "Why cannot the harvest be performed\n            ",
+            "nullable": true
           }
-        ]
+        }
       },
       "LocationWithAccess": {
         "type": "object",

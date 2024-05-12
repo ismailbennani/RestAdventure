@@ -151,6 +151,67 @@ export class AdminGameContentApiClient {
      * @param pageNumber (optional) The page number
      * @param pageSize (optional) The page size
      */
+    searchItemCategories(pageNumber?: number | undefined, pageSize?: number | undefined): Observable<SearchResultOfItemCategory> {
+        let url_ = this.baseUrl + "/admin/game/content/item-categories?";
+        if (pageNumber === null)
+            throw new Error("The parameter 'pageNumber' cannot be null.");
+        else if (pageNumber !== undefined)
+            url_ += "PageNumber=" + encodeURIComponent("" + pageNumber) + "&";
+        if (pageSize === null)
+            throw new Error("The parameter 'pageSize' cannot be null.");
+        else if (pageSize !== undefined)
+            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSearchItemCategories(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSearchItemCategories(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<SearchResultOfItemCategory>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<SearchResultOfItemCategory>;
+        }));
+    }
+
+    protected processSearchItemCategories(response: HttpResponseBase): Observable<SearchResultOfItemCategory> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = SearchResultOfItemCategory.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * Search items
+     * @param pageNumber (optional) The page number
+     * @param pageSize (optional) The page size
+     */
     searchItems(pageNumber?: number | undefined, pageSize?: number | undefined): Observable<SearchResultOfItem> {
         let url_ = this.baseUrl + "/admin/game/content/items?";
         if (pageNumber === null)
@@ -1214,6 +1275,141 @@ export interface ICharacterClass extends ICharacterClassMinimal {
 }
 
 /** Search result */
+export class SearchResultOfItemCategory implements ISearchResultOfItemCategory {
+    /** The items found by the query
+             */
+    items!: ItemCategory[];
+    /** The page number corresponding to the results that have been selected
+             */
+    pageNumber!: number;
+    /** The page size used by the search
+             */
+    pageSize!: number;
+    /** The total number of items matching the query
+             */
+    totalItemsCount!: number;
+    /** The total number of pages
+             */
+    totalPagesCount!: number;
+
+    constructor(data?: ISearchResultOfItemCategory) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.items = [];
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(ItemCategory.fromJS(item));
+            }
+            this.pageNumber = _data["pageNumber"];
+            this.pageSize = _data["pageSize"];
+            this.totalItemsCount = _data["totalItemsCount"];
+            this.totalPagesCount = _data["totalPagesCount"];
+        }
+    }
+
+    static fromJS(data: any): SearchResultOfItemCategory {
+        data = typeof data === 'object' ? data : {};
+        let result = new SearchResultOfItemCategory();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        data["pageNumber"] = this.pageNumber;
+        data["pageSize"] = this.pageSize;
+        data["totalItemsCount"] = this.totalItemsCount;
+        data["totalPagesCount"] = this.totalPagesCount;
+        return data;
+    }
+}
+
+/** Search result */
+export interface ISearchResultOfItemCategory {
+    /** The items found by the query
+             */
+    items: ItemCategory[];
+    /** The page number corresponding to the results that have been selected
+             */
+    pageNumber: number;
+    /** The page size used by the search
+             */
+    pageSize: number;
+    /** The total number of items matching the query
+             */
+    totalItemsCount: number;
+    /** The total number of pages
+             */
+    totalPagesCount: number;
+}
+
+/** Item category */
+export class ItemCategory implements IItemCategory {
+    /** The id of the category
+             */
+    id!: string;
+    /** The name of the category
+             */
+    name!: string;
+
+    constructor(data?: IItemCategory) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): ItemCategory {
+        data = typeof data === 'object' ? data : {};
+        let result = new ItemCategory();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        return data;
+    }
+}
+
+/** Item category */
+export interface IItemCategory {
+    /** The id of the category
+             */
+    id: string;
+    /** The name of the category
+             */
+    name: string;
+}
+
+/** Search result */
 export class SearchResultOfItem implements ISearchResultOfItem {
     /** The items found by the query
              */
@@ -1306,6 +1502,9 @@ export class ItemMinimal implements IItemMinimal {
     /** The name of the item
              */
     name!: string;
+    /** The category of the item
+             */
+    itemCategoryId!: string;
     /** The weight of the item
              */
     weight!: number;
@@ -1323,6 +1522,7 @@ export class ItemMinimal implements IItemMinimal {
         if (_data) {
             this.id = _data["id"];
             this.name = _data["name"];
+            this.itemCategoryId = _data["itemCategoryId"];
             this.weight = _data["weight"];
         }
     }
@@ -1338,6 +1538,7 @@ export class ItemMinimal implements IItemMinimal {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
         data["name"] = this.name;
+        data["itemCategoryId"] = this.itemCategoryId;
         data["weight"] = this.weight;
         return data;
     }
@@ -1351,6 +1552,9 @@ export interface IItemMinimal {
     /** The name of the item
              */
     name: string;
+    /** The category of the item
+             */
+    itemCategoryId: string;
     /** The weight of the item
              */
     weight: number;
@@ -1981,6 +2185,9 @@ export class HarvestableEntityHarvestMinimal implements IHarvestableEntityHarves
     /** The level of the harvest
              */
     level!: number;
+    /** If set, the tool required for the harvest
+             */
+    tool?: ItemCategory | undefined;
     /** The targets compatible with the harvest
              */
     targets!: StaticObject[];
@@ -2010,6 +2217,7 @@ export class HarvestableEntityHarvestMinimal implements IHarvestableEntityHarves
             this.job = _data["job"] ? JobMinimal.fromJS(_data["job"]) : new JobMinimal();
             this.name = _data["name"];
             this.level = _data["level"];
+            this.tool = _data["tool"] ? ItemCategory.fromJS(_data["tool"]) : <any>undefined;
             if (Array.isArray(_data["targets"])) {
                 this.targets = [] as any;
                 for (let item of _data["targets"])
@@ -2036,6 +2244,7 @@ export class HarvestableEntityHarvestMinimal implements IHarvestableEntityHarves
         data["job"] = this.job ? this.job.toJSON() : <any>undefined;
         data["name"] = this.name;
         data["level"] = this.level;
+        data["tool"] = this.tool ? this.tool.toJSON() : <any>undefined;
         if (Array.isArray(this.targets)) {
             data["targets"] = [];
             for (let item of this.targets)
@@ -2062,6 +2271,9 @@ export interface IHarvestableEntityHarvestMinimal {
     /** The level of the harvest
              */
     level: number;
+    /** If set, the tool required for the harvest
+             */
+    tool?: ItemCategory | undefined;
     /** The targets compatible with the harvest
              */
     targets: StaticObject[];

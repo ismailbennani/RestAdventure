@@ -2,7 +2,7 @@
 
 public record TeamId(Guid Guid);
 
-public class Team
+public class Team : ITeam
 {
     public TeamId Id { get; } = new(Guid.NewGuid());
 }

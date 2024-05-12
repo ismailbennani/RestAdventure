@@ -9,10 +9,16 @@ public class Miner
 {
     public Miner()
     {
+        OreCategory = new ItemCategory
+        {
+            Name = "Ore"
+        };
+
         Iron = new Item
         {
             Name = "Iron",
             Description = "A common metallic ore used extensively in crafting tools, weapons, and armor due to its durability and versatility.",
+            Category = OreCategory,
             Weight = 10
         };
 
@@ -20,6 +26,7 @@ public class Miner
         {
             Name = "Copper",
             Description = "Known for its malleability and conductivity, widely used in electrical wiring, plumbing, and as an alloy in metalworking.",
+            Category = OreCategory,
             Weight = 10
         };
 
@@ -27,6 +34,7 @@ public class Miner
         {
             Name = "Silver",
             Description = "Valued for its luster and conductivity, used in various applications including jewelry, electronics, and as a currency in some cultures.",
+            Category = OreCategory,
             Weight = 10
         };
 
@@ -34,6 +42,7 @@ public class Miner
         {
             Name = "Gold",
             Description = "Highly sought after for its intrinsic value and decorative properties, often used in jewelry, currency, and as a symbol of wealth.",
+            Category = OreCategory,
             Weight = 10
         };
 
@@ -42,6 +51,7 @@ public class Miner
             Name = "Mithril",
             Description =
                 "A rare and valuable ore prized for its lightweight yet durable properties, often used in the crafting of high-quality weapons and armor in fantasy settings.",
+            Category = OreCategory,
             Weight = 10
         };
 
@@ -57,6 +67,7 @@ public class Miner
             Level = 1,
             HarvestDuration = 2,
             Targets = [IronOre],
+            Tool = null,
             Items = [new ItemStack(Iron, 1)],
             Experience = 1
         };
@@ -67,6 +78,7 @@ public class Miner
             Level = 10,
             HarvestDuration = 2,
             Targets = [CopperOre],
+            Tool = null,
             Items = [new ItemStack(Copper, 1)],
             Experience = 5
         };
@@ -77,6 +89,7 @@ public class Miner
             Level = 20,
             HarvestDuration = 2,
             Targets = [SilverOre],
+            Tool = null,
             Items = [new ItemStack(Silver, 1)],
             Experience = 15
         };
@@ -87,6 +100,7 @@ public class Miner
             Level = 30,
             HarvestDuration = 2,
             Targets = [GoldOre],
+            Tool = null,
             Items = [new ItemStack(Gold, 1)],
             Experience = 30
         };
@@ -97,6 +111,7 @@ public class Miner
             Level = 40,
             HarvestDuration = 2,
             Targets = [MithrilOre],
+            Tool = null,
             Items = [new ItemStack(Mithril, 1)],
             Experience = 50
         };
@@ -108,8 +123,8 @@ public class Miner
         };
     }
 
-
     public Job Job { get; }
+    public ItemCategory OreCategory { get; }
     public Item Copper { get; }
     public Item Silver { get; }
     public Item Gold { get; set; }

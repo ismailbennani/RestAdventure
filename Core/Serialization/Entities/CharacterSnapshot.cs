@@ -1,9 +1,12 @@
 ﻿using RestAdventure.Core.Entities.Characters;
+using RestAdventure.Core.Jobs;
+using RestAdventure.Core.Serialization.Jobs;
+using RestAdventure.Core.Utils;
 using RestAdventure.Kernel.Security;
 
 namespace RestAdventure.Core.Serialization.Entities;
 
-public class CharacterSnapshot : GameEntitySnapshot<CharacterId>
+public class CharacterSnapshot : GameEntitySnapshot<CharacterId>, ICharacter
 {
     CharacterSnapshot(CharacterId id) : base(id)
     {
@@ -11,10 +14,12 @@ public class CharacterSnapshot : GameEntitySnapshot<CharacterId>
 
     public required UserId PlayerId { get; init; }
     public required CharacterClass Class { get; init; }
-    public int Health { get; init; }
-    public ProgressionBarSnapshot Progression { get; init; }
-    public InventorySnapshot Inventory { get; init; }
+    public required int Health { get; init; }
+    public required ProgressionBarSnapshot Progression { get; init; }
+    IProgressionBar ICharacter.Progression => Progression;
+    public required InventorySnapshot Inventory { get; init; }
     public required IReadOnlyCollection<JobInstanceSnapshot> Jobs { get; init; }
+    IReadOnlyCollection<IJobInstance> ICharacter.Jobs => Jobs;
 
     public static CharacterSnapshot Take(Character character) =>
         new(character.Id)

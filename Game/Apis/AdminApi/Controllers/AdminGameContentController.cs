@@ -37,6 +37,13 @@ public class AdminGameContentController : AdminApiController
     /// <summary>
     ///     Search items
     /// </summary>
+    [HttpGet("item-categories")]
+    public SearchResultDto<ItemCategoryDto> SearchItemCategories([FromQuery] SearchRequestDto request) =>
+        SearchResources(request, content => content.ItemCategories, (_, i) => i.ToDto());
+
+    /// <summary>
+    ///     Search items
+    /// </summary>
     [HttpGet("items")]
     public SearchResultDto<ItemDto> SearchItems([FromQuery] SearchRequestDto request) => SearchResources(request, content => content.Items, (_, i) => i.ToDto());
 

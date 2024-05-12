@@ -19,6 +19,11 @@ public class JobHarvest
     public required int Level { get; init; }
 
     /// <summary>
+    ///     If set, this harvest requires the use of a tool of the specified category
+    /// </summary>
+    public required ItemCategory? Tool { get; init; }
+
+    /// <summary>
     ///     The number of ticks it takes to perform the harvest
     /// </summary>
     public required int HarvestDuration { get; init; }
@@ -41,6 +46,6 @@ public class JobHarvest
 
 public static class JobHarvestMappingExtensions
 {
-    public static bool Match(this JobHarvest harvest, StaticObjectInstance instance) => harvest.Targets.Contains(instance.Object);
-    public static bool Match(this JobHarvest harvest, StaticObjectInstanceSnapshot instance) => harvest.Targets.Contains(instance.Object);
+    public static bool CanTarget(this JobHarvest harvest, StaticObjectInstance instance) => harvest.Targets.Contains(instance.Object);
+    public static bool CanTarget(this JobHarvest harvest, StaticObjectInstanceSnapshot instance) => harvest.Targets.Contains(instance.Object);
 }

@@ -2,7 +2,7 @@
 
 namespace RestAdventure.Core.Entities;
 
-public interface IGameEntity : IDisposable
+public interface IGameEntity
 {
     /// <summary>
     ///     The unique ID of the entity
@@ -10,14 +10,9 @@ public interface IGameEntity : IDisposable
     GameEntityId Id { get; }
 
     /// <summary>
-    ///     The creator of the entity
-    /// </summary>
-    IGameEntitySource? Source { get; }
-
-    /// <summary>
     ///     The team of the character
     /// </summary>
-    Team? Team { get; }
+    ITeam? Team { get; }
 
     /// <summary>
     ///     The name of the entity
@@ -33,9 +28,4 @@ public interface IGameEntity : IDisposable
     ///     If the character is busy, they cannot perform or be the target of actions
     /// </summary>
     bool Busy { get; }
-
-    /// <summary>
-    ///     Kill the entity
-    /// </summary>
-    Task KillAsync(Game state);
 }

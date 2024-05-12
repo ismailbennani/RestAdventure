@@ -23,6 +23,11 @@ public class GameContent
     public GameResourcesStore<StaticObjectId, StaticObject> StaticObjects { get; } = new();
 
     /// <summary>
+    ///     The item categories of the game
+    /// </summary>
+    public GameResourcesStore<ItemCategoryId, ItemCategory> ItemCategories { get; } = new();
+
+    /// <summary>
     ///     The items of the game
     /// </summary>
     public GameResourcesStore<ItemId, Item> Items { get; } = new();

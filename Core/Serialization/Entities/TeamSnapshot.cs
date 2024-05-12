@@ -2,7 +2,7 @@
 
 namespace RestAdventure.Core.Serialization.Entities;
 
-public class TeamSnapshot
+public class TeamSnapshot : ITeam
 {
     TeamSnapshot(TeamId id)
     {
@@ -11,5 +11,5 @@ public class TeamSnapshot
 
     public TeamId Id { get; }
 
-    public static TeamSnapshot Take(Team team) => new(team.Id);
+    public static TeamSnapshot Take(ITeam team) => new(team.Id);
 }

@@ -24,6 +24,11 @@ public class Item : GameResource<ItemId>
     public string? Description { get; init; }
 
     /// <summary>
+    ///     The category of the item
+    /// </summary>
+    public required ItemCategory Category { get; init; }
+
+    /// <summary>
     ///     The weight of the item
     /// </summary>
     public required int Weight { get; init; }

@@ -8,6 +8,7 @@ using RestAdventure.Core.Jobs;
 using RestAdventure.Core.Maps.Locations;
 using RestAdventure.Core.Resources;
 using RestAdventure.Core.Serialization;
+using RestAdventure.Core.Serialization.Players;
 using RestAdventure.Game.Apis.Common.Dtos.Characters;
 using RestAdventure.Game.Apis.Common.Dtos.Items;
 using RestAdventure.Game.Apis.Common.Dtos.Jobs;

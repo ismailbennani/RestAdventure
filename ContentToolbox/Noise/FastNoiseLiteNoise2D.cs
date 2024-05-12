@@ -1,4 +1,6 @@
-﻿namespace ContentToolbox.Noise;
+﻿using ContentToolbox.Noise.External;
+
+namespace ContentToolbox.Noise;
 
 public class FastNoiseLiteNoise2D : Noise2D
 {

@@ -4,6 +4,7 @@ using RestAdventure.Core;
 using RestAdventure.Core.Entities.Characters;
 using RestAdventure.Core.Serialization;
 using RestAdventure.Core.Serialization.Entities;
+using RestAdventure.Core.Serialization.Players;
 using RestAdventure.Game.Apis.Common.Dtos.Characters;
 using RestAdventure.Game.Authentication;
 

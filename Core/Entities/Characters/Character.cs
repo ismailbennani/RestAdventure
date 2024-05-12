@@ -10,7 +10,7 @@ namespace RestAdventure.Core.Entities.Characters;
 
 public record CharacterId(Guid Guid) : GameEntityId(Guid);
 
-public class Character : GameEntity<CharacterId>, IGameEntityWithInventory, IGameEntityWithJobs, IGameEntityWithCombatCapabilities, IGameEntityWithMovement
+public class Character : GameEntity<CharacterId>, IGameEntityWithInventory, IGameEntityWithJobs, IGameEntityWithCombatCapabilities, IGameEntityWithMovement, ICharacter
 {
     public Character(Player player, CharacterClass characterClass, string name) : base(new CharacterId(Guid.NewGuid()), player.Team, name, characterClass.StartLocation)
     {
@@ -40,8 +40,9 @@ public class Character : GameEntity<CharacterId>, IGameEntityWithInventory, IGam
     /// </summary>
     public ProgressionBar Progression { get; private set; }
 
-    public int Level => Progression.Level;
+    IProgressionBar ICharacter.Progression => Progression;
 
+    public int Level => Progression.Level;
 
     /// <summary>
     ///     The inventory of the character
@@ -52,6 +53,8 @@ public class Character : GameEntity<CharacterId>, IGameEntityWithInventory, IGam
     ///     The jobs of the character
     /// </summary>
     public EntityJobs Jobs { get; private set; }
+
+    IReadOnlyCollection<IJobInstance> ICharacter.Jobs => Jobs;
 
     /// <summary>
     ///     The movement of the character

@@ -2,7 +2,7 @@
 
 namespace RestAdventure.Core.Jobs;
 
-public class JobInstance
+public class JobInstance : IJobInstance
 {
     public JobInstance(Job job)
     {
@@ -10,17 +10,9 @@ public class JobInstance
         Progression = new ProgressionBar(job.LevelCaps);
     }
 
-    public IEnumerable<JobHarvest> Harvests => Job.Harvests;
-
-    /// <summary>
-    ///     The job that is instantiated.
-    /// </summary>
     public Job Job { get; }
-
-    /// <summary>
-    ///     The progression of the job
-    /// </summary>
     public ProgressionBar Progression { get; }
+    IProgressionBar IJobInstance.Progression => Progression;
 
     public override string ToString() => $"{Job}[lv. {Progression.Level}, {Progression.Experience}xp]";
 }

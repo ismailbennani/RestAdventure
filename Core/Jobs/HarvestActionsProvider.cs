@@ -1,6 +1,7 @@
 ﻿using RestAdventure.Core.Actions;
 using RestAdventure.Core.Serialization;
 using RestAdventure.Core.Serialization.Entities;
+using RestAdventure.Core.Serialization.Jobs;
 using Action = RestAdventure.Core.Actions.Action;
 
 namespace RestAdventure.Core.Jobs;
@@ -14,7 +15,7 @@ public class HarvestActionsProvider : IActionsProvider
         foreach (JobInstanceSnapshot job in character.Jobs)
         foreach (JobHarvest harvest in job.Job.Harvests)
         {
-            if (!harvest.Match(staticObject))
+            if (!harvest.CanTarget(staticObject))
             {
                 continue;
             }

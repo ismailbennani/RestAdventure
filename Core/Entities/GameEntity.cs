@@ -9,7 +9,7 @@ public record GameEntityId(Guid Guid);
 /// <remarks>
 ///     Common representation of all <see cref="GameEntity{TId}" /> instances
 /// </remarks>
-public abstract class GameEntity : IEquatable<GameEntity>, IGameEntity
+public abstract class GameEntity : IEquatable<GameEntity>, IGameEntity, IDisposable
 {
     public GameEntity(GameEntityId id, string name, Location location) : this(null, id, name, location) { }
 
@@ -29,6 +29,8 @@ public abstract class GameEntity : IEquatable<GameEntity>, IGameEntity
 
     /// <inheritdoc />
     public Team? Team { get; }
+
+    ITeam? IGameEntity.Team => Team;
 
     /// <inheritdoc />
     public string Name { get; set; }

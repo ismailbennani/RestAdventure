@@ -7,6 +7,7 @@ using RestAdventure.Core.History.Combats;
 using RestAdventure.Core.Serialization;
 using RestAdventure.Core.Serialization.Combats;
 using RestAdventure.Core.Serialization.Entities;
+using RestAdventure.Core.Serialization.Players;
 using RestAdventure.Game.Apis.Common.Dtos.Combats;
 using RestAdventure.Game.Apis.Common.Dtos.History.Combats;
 using RestAdventure.Game.Apis.Common.Dtos.Queries;

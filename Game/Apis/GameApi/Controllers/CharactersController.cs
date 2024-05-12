@@ -7,6 +7,7 @@ using RestAdventure.Core.History.Entities;
 using RestAdventure.Core.Players;
 using RestAdventure.Core.Serialization;
 using RestAdventure.Core.Serialization.Entities;
+using RestAdventure.Core.Serialization.Players;
 using RestAdventure.Game.Apis.Common.Dtos.Characters;
 using RestAdventure.Game.Apis.Common.Dtos.History.Characters;
 using RestAdventure.Game.Apis.Common.Dtos.Queries;

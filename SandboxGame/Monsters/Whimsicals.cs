@@ -1,10 +1,11 @@
 ﻿using RestAdventure.Core.Entities.Monsters;
+using SandboxGame.Items;
 
 namespace SandboxGame.Monsters;
 
 public class Whimsicals
 {
-    public Whimsicals()
+    public Whimsicals(GenericItemCategories categories)
     {
         Family = new MonsterFamily
         {

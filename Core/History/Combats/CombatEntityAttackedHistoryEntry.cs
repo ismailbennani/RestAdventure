@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using RestAdventure.Core.Combat;
 using RestAdventure.Core.Combat.Notifications;
-using RestAdventure.Core.Combat.Old;
 using CombatInstance = RestAdventure.Core.Combat.CombatInstance;
 
 namespace RestAdventure.Core.History.Combats;

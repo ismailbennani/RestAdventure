@@ -1,15 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using RestAdventure.Core;
-using RestAdventure.Core.Entities;
 using RestAdventure.Core.Entities.Characters;
 using RestAdventure.Core.Entities.StaticObjects;
 using RestAdventure.Core.Jobs;
+using RestAdventure.Core.Players;
 using RestAdventure.Core.Serialization;
 using RestAdventure.Core.Serialization.Entities;
+using RestAdventure.Core.Serialization.Jobs;
+using RestAdventure.Core.Serialization.Players;
 using RestAdventure.Game.Apis.Common.Dtos.Items;
 using RestAdventure.Game.Apis.Common.Dtos.Jobs;
-using RestAdventure.Game.Apis.Common.Dtos.StaticObjects;
 using RestAdventure.Game.Authentication;
 using RestAdventure.Kernel.Errors;
 
@@ -36,10 +37,10 @@ public class JobsHarvestController : GameApiController
     ///     Get harvestables
     /// </summary>
     [HttpGet]
-    [ProducesResponseType<IReadOnlyCollection<HarvestableEntityDto>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<IReadOnlyCollection<AvailableHarvestTargetDto>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
-    public ActionResult<IReadOnlyCollection<HarvestableEntityDto>> GetHarvestables(Guid characterGuid)
+    public ActionResult<IReadOnlyCollection<AvailableHarvestTargetDto>> GetHarvestables(Guid characterGuid)
     {
         GameSnapshot state = _gameService.GetLastSnapshot();
         PlayerSnapshot player = ControllerContext.RequirePlayer(state);
@@ -50,27 +51,29 @@ public class JobsHarvestController : GameApiController
             return BadRequest();
         }
 
-        IEnumerable<HarvestAction> actions = state.Actions.GetAvailableActions(state, character).OfType<HarvestAction>();
-
-        List<HarvestableEntityDto> result = [];
-        foreach (IGrouping<StaticObjectInstanceId, HarvestAction> group in actions.GroupBy(a => a.TargetId))
+        List<AvailableHarvestTargetDto> result = [];
+        IEnumerable<StaticObjectInstanceSnapshot> staticObjects = state.Entities.Values.OfType<StaticObjectInstanceSnapshot>().Where(o => o.Location == character.Location);
+        foreach (StaticObjectInstanceSnapshot staticObject in staticObjects)
         {
-            List<HarvestableEntityHarvestDto> harvests = [];
+            List<AvailableHarvestActionDto> resultActions = [];
 
-            StaticObjectInstanceSnapshot? staticObject = state.Entities.GetValueOrDefault(group.Key) is StaticObjectInstanceSnapshot o ? o : null;
-            Maybe canHarvest = staticObject != null ? staticObject.Busy ? "Target is busy" : true : true;
-
-            foreach (HarvestAction action in group)
+            foreach (JobInstanceSnapshot job in character.Jobs)
+            foreach (JobHarvest harvest in job.Job.Harvests)
             {
-                harvests.Add(
-                    new HarvestableEntityHarvestDto
+                if (!harvest.CanTarget(staticObject))
+                {
+                    continue;
+                }
+
+                Maybe canHarvest = character.CanHarvest(harvest, staticObject);
+                resultActions.Add(
+                    new AvailableHarvestActionDto
                     {
-                        Job = action.Job.ToMinimalDto(),
-                        Name = action.Harvest.Name,
-                        Level = action.Harvest.Level,
-                        Targets = action.Harvest.Targets.Select(t => t.ToStaticObjectDto()).ToArray(),
-                        ExpectedHarvest = action.Harvest.Items.Select(i => i.ToDto()).ToArray(),
-                        ExpectedExperience = action.Harvest.Experience,
+                        Job = job.Job.ToMinimalDto(),
+                        Name = harvest.Name,
+                        Tool = harvest.Tool?.ToDto(),
+                        ExpectedHarvest = harvest.Items.Select(i => i.ToDto()).ToArray(),
+                        ExpectedExperience = harvest.Experience,
                         CanHarvest = canHarvest.Success,
                         WhyCannotHarvest = canHarvest.WhyNot
                     }
@@ -78,11 +81,11 @@ public class JobsHarvestController : GameApiController
             }
 
             result.Add(
-                new HarvestableEntityDto
+                new AvailableHarvestTargetDto
                 {
-                    Id = group.Key.Guid,
-                    Name = staticObject?.Name ?? "???",
-                    Harvests = harvests
+                    ObjectId = staticObject.Object.Id.Guid,
+                    ObjectInstanceId = staticObject.Id.Guid,
+                    Actions = resultActions
                 }
             );
         }
@@ -99,37 +102,41 @@ public class JobsHarvestController : GameApiController
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public ActionResult Harvest(Guid characterGuid, Guid entityGuid, string harvestName)
     {
-        GameSnapshot state = _gameService.GetLastSnapshot();
-        PlayerSnapshot player = ControllerContext.RequirePlayer(state);
+        Core.Game game = _gameService.RequireGame();
+        Player player = ControllerContext.RequirePlayer(game);
+
+        StaticObjectInstanceId staticObjectId = new(entityGuid);
+        StaticObjectInstance? staticObject = game.Entities.Get<StaticObjectInstance>(staticObjectId);
+        if (staticObject == null)
+        {
+            return NotFound();
+        }
 
         CharacterId characterId = new(characterGuid);
-        if (state.Entities.GetValueOrDefault(characterId) is not CharacterSnapshot character || character.PlayerId != player.UserId)
+        Character? character = game.Entities.Get<Character>(characterId);
+        if (character == null || character.Player != player)
         {
             return BadRequest();
         }
 
-        GameEntityId entityId = new(entityGuid);
-        if (state.Entities.GetValueOrDefault(entityId) is not StaticObjectInstanceSnapshot)
+        if (character.Location != staticObject.Location)
         {
             return NotFound();
         }
 
-        HarvestAction? action = state.Actions.GetAvailableActions(state, character)
-            .OfType<HarvestAction>()
-            .SingleOrDefault(a => a.Harvest.Name == harvestName && a.TargetId.Guid == entityGuid);
-        if (action == null)
+        var harvest = character.Jobs.SelectMany(j => j.Job.Harvests.Select(h => new { j.Job, Harvest = h })).FirstOrDefault(x => x.Harvest.Name == harvestName);
+        if (harvest == null)
         {
             return NotFound();
         }
 
-        Core.Game game = _gameService.RequireGame();
-        Character? gameCharacter = game.Entities.Get<Character>(characterId);
-        if (gameCharacter == null)
-        {
-            return BadRequest();
-        }
+        HarvestAction action = new(harvest.Job, harvest.Harvest, staticObjectId);
+        Maybe queued = game.Actions.QueueAction(character, action);
 
-        game.Actions.QueueAction(gameCharacter, action);
+        if (!queued.Success)
+        {
+            return Problem(queued.WhyNot, statusCode: StatusCodes.Status400BadRequest);
+        }
 
         return NoContent();
     }

@@ -1,5 +1,4 @@
-﻿using RestAdventure.Core.Combat.Old;
-using RestAdventure.Core.Combat.Options;
+﻿using RestAdventure.Core.Combat.Options;
 using RestAdventure.Core.Maps.Locations;
 using RestAdventure.Kernel.Errors;
 

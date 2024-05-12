@@ -53,6 +53,8 @@ using FNLfloat = float;
 
 //using FNLfloat = System.Double;
 
+namespace ContentToolbox.Noise.External;
+
 public class FastNoiseLite
 {
     const short INLINE = 256; // MethodImplOptions.AggressiveInlining;

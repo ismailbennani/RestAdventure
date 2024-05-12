@@ -2,7 +2,6 @@
 using RestAdventure.Core.Entities.StaticObjects;
 using RestAdventure.Core.Maps.Locations;
 using RestAdventure.Core.Utils;
-using SandboxGame.MyMath;
 
 namespace ContentToolbox.Spawners.EntitySpawners;
 

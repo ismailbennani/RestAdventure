@@ -18,6 +18,10 @@ static class ItemMappingExtensions
     public static ItemDto ToDto(this Item item) =>
         new()
         {
-            Id = item.Id.Guid, Name = item.Name, Description = item.Description, Weight = item.Weight
+            Id = item.Id.Guid,
+            Name = item.Name,
+            Description = item.Description,
+            ItemCategoryId = item.Category.Id.Guid,
+            Weight = item.Weight
         };
 }

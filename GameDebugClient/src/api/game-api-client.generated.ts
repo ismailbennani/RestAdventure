@@ -1187,7 +1187,7 @@ export class JobsHarvestApiClient {
     /**
      * Get harvestables
      */
-    getHarvestables(characterGuid: string): Observable<HarvestableEntity[]> {
+    getHarvestables(characterGuid: string): Observable<AvailableHarvestTarget[]> {
         let url_ = this.baseUrl + "/game/team/characters/{characterGuid}/jobs/harvestables";
         if (characterGuid === undefined || characterGuid === null)
             throw new Error("The parameter 'characterGuid' must be defined.");
@@ -1209,14 +1209,14 @@ export class JobsHarvestApiClient {
                 try {
                     return this.processGetHarvestables(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<HarvestableEntity[]>;
+                    return _observableThrow(e) as any as Observable<AvailableHarvestTarget[]>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<HarvestableEntity[]>;
+                return _observableThrow(response_) as any as Observable<AvailableHarvestTarget[]>;
         }));
     }
 
-    protected processGetHarvestables(response: HttpResponseBase): Observable<HarvestableEntity[]> {
+    protected processGetHarvestables(response: HttpResponseBase): Observable<AvailableHarvestTarget[]> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1230,7 +1230,7 @@ export class JobsHarvestApiClient {
             if (Array.isArray(resultData200)) {
                 result200 = [] as any;
                 for (let item of resultData200)
-                    result200!.push(HarvestableEntity.fromJS(item));
+                    result200!.push(AvailableHarvestTarget.fromJS(item));
             }
             else {
                 result200 = <any>null;
@@ -2315,6 +2315,9 @@ export class ItemMinimal implements IItemMinimal {
     /** The name of the item
              */
     name!: string;
+    /** The category of the item
+             */
+    itemCategoryId!: string;
     /** The weight of the item
              */
     weight!: number;
@@ -2332,6 +2335,7 @@ export class ItemMinimal implements IItemMinimal {
         if (_data) {
             this.id = _data["id"];
             this.name = _data["name"];
+            this.itemCategoryId = _data["itemCategoryId"];
             this.weight = _data["weight"];
         }
     }
@@ -2347,6 +2351,7 @@ export class ItemMinimal implements IItemMinimal {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
         data["name"] = this.name;
+        data["itemCategoryId"] = this.itemCategoryId;
         data["weight"] = this.weight;
         return data;
     }
@@ -2360,6 +2365,9 @@ export interface IItemMinimal {
     /** The name of the item
              */
     name: string;
+    /** The category of the item
+             */
+    itemCategoryId: string;
     /** The weight of the item
              */
     weight: number;
@@ -2640,6 +2648,9 @@ export class HarvestableEntityHarvestMinimal implements IHarvestableEntityHarves
     /** The level of the harvest
              */
     level!: number;
+    /** If set, the tool required for the harvest
+             */
+    tool?: ItemCategory | undefined;
     /** The targets compatible with the harvest
              */
     targets!: StaticObject[];
@@ -2669,6 +2680,7 @@ export class HarvestableEntityHarvestMinimal implements IHarvestableEntityHarves
             this.job = _data["job"] ? JobMinimal.fromJS(_data["job"]) : new JobMinimal();
             this.name = _data["name"];
             this.level = _data["level"];
+            this.tool = _data["tool"] ? ItemCategory.fromJS(_data["tool"]) : <any>undefined;
             if (Array.isArray(_data["targets"])) {
                 this.targets = [] as any;
                 for (let item of _data["targets"])
@@ -2695,6 +2707,7 @@ export class HarvestableEntityHarvestMinimal implements IHarvestableEntityHarves
         data["job"] = this.job ? this.job.toJSON() : <any>undefined;
         data["name"] = this.name;
         data["level"] = this.level;
+        data["tool"] = this.tool ? this.tool.toJSON() : <any>undefined;
         if (Array.isArray(this.targets)) {
             data["targets"] = [];
             for (let item of this.targets)
@@ -2721,6 +2734,9 @@ export interface IHarvestableEntityHarvestMinimal {
     /** The level of the harvest
              */
     level: number;
+    /** If set, the tool required for the harvest
+             */
+    tool?: ItemCategory | undefined;
     /** The targets compatible with the harvest
              */
     targets: StaticObject[];
@@ -2730,6 +2746,56 @@ export interface IHarvestableEntityHarvestMinimal {
     /** The expected experience gain from the harvest
              */
     expectedExperience: number;
+}
+
+/** Item category */
+export class ItemCategory implements IItemCategory {
+    /** The id of the category
+             */
+    id!: string;
+    /** The name of the category
+             */
+    name!: string;
+
+    constructor(data?: IItemCategory) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): ItemCategory {
+        data = typeof data === 'object' ? data : {};
+        let result = new ItemCategory();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        return data;
+    }
+}
+
+/** Item category */
+export interface IItemCategory {
+    /** The id of the category
+             */
+    id: string;
+    /** The name of the category
+             */
+    name: string;
 }
 
 /** Static object */
@@ -5625,58 +5691,92 @@ In that case NextTickDate refers to the old tick's next tick date, which means t
     nextTickDate?: Date | undefined;
 }
 
-/** Harvestable entity */
-export class HarvestableEntity extends EntityMinimal implements IHarvestableEntity {
-    /** The harvests available on the entity
+/** Available harvest target */
+export class AvailableHarvestTarget implements IAvailableHarvestTarget {
+    /** The object of the harvest
              */
-    harvests!: HarvestableEntityHarvest[];
+    objectId!: string;
+    /** The instance of the object that is the target of the harvest
+             */
+    objectInstanceId!: string;
+    /** The available harvest actions
+             */
+    actions!: AvailableHarvestAction[];
 
-    constructor(data?: IHarvestableEntity) {
-        super(data);
+    constructor(data?: IAvailableHarvestTarget) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
         if (!data) {
-            this.harvests = [];
+            this.actions = [];
         }
     }
 
-    override init(_data?: any) {
-        super.init(_data);
+    init(_data?: any) {
         if (_data) {
-            if (Array.isArray(_data["harvests"])) {
-                this.harvests = [] as any;
-                for (let item of _data["harvests"])
-                    this.harvests!.push(HarvestableEntityHarvest.fromJS(item));
+            this.objectId = _data["objectId"];
+            this.objectInstanceId = _data["objectInstanceId"];
+            if (Array.isArray(_data["actions"])) {
+                this.actions = [] as any;
+                for (let item of _data["actions"])
+                    this.actions!.push(AvailableHarvestAction.fromJS(item));
             }
         }
     }
 
-    static override fromJS(data: any): HarvestableEntity {
+    static fromJS(data: any): AvailableHarvestTarget {
         data = typeof data === 'object' ? data : {};
-        let result = new HarvestableEntity();
+        let result = new AvailableHarvestTarget();
         result.init(data);
         return result;
     }
 
-    override toJSON(data?: any) {
+    toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        if (Array.isArray(this.harvests)) {
-            data["harvests"] = [];
-            for (let item of this.harvests)
-                data["harvests"].push(item.toJSON());
+        data["objectId"] = this.objectId;
+        data["objectInstanceId"] = this.objectInstanceId;
+        if (Array.isArray(this.actions)) {
+            data["actions"] = [];
+            for (let item of this.actions)
+                data["actions"].push(item.toJSON());
         }
-        super.toJSON(data);
         return data;
     }
 }
 
-/** Harvestable entity */
-export interface IHarvestableEntity extends IEntityMinimal {
-    /** The harvests available on the entity
+/** Available harvest target */
+export interface IAvailableHarvestTarget {
+    /** The object of the harvest
              */
-    harvests: HarvestableEntityHarvest[];
+    objectId: string;
+    /** The instance of the object that is the target of the harvest
+             */
+    objectInstanceId: string;
+    /** The available harvest actions
+             */
+    actions: AvailableHarvestAction[];
 }
 
-/** Harvestable entity harvest */
-export class HarvestableEntityHarvest extends HarvestableEntityHarvestMinimal implements IHarvestableEntityHarvest {
+/** Available harvest action */
+export class AvailableHarvestAction implements IAvailableHarvestAction {
+    /** The job providing the harvest
+             */
+    job!: JobMinimal;
+    /** The name of the harvest
+             */
+    name!: string;
+    /** If set, the tool required for the harvest
+             */
+    tool?: ItemCategory | undefined;
+    /** The expected result of the harvest
+             */
+    expectedHarvest!: ItemStack[];
+    /** The expected experience gain from the harvest
+             */
+    expectedExperience!: number;
     /** Can the harvest be performed
              */
     canHarvest!: boolean;
@@ -5684,36 +5784,76 @@ export class HarvestableEntityHarvest extends HarvestableEntityHarvestMinimal im
              */
     whyCannotHarvest?: string | undefined;
 
-    constructor(data?: IHarvestableEntityHarvest) {
-        super(data);
+    constructor(data?: IAvailableHarvestAction) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.job = new JobMinimal();
+            this.expectedHarvest = [];
+        }
     }
 
-    override init(_data?: any) {
-        super.init(_data);
+    init(_data?: any) {
         if (_data) {
+            this.job = _data["job"] ? JobMinimal.fromJS(_data["job"]) : new JobMinimal();
+            this.name = _data["name"];
+            this.tool = _data["tool"] ? ItemCategory.fromJS(_data["tool"]) : <any>undefined;
+            if (Array.isArray(_data["expectedHarvest"])) {
+                this.expectedHarvest = [] as any;
+                for (let item of _data["expectedHarvest"])
+                    this.expectedHarvest!.push(ItemStack.fromJS(item));
+            }
+            this.expectedExperience = _data["expectedExperience"];
             this.canHarvest = _data["canHarvest"];
             this.whyCannotHarvest = _data["whyCannotHarvest"];
         }
     }
 
-    static override fromJS(data: any): HarvestableEntityHarvest {
+    static fromJS(data: any): AvailableHarvestAction {
         data = typeof data === 'object' ? data : {};
-        let result = new HarvestableEntityHarvest();
+        let result = new AvailableHarvestAction();
         result.init(data);
         return result;
     }
 
-    override toJSON(data?: any) {
+    toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
+        data["job"] = this.job ? this.job.toJSON() : <any>undefined;
+        data["name"] = this.name;
+        data["tool"] = this.tool ? this.tool.toJSON() : <any>undefined;
+        if (Array.isArray(this.expectedHarvest)) {
+            data["expectedHarvest"] = [];
+            for (let item of this.expectedHarvest)
+                data["expectedHarvest"].push(item.toJSON());
+        }
+        data["expectedExperience"] = this.expectedExperience;
         data["canHarvest"] = this.canHarvest;
         data["whyCannotHarvest"] = this.whyCannotHarvest;
-        super.toJSON(data);
         return data;
     }
 }
 
-/** Harvestable entity harvest */
-export interface IHarvestableEntityHarvest extends IHarvestableEntityHarvestMinimal {
+/** Available harvest action */
+export interface IAvailableHarvestAction {
+    /** The job providing the harvest
+             */
+    job: JobMinimal;
+    /** The name of the harvest
+             */
+    name: string;
+    /** If set, the tool required for the harvest
+             */
+    tool?: ItemCategory | undefined;
+    /** The expected result of the harvest
+             */
+    expectedHarvest: ItemStack[];
+    /** The expected experience gain from the harvest
+             */
+    expectedExperience: number;
     /** Can the harvest be performed
              */
     canHarvest: boolean;

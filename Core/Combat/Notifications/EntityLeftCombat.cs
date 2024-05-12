@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using RestAdventure.Core.Combat.Old;
 
 namespace RestAdventure.Core.Combat.Notifications;
 

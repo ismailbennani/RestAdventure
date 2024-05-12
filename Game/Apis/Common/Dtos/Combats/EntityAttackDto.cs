@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using RestAdventure.Core.Combat.Old;
+using RestAdventure.Core.Combat;
 
 namespace RestAdventure.Game.Apis.Common.Dtos.Combats;
 

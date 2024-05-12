@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Admin API",
-    "version": "0.0.0-alpha.0.233+2a1139010fada7f6864f85e7bd96490563a587b1"
+    "version": "0.0.0-alpha.0.238+657a8c483dabb728bef55ebef2fe4c03c2d95e9b"
   },
   "servers": [
     {
@@ -61,6 +61,49 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SearchResultOfCharacterClass"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/game/content/item-categories": {
+      "get": {
+        "tags": [
+          "Game"
+        ],
+        "summary": "Search items",
+        "operationId": "AdminGameContent_SearchItemCategories",
+        "parameters": [
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "description": "The page number\n            ",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "description": "The page size\n            ",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResultOfItemCategory"
                 }
               }
             }
@@ -646,6 +689,69 @@
           }
         }
       },
+      "SearchResultOfItemCategory": {
+        "type": "object",
+        "description": "Search result\n            ",
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "pageNumber",
+          "pageSize",
+          "totalItemsCount",
+          "totalPagesCount"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "description": "The items found by the query\n            ",
+            "items": {
+              "$ref": "#/components/schemas/ItemCategory"
+            }
+          },
+          "pageNumber": {
+            "type": "integer",
+            "description": "The page number corresponding to the results that have been selected\n            ",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "The page size used by the search\n            ",
+            "format": "int32"
+          },
+          "totalItemsCount": {
+            "type": "integer",
+            "description": "The total number of items matching the query\n            ",
+            "format": "int32"
+          },
+          "totalPagesCount": {
+            "type": "integer",
+            "description": "The total number of pages\n            ",
+            "format": "int32"
+          }
+        }
+      },
+      "ItemCategory": {
+        "type": "object",
+        "description": "Item category\n            ",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The id of the category\n            ",
+            "format": "guid",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the category\n            ",
+            "minLength": 1
+          }
+        }
+      },
       "SearchResultOfItem": {
         "type": "object",
         "description": "Search result\n            ",
@@ -713,6 +819,7 @@
         "required": [
           "id",
           "name",
+          "itemCategoryId",
           "weight"
         ],
         "properties": {
@@ -725,6 +832,12 @@
           "name": {
             "type": "string",
             "description": "The name of the item\n            ",
+            "minLength": 1
+          },
+          "itemCategoryId": {
+            "type": "string",
+            "description": "The category of the item\n            ",
+            "format": "guid",
             "minLength": 1
           },
           "weight": {
@@ -1024,6 +1137,15 @@
             "type": "integer",
             "description": "The level of the harvest\n            ",
             "format": "int32"
+          },
+          "tool": {
+            "description": "If set, the tool required for the harvest\n            ",
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ItemCategory"
+              }
+            ]
           },
           "targets": {
             "type": "array",

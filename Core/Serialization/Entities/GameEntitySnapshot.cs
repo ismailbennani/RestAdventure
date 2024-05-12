@@ -6,7 +6,7 @@ using RestAdventure.Core.Maps.Locations;
 
 namespace RestAdventure.Core.Serialization.Entities;
 
-public class GameEntitySnapshot
+public class GameEntitySnapshot : IGameEntity
 {
     protected GameEntitySnapshot(GameEntityId id)
     {
@@ -16,6 +16,7 @@ public class GameEntitySnapshot
     public GameEntityId Id { get; }
 
     public required TeamSnapshot? Team { get; init; }
+    ITeam? IGameEntity.Team => Team;
     public required string Name { get; init; }
     public required Location Location { get; init; }
     public required bool Busy { get; init; }

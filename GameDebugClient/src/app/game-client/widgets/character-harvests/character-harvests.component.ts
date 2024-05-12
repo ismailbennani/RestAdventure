@@ -1,7 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
-import { ReplaySubject, switchMap, tap } from 'rxjs';
-import { Action, Character, HarvestAction, IHarvestableEntity, IHarvestableEntityHarvest, ItemStack, JobsHarvestApiClient } from '../../../../api/game-api-client.generated';
+import { ReplaySubject, map, switchMap, tap } from 'rxjs';
+import { StaticObject } from '../../../../api/admin-api-client.generated';
+import { Action, Character, HarvestAction, ItemStack, JobsHarvestApiClient } from '../../../../api/game-api-client.generated';
+import { GameContentService } from '../../services/game-content.service';
 import { GameService } from '../../services/game.service';
 
 @Component({
@@ -19,35 +21,71 @@ export class CharacterHarvestsComponent implements OnInit {
     this._character = value;
     this.characterSubject.next(value);
   }
-
-  protected harvestables: (IHarvestableEntity & { count: number })[] = [];
-
   private _character: Character = null!;
+
+  protected harvestables: {
+    objectId: string;
+    objectInstanceId: string;
+    name: string;
+    actions: { name: string; count: number; expectedHarvest: ItemStack[]; expectedExperience: number; canHarvest: boolean; cannotHarvestReason?: string }[];
+  }[] = [];
+
   private characterSubject: ReplaySubject<Character> = new ReplaySubject<Character>(1);
+  private staticObjects: StaticObject[] = [];
 
   constructor(
     private gameService: GameService,
+    private gameContentService: GameContentService,
     private jobsHarvestApiClient: JobsHarvestApiClient,
   ) {}
 
   ngOnInit(): void {
+    this.gameContentService.staticObjects$
+      .pipe(
+        map(staticObjects => {
+          this.staticObjects = staticObjects;
+          this.characterSubject.next(this._character);
+        }),
+      )
+      .subscribe();
+
     this.characterSubject
       .pipe(
         switchMap(character => this.jobsHarvestApiClient.getHarvestables(character.id)),
         tap(harvestables => {
           this.harvestables = [];
+
           for (const harvestable of harvestables) {
-            let found = false;
-            for (const existing of this.harvestables.filter(h => h.name === harvestable.name)) {
-              if (existing && harvestable.harvests.every(h => existing.harvests.some(eh => eh.name === h.name))) {
-                existing.count++;
-                found = true;
-                break;
-              }
+            let harvestableDisplay = this.harvestables.find(h => h.objectId === harvestable.objectId);
+            if (!harvestableDisplay) {
+              const staticObject = this.staticObjects.find(o => o.id === harvestable.objectId);
+              harvestableDisplay = {
+                objectId: harvestable.objectId,
+                objectInstanceId: harvestable.objectInstanceId,
+                name: staticObject?.name ?? harvestable.objectInstanceId,
+                actions: [],
+              };
+              this.harvestables.push(harvestableDisplay);
             }
 
-            if (!found) {
-              this.harvestables.push({ ...harvestable, count: 1 });
+            for (const action of harvestable.actions) {
+              let actionDisplay = harvestableDisplay?.actions.find(
+                a => a.name === action.name && a.canHarvest === action.canHarvest && a.cannotHarvestReason === action.whyCannotHarvest,
+              );
+
+              if (!actionDisplay) {
+                actionDisplay = {
+                  name: action.name,
+                  count: 0,
+                  expectedHarvest: action.expectedHarvest,
+                  expectedExperience: action.expectedExperience,
+                  canHarvest: action.canHarvest,
+                  cannotHarvestReason: action.whyCannotHarvest,
+                };
+                harvestableDisplay.actions.push(actionDisplay);
+              }
+
+              actionDisplay.count += 1;
             }
           }
         }),
@@ -55,22 +93,22 @@ export class CharacterHarvestsComponent implements OnInit {
       .subscribe();
   }
 
-  harvest(entity: IHarvestableEntity, harvest: IHarvestableEntityHarvest) {
+  harvest(entity: { objectInstanceId: string }, harvest: { name: string; canHarvest: boolean }) {
     if (!this.character || !harvest.canHarvest) {
       return;
     }
 
     this.jobsHarvestApiClient
-      .harvest(this.character.id, entity.id, harvest.name)
+      .harvest(this.character.id, entity.objectInstanceId, harvest.name)
       .pipe(switchMap(_ => this.gameService.refreshNow(true)))
       .subscribe();
   }
 
-  plansToHarvest(harvestable?: IHarvestableEntity, harvest?: IHarvestableEntityHarvest) {
+  plansToHarvest(harvestable?: { objectInstanceId: string }, harvest?: { name: string }) {
     return this.character.plannedAction && this.isHarvestingAction(this.character.plannedAction, harvestable, harvest);
   }
 
-  isHarvesting(harvestable?: IHarvestableEntity, harvest?: IHarvestableEntityHarvest) {
+  isHarvesting(harvestable?: { objectInstanceId: string }, harvest?: { name: string }) {
     return this.character.ongoingAction && this.isHarvestingAction(this.character.ongoingAction, harvestable, harvest);
   }
 
@@ -78,12 +116,12 @@ export class CharacterHarvestsComponent implements OnInit {
     return items.map(s => `${s.count}x ${s.item.name}`).join(', ');
   }
 
-  private isHarvestingAction(action: Action, harvestable?: IHarvestableEntity, harvest?: IHarvestableEntityHarvest) {
-    if (!(action instanceof HarvestAction) || !this.harvestables.find(h => h.id === (action as HarvestAction).targetId)) {
+  private isHarvestingAction(action: Action, harvestable?: { objectInstanceId: string }, harvest?: { name: string }) {
+    if (!(action instanceof HarvestAction) || !this.harvestables.find(h => h.objectInstanceId === (action as HarvestAction).targetId)) {
       return false;
     }
 
-    if (harvestable && action.targetId !== harvestable.id) {
+    if (harvestable && action.targetId !== harvestable.objectInstanceId) {
       return false;
     }
 

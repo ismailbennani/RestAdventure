@@ -21,30 +21,19 @@ public class HarvestAction : Action
 
     protected override Maybe CanPerformInternal(Game state, Character character)
     {
-        if (character.Busy)
-        {
-            return "Character is busy";
-        }
-
         JobInstance? jobInstance = character.Jobs.Get(Job);
-
         if (jobInstance == null)
         {
             return "Unknown job";
         }
 
-        if (Harvest.Level > jobInstance.Progression.Level)
-        {
-            return "Job level too low";
-        }
-
         StaticObjectInstance? target = state.Entities.Get<StaticObjectInstance>(TargetId);
-        if (target == null || !Harvest.Match(target) || target.Busy)
+        if (target == null || !Harvest.CanTarget(target) || target.Busy)
         {
-            return "Entity cannot be harvested";
+            return "Entity not found";
         }
 
-        return true;
+        return jobInstance.CanHarvest(Harvest, target.Object);
     }
 
     public override bool IsOver(Game state, Character character) => state.Tick - StartTick >= Harvest.HarvestDuration;

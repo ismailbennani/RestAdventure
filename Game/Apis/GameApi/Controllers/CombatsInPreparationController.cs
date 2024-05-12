@@ -2,7 +2,6 @@
 using NSwag.Annotations;
 using RestAdventure.Core;
 using RestAdventure.Core.Combat;
-using RestAdventure.Core.Combat.Old;
 using RestAdventure.Core.Combat.Options;
 using RestAdventure.Core.Entities.Characters;
 using RestAdventure.Core.Players;

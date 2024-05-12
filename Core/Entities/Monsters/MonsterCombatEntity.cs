@@ -1,5 +1,4 @@
 ﻿using RestAdventure.Core.Combat;
-using RestAdventure.Core.Combat.Old;
 
 namespace RestAdventure.Core.Entities.Monsters;
 

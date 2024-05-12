@@ -1,4 +1,4 @@
-﻿using SandboxGame.MyMath;
+﻿using RestAdventure.Core.Utils;
 
 namespace SandboxGame.Generation.Shaping;
 
