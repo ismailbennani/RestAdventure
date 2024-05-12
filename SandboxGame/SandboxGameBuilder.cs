@@ -75,24 +75,12 @@ public class SandboxGameBuilder
         ExtractContent(scenario, Herbalist);
         ExtractContent(scenario, MapGeneratorResult.GeneratedMaps);
 
-        scenario.Spawners.Add(
-            new RandomSpawner(
-                new MonsterGroupByAreaLevelSpawner
-                {
-                    SpeciesByLevelRange =
-                    [
-                        (0, 9, [Rattlings.PetitPaw]),
-                        (10, 19, [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat]),
-                        (20, 29, [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat]),
-                        (30, 39, [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat]),
-                        (40, 49, [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat]),
-                        (50, 59, [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat])
-                    ],
-                    TeamSize = (1, 3)
-                },
-                _loggerFactory.CreateLogger<RandomSpawner>()
-            ){ MaxCountPerLocation = 1, RespawnDelay = (5, 10) }
-        );
+        foreach (MapArea area in scenario.Areas)
+        {
+            scenario.Spawners.Add(GetRattlingsSpawner(area, area.Level, (1, 3)));
+            scenario.Spawners.Add(GetRattlingsSpawner(area, area.Level, (4, 6)));
+            scenario.Spawners.Add(GetRattlingsSpawner(area, area.Level, (7, 8)));
+        }
 
         scenario.Spawners.AddRange(GetHerbalistSpawners());
         scenario.Spawners.AddRange(GetForesterSpawners());
@@ -208,5 +196,82 @@ public class SandboxGameBuilder
             ),
             _loggerFactory.CreateLogger<RandomSpawner>()
         ) { MaxCount = 500, MaxCountPerLocation = 5 };
+    }
+
+    RandomSpawner GetRattlingsSpawner(MapArea area, int level, (int, int) teamSize)
+    {
+        (int, int) respawnDelay = (5, 10);
+
+        switch (level)
+        {
+            case 0:
+                return new RandomSpawner(
+                    new MapAreaSpawnerLocationSelector { Area = area },
+                    new MonsterGroupSpawner
+                    {
+                        Species = [Rattlings.PetitPaw],
+                        TeamSize = teamSize,
+                        LevelBounds = (1, 9)
+                    },
+                    _loggerFactory.CreateLogger<RandomSpawner>()
+                ) { MaxCountPerLocation = 1, RespawnDelay = respawnDelay };
+            case 10:
+                return new RandomSpawner(
+                    new MapAreaSpawnerLocationSelector { Area = area },
+                    new MonsterGroupSpawner
+                    {
+                        Species = [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat],
+                        TeamSize = teamSize,
+                        LevelBounds = (10, 19)
+                    },
+                    _loggerFactory.CreateLogger<RandomSpawner>()
+                ) { MaxCountPerLocation = 1, RespawnDelay = respawnDelay };
+            case 20:
+                return new RandomSpawner(
+                    new MapAreaSpawnerLocationSelector { Area = area },
+                    new MonsterGroupSpawner
+                    {
+                        Species = [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat],
+                        TeamSize = teamSize,
+                        LevelBounds = (20, 29)
+                    },
+                    _loggerFactory.CreateLogger<RandomSpawner>()
+                ) { MaxCountPerLocation = 1, RespawnDelay = respawnDelay };
+            case 30:
+                return new RandomSpawner(
+                    new MapAreaSpawnerLocationSelector { Area = area },
+                    new MonsterGroupSpawner
+                    {
+                        Species = [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat],
+                        TeamSize = teamSize,
+                        LevelBounds = (30, 39)
+                    },
+                    _loggerFactory.CreateLogger<RandomSpawner>()
+                ) { MaxCountPerLocation = 1, RespawnDelay = respawnDelay };
+            case 40:
+                return new RandomSpawner(
+                    new MapAreaSpawnerLocationSelector { Area = area },
+                    new MonsterGroupSpawner
+                    {
+                        Species = [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat],
+                        TeamSize = teamSize,
+                        LevelBounds = (40, 49)
+                    },
+                    _loggerFactory.CreateLogger<RandomSpawner>()
+                ) { MaxCountPerLocation = 1, RespawnDelay = respawnDelay };
+            case 50:
+                return new RandomSpawner(
+                    new MapAreaSpawnerLocationSelector { Area = area },
+                    new MonsterGroupSpawner
+                    {
+                        Species = [Rattlings.PetitPaw, Rattlings.Rapierat, Rattlings.Biggaud, Rattlings.Melurat],
+                        TeamSize = teamSize,
+                        LevelBounds = (50, 59)
+                    },
+                    _loggerFactory.CreateLogger<RandomSpawner>()
+                ) { MaxCountPerLocation = 1, RespawnDelay = respawnDelay };
+            default:
+                throw new ArgumentOutOfRangeException(nameof(level), level, null);
+        }
     }
 }
