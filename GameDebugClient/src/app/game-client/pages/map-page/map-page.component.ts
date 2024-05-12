@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { Observable, ReplaySubject, debounceTime, forkJoin, map } from 'rxjs';
+import { Observable, ReplaySubject, debounceTime, forkJoin, map, startWith } from 'rxjs';
 import {
   AdminGameContentApiClient,
   AdminGameStateApiClient,
@@ -51,7 +51,12 @@ export class MapPageComponent implements OnInit {
             this.refreshMarkersSubject.next();
           });
 
-          this.gameService.state$.pipe(map(() => this.loadHarvestableInstances().subscribe(() => this.refreshMarkersSubject.next()))).subscribe();
+          this.gameService.state$
+            .pipe(
+              startWith(),
+              map(() => this.loadHarvestableInstances().subscribe(() => this.refreshMarkersSubject.next())),
+            )
+            .subscribe();
         }),
       )
       .subscribe();
@@ -183,6 +188,14 @@ export class MapPageComponent implements OnInit {
 
     const harvestableMarkers: { [staticObjectId: string]: { [x: number]: { [y: number]: { job: string; marker: MapMarker } } } } = {};
     for (const harvestable of this.harvestables) {
+      if (!harvestableMarkers[harvestable.target.id]) {
+        this.markerCounts[harvestable.target.id] = harvestable.instances.length;
+      }
+
+      for (const instance of harvestable.instances) {
+        this.markerCounts[harvestable.target.id] += 1;
+      }
+
       if (!this.markerConfiguration[harvestable.target.id]) {
         continue;
       }
@@ -195,7 +208,6 @@ export class MapPageComponent implements OnInit {
 
       if (!harvestableMarkers[harvestable.target.id]) {
         harvestableMarkers[harvestable.target.id] = {};
-        this.markerCounts[harvestable.target.id] = 1;
       }
 
       for (const instance of harvestable.instances) {
@@ -219,8 +231,6 @@ export class MapPageComponent implements OnInit {
 
         harvestableMarkers[harvestable.target.id][instance.location.positionX][instance.location.positionY].marker.alpha =
           (harvestableMarkers[harvestable.target.id][instance.location.positionX][instance.location.positionY].marker.alpha ?? 0) + 0.1;
-
-        this.markerCounts[harvestable.target.id] += 1;
       }
     }
 
