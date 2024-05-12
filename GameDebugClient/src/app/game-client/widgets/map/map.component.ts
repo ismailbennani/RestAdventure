@@ -61,6 +61,7 @@ export class MapComponent implements OnInit {
       this.center = [...value];
     }
 
+    this.updateGridCaches();
     this.redrawSubject.next();
   }
   private _centerAt: [number, number] | undefined = undefined;
