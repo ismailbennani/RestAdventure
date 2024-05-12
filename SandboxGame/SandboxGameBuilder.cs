@@ -36,31 +36,33 @@ public class SandboxGameBuilder
 
         IReadOnlyCollection<NoiseResourceAllocationGenerator.WeightedResource> herbalistLeveledRepartition =
         [
-            new NoiseResourceAllocationGenerator.WeightedResource { Object = Herbalist.PeppermintPlant, WeightsByZoneLevel = new Dictionary<int, double> { { 10, 5 } } },
-            new NoiseResourceAllocationGenerator.WeightedResource { Object = Herbalist.LavenderPlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0 }, { 20, 4 } } },
-            new NoiseResourceAllocationGenerator.WeightedResource { Object = Herbalist.GinsengPlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0 }, { 30, 3 } } },
-            new NoiseResourceAllocationGenerator.WeightedResource { Object = Herbalist.ChamomilePlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0 }, { 40, 2 } } },
+            new NoiseResourceAllocationGenerator.WeightedResource { Object = Herbalist.PeppermintPlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 5 } } },
             new NoiseResourceAllocationGenerator.WeightedResource
-            {
-                Object = Herbalist.EchinaceaPlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0 }, { 50, 1 } }
-            }
+                { Object = Herbalist.LavenderPlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0 }, { 19, 0 }, { 20, 4 } } },
+            new NoiseResourceAllocationGenerator.WeightedResource
+                { Object = Herbalist.GinsengPlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0 }, { 29, 0 }, { 30, 3 } } },
+            new NoiseResourceAllocationGenerator.WeightedResource
+                { Object = Herbalist.ChamomilePlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0 }, { 39, 0 }, { 40, 2 } } },
+            new NoiseResourceAllocationGenerator.WeightedResource
+                { Object = Herbalist.EchinaceaPlant, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0 }, { 49, 0 }, { 50, 1 } } }
         ];
 
         IReadOnlyCollection<NoiseResourceAllocationGenerator.WeightedResource> foresterLeveledRepartition =
         [
-            new NoiseResourceAllocationGenerator.WeightedResource { Object = Forester.OakTree, WeightsByZoneLevel = new Dictionary<int, double> { { 10, 16 } } },
-            new NoiseResourceAllocationGenerator.WeightedResource { Object = Forester.PineTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0 }, { 20, 8 } } },
-            new NoiseResourceAllocationGenerator.WeightedResource { Object = Forester.MapleTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0 }, { 30, 4 } } },
-            new NoiseResourceAllocationGenerator.WeightedResource { Object = Forester.BirchTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0 }, { 40, 2 } } },
+            new NoiseResourceAllocationGenerator.WeightedResource { Object = Forester.OakTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 16 } } },
             new NoiseResourceAllocationGenerator.WeightedResource
-            {
-                Object = Forester.WalnutTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0 }, { 50, 1 } }
-            }
+                { Object = Forester.PineTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0 }, { 19, 0 }, { 20, 8 } } },
+            new NoiseResourceAllocationGenerator.WeightedResource
+                { Object = Forester.MapleTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0 }, { 29, 0 }, { 30, 4 } } },
+            new NoiseResourceAllocationGenerator.WeightedResource
+                { Object = Forester.BirchTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0 }, { 39, 0 }, { 40, 2 } } },
+            new NoiseResourceAllocationGenerator.WeightedResource
+                { Object = Forester.WalnutTree, WeightsByZoneLevel = new Dictionary<int, double> { { 0, 0 }, { 49, 0 }, { 50, 1 } } }
         ];
 
         MapGenerator = new MapGenerator(
             new ErodedIslandGenerator(100, 100, 0.6),
-            new VoronoiPartitionGenerator(100, loggerFactory.CreateLogger<VoronoiPartitionGenerator>()),
+            new VoronoiPartitionGenerator(20, loggerFactory.CreateLogger<VoronoiPartitionGenerator>()),
             new KingdomZonesGenerator(),
             [
                 new NoiseResourceAllocationGenerator(herbalistLeveledRepartition, new SimplexNoise2D(0.05f)) { Coefficient = 1 },

@@ -1978,6 +1978,9 @@ export class HarvestableEntityHarvestMinimal implements IHarvestableEntityHarves
     /** The name of the harvest
              */
     name!: string;
+    /** The level of the harvest
+             */
+    level!: number;
     /** The targets compatible with the harvest
              */
     targets!: StaticObject[];
@@ -2006,6 +2009,7 @@ export class HarvestableEntityHarvestMinimal implements IHarvestableEntityHarves
         if (_data) {
             this.job = _data["job"] ? JobMinimal.fromJS(_data["job"]) : new JobMinimal();
             this.name = _data["name"];
+            this.level = _data["level"];
             if (Array.isArray(_data["targets"])) {
                 this.targets = [] as any;
                 for (let item of _data["targets"])
@@ -2031,6 +2035,7 @@ export class HarvestableEntityHarvestMinimal implements IHarvestableEntityHarves
         data = typeof data === 'object' ? data : {};
         data["job"] = this.job ? this.job.toJSON() : <any>undefined;
         data["name"] = this.name;
+        data["level"] = this.level;
         if (Array.isArray(this.targets)) {
             data["targets"] = [];
             for (let item of this.targets)
@@ -2054,6 +2059,9 @@ export interface IHarvestableEntityHarvestMinimal {
     /** The name of the harvest
              */
     name: string;
+    /** The level of the harvest
+             */
+    level: number;
     /** The targets compatible with the harvest
              */
     targets: StaticObject[];

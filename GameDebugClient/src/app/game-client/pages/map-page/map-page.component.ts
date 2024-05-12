@@ -23,6 +23,7 @@ import { MapComponent, MapMarker, MapMarkerShape } from '../../widgets/map/map.c
 export class MapPageComponent implements OnInit {
   protected locations: LocationMinimal[] = [];
   protected markerGroups: { [group: string]: MapMarker[] } = {};
+  protected markerCounts: { [name: string]: number } = {};
   protected markerDescriptions: { category: string; markers: { name: string; display: string; marker: { shape: MapMarkerShape; color: string; borderColor?: string } }[] }[] = [];
   protected markerConfiguration: { [name: string]: boolean } = {};
   protected markerCategoryConfiguration: { [category: string]: boolean | 'indeterminate' } = {};
@@ -96,7 +97,7 @@ export class MapPageComponent implements OnInit {
         return forkJoin(work);
       }),
       map(harvestables => {
-        this.harvestables = harvestables;
+        this.harvestables = harvestables.sort((h1, h2) => h1.harvest.level - h2.harvest.level);
         this.refreshMarkerDescriptions();
         this.refreshMarkers();
       }),
@@ -142,6 +143,7 @@ export class MapPageComponent implements OnInit {
 
   private refreshMarkers() {
     this.markerGroups = {};
+    this.markerCounts = {};
 
     if (this.team) {
       const teamDescription = this.markerDescriptions.find(d => d.category == 'Team');
@@ -161,6 +163,8 @@ export class MapPageComponent implements OnInit {
             positionY: character.location.positionY,
           },
         ];
+
+        this.markerCounts[character.id] = 1;
       }
     }
 
@@ -178,6 +182,7 @@ export class MapPageComponent implements OnInit {
 
       if (!harvestableMarkers[harvestable.target.id]) {
         harvestableMarkers[harvestable.target.id] = {};
+        this.markerCounts[harvestable.target.id] = 1;
       }
 
       for (const instance of harvestable.instances) {
@@ -201,6 +206,8 @@ export class MapPageComponent implements OnInit {
 
         harvestableMarkers[harvestable.target.id][instance.location.positionX][instance.location.positionY].marker.alpha =
           (harvestableMarkers[harvestable.target.id][instance.location.positionX][instance.location.positionY].marker.alpha ?? 0) + 0.1;
+
+        this.markerCounts[harvestable.target.id] += 1;
       }
     }
 

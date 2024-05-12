@@ -1,4 +1,5 @@
-﻿using RestAdventure.Core;
+﻿using ContentToolbox.Noise;
+using RestAdventure.Core;
 using RestAdventure.Core.Entities;
 using RestAdventure.Core.Extensions;
 using RestAdventure.Core.Maps.Locations;
@@ -8,15 +9,29 @@ namespace ContentToolbox.Spawners;
 
 public class RandomSpawner : Spawner
 {
-    readonly SpawnerLocationSelector _locationSelector;
+    readonly Noise2D? _noise;
+    readonly SpawnerLocationSelector? _locationSelector;
     readonly EntitySpawner _entitySpawner;
     int _totalCount;
     readonly Dictionary<Location, int> _countPerLocation = new();
     long _globalRespawnDelay;
     readonly Dictionary<Location, long> _locationRespawnDelays = new();
 
-    public RandomSpawner(SpawnerLocationSelector locationSelector, EntitySpawner entitySpawner)
+    public RandomSpawner(EntitySpawner entitySpawner) : this(null, null, entitySpawner)
     {
+    }
+
+    public RandomSpawner(Noise2D noise, EntitySpawner entitySpawner) : this(noise, null, entitySpawner)
+    {
+    }
+
+    public RandomSpawner(SpawnerLocationSelector locationSelector, EntitySpawner entitySpawner) : this(null, locationSelector, entitySpawner)
+    {
+    }
+
+    public RandomSpawner(Noise2D? noise, SpawnerLocationSelector? locationSelector, EntitySpawner entitySpawner)
+    {
+        _noise = noise;
         _locationSelector = locationSelector;
         _entitySpawner = entitySpawner;
     }
@@ -81,7 +96,7 @@ public class RandomSpawner : Spawner
         int totalSpawned = 0;
         while (suitableLocations.Count > 0 && (!maxSpawn.HasValue || totalSpawned < maxSpawn) && (!MaxCount.HasValue || _totalCount < MaxCount))
         {
-            Location randomLocation = random.Choose(suitableLocations);
+            Location randomLocation = ChooseLocation(random, suitableLocations);
 
             if (!_countPerLocation.TryAdd(randomLocation, 1))
             {
@@ -133,7 +148,7 @@ public class RandomSpawner : Spawner
 
     IEnumerable<Location> GetSuitableLocations(GameState state, bool ignoreRespawnDelays)
     {
-        IEnumerable<Location> locations = _locationSelector.GetLocations(state);
+        IEnumerable<Location> locations = _locationSelector?.GetLocations(state) ?? state.Content.Maps.Locations;
 
         if (!ignoreRespawnDelays)
         {
@@ -146,6 +161,26 @@ public class RandomSpawner : Spawner
         }
 
         return locations;
+    }
+
+    Location ChooseLocation(Random random, HashSet<Location> suitableLocations)
+    {
+        if (_noise != null)
+        {
+            const int fuel = 1000;
+            for (int i = 0; i < fuel; i++)
+            {
+                Location location = random.Choose(suitableLocations);
+                double noise = _noise.Get(location.PositionX, location.PositionY);
+                double check = random.NextDouble();
+                if (check <= noise)
+                {
+                    return location;
+                }
+            }
+        }
+
+        return random.Choose(suitableLocations);
     }
 
     void TickRespawnDelays()
@@ -163,14 +198,4 @@ public class RandomSpawner : Spawner
             }
         }
     }
-}
-
-public abstract class SpawnerLocationSelector
-{
-    public abstract IEnumerable<Location> GetLocations(GameState state);
-}
-
-public abstract class EntitySpawner
-{
-    public abstract IEnumerable<GameEntity> Spawn(Location location);
 }

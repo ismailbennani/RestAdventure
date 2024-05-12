@@ -29,7 +29,12 @@
                     [id]="marker.name"
                     (change)="setEnabled(marker.name, $any($event.target).checked)"
                   />
-                  <label class="form-check-label text-nowrap" [for]="marker.name"> {{ marker.display | titlecase }} </label>
+                  <label class="form-check-label text-nowrap" [for]="marker.name">
+                    {{ marker.display | titlecase }}
+                    @if (markerCounts[marker.name] > 1) {
+                      ({{ markerCounts[marker.name] }})
+                    }
+                  </label>
                 </div>
                 <div
                   [class.invisible]="!markerConfiguration[marker.name]"

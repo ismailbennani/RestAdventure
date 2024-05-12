@@ -23,6 +23,12 @@ public class HarvestableEntityHarvestMinimalDto
     public required string Name { get; init; }
 
     /// <summary>
+    ///     The level of the harvest
+    /// </summary>
+    [Required]
+    public required int Level { get; init; }
+
+    /// <summary>
     ///     The targets compatible with the harvest
     /// </summary>
     [Required]
@@ -48,6 +54,7 @@ static class HarvestableEntityHarvestMinimalMappingExtensions
         {
             Job = job.ToMinimalDto(),
             Name = harvest.Name,
+            Level = harvest.Level,
             Targets = harvest.Targets.Select(t => t.ToStaticObjectDto()).ToArray(),
             ExpectedHarvest = harvest.Items.Select(e => e.ToDto()).ToArray(),
             ExpectedExperience = harvest.Experience

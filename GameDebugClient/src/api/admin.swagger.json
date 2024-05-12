@@ -3,7 +3,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest Adventure - Admin API",
-    "version": "0.0.0-alpha.0.211+1d544e399e998d4a07ec41cd613b74b2620e3710"
+    "version": "0.0.0-alpha.0.220+1b5d7cb215c09776b330aea5fef03d6f5270f9e9"
   },
   "servers": [
     {
@@ -1001,6 +1001,7 @@
         "required": [
           "job",
           "name",
+          "level",
           "targets",
           "expectedHarvest",
           "expectedExperience"
@@ -1018,6 +1019,11 @@
             "type": "string",
             "description": "The name of the harvest\n            ",
             "minLength": 1
+          },
+          "level": {
+            "type": "integer",
+            "description": "The level of the harvest\n            ",
+            "format": "int32"
           },
           "targets": {
             "type": "array",
