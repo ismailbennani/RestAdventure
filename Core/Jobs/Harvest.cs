@@ -13,7 +13,7 @@ public static class Harvest
     {
         if (!harvest.Targets.Contains(staticObject))
         {
-            return "The object doesn't match the harvest";
+            return "Entity doesn't match the harvest";
         }
 
         if (harvest.Level > jobInstance.Progression.Level)
@@ -25,12 +25,12 @@ public static class Harvest
         {
             if (tool == null)
             {
-                return "The harvest requires a tool";
+                return "Requires a tool";
             }
 
             if (harvest.Tool != tool.Category)
             {
-                return "The tool in use doesn't match the harvest";
+                return "Tool in use doesn't match the required tool";
             }
         }
 

@@ -3,6 +3,7 @@ using NSwag.Annotations;
 using RestAdventure.Core;
 using RestAdventure.Core.Entities.Characters;
 using RestAdventure.Core.Entities.StaticObjects;
+using RestAdventure.Core.Items;
 using RestAdventure.Core.Jobs;
 using RestAdventure.Core.Players;
 using RestAdventure.Core.Serialization;
@@ -100,7 +101,7 @@ public class JobsHarvestController : GameApiController
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
-    public ActionResult Harvest(Guid characterGuid, Guid entityGuid, string harvestName)
+    public ActionResult Harvest(Guid characterGuid, Guid entityGuid, string harvestName, Guid? toolInstanceGuid = null)
     {
         Core.Game game = _gameService.RequireGame();
         Player player = ControllerContext.RequirePlayer(game);
@@ -130,7 +131,18 @@ public class JobsHarvestController : GameApiController
             return NotFound();
         }
 
-        HarvestAction action = new(harvest.Job, harvest.Harvest, staticObjectId);
+        ItemInstance? tool = null;
+        if (toolInstanceGuid.HasValue)
+        {
+            ItemInstanceId toolInstanceId = new(toolInstanceGuid.Value);
+            tool = character.Inventory.Stacks.FirstOrDefault(s => s.ItemInstance.Id == toolInstanceId)?.ItemInstance;
+            if (tool == null)
+            {
+                return NotFound();
+            }
+        }
+
+        HarvestAction action = new(harvest.Job, harvest.Harvest, staticObjectId, tool?.Id);
         Maybe queued = game.Actions.QueueAction(character, action);
 
         if (!queued.Success)

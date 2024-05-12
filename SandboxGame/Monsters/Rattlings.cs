@@ -6,7 +6,7 @@ namespace SandboxGame.Monsters;
 
 public class Rattlings
 {
-    public Rattlings(GenericItemCategories categories)
+    public Rattlings(ResourceCategories categories)
     {
         Fur = new Item
         {

@@ -2,24 +2,20 @@
 using RestAdventure.Core.Items;
 using RestAdventure.Core.Jobs;
 using SandboxGame.Experience;
+using SandboxGame.Items;
 
 namespace SandboxGame.Jobs;
 
 public class Herbalist
 {
-    public Herbalist()
+    public Herbalist(ResourceCategories categories)
     {
-        PlantCategory = new ItemCategory
-        {
-            Name = "Plant"
-        };
-
         Peppermint = new Item
         {
             Name = "Peppermint",
             Description = "Peppermint is known for its refreshing flavor and cooling sensation. It's commonly used to aid digestion, relieve headaches, and soothe sore muscles. "
                           + "Peppermint tea is a popular way to enjoy its benefits.",
-            Category = PlantCategory,
+            Category = categories.PlantCategory,
             Weight = 1
         };
 
@@ -28,7 +24,7 @@ public class Herbalist
             Name = "Lavender",
             Description =
                 "Lavender is known for its calming properties and is often used in aromatherapy, herbal teas, and medicinal preparations to promote relaxation and alleviate stress.",
-            Category = PlantCategory,
+            Category = categories.PlantCategory,
             Weight = 1
         };
 
@@ -38,7 +34,7 @@ public class Herbalist
             Description =
                 "Ginseng is a highly valued herb in traditional medicine, known for its adaptogenic properties that help the body cope with stress and promote overall well-being. "
                 + "It's often used in teas, tinctures, and supplements.",
-            Category = PlantCategory,
+            Category = categories.PlantCategory,
             Weight = 1
         };
 
@@ -47,7 +43,7 @@ public class Herbalist
             Name = "Chamomile",
             Description = "Chamomile is prized for its soothing effects and is commonly used to promote relaxation, aid digestion, and relieve insomnia. "
                           + "It's often brewed into herbal teas or used in topical preparations.",
-            Category = PlantCategory,
+            Category = categories.PlantCategory,
             Weight = 1
         };
 
@@ -57,7 +53,7 @@ public class Herbalist
             Description =
                 "Echinacea is renowned for its immune-boosting properties and is often used to prevent or shorten the duration of colds and other respiratory infections. "
                 + "It's typically consumed as a tea or taken in supplement form.",
-            Category = PlantCategory,
+            Category = categories.PlantCategory,
             Weight = 1
         };
 
@@ -130,7 +126,6 @@ public class Herbalist
     }
 
     public Job Job { get; }
-    public ItemCategory PlantCategory { get; }
     public Item Lavender { get; }
     public Item Ginseng { get; }
     public Item Chamomile { get; set; }

@@ -5,7 +5,7 @@ namespace SandboxGame.Monsters;
 
 public class Whimsicals
 {
-    public Whimsicals(GenericItemCategories categories)
+    public Whimsicals(ResourceCategories categories)
     {
         Family = new MonsterFamily
         {

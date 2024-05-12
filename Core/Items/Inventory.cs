@@ -111,6 +111,8 @@ public class Inventory : IReadOnlyInventory, IDisposable
     /// <inheritdoc />
     public ItemInstanceStack? Find(ItemInstance itemInstance) => _stacks.FirstOrDefault(e => e.ItemInstance == itemInstance);
 
+    public ItemInstanceStack? Find(ItemInstanceId itemInstanceId) => _stacks.FirstOrDefault(e => e.ItemInstance.Id == itemInstanceId);
+
     public void Dispose()
     {
         Changed = null;

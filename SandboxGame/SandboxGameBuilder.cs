@@ -32,12 +32,13 @@ public class SandboxGameBuilder
     public SandboxGameBuilder(ILoggerFactory loggerFactory)
     {
         _loggerFactory = loggerFactory;
-        GenericItemCategories = new GenericItemCategories();
-        Whimsicals = new Whimsicals(GenericItemCategories);
-        Rattlings = new Rattlings(GenericItemCategories);
-        Forester = new Forester();
-        Herbalist = new Herbalist();
-        Miner = new Miner();
+        ResourceCategories = new ResourceCategories();
+        WeaponCategories = new WeaponCategories();
+        Whimsicals = new Whimsicals(ResourceCategories);
+        Rattlings = new Rattlings(ResourceCategories);
+        Forester = new Forester(ResourceCategories, WeaponCategories);
+        Herbalist = new Herbalist(ResourceCategories);
+        Miner = new Miner(ResourceCategories, WeaponCategories);
 
         MapGenerator = new MapGenerator(
             new ErodedIslandGenerator(60, 60, 0.6),
@@ -63,7 +64,8 @@ public class SandboxGameBuilder
 
     public MapGenerator MapGenerator { get; }
     public MapGenerator.Result MapGeneratorResult { get; }
-    public GenericItemCategories GenericItemCategories { get; }
+    public ResourceCategories ResourceCategories { get; }
+    public WeaponCategories WeaponCategories { get; }
     public CharacterClasses CharacterClasses { get; }
     public Whimsicals Whimsicals { get; }
     public Rattlings Rattlings { get; }

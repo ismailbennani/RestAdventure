@@ -8,16 +8,18 @@ namespace RestAdventure.Core.Jobs;
 
 public class HarvestAction : Action
 {
-    public HarvestAction(Job job, JobHarvest harvest, StaticObjectInstanceId targetId) : base($"{harvest.Name}")
+    public HarvestAction(Job job, JobHarvest harvest, StaticObjectInstanceId targetId, ItemInstanceId? toolId = null) : base($"{harvest.Name}")
     {
         Job = job;
         Harvest = harvest;
         TargetId = targetId;
+        ToolId = toolId;
     }
 
     public Job Job { get; }
     public JobHarvest Harvest { get; }
     public StaticObjectInstanceId TargetId { get; }
+    public ItemInstanceId? ToolId { get; }
 
     protected override Maybe CanPerformInternal(Game state, Character character)
     {
@@ -33,7 +35,17 @@ public class HarvestAction : Action
             return "Entity not found";
         }
 
-        return jobInstance.CanHarvest(Harvest, target.Object);
+        ItemInstance? tool = null;
+        if (ToolId != null)
+        {
+            tool = character.Inventory.Find(ToolId)?.ItemInstance;
+            if (tool == null)
+            {
+                return "Could not find tool in inventory";
+            }
+        }
+
+        return jobInstance.CanHarvest(Harvest, target.Object, tool?.Item);
     }
 
     public override bool IsOver(Game state, Character character) => state.Tick - StartTick >= Harvest.HarvestDuration;
