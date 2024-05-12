@@ -147,7 +147,7 @@ public class SandboxGameBuilder
                 }
             ),
             _loggerFactory.CreateLogger<RandomSpawner>()
-        ) { MaxCount = 1000, MaxCountPerLocation = 10 };
+        ) { MaxCount = 1000, MaxCountPerLocation = 10, MaxSpawnPerExecution = 10 };
     }
 
     IEnumerable<RandomSpawner> GetForesterSpawners()
@@ -195,7 +195,7 @@ public class SandboxGameBuilder
                 }
             ),
             _loggerFactory.CreateLogger<RandomSpawner>()
-        ) { MaxCount = 500, MaxCountPerLocation = 5 };
+        ) { MaxCount = 500, MaxCountPerLocation = 5, MaxSpawnPerExecution = 10 };
     }
 
     RandomSpawner GetRattlingsSpawner(MapArea area, int level, (int, int) teamSize)

@@ -59,7 +59,7 @@ public class RandomSpawner : Spawner
     ///     If set, the max number of spawned entities per execution of the spawner. The spawner will stop after this number of entities even if <see cref="MaxCount" /> is not
     ///     reached yet. If more spawning is still required, it will resume spawning on the next tick.
     /// </summary>
-    public int? MaxSpawnPerExecution { get; set; }
+    public int? MaxSpawnPerExecution { get; set; } = 1;
 
     /// <summary>
     ///     Fill the area with entities. The <see cref="MaxCount" /> and <see cref="MaxCountPerLocation" /> constraints will be enforced

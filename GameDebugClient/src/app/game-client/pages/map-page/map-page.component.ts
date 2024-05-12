@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { Observable, forkJoin, map, switchMap } from 'rxjs';
+import { Observable, ReplaySubject, debounceTime, forkJoin, map } from 'rxjs';
 import {
   AdminGameContentApiClient,
   AdminGameStateApiClient,
@@ -11,6 +11,7 @@ import {
   StaticObject,
 } from '../../../../api/admin-api-client.generated';
 import { Team } from '../../../../api/game-api-client.generated';
+import { GameService } from '../../services/game.service';
 import { TeamService } from '../../services/team/team.service';
 import { MapComponent, MapMarker, MapMarkerShape } from '../../widgets/map/map.component';
 
@@ -29,25 +30,36 @@ export class MapPageComponent implements OnInit {
   protected markerCategoryConfiguration: { [category: string]: boolean | 'indeterminate' } = {};
 
   private team: Team | undefined;
+  private jobs: Job[] = [];
   private harvestables: { job: Job; harvest: HarvestableEntityHarvestMinimal; target: StaticObject; instances: Entity[] }[] = [];
+
+  private refreshMarkersSubject: ReplaySubject<void> = new ReplaySubject<void>(1);
 
   constructor(
     private adminGameContentApiClient: AdminGameContentApiClient,
     private adminGameStateApiClient: AdminGameStateApiClient,
+    private gameService: GameService,
     private teamService: TeamService,
   ) {}
 
   ngOnInit(): void {
-    forkJoin({ locations: this.loadLocations(), harvestables: this.loadHarvestableInstances() })
+    forkJoin({ locations: this.loadLocations(), jobs: this.loadJobs() })
       .pipe(
-        switchMap(() => this.teamService.team$),
-        map(team => {
-          this.team = team;
-          this.refreshMarkerDescriptions();
-          this.refreshMarkers();
+        map(() => {
+          this.teamService.team$.subscribe(team => {
+            this.team = team;
+            this.refreshMarkersSubject.next();
+          });
+
+          this.gameService.state$.pipe(map(() => this.loadHarvestableInstances().subscribe(() => this.refreshMarkersSubject.next()))).subscribe();
         }),
       )
       .subscribe();
+
+    this.refreshMarkersSubject.pipe(debounceTime(100)).subscribe(() => {
+      this.refreshMarkerDescriptions();
+      this.refreshMarkers();
+    });
   }
 
   protected setEnabled(marker: string, enabled: boolean) {
@@ -75,27 +87,28 @@ export class MapPageComponent implements OnInit {
     return this.adminGameContentApiClient.searchLocationsMinimal(1, 99999999).pipe(map(locations => (this.locations = locations.items)));
   }
 
-  private loadHarvestableInstances() {
-    return this.adminGameContentApiClient.searchJobs(1, 99999999).pipe(
-      switchMap(jobs => {
-        const work: Observable<{
-          job: Job;
-          harvest: HarvestableEntityHarvestMinimal;
-          target: StaticObject;
-          instances: Entity[];
-        }>[] = [];
-        for (const job of jobs.items) {
-          for (const harvest of job.harvests) {
-            for (const target of harvest.targets) {
-              work.push(
-                this.adminGameStateApiClient.searchStaticObjectInstances(target.id, 1, 99999999).pipe(map(instances => ({ job, harvest, target, instances: instances.items }))),
-              );
-            }
-          }
-        }
+  private loadJobs() {
+    return this.adminGameContentApiClient.searchJobs(1, 99999999).pipe(map(jobs => (this.jobs = jobs.items)));
+  }
 
-        return forkJoin(work);
-      }),
+  private loadHarvestableInstances() {
+    const work: Observable<{
+      job: Job;
+      harvest: HarvestableEntityHarvestMinimal;
+      target: StaticObject;
+      instances: Entity[];
+    }>[] = [];
+    for (const job of this.jobs) {
+      for (const harvest of job.harvests) {
+        for (const target of harvest.targets) {
+          work.push(
+            this.adminGameStateApiClient.searchStaticObjectInstances(target.id, 1, 99999999).pipe(map(instances => ({ job, harvest, target, instances: instances.items }))),
+          );
+        }
+      }
+    }
+
+    return forkJoin(work).pipe(
       map(harvestables => {
         this.harvestables = harvestables.sort((h1, h2) => h1.harvest.level - h2.harvest.level);
         this.refreshMarkerDescriptions();

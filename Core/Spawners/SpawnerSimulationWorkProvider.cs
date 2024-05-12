@@ -14,9 +14,12 @@ public class SpawnerSimulationWorkProvider : SimulationWorkProvider
 
     public override IEnumerable<GameSimulation.Work> Initialization()
     {
-        foreach (Spawner spawner in _state.Content.Maps.Spawners)
+        if (_state.Settings.GenerateEntitiesOnInitialization)
         {
-            yield return new GameSimulation.Work(spawner.Id.Guid, () => SpawnAsync(spawner, s => s.GetInitialEntities(_state)));
+            foreach (Spawner spawner in _state.Content.Maps.Spawners)
+            {
+                yield return new GameSimulation.Work(spawner.Id.Guid, () => SpawnAsync(spawner, s => s.GetInitialEntities(_state)));
+            }
         }
     }
 

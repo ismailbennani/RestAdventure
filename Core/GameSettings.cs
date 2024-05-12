@@ -2,6 +2,8 @@
 
 public class GameSettings
 {
+    public bool GenerateEntitiesOnInitialization = true;
+
     /// <summary>
     ///     The max number of characters in a team
     /// </summary>
